@@ -19,7 +19,7 @@ export function Navbar() {
     setProfileOpen(false);
   }, []);
 
-  const currentMember = state.members[0];
+  const currentMember = state.members.find((m) => m.id === state.currentUserId) || state.members[0];
 
   return (
     <nav ref={navRef} className="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">

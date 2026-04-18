@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { QuestBtn } from "@/components/ui/QuestBtn";
 import { SvgIcons } from "@/components/ui/SvgIcons";
 
@@ -10,6 +11,13 @@ interface ProfileDropdownProps {
 
 export function ProfileDropdown({ onDismiss }: ProfileDropdownProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
 
   useEffect(() => {
     const el = ref.current;
@@ -58,6 +66,12 @@ export function ProfileDropdown({ onDismiss }: ProfileDropdownProps) {
             <span>每日提醒</span>
             <span className="text-sub">18:30</span>
           </div>
+          <button
+            onClick={handleLogout}
+            className="mt-2 w-full py-2 text-sm font-bold text-red-500 bg-red-50 border-2 border-red-200 rounded-xl hover:bg-red-100 transition-colors"
+          >
+            退出登录
+          </button>
         </div>
       </div>
     </>
