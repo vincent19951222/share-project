@@ -1,11 +1,4 @@
 export const SvgIcons = {
-  // Avatar icons
-  alen: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#bfdbfe"/><rect x="6" y="9" width="5" height="3" fill="#1f2937" stroke="none"/><rect x="13" y="9" width="5" height="3" fill="#1f2937" stroke="none"/><path d="M8 16h8"/></svg>`,
-  bob: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#bbf7d0"/><path d="M6 9h12" stroke-width="3"/><path d="M10 15v-2M14 15v-2"/></svg>`,
-  cindy: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#e9d5ff"/><circle cx="8" cy="11" r="2" fill="#1f2937" stroke="none"/><circle cx="16" cy="11" r="2" fill="#1f2937" stroke="none"/><path d="M12 16h.01" stroke-width="3"/></svg>`,
-  dave: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#ffedd5"/><rect x="7" y="10" width="3" height="3" fill="#1f2937"/><rect x="14" y="10" width="3" height="3" fill="#1f2937"/><path d="M9 16h6"/></svg>`,
-  eva: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#fbcfe8"/><path d="M8 10v2M16 10v2M9 16h6"/></svg>`,
-
   // Action icons
   strength: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="#fca5a5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 11V5a2 2 0 0 0-4 0v6M12 11V5a2 2 0 0 0-4 0v6M8 11V7a2 2 0 0 0-4 0v4a8 8 0 0 0 16 0V9a2 2 0 0 0-4 0v2"/></svg>`,
   run: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2" fill="#cbd5e1"/><path d="M10 10h4v4l-2 4M14 10l2-2m-6 2l-2 2M6 18h4"/></svg>`,

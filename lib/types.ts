@@ -1,7 +1,7 @@
 export interface Member {
   id: string;
   name: string;
-  avatarSvg: string;
+  avatarKey: string;
 }
 
 export type CellStatus = boolean | null;
