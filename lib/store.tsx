@@ -2,8 +2,6 @@
 
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
 import { BoardState, BoardAction } from "./types";
-import { createMembers, initGridData, createSeedLog } from "./mock-data";
-import { SvgIcons } from "@/components/ui/SvgIcons";
 
 function boardReducer(state: BoardState, action: BoardAction): BoardState {
   switch (action.type) {
@@ -55,21 +53,6 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
   }
 }
 
-const today = 18;
-const totalDays = 30;
-const members = createMembers(SvgIcons);
-
-const initialState: BoardState = {
-  members,
-  gridData: initGridData(members.length, today, totalDays),
-  teamCoins: 1250,
-  targetCoins: 2000,
-  today,
-  totalDays,
-  logs: [createSeedLog()],
-  activeTab: "punch",
-};
-
 interface BoardContextType {
   state: BoardState;
   dispatch: React.Dispatch<BoardAction>;
@@ -77,7 +60,13 @@ interface BoardContextType {
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
-export function BoardProvider({ children }: { children: ReactNode }) {
+export function BoardProvider({
+  initialState,
+  children,
+}: {
+  initialState: BoardState;
+  children: ReactNode;
+}) {
   const [state, dispatch] = useReducer(boardReducer, initialState);
 
   useEffect(() => {

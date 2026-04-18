@@ -22,6 +22,7 @@ export interface BoardState {
   totalDays: number;
   logs: ActivityLog[];
   activeTab: "punch" | "dash";
+  currentUserId: string;
 }
 
 export type BoardAction =

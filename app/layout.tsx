@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { BoardProvider } from "@/lib/store";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,7 +20,7 @@ export default function RootLayout({
         />
       </head>
       <body className="h-screen w-screen flex flex-col p-4 gap-4 text-main relative">
-        <BoardProvider>{children}</BoardProvider>
+        {children}
       </body>
     </html>
   );
