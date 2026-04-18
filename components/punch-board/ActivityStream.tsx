@@ -62,9 +62,9 @@ export function ActivityStream() {
   return (
     <footer className="h-[20vh] w-full soft-card flex flex-col shrink-0 overflow-hidden relative">
       <div className="bg-slate-50 text-sub text-[10px] px-6 py-2 font-bold border-b-2 border-slate-100 flex justify-between rounded-t-[1.25rem] tracking-wider">
-        <span>ACTIVITY STREAM (LIVE)</span>
+        <span>活动动态（实时）</span>
         <span className="text-green-500 flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse" /> SYNCING
+          <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse" /> 同步中
         </span>
       </div>
       <div ref={streamRef} className="flex-1 p-3 px-6 text-sm overflow-y-auto flex flex-col gap-2">
@@ -107,7 +107,7 @@ export function ActivityStream() {
                     disabled={isPoked}
                   >
                     <span dangerouslySetInnerHTML={{ __html: SvgIcons.poke }} />
-                    <span>{isPoked ? "✓ Poked" : "Poke"}</span>
+                    <span>{isPoked ? "✓ 已催促" : "催促"}</span>
                     <b>{m.name}</b>
                   </button>
                 );
