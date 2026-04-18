@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AVATAR_OPTIONS, type AvatarKey } from "@/lib/avatars";
 
 export function LoginForm() {
   const router = useRouter();
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarKey | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,11 +18,22 @@ export function LoginForm() {
     setError("");
     setLoading(true);
 
+    if (mode === "register" && !selectedAvatar) {
+      setError("请选择一个头像");
+      setLoading(false);
+      return;
+    }
+
     try {
+      const body: Record<string, string> = { username, password };
+      if (mode === "register" && selectedAvatar) {
+        body.avatarKey = selectedAvatar;
+      }
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -35,6 +49,11 @@ export function LoginForm() {
       setError("网络错误，请重试");
       setLoading(false);
     }
+  }
+
+  function switchMode() {
+    setMode(mode === "login" ? "register" : "login");
+    setError("");
   }
 
   return (
@@ -81,6 +100,30 @@ export function LoginForm() {
         </div>
       </div>
 
+      {mode === "register" && (
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold text-sub tracking-wider uppercase pl-1">
+            Choose Avatar
+          </label>
+          <div className="grid grid-cols-4 gap-2">
+            {AVATAR_OPTIONS.map((avatar) => (
+              <button
+                key={avatar.key}
+                type="button"
+                onClick={() => setSelectedAvatar(avatar.key)}
+                className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                  selectedAvatar === avatar.key
+                    ? "border-slate-800 shadow-[0_3px_0_0_#1f2937] scale-105 ring-2 ring-yellow-300"
+                    : "border-slate-200 hover:border-slate-400"
+                }`}
+              >
+                <img src={avatar.url} alt={avatar.label} className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="text-red-500 text-sm font-bold bg-red-50 border-2 border-red-200 rounded-lg p-3">
           {error}
@@ -95,7 +138,15 @@ export function LoginForm() {
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        {loading ? "LOGGING IN..." : "START QUEST"}
+        {loading ? "LOADING..." : mode === "login" ? "START QUEST" : "CREATE & JOIN"}
+      </button>
+
+      <button
+        type="button"
+        onClick={switchMode}
+        className="text-sm font-bold text-sub hover:text-slate-800 transition-colors"
+      >
+        {mode === "login" ? "新用户？创建账号" : "已有账号？登录"}
       </button>
     </form>
   );

@@ -39,10 +39,6 @@ export default function LoginPage() {
             <p className="text-sub font-bold text-sm">输入你的用户名和密码，准备开始协同挑战。</p>
           </div>
           <LoginForm />
-          <div className="mt-8 text-center">
-            <span className="text-sub text-sm font-bold">测试账号：li / luo / liu / wu / ji </span>
-            <span className="text-sub text-sm font-bold ml-2">密码：0000</span>
-          </div>
         </div>
       </div>
     </main>
