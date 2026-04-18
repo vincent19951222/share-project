@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队打卡看板 (SVG Vector Style)</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts: Quicksand & Noto Sans SC -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        .soft-card {
+            background-color: #ffffff;
+            border: 6px solid #f1f5f9;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .quest-btn {
+            background-color: #fde047;
+            border: 3px solid #1f2937;
+            border-radius: 9999px;
+            box-shadow: 0 4px 0 0 #1f2937;
+            color: #1f2937;
+            font-weight: 800;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quest-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 0 #1f2937;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .tab-btn.active {
+            background-color: #fde047;
+            border: 2px solid #1f2937;
+            box-shadow: 0 3px 0 0 #1f2937;
+            color: #1f2937;
+        }
+        .tab-btn.inactive {
+            background-color: transparent;
+            color: #64748b;
+        }
+        .tab-btn.inactive:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .cell {
+            width: 3rem;
+            height: 3rem;
+            flex-shrink: 0;
+            border-radius: 0.75rem;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+        .cell-missed { background-color: #f1f5f9; border: 2px solid #e2e8f0; color: #cbd5e1; }
+        .cell-future { background-color: transparent; border: 2px dashed #cbd5e1; }
+        .cell-punched { 
+            background-color: #fde047; 
+            border: 2px solid #1f2937;
+            box-shadow: 0 3px 0 0 #1f2937;
+            color: #1f2937;
+        }
+        .cell-today {
+            background-color: #ffffff;
+            border: 2px dashed #94a3b8;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .cell-today:hover {
+            border-color: #1f2937;
+            border-style: solid;
+            color: #1f2937;
+            transform: translateY(-2px);
+        }
+
+        .my-punch-btn {
+            background-color: #1f2937;
+            border: 2px solid #1f2937;
+            color: #fde047;
+            box-shadow: 0 4px 0 0 #cbd5e1;
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(253, 224, 71, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(253, 224, 71, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(253, 224, 71, 0); }
+        }
+
+        .punch-popup {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background-color: white;
+            border: 3px solid #1f2937;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            box-shadow: 0 6px 0 0 #1f2937;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+        }
+        .punch-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 15px);
+            right: 0;
+            width: 280px;
+            background-color: white;
+            border: 4px solid #1f2937;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 0 0 #1f2937;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease-out;
+            z-index: 100;
+        }
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes coinBump {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #f59e0b; }
+            100% { transform: scale(1); }
+        }
+        .animate-bump { animation: coinBump 0.3s ease-out; }
+
+        .text-sub { color: #64748b; }
+        .text-main { color: #1e293b; }
+        
+        /* 强制所有插入的SVG颜色跟父级一致（除非SVG内定） */
+        .svg-icon svg { display: inline-block; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col p-4 gap-4 text-main relative">
+
+    <!-- ================= 顶部全局导航栏 ================= -->
+    <nav class="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">
+        <!-- 左侧 Logo & Tabs -->
+        <div class="flex items-center gap-6">
+            <div class="font-black text-2xl tracking-tighter flex items-center gap-2">
+                <div class="w-8 h-8 bg-yellow-300 border-2 border-slate-800 rounded-lg flex items-center justify-center shadow-[0_2px_0_0_#1f2937] p-1">
+                    <!-- 📦 Box SVG -->
+                    <svg viewBox="0 0 24 24" class="w-full h-full text-slate-800" fill="#fcd34d" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M2 8h20M12 8v13M8 13h8"/></svg>
+                </div>
+                ROOM TODO
+            </div>
+            <div class="flex gap-2 bg-slate-100 p-1 rounded-full border-2 border-slate-200">
+                <button onclick="switchTab('punch')" id="tab-punch" class="tab-btn active text-sm">
+                    <!-- 🎯 Target SVG -->
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" fill="#fecaca"/><circle cx="12" cy="12" r="6" fill="#f87171"/><circle cx="12" cy="12" r="2" fill="#1f2937"/></svg>
+                    协同打卡
+                </button>
+                <button onclick="switchTab('dash')" id="tab-dash" class="tab-btn inactive text-sm">
+                    <!-- 📊 Chart SVG -->
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="#cbd5e1" stroke="currentColor" stroke-width="2.5"><rect x="4" y="14" width="4" height="6" rx="1"/><rect x="10" y="10" width="4" height="10" rx="1"/><rect x="16" y="4" width="4" height="16" rx="1"/></svg>
+                    战报中心
+                </button>
+            </div>
+        </div>
+
+        <!-- 右侧 个人资料 -->
+        <div class="relative">
+            <button onclick="toggleProfile()" class="flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full pl-2 pr-4 py-1 hover:border-slate-800 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-white shadow-sm p-1 text-slate-800" id="nav-avatar-container">
+                    <!-- Avatar Alen JS注入 -->
+                </div>
+                <span class="font-bold text-sm">Alen</span>
+            </button>
+            
+            <!-- 个人资料下拉弹窗 (Profile Modal) -->
+            <div id="profile-dropdown" class="dropdown-menu flex flex-col overflow-hidden">
+                <div class="p-5 border-b-2 border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-sub">ASSET BALANCE</span>
+                        <div class="text-2xl font-black text-yellow-500 flex items-center gap-1">
+                            <!-- 🪙 Coin SVG -->
+                            <svg viewBox="0 0 24 24" class="w-6 h-6"><circle cx="12" cy="12" r="10" fill="#fde047" stroke="#1f2937" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#1f2937" stroke-width="2.5"/></svg>
+                            3,450
+                        </div>
+                    </div>
+                    <button class="quest-btn px-3 py-1 text-xs">提现</button>
+                </div>
+                <div class="p-5 flex flex-col gap-3">
+                    <span class="text-xs font-bold text-sub">ACHIEVEMENTS (3)</span>
+                    <div class="flex gap-3">
+                        <div class="w-12 h-12 bg-orange-100 border-2 border-orange-200 rounded-xl flex items-center justify-center shadow-sm p-2 text-slate-800" title="初级举铁匠">
+                            <!-- 🏋️ Weightlift SVG -->
+                            <svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M5 10v4M19 10v4M12 12v5M9 17h6"/><circle cx="12" cy="7" r="2" fill="#cbd5e1"/></svg>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 border-2 border-blue-200 rounded-xl flex items-center justify-center shadow-sm p-2 text-slate-800" title="慢跑达人">
+                            <!-- 🏃 Run SVG -->
+                            <svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2" fill="#cbd5e1"/><path d="M10 10h4v4l-2 4M14 10l2-2m-6 2l-2 2M6 18h4"/></svg>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 border-2 border-green-200 rounded-xl flex items-center justify-center shadow-sm p-2 text-slate-800" title="早起鸟">
+                            <!-- 🐦 Bird SVG -->
+                            <svg viewBox="0 0 24 24" class="w-full h-full" fill="#bbf7d0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14c-1.5-1-3-1-3-1s1.5 2 3 3c0 2 3 4 7 4s9-3 9-7-4-7-9-7c-2 0-4 1-5 2"/><circle cx="15" cy="9" r="1.5" fill="currentColor"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 border-t-2 border-slate-100 bg-slate-50 flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-sm font-bold">
+                        <span>关联 App</span>
+                        <span class="text-green-500 bg-green-100 px-2 py-0.5 rounded text-xs">Apple Health 已连</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm font-bold">
+                        <span>每日提醒</span>
+                        <span class="text-sub">18:30</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= 视图容器 ================= -->
+    <div class="flex-1 w-full relative overflow-hidden">
+
+        <!-- 🔴 视图 1：协同打卡 -->
+        <div id="view-punch" class="absolute inset-0 flex flex-col gap-4 transition-opacity duration-300">
+            <!-- Zone A: 团队战情看板 -->
+            <header class="h-[12vh] w-full soft-card flex items-center justify-between px-8 shrink-0 z-20">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 flex items-center justify-center bg-orange-100 rounded-full border-2 border-orange-200 shadow-sm text-orange-500 p-2">
+                        <!-- 🏆 Trophy SVG -->
+                        <svg viewBox="0 0 24 24" class="w-full h-full" fill="#fef08a" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-sub tracking-wider uppercase">Team Vault</span>
+                        <div class="text-2xl font-extrabold flex items-baseline gap-1" id="team-coins-display">1,250</div>
+                    </div>
+                </div>
+                <div class="flex-1 max-w-xl mx-8 flex flex-col gap-2">
+                    <div class="flex justify-between text-xs font-bold text-sub">
+                        <span class="text-main flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" fill="#fecaca"/><circle cx="12" cy="12" r="6" fill="#f87171"/><circle cx="12" cy="12" r="2" fill="#1f2937"/></svg>
+                            WEEKLY QUEST: 星巴克下午茶
+                        </span>
+                        <span>2000 Pts</span>
+                    </div>
+                    <div class="h-4 w-full bg-slate-100 border-2 border-slate-200 rounded-full relative overflow-hidden">
+                        <div id="progress-bar" class="h-full bg-yellow-300 border-r-2 border-slate-800 transition-all duration-500 ease-out" style="width: 62.5%;"></div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] font-bold text-sub tracking-wider uppercase">Today's Rate</span>
+                    <div class="text-2xl font-extrabold text-main">
+                        <span id="today-punched">3</span><span class="text-lg text-slate-300">/5</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Zone B: 多维时间轴热力图 -->
+            <main class="flex-1 w-full soft-card flex relative overflow-hidden">
+                <div class="w-24 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
+                    <div class="h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">MEMBERS</div>
+                    <div id="members-column" class="flex-1 flex flex-col py-2 justify-between items-center"></div>
+                </div>
+                <div id="grid-container" class="flex-1 overflow-x-auto no-scrollbar relative flex flex-col scroll-smooth">
+                    <div id="days-header" class="h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center px-4 gap-3 shrink-0 w-max sticky top-0 z-0"></div>
+                    <div class="flex-1 py-2 px-4 w-max relative">
+                        <div id="grid-matrix" class="flex flex-col justify-between h-full relative z-10"></div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Zone C: 动态成就墙 -->
+            <footer class="h-[20vh] w-full soft-card flex flex-col shrink-0 overflow-hidden relative">
+                <div class="bg-slate-50 text-sub text-[10px] px-6 py-2 font-bold border-b-2 border-slate-100 flex justify-between rounded-t-[1.25rem] tracking-wider">
+                    <span>ACTIVITY STREAM (LIVE)</span>
+                    <span class="text-green-500 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span> SYNCING
+                    </span>
+                </div>
+                <div id="console-stream" class="flex-1 p-3 px-6 text-sm overflow-y-auto flex flex-col gap-2"></div>
+                
+                <div id="toast-notification" class="absolute bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300">
+                    <div id="toast-icon" class="w-6 h-6 text-white"></div>
+                    <span id="toast-text"></span>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 🔵 视图 2：战报中心 -->
+        <div id="view-dash" class="absolute inset-0 flex flex-col gap-4 opacity-0 pointer-events-none transition-opacity duration-300 bg-white soft-card p-6 overflow-y-auto">
+            
+            <div class="flex justify-between items-end mb-4 relative z-10">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tight">OCTOBER REPORT</h1>
+                    <p class="text-sub font-bold mt-1 flex items-center gap-2">
+                        10月团队荣誉战报 
+                        <!-- 🎖️ Medal SVG -->
+                        <svg viewBox="0 0 24 24" class="w-5 h-5 text-slate-800" fill="#fef08a" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M9 11L7 2l3.5 2L12 2l1.5 2L17 2l-2 9"/></svg>
+                    </p>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs font-bold text-sub">TEAM SCORE</div>
+                    <div class="text-3xl font-black text-yellow-500">+12,450</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 flex-1">
+                <!-- 里程碑大卡片 -->
+                <div class="col-span-2 bg-slate-50 border-4 border-slate-100 rounded-[1.5rem] p-6 flex flex-col justify-between relative overflow-hidden">
+                    <!-- 🍔 背景 Burger SVG -->
+                    <div class="absolute -right-6 -bottom-6 w-48 h-48 opacity-20 rotate-[-15deg] text-slate-400">
+                        <svg viewBox="0 0 24 24" class="w-full h-full" fill="currentColor" stroke="none"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 17a4 4 0 0 0 16 0H4z"/><path d="M2 13h20v2H2z" fill="#94a3b8"/><path d="M4 15h16v2H4z" fill="#cbd5e1"/></svg>
+                    </div>
+                    
+                    <h2 class="text-xl font-black mb-2 relative z-10">MILESTONES / 团队里程碑</h2>
+                    <div class="mt-4 relative z-10">
+                        <p class="text-sub font-bold text-sm">本月全员共同燃烧热量，相当于消耗了...</p>
+                        <div class="text-6xl font-black text-orange-500 mt-2">50 个巨无霸汉堡!</div>
+                    </div>
+                    <div class="mt-6 flex gap-4 relative z-10">
+                        <div class="bg-white border-2 border-slate-200 px-4 py-2 rounded-xl flex-1 shadow-sm">
+                            <div class="text-xs text-sub font-bold">总打卡次数</div>
+                            <div class="text-2xl font-black">124 次</div>
+                        </div>
+                        <div class="bg-white border-2 border-slate-200 px-4 py-2 rounded-xl flex-1 shadow-sm">
+                            <div class="text-xs text-sub font-bold">全勤天数</div>
+                            <div class="text-2xl font-black text-green-500">12 天</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 协作亮点卡片 -->
+                <div class="col-span-1 flex flex-col gap-4">
+                    <div class="bg-blue-50 border-4 border-blue-100 rounded-[1.5rem] p-5 flex-1 flex flex-col justify-center items-center text-center">
+                        <div class="w-10 h-10 mb-2 text-blue-500">
+                            <!-- 📣 Megaphone SVG -->
+                            <svg viewBox="0 0 24 24" class="w-full h-full" fill="#bfdbfe" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18l-3-3H4v-6h4l3-3v12z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg>
+                        </div>
+                        <h3 class="font-black text-blue-900 text-lg">月度打气筒</h3>
+                        <p class="text-xs text-blue-700 font-bold mt-1">Bob 催促了 15 次！</p>
+                    </div>
+                    <div class="bg-purple-50 border-4 border-purple-100 rounded-[1.5rem] p-5 flex-1 flex flex-col justify-center items-center text-center">
+                        <div class="w-10 h-10 mb-2 text-purple-500">
+                            <!-- 🧊 Ice SVG -->
+                            <svg viewBox="0 0 24 24" class="w-full h-full" fill="#e0f2fe" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16M10 10l6 6M4 10l6-6M10 10L4 16"/></svg>
+                        </div>
+                        <h3 class="font-black text-purple-900 text-lg">早起破冰者</h3>
+                        <p class="text-xs text-purple-700 font-bold mt-1">Dave 18天首位打卡</p>
+                    </div>
+                </div>
+
+                <!-- 活跃趋势折线图 -->
+                <div class="col-span-3 bg-white border-4 border-slate-100 rounded-[1.5rem] p-6 flex flex-col mt-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-black">ACTIVITY TREND / 活跃趋势</h2>
+                        <span class="text-xs font-bold text-sub bg-slate-100 px-2 py-1 rounded">纵轴: 当日打卡人数 (0-5)</span>
+                    </div>
+                    <div class="w-full h-32 relative mt-2 bg-slate-50 border-2 border-slate-200 rounded-xl pt-4">
+                        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="w-full h-full drop-shadow-md">
+                            <line x1="0" y1="20" x2="1000" y2="20" stroke="#e2e8f0" stroke-dasharray="5,5" stroke-width="2"/>
+                            <line x1="0" y1="50" x2="1000" y2="50" stroke="#e2e8f0" stroke-dasharray="5,5" stroke-width="2"/>
+                            <line x1="0" y1="80" x2="1000" y2="80" stroke="#e2e8f0" stroke-dasharray="5,5" stroke-width="2"/>
+                            <polyline fill="none" stroke="#fde047" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="0,44 100,32 200,20 300,56 400,20 500,20 600,44 700,68 800,20 900,32 1000,20"/>
+                            <circle cx="200" cy="20" r="8" fill="#1f2937" />
+                            <circle cx="400" cy="20" r="8" fill="#1f2937" />
+                            <circle cx="500" cy="20" r="8" fill="#1f2937" />
+                            <circle cx="800" cy="20" r="8" fill="#1f2937" />
+                            <circle cx="1000" cy="20" r="8" fill="#1f2937" />
+                        </svg>
+                        <div class="absolute inset-0 pointer-events-none flex justify-around items-end pb-1 px-4 text-[10px] font-bold text-slate-400">
+                            <span>10.01</span><span>10.05</span><span>10.10</span><span>10.15</span><span>10.20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= JavaScript 逻辑及全局 SVG 定义 ================= -->
+    <script>
+        // --- 方块几何线稿风 SVG 图标库 (Soft Brutalism Line/Pixel hybrid) ---
+        const SvgIcons = {
+            // 人物头像类 (统一几何画法)
+            alen: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#bfdbfe"/><rect x="6" y="9" width="5" height="3" fill="#1f2937" stroke="none"/><rect x="13" y="9" width="5" height="3" fill="#1f2937" stroke="none"/><path d="M8 16h8"/></svg>`,
+            bob: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#bbf7d0"/><path d="M6 9h12" stroke-width="3"/><path d="M10 15v-2M14 15v-2"/></svg>`,
+            cindy: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#e9d5ff"/><circle cx="8" cy="11" r="2" fill="#1f2937" stroke="none"/><circle cx="16" cy="11" r="2" fill="#1f2937" stroke="none"/><path d="M12 16h.01" stroke-width="3"/></svg>`,
+            dave: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#ffedd5"/><rect x="7" y="10" width="3" height="3" fill="#1f2937"/><rect x="14" y="10" width="3" height="3" fill="#1f2937"/><path d="M9 16h6"/></svg>`,
+            eva: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4" fill="#fbcfe8"/><path d="M8 10v2M16 10v2M9 16h6"/></svg>`,
+            
+            // 动作/交互类
+            strength: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="#fca5a5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 11V5a2 2 0 0 0-4 0v6M12 11V5a2 2 0 0 0-4 0v6M8 11V7a2 2 0 0 0-4 0v4a8 8 0 0 0 16 0V9a2 2 0 0 0-4 0v2"/></svg>`,
+            run: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2" fill="#cbd5e1"/><path d="M10 10h4v4l-2 4M14 10l2-2m-6 2l-2 2M6 18h4"/></svg>`,
+            stretch: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2" fill="#cbd5e1"/><path d="M8 16l4-4 4 4M12 12V8M8 8h8"/></svg>`,
+            
+            // 日志图标类
+            msgLog: `<svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-slate-400" fill="#f1f5f9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+            msgAlert: `<svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-orange-500" fill="#fef08a" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>`,
+            msgSuccess: `<svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-yellow-500" fill="#fde047" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4.5 4.5L18 22l-6-3-6 3 1.5-8.5L3 9l6-1z"/></svg>`,
+            msgHighlight: `<svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-yellow-500" fill="#fde047" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+            poke: `<svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0 text-slate-800" fill="#fde047" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+            signal: `<svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0 inline-block align-middle" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4a16 16 0 0 1 16 16M4 10a10 10 0 0 1 10 10M4 16a4 4 0 0 1 4 4M4 22h.01"/></svg>`
+        };
+
+        // --- 核心状态 ---
+        const state = {
+            teamCoins: 1250, targetCoins: 2000,
+            today: 18, totalDays: 30,
+            currentUserIndex: 0, 
+            members: [
+                { id: 'A', name: 'Alen', avatar: SvgIcons.alen },
+                { id: 'B', name: 'Bob',  avatar: SvgIcons.bob },
+                { id: 'C', name: 'Cindy',avatar: SvgIcons.cindy },
+                { id: 'D', name: 'Dave', avatar: SvgIcons.dave },
+                { id: 'E', name: 'Eva',  avatar: SvgIcons.eva }
+            ],
+            gridData: [], logs: []
+        };
+
+        // --- 初始化数据 ---
+        function initData() {
+            // 将导航栏的头像同步为 SVG
+            document.getElementById('nav-avatar-container').innerHTML = state.members[0].avatar;
+
+            for (let i = 0; i < state.members.length; i++) {
+                const memberData = [];
+                for (let day = 1; day <= state.totalDays; day++) {
+                    if (day < state.today) {
+                        memberData.push(Math.random() > 0.2); 
+                    } else if (day === state.today) {
+                        if(i === 0) memberData.push(false); 
+                        else if(i === 1) memberData.push(false); 
+                        else memberData.push(true); 
+                    } else {
+                        memberData.push(null);
+                    }
+                }
+                state.gridData.push(memberData);
+            }
+            addLog('WebSocket Connection Established. [Realtime Engine Active]', 'system');
+            
+            setTimeout(() => {
+                simulateRemotePunch(1, '力量训练'); // Bob
+            }, 5000);
+        }
+
+        // --- 视图渲染 ---
+        function renderAll() {
+            renderZoneA();
+            renderZoneB();
+            scrollToToday();
+        }
+
+        function renderZoneA() {
+            document.getElementById('team-coins-display').innerText = state.teamCoins.toLocaleString();
+            const progress = Math.min((state.teamCoins / state.targetCoins) * 100, 100);
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            let todayPunchedCount = 0;
+            state.gridData.forEach(row => { if (row[state.today - 1] === true) todayPunchedCount++; });
+            document.getElementById('today-punched').innerText = todayPunchedCount;
+        }
+
+        function renderZoneB() {
+            const memCol = document.getElementById('members-column');
+            const dayHeader = document.getElementById('days-header');
+            const matrix = document.getElementById('grid-matrix');
+
+            memCol.innerHTML = ''; dayHeader.innerHTML = ''; matrix.innerHTML = '';
+
+            // Y轴头像
+            state.members.forEach((m, idx) => {
+                const isMe = idx === state.currentUserIndex;
+                memCol.innerHTML += `
+                    <div class="h-10 w-10 flex items-center justify-center rounded-full shadow-sm border p-1 text-slate-800 bg-slate-50 ${isMe ? 'border-2 border-slate-800 ring-2 ring-yellow-300' : 'border-slate-200'} relative" title="${m.name}">
+                        ${m.avatar}
+                        ${isMe ? '<div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border border-white rounded-full"></div>' : ''}
+                    </div>
+                `;
+            });
+
+            // X轴日期
+            for (let d = 1; d <= state.totalDays; d++) {
+                const isToday = d === state.today;
+                const baseClass = "w-12 flex justify-center items-center text-xs font-bold rounded-full h-6";
+                const todayClass = isToday ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]" : "text-slate-400";
+                dayHeader.innerHTML += `<div class="${baseClass} ${todayClass}">${d}</div>`;
+            }
+
+            // 矩阵方块渲染
+            state.members.forEach((member, rIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex gap-3 h-12 items-center';
+                const isMe = rIndex === state.currentUserIndex;
+                
+                for (let d = 1; d <= state.totalDays; d++) {
+                    const cIndex = d - 1;
+                    const status = state.gridData[rIndex][cIndex];
+                    const cell = document.createElement('div');
+                    
+                    if (d < state.today) {
+                        cell.className = `cell ${status ? 'cell-punched' : 'cell-missed'}`;
+                        cell.innerHTML = status ? '✓' : '';
+                    } else if (d === state.today) {
+                        if (status) {
+                            cell.className = 'cell cell-punched';
+                            cell.innerHTML = '✓';
+                        } else {
+                            if (isMe) {
+                                // 当前用户的专属打卡入口
+                                cell.className = 'cell my-punch-btn text-xl cursor-pointer';
+                                cell.innerHTML = '+';
+                                
+                                // 生成弹窗菜单 (使用 SVG)
+                                const popup = document.createElement('div');
+                                popup.className = 'punch-popup';
+                                popup.innerHTML = `
+                                    <button class="hover:bg-slate-100 p-1.5 rounded text-slate-800 w-10 h-10 flex items-center justify-center" title="力量">${SvgIcons.strength}</button>
+                                    <button class="hover:bg-slate-100 p-1.5 rounded text-slate-800 w-10 h-10 flex items-center justify-center" title="有氧">${SvgIcons.run}</button>
+                                    <button class="hover:bg-slate-100 p-1.5 rounded text-slate-800 w-10 h-10 flex items-center justify-center" title="伸展">${SvgIcons.stretch}</button>
+                                `;
+                                
+                                cell.onclick = (e) => {
+                                    e.stopPropagation();
+                                    document.querySelectorAll('.punch-popup').forEach(p => p.classList.remove('show'));
+                                    popup.classList.toggle('show');
+                                };
+                                
+                                popup.querySelectorAll('button').forEach(btn => {
+                                    btn.onclick = (e) => {
+                                        e.stopPropagation();
+                                        popup.classList.remove('show');
+                                        handlePunch(rIndex, cIndex, member, btn.title);
+                                    };
+                                });
+                                
+                                cell.appendChild(popup);
+                            } else {
+                                cell.className = 'cell cell-future opacity-50';
+                            }
+                        }
+                    } else {
+                        cell.className = 'cell cell-future';
+                    }
+                    rowDiv.appendChild(cell);
+                }
+                matrix.appendChild(rowDiv);
+            });
+            checkAndRenderUrgeButtons();
+        }
+
+        function scrollToToday() {
+            const container = document.getElementById('grid-container');
+            const offset = (state.today - 2) * 60; 
+            container.scrollLeft = offset;
+        }
+
+        // --- 交互逻辑 ---
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.punch-popup').forEach(p => p.classList.remove('show'));
+            document.getElementById('profile-dropdown').classList.remove('show');
+        });
+
+        function toggleProfile() {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function switchTab(tabId) {
+            const viewPunch = document.getElementById('view-punch');
+            const viewDash = document.getElementById('view-dash');
+            const tabPunch = document.getElementById('tab-punch');
+            const tabDash = document.getElementById('tab-dash');
+
+            if(tabId === 'punch') {
+                viewPunch.style.opacity = '1'; viewPunch.style.pointerEvents = 'auto';
+                viewDash.style.opacity = '0'; viewDash.style.pointerEvents = 'none';
+                tabPunch.className = 'tab-btn active text-sm';
+                tabDash.className = 'tab-btn inactive text-sm';
+            } else {
+                viewDash.style.opacity = '1'; viewDash.style.pointerEvents = 'auto';
+                viewPunch.style.opacity = '0'; viewPunch.style.pointerEvents = 'none';
+                tabDash.className = 'tab-btn active text-sm';
+                tabPunch.className = 'tab-btn inactive text-sm';
+            }
+        }
+
+        function handlePunch(rIndex, cIndex, member, type) {
+            state.gridData[rIndex][cIndex] = true;
+            state.teamCoins += 15;
+            
+            const coinEl = document.getElementById('team-coins-display');
+            coinEl.classList.remove('animate-bump');
+            void coinEl.offsetWidth;
+            coinEl.classList.add('animate-bump');
+
+            addLog(`<div class="w-4 h-4 inline-block align-middle text-slate-800">${member.avatar}</div> <b>${member.name}</b> 完成了 <b>${type}</b>! Team Pts +15.`, 'success');
+
+            renderZoneA(); renderZoneB();
+        }
+
+        function simulateRemotePunch(rIndex, typeDesc) {
+            if(state.gridData[rIndex][state.today - 1] === true) return; 
+
+            const member = state.members[rIndex];
+            state.gridData[rIndex][state.today - 1] = true;
+            state.teamCoins += 15;
+
+            renderZoneA(); renderZoneB();
+            
+            addLog(`[实时推送] <div class="w-4 h-4 inline-block align-middle text-slate-800">${member.avatar}</div> <b>${member.name}</b> 刚刚完成了 ${typeDesc}，点亮了格子！`, 'highlight');
+
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-icon').innerHTML = member.avatar;
+            document.getElementById('toast-text').innerText = `${member.name} 刚刚打卡了！`;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        function addLog(text, type) {
+            const stream = document.getElementById('console-stream');
+            const logDiv = document.createElement('div');
+            
+            let colorClass = 'text-sub';
+            let icon = SvgIcons.msgLog;
+
+            if (type === 'success') { colorClass = 'text-main'; icon = SvgIcons.msgSuccess; }
+            if (type === 'alert') { colorClass = 'text-orange-500'; icon = SvgIcons.msgAlert; }
+            if (type === 'highlight') { colorClass = 'text-yellow-600 bg-yellow-50 p-2 rounded-lg border border-yellow-200 shadow-sm'; icon = SvgIcons.msgHighlight; }
+            
+            const timeStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+            
+            logDiv.className = `w-full flex items-start gap-2 ${colorClass}`;
+            logDiv.innerHTML = `<span class="text-slate-300 font-mono text-[10px] mt-1 shrink-0">[${timeStr}]</span> <span class="flex items-center pt-0.5">${icon}</span> <span class="text-xs leading-relaxed flex-1">${text}</span>`;
+            
+            stream.appendChild(logDiv);
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        function checkAndRenderUrgeButtons() {
+            const unpunchedMembers = [];
+            state.members.forEach((m, rIndex) => {
+                if (rIndex !== state.currentUserIndex && state.gridData[rIndex][state.today - 1] === false) {
+                    unpunchedMembers.push(m);
+                }
+            });
+
+            document.querySelectorAll('.urge-log').forEach(e => e.remove());
+
+            if (unpunchedMembers.length > 0) {
+                const stream = document.getElementById('console-stream');
+                const logDiv = document.createElement('div');
+                logDiv.className = `w-full flex flex-col gap-2 mt-2 urge-log bg-slate-50 p-2 rounded-xl border border-slate-100`;
+                
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'flex gap-2 flex-wrap';
+
+                unpunchedMembers.forEach(m => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quest-btn px-3 py-1 text-[10px] tracking-wide flex items-center gap-1';
+                    btn.innerHTML = `<span>${SvgIcons.poke} Poke</span> <b>${m.name}</b>`;
+                    btn.onclick = () => {
+                        addLog(`${SvgIcons.signal} <span class="align-middle">已向 ${m.name} 发送催促提示。</span>`, 'system');
+                        btn.disabled = true;
+                        btn.innerHTML = `✓ Poked`;
+                    };
+                    btnContainer.appendChild(btn);
+                });
+                
+                logDiv.appendChild(btnContainer);
+                stream.appendChild(logDiv);
+                stream.scrollTop = stream.scrollHeight;
+            }
+        }
+
+        window.onload = () => {
+            initData();
+            renderAll();
+        };
+
+    </script>
+</body>
+</html>
