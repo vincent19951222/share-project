@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
@@ -9,17 +9,20 @@ import { SvgIcons } from "@/components/ui/SvgIcons";
 export function Navbar() {
   const { state, dispatch } = useBoard();
   const [profileOpen, setProfileOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const handler = () => setProfileOpen(false);
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
+  const handleProfileClick = useCallback(() => {
+    setProfileOpen((prev) => !prev);
+  }, []);
+
+  const handleClickOutside = useCallback(() => {
+    setProfileOpen(false);
   }, []);
 
   const currentMember = state.members[0];
 
   return (
-    <nav className="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">
+    <nav ref={navRef} className="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">
       <div className="flex items-center gap-6">
         <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
           <div className="w-8 h-8 bg-yellow-300 border-2 border-slate-800 rounded-lg flex items-center justify-center shadow-[0_2px_0_0_#1f2937] p-1">
@@ -46,10 +49,7 @@ export function Navbar() {
       </div>
       <div className="relative">
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setProfileOpen((prev) => !prev);
-          }}
+          onClick={handleProfileClick}
           className="flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full pl-2 pr-4 py-1 hover:border-slate-800 transition-colors"
         >
           <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-white shadow-sm p-1 text-slate-800">
@@ -57,7 +57,7 @@ export function Navbar() {
           </div>
           <span className="font-bold text-sm">{currentMember.name}</span>
         </button>
-        {profileOpen && <ProfileDropdown />}
+        {profileOpen && <ProfileDropdown onDismiss={handleClickOutside} />}
       </div>
     </nav>
   );

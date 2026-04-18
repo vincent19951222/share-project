@@ -46,6 +46,6 @@ export function createSeedLog(): ActivityLog {
     id: "seed-1",
     text: "WebSocket Connection Established. [Realtime Engine Active]",
     type: "system",
-    timestamp: new Date(),
+    timestamp: new Date(0), // Fixed timestamp to avoid SSR/CSR hydration mismatch
   };
 }
