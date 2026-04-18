@@ -32,7 +32,7 @@ export function Navbar() {
           <div className="w-8 h-8 bg-yellow-300 border-2 border-slate-800 rounded-lg flex items-center justify-center shadow-[0_2px_0_0_#1f2937] p-1">
             <span dangerouslySetInnerHTML={{ __html: SvgIcons.box }} />
           </div>
-          ROOM TODO
+          脱脂牛马
         </div>
         <div className="flex gap-2 bg-slate-100 p-1 rounded-full border-2 border-slate-200">
           <TabBtn
