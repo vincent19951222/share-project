@@ -6,10 +6,12 @@ import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SvgIcons } from "@/components/ui/SvgIcons";
 import { getAvatarUrl } from "@/lib/avatars";
+import { EditProfileModal } from "@/components/profile/EditProfileModal";
 
 export function Navbar() {
   const { state, dispatch } = useBoard();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const handleProfileClick = useCallback(() => {
@@ -23,6 +25,7 @@ export function Navbar() {
   const currentMember = state.members.find((m) => m.id === state.currentUserId) || state.members[0];
 
   return (
+    <>
     <nav ref={navRef} className="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">
       <div className="flex items-center gap-6">
         <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
@@ -58,8 +61,16 @@ export function Navbar() {
           </div>
           <span className="font-bold text-sm">{currentMember.name}</span>
         </button>
-        {profileOpen && <ProfileDropdown onDismiss={handleClickOutside} />}
+        {profileOpen && <ProfileDropdown onDismiss={handleClickOutside} onEditProfile={() => { setProfileOpen(false); setEditModalOpen(true); }} />}
       </div>
     </nav>
+    {editModalOpen && (
+      <EditProfileModal
+        currentUsername={currentMember.name}
+        currentAvatarKey={currentMember.avatarKey}
+        onClose={() => setEditModalOpen(false)}
+      />
+    )}
+    </>
   );
 }

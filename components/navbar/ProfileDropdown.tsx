@@ -7,9 +7,10 @@ import { SvgIcons } from "@/components/ui/SvgIcons";
 
 interface ProfileDropdownProps {
   onDismiss: () => void;
+  onEditProfile: () => void;
 }
 
-export function ProfileDropdown({ onDismiss }: ProfileDropdownProps) {
+export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownProps) {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -66,6 +67,12 @@ export function ProfileDropdown({ onDismiss }: ProfileDropdownProps) {
             <span>每日提醒</span>
             <span className="text-sub">18:30</span>
           </div>
+          <button
+            onClick={onEditProfile}
+            className="mt-2 w-full py-2 text-sm font-bold text-slate-800 bg-slate-100 border-2 border-slate-200 rounded-xl hover:bg-slate-200 transition-colors"
+          >
+            编辑资料
+          </button>
           <button
             onClick={handleLogout}
             className="mt-2 w-full py-2 text-sm font-bold text-red-500 bg-red-50 border-2 border-red-200 rounded-xl hover:bg-red-100 transition-colors"
