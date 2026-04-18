@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAvatarUrl } from "@/lib/avatars";
 
 interface ToastData {
-  avatarSvg: string;
+  avatarKey: string;
   text: string;
 }
 
@@ -25,9 +26,10 @@ export function Toast({ data }: { data: ToastData | null }) {
         visible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
       }`}
     >
-      <div
-        className="w-6 h-6 text-white"
-        dangerouslySetInnerHTML={{ __html: data.avatarSvg }}
+      <img
+        src={getAvatarUrl(data.avatarKey)}
+        alt=""
+        className="w-6 h-6 rounded-full object-cover"
       />
       <span>{data.text}</span>
     </div>

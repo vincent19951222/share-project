@@ -5,6 +5,7 @@ import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SvgIcons } from "@/components/ui/SvgIcons";
+import { getAvatarUrl } from "@/lib/avatars";
 
 export function Navbar() {
   const { state, dispatch } = useBoard();
@@ -52,8 +53,8 @@ export function Navbar() {
           onClick={handleProfileClick}
           className="flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full pl-2 pr-4 py-1 hover:border-slate-800 transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-white shadow-sm p-1 text-slate-800">
-            <span dangerouslySetInnerHTML={{ __html: currentMember.avatarSvg }} />
+          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-white shadow-sm overflow-hidden">
+            <img src={getAvatarUrl(currentMember.avatarKey)} alt={currentMember.name} className="w-full h-full object-cover" />
           </div>
           <span className="font-bold text-sm">{currentMember.name}</span>
         </button>

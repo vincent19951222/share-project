@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { useBoard } from "@/lib/store";
 import { PunchPopup } from "@/components/ui/PunchPopup";
+import { getAvatarUrl } from "@/lib/avatars";
 
 export function HeatmapGrid() {
   const { state, dispatch } = useBoard();
@@ -18,7 +19,7 @@ export function HeatmapGrid() {
 
   return (
     <main className="flex-1 w-full soft-card flex relative overflow-hidden">
-      <div className="w-24 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
+      <div className="w-28 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
         <div className="h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">
           MEMBERS
         </div>
@@ -26,17 +27,18 @@ export function HeatmapGrid() {
           {state.members.map((m, idx) => {
             const isMe = idx === currentUserIndex;
             return (
-              <div
-                key={m.id}
-                className={`h-10 w-10 flex items-center justify-center rounded-full shadow-sm border p-1 text-slate-800 bg-slate-50 ${
-                  isMe ? "border-2 border-slate-800 ring-2 ring-yellow-300" : "border-slate-200"
-                } relative`}
-                title={m.name}
-              >
-                <span dangerouslySetInnerHTML={{ __html: m.avatarSvg }} />
-                {isMe && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border border-white rounded-full" />
-                )}
+              <div key={m.id} className="flex flex-col items-center gap-1 relative">
+                <div
+                  className={`h-10 w-10 flex items-center justify-center rounded-full shadow-sm border overflow-hidden bg-slate-50 ${
+                    isMe ? "border-2 border-slate-800 ring-2 ring-yellow-300" : "border-slate-200"
+                  } relative`}
+                >
+                  <img src={getAvatarUrl(m.avatarKey)} alt={m.name} className="w-full h-full object-cover" />
+                  {isMe && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border border-white rounded-full" />
+                  )}
+                </div>
+                <span className="text-[10px] font-bold text-sub truncate max-w-[4rem] text-center">{m.name}</span>
               </div>
             );
           })}

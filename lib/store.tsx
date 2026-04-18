@@ -16,7 +16,7 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
           ...state.logs,
           {
             id: `log-${Date.now()}`,
-            text: `<div class="w-4 h-4 inline-block align-middle text-slate-800">${state.members[action.memberIndex].avatarSvg}</div> <b>${state.members[action.memberIndex].name}</b> 完成了 <b>${action.punchType}</b>! Team Pts +15.`,
+            text: `<b>${state.members[action.memberIndex].name}</b> 完成了 <b>${action.punchType}</b>! Team Pts +15.`,
             type: "success",
             timestamp: new Date(),
           },
@@ -41,7 +41,7 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
           ...state.logs,
           {
             id: `log-${Date.now()}`,
-            text: `[实时推送] <div class="w-4 h-4 inline-block align-middle text-slate-800">${member.avatarSvg}</div> <b>${member.name}</b> 刚刚完成了 ${action.typeDesc}，点亮了格子！`,
+            text: `[实时推送] <b>${member.name}</b> 刚刚完成了 ${action.typeDesc}，点亮了格子！`,
             type: "highlight",
             timestamp: new Date(),
           },

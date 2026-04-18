@@ -25,7 +25,7 @@ function getLogColorClass(type: string) {
 }
 
 interface ToastData {
-  avatarSvg: string;
+  avatarKey: string;
   text: string;
 }
 
@@ -49,7 +49,7 @@ export function ActivityStream() {
         const memberName = memberMatch[1];
         const member = state.members.find((m) => m.name === memberName);
         if (member) {
-          setToastData({ avatarSvg: member.avatarSvg, text: `${member.name} 刚刚打卡了！` });
+          setToastData({ avatarKey: member.avatarKey, text: `${member.name} 刚刚打卡了！` });
         }
       }
     }
