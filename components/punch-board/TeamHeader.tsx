@@ -27,7 +27,7 @@ export function TeamHeader() {
         <div className="flex justify-between text-xs font-bold text-sub">
           <span className="text-main flex items-center gap-1">
             <span dangerouslySetInnerHTML={{ __html: SvgIcons.target }} />
-            WEEKLY QUEST: 星巴克下午茶
+            本周牛马放纵餐: 星巴克下午茶
           </span>
           <span>{state.targetCoins} Pts</span>
         </div>
