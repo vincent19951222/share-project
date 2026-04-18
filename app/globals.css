@@ -162,3 +162,51 @@ body {
 .text-main { color: #1e293b; }
 
 .svg-icon svg { display: inline-block; }
+
+.poster-bg {
+  background-image: url('/login-poster.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.input-group {
+  position: relative;
+}
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #64748b;
+  transition: color 0.2s;
+  pointer-events: none;
+}
+.brutal-input:focus ~ .input-icon {
+  color: #1f2937;
+}
+
+.brutal-input {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  padding-left: 3rem;
+  border: 3px solid #e2e8f0;
+  border-radius: 1rem;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-weight: 700;
+  color: #1e293b;
+  background-color: #f8fafc;
+}
+.brutal-input::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+.brutal-input:focus {
+  background-color: #ffffff;
+  border-color: #1f2937;
+  box-shadow: 0 4px 0 0 #1f2937;
+  transform: translateY(-2px);
+}
