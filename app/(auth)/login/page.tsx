@@ -15,11 +15,11 @@ export default function LoginPage() {
                   <path d="M2 8h20M12 8v13M8 13h8" />
                 </svg>
               </div>
-              ROOM TODO
+              脱脂牛马
             </div>
             <div className="flex flex-col gap-2">
               <span className="px-3 py-1 bg-yellow-300/90 text-slate-900 text-xs font-bold rounded-md w-max border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1f2937]">
-                LEVEL UP TOGETHER
+                共同成长
               </span>
               <h1 className="text-4xl font-black leading-tight drop-shadow-lg">
                 打卡不仅仅是
@@ -35,7 +35,7 @@ export default function LoginPage() {
         {/* Right: Login form */}
         <div className="w-full md:w-1/2 p-8 md:p-14 flex flex-col justify-center bg-white">
           <div className="mb-10">
-            <h2 className="text-3xl font-black mb-2 text-slate-800">Join Room</h2>
+            <h2 className="text-3xl font-black mb-2 text-slate-800">加入团队</h2>
             <p className="text-sub font-bold text-sm">输入你的用户名和密码，准备开始协同挑战。</p>
           </div>
           <LoginForm />
