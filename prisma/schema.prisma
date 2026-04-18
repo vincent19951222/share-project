@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  password     String
+  avatarKey    String
+  coins        Int           @default(0)
+  teamId       String
+  team         Team          @relation(fields: [teamId], references: [id])
+  punchRecords PunchRecord[]
+  createdAt    DateTime      @default(now())
+}
+
+model PunchRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  dayIndex  Int
+  punched   Boolean
+  punchType String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dayIndex])
+}

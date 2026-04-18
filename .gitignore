@@ -14,3 +14,12 @@ Thumbs.db
 
 # Node
 node_modules/
+
+# Database
+*.db
+
+# Prisma generated client
+/lib/generated/prisma
+
+# Environment
+.env
