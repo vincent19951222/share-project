@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Room Todo - 团队打卡看板",
-  description: "团队协同打卡与战报看板",
+  title: "脱脂牛马 - 团队打卡看板",
+  description: "脱脂牛马团队协同打卡与战报看板",
 };
 
 export default function RootLayout({
