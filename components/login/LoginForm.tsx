@@ -138,7 +138,7 @@ export function LoginForm() {
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        {loading ? "LOADING..." : mode === "login" ? "START QUEST" : "CREATE & JOIN"}
+        {loading ? "加载中..." : mode === "login" ? "开工！" : "创建并加入"}
       </button>
 
       <button

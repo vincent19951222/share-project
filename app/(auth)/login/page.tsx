@@ -35,7 +35,7 @@ export default function LoginPage() {
         {/* Right: Login form */}
         <div className="w-full md:w-1/2 p-8 md:p-14 flex flex-col justify-center bg-white">
           <div className="mb-10">
-            <h2 className="text-3xl font-black mb-2 text-slate-800">加入团队</h2>
+            <h2 className="text-3xl font-black mb-2 text-slate-800">加入牛马俱乐部</h2>
             <p className="text-sub font-bold text-sm">输入你的用户名和密码，准备开始协同挑战。</p>
           </div>
           <LoginForm />
