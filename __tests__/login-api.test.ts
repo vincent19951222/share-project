@@ -47,7 +47,7 @@ describe("POST /api/auth/login", () => {
     expect(body.error).toBeDefined();
   });
 
-  it("should return 401 for non-existent user", async () => {
+  it("should return 400 for non-existent user without avatarKey", async () => {
     const request = new NextRequest("http://localhost/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ username: "nobody", password: "0000" }),
@@ -55,13 +55,58 @@ describe("POST /api/auth/login", () => {
     });
 
     const response = await POST(request);
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(400);
   });
 
   it("should return 400 for missing fields", async () => {
     const request = new NextRequest("http://localhost/api/auth/login", {
       method: "POST",
       body: JSON.stringify({}),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
+
+  it("should register new user when username does not exist", async () => {
+    const request = new NextRequest("http://localhost/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username: "newuser", password: "1234", avatarKey: "male1" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    expect(body.success).toBe(true);
+    expect(body.user.username).toBe("newuser");
+    expect(body.user.avatarKey).toBe("male1");
+    expect(body.user).not.toHaveProperty("password");
+
+    const setCookie = response.headers.get("set-cookie");
+    expect(setCookie).toContain("userId=");
+  });
+
+  it("should return 400 when registering without avatarKey", async () => {
+    const request = new NextRequest("http://localhost/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username: "another", password: "1234" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+
+    const body = await response.json();
+    expect(body.error).toBeDefined();
+  });
+
+  it("should return 400 when registering with invalid avatarKey", async () => {
+    const request = new NextRequest("http://localhost/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username: "another2", password: "1234", avatarKey: "nonexistent" }),
       headers: { "Content-Type": "application/json" },
     });
 
