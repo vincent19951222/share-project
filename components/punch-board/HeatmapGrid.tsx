@@ -7,7 +7,7 @@ import { PunchPopup } from "@/components/ui/PunchPopup";
 export function HeatmapGrid() {
   const { state, dispatch } = useBoard();
   const containerRef = useRef<HTMLDivElement>(null);
-  const currentUserIndex = 0;
+  const currentUserIndex = state.members.findIndex((m) => m.id === state.currentUserId);
 
   useEffect(() => {
     if (containerRef.current) {
