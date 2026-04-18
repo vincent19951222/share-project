@@ -17,7 +17,7 @@ export function TeamHeader() {
           <span dangerouslySetInnerHTML={{ __html: SvgIcons.trophy }} />
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-sub tracking-wider uppercase">Team Vault</span>
+          <span className="text-[10px] font-bold text-sub tracking-wider uppercase">牛马金库</span>
           <div className="text-2xl font-extrabold flex items-baseline gap-1">
             {state.teamCoins.toLocaleString()}
           </div>
