@@ -39,7 +39,7 @@ export function TeamHeader() {
         </div>
       </div>
       <div className="flex flex-col items-end">
-        <span className="text-[10px] font-bold text-sub tracking-wider uppercase">Today&apos;s Rate</span>
+        <span className="text-[10px] font-bold text-sub tracking-wider uppercase">今日脱脂率</span>
         <div className="text-2xl font-extrabold text-main">
           <span>{todayPunchedCount}</span>
           <span className="text-lg text-slate-300">/{state.members.length}</span>
