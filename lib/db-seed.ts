@@ -7,11 +7,11 @@ export const SEED_TEAM = {
 };
 
 export const SEED_USERS = [
-  { username: "li", avatarKey: "alen", coins: 345 },
-  { username: "luo", avatarKey: "bob", coins: 280 },
-  { username: "liu", avatarKey: "cindy", coins: 310 },
-  { username: "wu", avatarKey: "dave", coins: 225 },
-  { username: "ji", avatarKey: "eva", coins: 290 },
+  { username: "li", avatarKey: "male1", coins: 345 },
+  { username: "luo", avatarKey: "male2", coins: 280 },
+  { username: "liu", avatarKey: "female1", coins: 310 },
+  { username: "wu", avatarKey: "male3", coins: 225 },
+  { username: "ji", avatarKey: "female2", coins: 290 },
 ];
 
 function seededRandom(seed: number): () => number {

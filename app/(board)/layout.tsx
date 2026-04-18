@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { BoardProvider } from "@/lib/store";
 import type { BoardState } from "@/lib/types";
-import { SvgIcons } from "@/components/ui/SvgIcons";
 
 export default async function BoardLayout({
   children,
@@ -32,7 +31,7 @@ export default async function BoardLayout({
   const members = team.users.map((u) => ({
     id: u.id,
     name: u.username,
-    avatarSvg: (SvgIcons as Record<string, string>)[u.avatarKey] || "",
+    avatarKey: u.avatarKey,
   }));
 
   const today = 18;
