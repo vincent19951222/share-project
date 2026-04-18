@@ -29,7 +29,7 @@ export function TeamHeader() {
             <span dangerouslySetInnerHTML={{ __html: SvgIcons.target }} />
             本周牛马放纵餐: 星巴克下午茶
           </span>
-          <span>{state.targetCoins} Pts</span>
+          <span>{state.targetCoins} 银子</span>
         </div>
         <div className="h-4 w-full bg-slate-100 border-2 border-slate-200 rounded-full relative overflow-hidden">
           <div
