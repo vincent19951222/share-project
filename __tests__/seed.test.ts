@@ -4,6 +4,7 @@ import { seedDatabase, SEED_USERS, SEED_TEAM } from "@/lib/db-seed";
 
 describe("seedDatabase", () => {
   beforeAll(async () => {
+    await prisma.boardNote.deleteMany();
     await prisma.punchRecord.deleteMany();
     await prisma.user.deleteMany();
     await prisma.team.deleteMany();

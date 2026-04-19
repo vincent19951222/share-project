@@ -8,11 +8,12 @@ datasource db {
 }
 
 model Team {
-  id        String   @id @default(cuid())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  users     User[]
+  id         String      @id @default(cuid())
+  name       String
+  code       String      @unique
+  createdAt  DateTime    @default(now())
+  users      User[]
+  boardNotes BoardNote[]
 }
 
 model User {
@@ -24,6 +25,7 @@ model User {
   teamId       String
   team         Team          @relation(fields: [teamId], references: [id])
   punchRecords PunchRecord[]
+  boardNotes   BoardNote[]
   createdAt    DateTime      @default(now())
 }
 
@@ -37,4 +39,23 @@ model PunchRecord {
   createdAt DateTime @default(now())
 
   @@unique([userId, dayIndex])
+}
+
+model BoardNote {
+  id        String    @id @default(cuid())
+  teamId    String
+  team      Team      @relation(fields: [teamId], references: [id])
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  type      String
+  content   String
+  color     String?
+  isDeleted Boolean   @default(false)
+  pinned    Boolean   @default(false)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([teamId, isDeleted, pinned, createdAt])
+  @@index([authorId])
 }
