@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共享看板 - 脱脂牛马</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .soft-card {
+            background-color: #ffffff;
+            border: 6px solid #f1f5f9;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .quest-btn {
+            background-color: #fde047;
+            border: 3px solid #1f2937;
+            border-radius: 9999px;
+            box-shadow: 0 4px 0 0 #1f2937;
+            color: #1f2937;
+            font-weight: 800;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quest-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 0 #1f2937;
+        }
+
+        .note-card {
+            break-inside: avoid;
+            margin-bottom: 1.25rem;
+            animation: cardEnter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            transition: all 0.2s ease;
+            display: inline-block;
+            width: 100%;
+        }
+        .note-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 0 0 rgba(31, 41, 55, 0.3);
+        }
+        @keyframes cardEnter {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes cardDelete {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8) rotate(5deg);
+            }
+        }
+        .note-card.deleting {
+            animation: cardDelete 0.3s ease-out forwards;
+        }
+
+        /* 不同类型笔记的颜色 */
+        .note-free-yellow {
+            background-color: #fef9c3;
+            border-color: #fde047;
+        }
+        .note-free-blue {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+        }
+        .note-free-green {
+            background-color: #dcfce7;
+            border-color: #86efac;
+        }
+        .note-free-pink {
+            background-color: #fce7f3;
+            border-color: #f9a8d4;
+        }
+
+        /* 通告类型 */
+        .note-announcement {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        .note-close-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #1f2937;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        .note-card:hover .note-close-btn {
+            opacity: 1;
+        }
+        .note-close-btn:hover {
+            background: #1f2937;
+            color: #fde047;
+            transform: rotate(90deg);
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-announcement {
+            background-color: #1f2937;
+            color: #fde047;
+        }
+        .badge-free {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #1f2937;
+            border: 2px solid #1f2937;
+        }
+
+        .masonry-grid {
+            column-count: 4;
+            column-gap: 1.25rem;
+        }
+        @media (max-width: 1400px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        @media (max-width: 1024px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        @media (max-width: 640px) {
+            .masonry-grid {
+                column-count: 1;
+            }
+        }
+
+        .text-sub { color: #64748b; }
+        .text-main { color: #1e293b; }
+
+        /* 实时推送动画 */
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+        .pulse-dot {
+            animation: pulse-dot 2s infinite;
+        }
+
+        /* 打字机效果 */
+        @keyframes blink {
+            0%, 50% { border-color: #1f2937; }
+            51%, 100% { border-color: transparent; }
+        }
+        .typing-cursor {
+            border-right: 2px solid #1f2937;
+            animation: blink 1s infinite;
+        }
+
+        /* 颜色选择器 */
+        .color-option {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 3px solid #1f2937;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 0 0 #1f2937;
+        }
+        .color-option.selected {
+            box-shadow: 0 0 0 3px #1f2937;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <!-- 顶部导航栏 -->
+    <nav class="h-14 w-full flex items-center justify-between mb-4 px-2">
+        <div class="flex items-center gap-6">
+            <div class="font-black text-2xl tracking-tighter flex items-center gap-2">
+                <div class="w-8 h-8 bg-yellow-300 border-2 border-slate-800 rounded-lg flex items-center justify-center shadow-[0_2px_0_0_#1f2937] p-1">
+                    <svg viewBox="0 0 24 24" class="w-full h-full text-slate-800" fill="#fcd34d" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/>
+                        <path d="M2 8h20M12 8v13M8 13h8"/>
+                    </svg>
+                </div>
+                脱脂牛马
+            </div>
+            <div class="flex gap-2 bg-slate-100 p-1 rounded-full border-2 border-slate-200">
+                <button class="px-4 py-2 rounded-full font-bold text-sm text-slate-500 hover:bg-slate-200 transition-colors">
+                    协同打卡
+                </button>
+                <button class="px-4 py-2 rounded-full font-bold text-sm bg-yellow-300 border-2 border-slate-800 shadow-[0_3px_0_0_#1f2937]">
+                    共享看板
+                </button>
+                <button class="px-4 py-2 rounded-full font-bold text-sm text-slate-500 hover:bg-slate-200 transition-colors">
+                    战报中心
+                </button>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 bg-green-100 border-2 border-green-200 px-3 py-1 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+                <span class="text-xs font-bold text-green-700">实时同步</span>
+            </div>
+            <button class="flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full pl-2 pr-4 py-1 hover:border-slate-800 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center border border-white shadow-sm">
+                    <svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="3" y="3" width="18" height="18" rx="4" fill="#bfdbfe"/>
+                        <rect x="6" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                        <rect x="13" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                        <path d="M8 16h8"/>
+                    </svg>
+                </div>
+                <span class="font-bold text-sm">Alen</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 发布区域 -->
+    <div class="soft-card p-6 mb-4">
+        <div class="flex gap-4">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-200 shadow-sm shrink-0">
+                <svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="3" width="18" height="18" rx="4" fill="#bfdbfe"/>
+                    <rect x="6" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                    <rect x="13" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                    <path d="M8 16h8"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <textarea
+                    id="note-input"
+                    placeholder="分享你的想法、训练心得或团队通告...（支持多行输入，不同长度会产生瀑布流效果）"
+                    class="w-full p-4 border-3 border-slate-200 rounded-xl resize-none focus:outline-none focus:border-slate-800 focus:ring-2 focus:ring-yellow-300 font-bold text-sm"
+                    rows="4"
+                ></textarea>
+                <div class="flex items-center justify-between mt-3">
+                    <div class="flex items-center gap-4">
+                        <!-- 类型选择 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-bold text-sub">类型:</label>
+                            <select id="note-type" class="px-3 py-1 border-2 border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:border-slate-800">
+                                <option value="free">自由笔记</option>
+                                <option value="announcement">普通通告</option>
+                            </select>
+                        </div>
+                        <!-- 颜色选择（仅自由笔记） -->
+                        <div id="color-picker" class="flex items-center gap-2">
+                            <label class="text-xs font-bold text-sub">颜色:</label>
+                            <div class="flex gap-1">
+                                <div class="color-option selected bg-yellow-200" data-color="yellow"></div>
+                                <div class="color-option bg-blue-200" data-color="blue"></div>
+                                <div class="color-option bg-green-200" data-color="green"></div>
+                                <div class="color-option bg-pink-200" data-color="pink"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="publish-btn" class="quest-btn px-6 py-2 text-sm flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                        发布
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 瀑布流卡片区域 -->
+    <div id="board-container" class="masonry-grid">
+        <!-- 卡片会动态插入这里 -->
+    </div>
+
+    <!-- 底部提示 -->
+    <div class="text-center mt-8 text-sub text-sm font-bold">
+        <p>💡 提示：局域网内所有成员实时同步，支持发布自由笔记和团队通告</p>
+    </div>
+
+    <script>
+        // 状态管理
+        const state = {
+            currentUser: {
+                id: 'alen',
+                name: 'Alen',
+                avatar: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="3" width="18" height="18" rx="4" fill="#bfdbfe"/>
+                    <rect x="6" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                    <rect x="13" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                    <path d="M8 16h8"/>
+                </svg>`
+            },
+            notes: [],
+            selectedColor: 'yellow'
+        };
+
+        // 示例数据 - 故意设置不同长度，产生瀑布流效果
+        const sampleNotes = [
+            {
+                id: '1',
+                type: 'announcement',
+                content: '📢 本周五下午团队聚餐，地点在星巴克，请大家准时参加！',
+                author: { name: 'Bob', avatar: 'bob' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 30),
+                color: null
+            },
+            {
+                id: '2',
+                type: 'free',
+                content: '今天完成了5km晨跑，感觉状态不错！💪',
+                author: { name: 'Cindy', avatar: 'cindy' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+                color: 'green'
+            },
+            {
+                id: '3',
+                type: 'free',
+                content: '推荐大家尝试新的训练计划，已经坚持一周了！效果非常明显，特别是核心力量的提升。我的方案是：周一胸肌+三头，周二背部+二头，周三休息，周四腿部，周五肩部，周末有氧或者休息。每个动作4组，每组8-12次。记住循序渐进，不要盲目追求重量！',
+                author: { name: 'Dave', avatar: 'dave' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
+                color: 'blue'
+            },
+            {
+                id: '4',
+                type: 'free',
+                content: '明天记得带健身装备 🏋️',
+                author: { name: 'Alen', avatar: 'alen' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8),
+                color: 'yellow'
+            },
+            {
+                id: '5',
+                type: 'announcement',
+                content: '🏆 恭喜团队完成本月打卡目标！累计打卡次数达到150次！\n\n特别表扬：\n• Bob 全勤打卡，从不缺席\n• Cindy 提前完成个人月度目标\n• Dave 连续打卡45天\n\n大家继续保持，下个月挑战更高的目标！💪',
+                author: { name: 'Eva', avatar: 'eva' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+                color: null
+            },
+            {
+                id: '6',
+                type: 'free',
+                content: '分享一个健康食谱：燕麦粥+蓝莓+坚果，营养丰富又美味！',
+                author: { name: 'Bob', avatar: 'bob' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 26),
+                color: 'pink'
+            },
+            {
+                id: '7',
+                type: 'free',
+                content: '坚持！',
+                author: { name: 'Cindy', avatar: 'cindy' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 28),
+                color: 'yellow'
+            },
+            {
+                id: '8',
+                type: 'free',
+                content: '今天尝试了新的HIIT训练方案，20分钟高强度间歇，感觉比之前45分钟慢跑还要累！但是效率确实很高，适合时间紧张的时候做。动作包括：开合跳、波比跳、高抬腿、登山者等，每个动作30秒，休息15秒，循环8组。大家也可以试试看！',
+                author: { name: 'Dave', avatar: 'dave' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 30),
+                color: 'green'
+            },
+            {
+                id: '9',
+                type: 'free',
+                content: '有人想一起约明天早上的晨跑吗？6点在小区门口集合！',
+                author: { name: 'Eva', avatar: 'eva' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 32),
+                color: 'blue'
+            },
+            {
+                id: '10',
+                type: 'free',
+                content: '打卡成功 ✅',
+                author: { name: 'Alen', avatar: 'alen' },
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 35),
+                color: 'pink'
+            }
+        ];
+
+        // 头像映射
+        const avatarMap = {
+            alen: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#bfdbfe"/>
+                <rect x="6" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                <rect x="13" y="9" width="5" height="3" fill="#1f2937" stroke="none"/>
+                <path d="M8 16h8"/>
+            </svg>`,
+            bob: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#bbf7d0"/>
+                <path d="M6 9h12" stroke-width="3"/>
+                <path d="M10 15v-2M14 15v-2"/>
+            </svg>`,
+            cindy: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#e9d5ff"/>
+                <circle cx="8" cy="11" r="2" fill="#1f2937" stroke="none"/>
+                <circle cx="16" cy="11" r="2" fill="#1f2937" stroke="none"/>
+                <path d="M12 16h.01" stroke-width="3"/>
+            </svg>`,
+            dave: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#ffedd5"/>
+                <rect x="7" y="10" width="3" height="3" fill="#1f2937"/>
+                <rect x="14" y="10" width="3" height="3" fill="#1f2937"/>
+                <path d="M9 16h6"/>
+            </svg>`,
+            eva: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#fbcfe8"/>
+                <path d="M8 10v2M16 10v2M9 16h6"/>
+            </svg>`
+        };
+
+        // 初始化
+        function init() {
+            state.notes = [...sampleNotes];
+            renderNotes();
+            setupEventListeners();
+        }
+
+        // 渲染卡片
+        function renderNotes() {
+            const container = document.getElementById('board-container');
+            container.innerHTML = '';
+
+            state.notes.forEach(note => {
+                const card = createNoteCard(note);
+                container.appendChild(card);
+            });
+        }
+
+        // 创建卡片元素
+        function createNoteCard(note) {
+            const card = document.createElement('div');
+            const isAnnouncement = note.type === 'announcement';
+            const colorClass = isAnnouncement ? 'note-announcement' : `note-free-${note.color}`;
+            const badgeClass = isAnnouncement ? 'badge-announcement' : 'badge-free';
+
+            card.className = `note-card ${colorClass} border-4 rounded-2xl p-5 shadow-[0_4px_0_0_#1f2937]`;
+            card.innerHTML = `
+                <button class="note-close-btn" onclick="deleteNote('${note.id}')">×</button>
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center border-2 border-slate-300 shadow-sm shrink-0">
+                        ${avatarMap[note.author.avatar] || avatarMap.alen}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-bold text-sm text-main">${note.author.name}</span>
+                            <span class="type-badge ${badgeClass}">${isAnnouncement ? '📢 通告' : '📝 笔记'}</span>
+                        </div>
+                        <span class="text-xs text-sub font-bold">${formatTimestamp(note.timestamp)}</span>
+                    </div>
+                </div>
+                <p class="text-sm font-bold text-main leading-relaxed whitespace-pre-wrap">${note.content}</p>
+            `;
+
+            return card;
+        }
+
+        // 格式化时间戳
+        function formatTimestamp(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (minutes < 1) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 7) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        // 发布新笔记
+        function publishNote() {
+            const input = document.getElementById('note-input');
+            const typeSelect = document.getElementById('note-type');
+            const content = input.value.trim();
+
+            if (!content) {
+                alert('请输入内容！');
+                return;
+            }
+
+            const newNote = {
+                id: Date.now().toString(),
+                type: typeSelect.value,
+                content: content,
+                author: state.currentUser,
+                timestamp: new Date(),
+                color: typeSelect.value === 'free' ? state.selectedColor : null
+            };
+
+            // 添加到数组开头
+            state.notes.unshift(newNote);
+
+            // 渲染新卡片（带动画）
+            const container = document.getElementById('board-container');
+            const newCard = createNoteCard(newNote);
+            container.insertBefore(newCard, container.firstChild);
+
+            // 清空输入
+            input.value = '';
+        }
+
+        // 删除笔记
+        function deleteNote(noteId) {
+            const card = event.target.closest('.note-card');
+            card.classList.add('deleting');
+
+            setTimeout(() => {
+                state.notes = state.notes.filter(n => n.id !== noteId);
+                renderNotes();
+            }, 300);
+        }
+
+        // 设置事件监听
+        function setupEventListeners() {
+            // 发布按钮
+            document.getElementById('publish-btn').addEventListener('click', publishNote);
+
+            // 输入框 Ctrl+Enter 发布
+            document.getElementById('note-input').addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    publishNote();
+                }
+            });
+
+            // 颜色选择
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    state.selectedColor = option.dataset.color;
+                });
+            });
+
+            // 类型切换时隐藏/显示颜色选择器
+            document.getElementById('note-type').addEventListener('change', (e) => {
+                const colorPicker = document.getElementById('color-picker');
+                if (e.target.value === 'announcement') {
+                    colorPicker.style.opacity = '0.5';
+                    colorPicker.style.pointerEvents = 'none';
+                } else {
+                    colorPicker.style.opacity = '1';
+                    colorPicker.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
+        // 模拟实时推送新笔记 - 不同长度产生瀑布流效果
+        function simulateRealtimePush() {
+            const randomNotes = [
+                { type: 'free', content: '今天天气不错，适合户外运动！☀️', color: 'yellow' },
+                { type: 'free', content: '分享一个拉伸技巧，可以缓解肌肉酸痛\n\n动作要领：\n1. 慢慢伸展，不要用力过猛\n2. 保持每个动作15-30秒\n3. 注意呼吸节奏\n4. 感到轻微拉伸感即可，不要疼痛', color: 'blue' },
+                { type: 'announcement', content: '📢 下周一开始新的训练周期，请大家做好准备！\n\n新的训练计划已发布，记得查看。本周日晚上8点有线上说明会，请大家准时参加。', color: null },
+                { type: 'free', content: '完成了！', color: 'green' },
+                { type: 'free', content: '有没有人想一起约明天早上的晨跑？', color: 'pink' },
+                { type: 'free', content: '今天尝试了新的训练方案，感觉不错！', color: 'yellow' },
+                { type: 'free', content: '坚持打卡第30天！🎉\n\n从一开始的艰难到现在已经形成习惯，感谢大家的鼓励和支持。继续加油！💪', color: 'blue' }
+            ];
+
+            const randomNote = randomNotes[Math.floor(Math.random() * randomNotes.length)];
+            const authors = ['Bob', 'Cindy', 'Dave', 'Eva'];
+            const avatars = ['bob', 'cindy', 'dave', 'eva'];
+            const randomIndex = Math.floor(Math.random() * authors.length);
+
+            const newNote = {
+                id: Date.now().toString(),
+                type: randomNote.type,
+                content: randomNote.content,
+                author: { name: authors[randomIndex], avatar: avatars[randomIndex] },
+                timestamp: new Date(),
+                color: randomNote.color
+            };
+
+            state.notes.unshift(newNote);
+
+            const container = document.getElementById('board-container');
+            const newCard = createNoteCard(newNote);
+            container.insertBefore(newCard, container.firstChild);
+
+            // 播放提示音（可选）
+            // new Audio('notification.mp3').play();
+        }
+
+        // 启动
+        init();
+
+        // 每30秒模拟一次实时推送（演示用）
+        setInterval(simulateRealtimePush, 30000);
+    </script>
+
+</body>
+</html>
