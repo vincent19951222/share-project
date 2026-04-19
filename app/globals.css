@@ -269,6 +269,11 @@ body {
 .note-card:hover .note-close-btn {
   opacity: 1;
 }
+@media (hover: none) {
+  .note-close-btn {
+    opacity: 1;
+  }
+}
 .note-close-btn:hover {
   background: #1f2937;
   color: #fde047;

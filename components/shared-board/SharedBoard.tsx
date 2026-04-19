@@ -16,6 +16,7 @@ export function SharedBoard() {
   const [submitting, setSubmitting] = useState(false);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(() => new Set());
   const [message, setMessage] = useState<string | null>(null);
+  const isActive = state.activeTab === "board";
 
   const currentMember = useMemo(
     () => state.members.find((member) => member.id === state.currentUserId) ?? state.members[0],
@@ -41,13 +42,15 @@ export function SharedBoard() {
   }, []);
 
   useEffect(() => {
+    if (!isActive) return;
+
     void fetchNotes();
     const timer = window.setInterval(() => {
       void fetchNotes();
     }, 30000);
 
     return () => window.clearInterval(timer);
-  }, [fetchNotes]);
+  }, [fetchNotes, isActive]);
 
   async function createNote(input: { type: BoardNoteType; content: string; color: BoardNoteColor | null }) {
     setSubmitting(true);
