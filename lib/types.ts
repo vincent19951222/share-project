@@ -21,12 +21,12 @@ export interface BoardState {
   today: number;
   totalDays: number;
   logs: ActivityLog[];
-  activeTab: "punch" | "dash";
+  activeTab: "punch" | "board" | "dash";
   currentUserId: string;
 }
 
 export type BoardAction =
   | { type: "PUNCH"; memberIndex: number; dayIndex: number; punchType: string }
   | { type: "ADD_LOG"; log: ActivityLog }
-  | { type: "SET_TAB"; tab: "punch" | "dash" }
+  | { type: "SET_TAB"; tab: "punch" | "board" | "dash" }
   | { type: "SIMULATE_REMOTE_PUNCH"; memberIndex: number; typeDesc: string };

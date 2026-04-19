@@ -3,6 +3,7 @@
 import { useBoard } from "@/lib/store";
 import { Navbar } from "@/components/navbar/Navbar";
 import { PunchBoard } from "@/components/punch-board/PunchBoard";
+import { SharedBoard } from "@/components/shared-board/SharedBoard";
 import { ReportCenter } from "@/components/report-center/ReportCenter";
 
 export default function Home() {
@@ -20,10 +21,16 @@ export default function Home() {
           <PunchBoard />
         </div>
         <div
-          className={`transition-opacity duration-300 ${
+          className={`absolute inset-0 transition-opacity duration-300 ${
+            state.activeTab === "board" ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <SharedBoard />
+        </div>
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${
             state.activeTab === "dash" ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
-          style={{ position: "absolute", inset: 0 }}
         >
           <ReportCenter />
         </div>

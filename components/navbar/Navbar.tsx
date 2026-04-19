@@ -43,6 +43,13 @@ export function Navbar() {
             协同打卡
           </TabBtn>
           <TabBtn
+            active={state.activeTab === "board"}
+            onClick={() => dispatch({ type: "SET_TAB", tab: "board" })}
+          >
+            <span className="w-4 h-4" dangerouslySetInnerHTML={{ __html: SvgIcons.megaphone }} />
+            共享看板
+          </TabBtn>
+          <TabBtn
             active={state.activeTab === "dash"}
             onClick={() => dispatch({ type: "SET_TAB", tab: "dash" })}
           >
