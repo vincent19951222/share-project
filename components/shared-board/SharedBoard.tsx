@@ -8,6 +8,10 @@ import { NoteMasonry } from "./NoteMasonry";
 import { SyncStatus } from "./SyncStatus";
 
 type SyncState = "idle" | "syncing" | "error";
+type BoardMessage = {
+  tone: "success" | "error";
+  text: string;
+};
 
 export function SharedBoard() {
   const { state } = useBoard();
@@ -15,7 +19,7 @@ export function SharedBoard() {
   const [syncState, setSyncState] = useState<SyncState>("idle");
   const [submitting, setSubmitting] = useState(false);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(() => new Set());
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<BoardMessage | null>(null);
   const isActive = state.activeTab === "board";
 
   const currentMember = useMemo(
@@ -69,10 +73,11 @@ export function SharedBoard() {
 
       const body = await response.json() as { note: BoardNoteDto };
       setNotes((current) => [body.note, ...current.filter((note) => note.id !== body.note.id)]);
+      setMessage({ tone: "success", text: "已发布到共享看板" });
       void fetchNotes();
       return true;
     } catch {
-      setMessage("发布失败，请稍后再试");
+      setMessage({ tone: "error", text: "发布失败，请稍后再试" });
       return false;
     } finally {
       setSubmitting(false);
@@ -93,7 +98,7 @@ export function SharedBoard() {
       setNotes((current) => current.filter((note) => note.id !== id));
       void fetchNotes();
     } catch {
-      setMessage("删除失败，请稍后再试");
+      setMessage({ tone: "error", text: "删除失败，请稍后再试" });
     } finally {
       setDeletingIds((current) => {
         const next = new Set(current);
@@ -119,8 +124,14 @@ export function SharedBoard() {
       />
 
       {message && (
-        <div className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-2 text-sm font-bold text-red-600">
-          {message}
+        <div
+          className={`mb-4 rounded-xl border-2 px-4 py-2 text-sm font-bold ${
+            message.tone === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-red-200 bg-red-50 text-red-600"
+          }`}
+        >
+          {message.text}
         </div>
       )}
 

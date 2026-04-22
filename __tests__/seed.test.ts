@@ -218,6 +218,32 @@ describe("seedDatabase", () => {
     expect(aggregate._sum.coins).toBe(50);
   });
 
+  it("should preserve seeded users' shared board notes by default", async () => {
+    await seedDatabase();
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { username: SEED_USERS[0].username },
+    });
+    const note = await prisma.boardNote.create({
+      data: {
+        teamId: user.teamId,
+        authorId: user.id,
+        type: "ANNOUNCEMENT",
+        content: "Seed should preserve this notice",
+        color: null,
+      },
+    });
+
+    await seedDatabase();
+
+    await expect(prisma.boardNote.findUniqueOrThrow({
+      where: { id: note.id },
+    })).resolves.toMatchObject({
+      content: "Seed should preserve this notice",
+      authorId: user.id,
+    });
+  });
+
   it("should remove extra users outside the seeded roster", async () => {
     await seedDatabase();
 

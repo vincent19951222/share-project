@@ -94,12 +94,6 @@ export async function seedDatabase(): Promise<void> {
     })),
   });
 
-  await prisma.boardNote.deleteMany({
-    where: {
-      authorId: { in: seededUserIds },
-    },
-  });
-
   await prisma.user.updateMany({
     where: { id: { in: seededUserIds } },
     data: {

@@ -30,6 +30,18 @@ const initialState: BoardState = {
   currentUserId: "user-1",
 };
 
+const activeBoardState: BoardState = {
+  ...initialState,
+  activeTab: "board",
+};
+
+function createJsonResponse(payload: unknown, ok = true) {
+  return {
+    ok,
+    json: async () => payload,
+  } as Response;
+}
+
 describe("SharedBoard polling", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -68,5 +80,56 @@ describe("SharedBoard polling", () => {
       (c: unknown[]) => c[0] as string,
     );
     expect(allCalls.every((url) => url === "/api/board/state")).toBe(true);
+  });
+
+  it("shows an explicit success message after publishing a note", async () => {
+    vi.useRealTimers();
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce(createJsonResponse({ notes: [] }))
+      .mockResolvedValueOnce(createJsonResponse({
+        note: {
+          id: "note-1",
+          type: "ANNOUNCEMENT",
+          content: "今晚八点训练",
+          color: null,
+          pinned: false,
+          createdAt: new Date().toISOString(),
+          author: { id: "user-1", name: "Li", avatarKey: "male1" },
+          canDelete: true,
+        },
+      }))
+      .mockResolvedValueOnce(createJsonResponse({ notes: [] })));
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={activeBoardState}>
+          <SharedBoard />
+        </BoardProvider>,
+      );
+    });
+
+    const textarea = container.querySelector("textarea");
+    const button = Array.from(container.querySelectorAll("button")).find(
+      (element) => element.textContent?.includes("发布"),
+    );
+
+    expect(textarea).not.toBeNull();
+    expect(button).not.toBeNull();
+
+    await act(async () => {
+      const setValue = Object.getOwnPropertyDescriptor(
+        HTMLTextAreaElement.prototype,
+        "value",
+      )?.set;
+
+      setValue?.call(textarea, "今晚八点训练");
+      textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await act(async () => {
+      button!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("已发布到共享看板");
   });
 });
