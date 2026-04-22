@@ -17,6 +17,8 @@ function getSlotColor(month: number, colorIndex: number) {
   return theme.memberColors[colorIndex % theme.memberColors.length];
 }
 
+const EMPTY_SLOT_COLOR = "#f8fafc";
+
 export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
   if (!activeSeason) {
     return (
@@ -55,20 +57,20 @@ export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
       </div>
       <div
         data-testid="season-progress-grid"
-        className="grid h-4 overflow-hidden rounded-full border-2 border-slate-800 bg-white"
+        className="grid h-4 gap-px overflow-hidden rounded-full border-2 border-slate-800 bg-slate-800 p-px"
         style={{ gridTemplateColumns: `repeat(${segments}, minmax(0, 1fr))` }}
       >
         {Array.from({ length: segments }, (_, index) => {
           const isFilled = index < filledSlots;
           const backgroundColor = isFilled
             ? getSlotColor(theme.month, filledColorOrder[index] ?? 0)
-            : theme.emptySlotColor;
+            : EMPTY_SLOT_COLOR;
 
           return (
             <div
               key={`${activeSeason.id}-${index}`}
               data-slot-state={isFilled ? "filled" : "empty"}
-              className="h-full"
+              className="h-full rounded-[2px]"
               style={{ backgroundColor }}
             />
           );
