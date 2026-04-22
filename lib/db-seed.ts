@@ -33,6 +33,7 @@ export async function seedDatabase(): Promise<void> {
   });
 
   const rand = seededRandom(42);
+  const seededUsernames = new Set(SEED_USERS.map((user) => user.username));
 
   for (const seedUser of SEED_USERS) {
     const user = await prisma.user.upsert({
@@ -59,5 +60,20 @@ export async function seedDatabase(): Promise<void> {
         },
       });
     }
+  }
+
+  const extraUsers = await prisma.user.findMany({
+    where: {
+      teamId: team.id,
+      username: { notIn: Array.from(seededUsernames) },
+    },
+    select: { id: true },
+  });
+
+  if (extraUsers.length > 0) {
+    const extraUserIds = extraUsers.map((user) => user.id);
+    await prisma.boardNote.deleteMany({ where: { authorId: { in: extraUserIds } } });
+    await prisma.punchRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.user.deleteMany({ where: { id: { in: extraUserIds } } });
   }
 }

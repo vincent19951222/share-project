@@ -1,24 +1,43 @@
 "use client";
 
 import { SvgIcons } from "@/components/ui/SvgIcons";
+import type { ReportHighlight } from "./report-data";
 
-export function Highlights() {
+interface HighlightsProps {
+  highlights: ReportHighlight[];
+}
+
+const toneClasses: Record<ReportHighlight["tone"], string> = {
+  blue: "bg-blue-50 border-blue-100 text-blue-900",
+  green: "bg-green-50 border-green-100 text-green-900",
+  rose: "bg-rose-50 border-rose-100 text-rose-900",
+};
+
+const bodyClasses: Record<ReportHighlight["tone"], string> = {
+  blue: "text-blue-700",
+  green: "text-green-700",
+  rose: "text-rose-700",
+};
+
+const iconByTone: Record<ReportHighlight["tone"], string> = {
+  blue: SvgIcons.megaphone,
+  green: SvgIcons.trophy,
+  rose: SvgIcons.target,
+};
+
+export function Highlights({ highlights }: HighlightsProps) {
   return (
-    <div className="col-span-1 flex flex-col gap-4">
-      <div className="bg-blue-50 border-4 border-blue-100 rounded-[1.5rem] p-5 flex-1 flex flex-col justify-center items-center text-center">
-        <div className="w-10 h-10 mb-2 text-blue-500">
-          <span dangerouslySetInnerHTML={{ __html: SvgIcons.megaphone }} />
-        </div>
-        <h3 className="font-black text-blue-900 text-lg">月度打气筒</h3>
-        <p className="text-xs text-blue-700 font-bold mt-1">Bob 催促了 15 次！</p>
-      </div>
-      <div className="bg-purple-50 border-4 border-purple-100 rounded-[1.5rem] p-5 flex-1 flex flex-col justify-center items-center text-center">
-        <div className="w-10 h-10 mb-2 text-purple-500">
-          <span dangerouslySetInnerHTML={{ __html: SvgIcons.ice }} />
-        </div>
-        <h3 className="font-black text-purple-900 text-lg">早起破冰者</h3>
-        <p className="text-xs text-purple-700 font-bold mt-1">Dave 18天首位打卡</p>
-      </div>
-    </div>
+    <aside className="flex flex-col gap-4">
+      {highlights.map((highlight) => (
+        <article
+          key={highlight.title}
+          className={`min-h-32 flex-1 rounded-[1.25rem] border-4 p-5 ${toneClasses[highlight.tone]}`}
+        >
+          <div className="mb-3 h-9 w-9" dangerouslySetInnerHTML={{ __html: iconByTone[highlight.tone] }} />
+          <h3 className="text-lg font-black">{highlight.title}</h3>
+          <p className={`mt-2 text-sm font-bold leading-relaxed ${bodyClasses[highlight.tone]}`}>{highlight.body}</p>
+        </article>
+      ))}
+    </aside>
   );
 }

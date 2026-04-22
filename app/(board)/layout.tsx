@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { buildBoardSnapshotForUser } from "@/lib/board-state";
 import { BoardProvider } from "@/lib/store";
 import type { BoardState } from "@/lib/types";
 
@@ -16,59 +16,26 @@ export default async function BoardLayout({
     redirect("/login");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      team: { include: { users: { include: { punchRecords: true } } } },
-    },
-  });
+  const snapshot = await buildBoardSnapshotForUser(userId);
 
-  if (!user) {
+  if (!snapshot) {
     redirect("/login");
   }
 
-  const team = user.team;
-  const members = team.users.map((u) => ({
-    id: u.id,
-    name: u.username,
-    avatarKey: u.avatarKey,
-  }));
-
-  const today = 18;
-  const totalDays = 30;
-
-  const gridData: (boolean | null)[][] = team.users.map((teamUser) => {
-    const row: (boolean | null)[] = [];
-    for (let day = 1; day <= totalDays; day++) {
-      if (day <= today) {
-        const record = teamUser.punchRecords.find((r) => r.dayIndex === day);
-        row.push(record ? record.punched : false);
-      } else {
-        row.push(null);
-      }
-    }
-    return row;
-  });
-
-  const teamCoins = team.users.reduce((sum, u) => sum + u.coins, 0);
-
   const initialState: BoardState = {
-    members,
-    gridData,
-    teamCoins,
-    targetCoins: 2000,
-    today,
-    totalDays,
+    ...snapshot,
     logs: [
       {
         id: "seed-1",
-        text: "WebSocket Connection Established. [Realtime Engine Active]",
+        text: "已连接共享战场，当前数据来自服务器快照。",
         type: "system",
         timestamp: new Date(0),
       },
     ],
     activeTab: "punch",
-    currentUserId: user.id,
+    lastAppliedPollRequestId: 0,
+    pendingPunchEpoch: 0,
+    latestSettledPunchEpoch: 0,
   };
 
   return <BoardProvider initialState={initialState}>{children}</BoardProvider>;

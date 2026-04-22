@@ -13,20 +13,40 @@ export interface ActivityLog {
   timestamp: Date;
 }
 
-export interface BoardState {
+export interface BoardSnapshot {
   members: Member[];
   gridData: CellStatus[][];
   teamCoins: number;
   targetCoins: number;
   today: number;
   totalDays: number;
-  logs: ActivityLog[];
-  activeTab: "punch" | "board" | "dash";
   currentUserId: string;
 }
 
+export interface BoardState extends BoardSnapshot {
+  logs: ActivityLog[];
+  activeTab: "punch" | "board" | "dash";
+  lastAppliedPollRequestId?: number;
+  pendingPunchEpoch?: number;
+  latestSettledPunchEpoch?: number;
+}
+
 export type BoardAction =
-  | { type: "PUNCH"; memberIndex: number; dayIndex: number; punchType: string }
   | { type: "ADD_LOG"; log: ActivityLog }
   | { type: "SET_TAB"; tab: "punch" | "board" | "dash" }
-  | { type: "SIMULATE_REMOTE_PUNCH"; memberIndex: number; typeDesc: string };
+  | { type: "BEGIN_PUNCH_SYNC"; punchEpoch: number }
+  | { type: "END_PUNCH_SYNC"; punchEpoch: number }
+  | {
+      type: "SYNC_REMOTE_STATE";
+      snapshot: BoardSnapshot;
+      source: "poll";
+      requestId: number;
+      pendingPunchEpochAtStart: number;
+      settledPunchEpochAtStart: number;
+    }
+  | {
+      type: "SYNC_REMOTE_STATE";
+      snapshot: BoardSnapshot;
+      source: "punch";
+      punchEpoch: number;
+    };
