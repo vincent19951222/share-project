@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef, useCallback } from "react";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
@@ -29,8 +30,15 @@ export function Navbar() {
     <nav ref={navRef} className="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">
       <div className="flex items-center gap-6">
         <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
-          <div className="w-8 h-8 bg-yellow-300 border-2 border-slate-800 rounded-lg flex items-center justify-center shadow-[0_2px_0_0_#1f2937] p-1">
-            <span dangerouslySetInnerHTML={{ __html: SvgIcons.box }} />
+          <div className="h-8 w-8 overflow-hidden rounded-lg border-2 border-slate-800 bg-white shadow-[0_2px_0_0_#1f2937]">
+            <Image
+              src="/logo.png"
+              alt="脱脂牛马 Logo"
+              width={32}
+              height={32}
+              className="h-full w-full object-cover"
+              priority
+            />
           </div>
           脱脂牛马
         </div>

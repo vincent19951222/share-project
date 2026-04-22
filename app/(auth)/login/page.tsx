@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { LoginForm } from "@/components/login/LoginForm";
 
 export default function LoginPage() {
@@ -9,11 +10,15 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/10 to-slate-900/70"></div>
           <div className="absolute inset-0 p-10 flex flex-col justify-between text-white z-10">
             <div className="font-black text-3xl tracking-tighter flex items-center gap-2 drop-shadow-md">
-              <div className="w-10 h-10 bg-yellow-300 border-2 border-slate-800 rounded-xl flex items-center justify-center shadow-[0_3px_0_0_#1f2937] p-1.5">
-                <svg viewBox="0 0 24 24" className="w-full h-full text-slate-800" fill="#fcd34d" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="8" width="18" height="13" rx="2" />
-                  <path d="M2 8h20M12 8v13M8 13h8" />
-                </svg>
+              <div className="h-10 w-10 overflow-hidden rounded-xl border-2 border-slate-800 bg-white shadow-[0_3px_0_0_#1f2937]">
+                <Image
+                  src="/logo.png"
+                  alt="脱脂牛马 Logo"
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
+                  priority
+                />
               </div>
               脱脂牛马
             </div>
