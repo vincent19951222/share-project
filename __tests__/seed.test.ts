@@ -37,10 +37,12 @@ describe("seedDatabase", () => {
         where: { username: seedUser.username },
         include: { punchRecords: true },
       });
-      expect(user!.punchRecords.length).toBeGreaterThan(0);
-
-      const dayIndices = user!.punchRecords.map((r) => r.dayIndex);
-      expect(new Set(dayIndices).size).toBe(dayIndices.length);
+      expect(user!.punchRecords).toHaveLength(1);
+      expect(user!.punchRecords[0]).toMatchObject({
+        dayIndex: 22,
+        punched: true,
+        punchType: "default",
+      });
     }
   });
 
@@ -49,7 +51,20 @@ describe("seedDatabase", () => {
     await seedDatabase();
 
     const userCount = await prisma.user.count();
+    const punchCount = await prisma.punchRecord.count();
     expect(userCount).toBe(SEED_USERS.length);
+    expect(punchCount).toBe(SEED_USERS.length);
+  });
+
+  it("should keep the seeded team vault at 50", async () => {
+    await seedDatabase();
+
+    const aggregate = await prisma.user.aggregate({
+      _sum: { coins: true },
+      where: { username: { in: SEED_USERS.map((user) => user.username) } },
+    });
+
+    expect(aggregate._sum.coins).toBe(50);
   });
 
   it("should remove extra users outside the seeded roster", async () => {

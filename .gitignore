@@ -24,6 +24,8 @@ dist/
 
 # Database
 *.db
+!prisma/dev.db
+prisma/dev.db.bak-*
 
 # Prisma generated client
 /lib/generated/prisma

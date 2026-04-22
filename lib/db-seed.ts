@@ -7,23 +7,17 @@ export const SEED_TEAM = {
 };
 
 export const SEED_USERS = [
-  { username: "li", avatarKey: "male1", coins: 345 },
-  { username: "luo", avatarKey: "male2", coins: 280 },
-  { username: "liu", avatarKey: "female1", coins: 310 },
-  { username: "wu", avatarKey: "male3", coins: 225 },
-  { username: "ji", avatarKey: "female2", coins: 290 },
+  { username: "li", avatarKey: "male1", coins: 10 },
+  { username: "luo", avatarKey: "male2", coins: 10 },
+  { username: "liu", avatarKey: "female1", coins: 10 },
+  { username: "wu", avatarKey: "male3", coins: 10 },
+  { username: "ji", avatarKey: "female2", coins: 10 },
 ];
 
-function seededRandom(seed: number): () => number {
-  let s = seed;
-  return () => {
-    s = (s * 16807) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
+export const SEED_PUNCH_DAY = 22;
+export const SEED_PUNCH_CREATED_AT = new Date("2026-04-22T00:00:00+08:00");
 
 export async function seedDatabase(): Promise<void> {
-  const today = 18;
   const passwordHash = await hashPassword("0000");
 
   const team = await prisma.team.upsert({
@@ -32,13 +26,18 @@ export async function seedDatabase(): Promise<void> {
     create: { code: SEED_TEAM.code, name: SEED_TEAM.name },
   });
 
-  const rand = seededRandom(42);
   const seededUsernames = new Set(SEED_USERS.map((user) => user.username));
+  const seededUserIds: string[] = [];
 
   for (const seedUser of SEED_USERS) {
     const user = await prisma.user.upsert({
       where: { username: seedUser.username },
-      update: { avatarKey: seedUser.avatarKey, coins: seedUser.coins, password: passwordHash },
+      update: {
+        avatarKey: seedUser.avatarKey,
+        coins: seedUser.coins,
+        password: passwordHash,
+        teamId: team.id,
+      },
       create: {
         username: seedUser.username,
         password: passwordHash,
@@ -47,20 +46,33 @@ export async function seedDatabase(): Promise<void> {
         teamId: team.id,
       },
     });
-
-    for (let day = 1; day < today; day++) {
-      const punched = rand() > 0.2;
-      await prisma.punchRecord.upsert({
-        where: { userId_dayIndex: { userId: user.id, dayIndex: day } },
-        update: { punched },
-        create: {
-          userId: user.id,
-          dayIndex: day,
-          punched,
-        },
-      });
-    }
+    seededUserIds.push(user.id);
   }
+
+  await prisma.punchRecord.deleteMany({
+    where: { userId: { in: seededUserIds } },
+  });
+
+  await prisma.punchRecord.createMany({
+    data: seededUserIds.map((userId) => ({
+      userId,
+      dayIndex: SEED_PUNCH_DAY,
+      punched: true,
+      punchType: "default",
+      createdAt: SEED_PUNCH_CREATED_AT,
+    })),
+  });
+
+  await prisma.boardNote.deleteMany({
+    where: {
+      authorId: { in: seededUserIds },
+    },
+  });
+
+  await prisma.user.updateMany({
+    where: { id: { in: seededUserIds } },
+    data: { coins: 10 },
+  });
 
   const extraUsers = await prisma.user.findMany({
     where: {
