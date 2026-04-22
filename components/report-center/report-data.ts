@@ -31,8 +31,7 @@ export interface ReportData {
   summary: string;
   teamVault: {
     current: number;
-    target: number;
-    progress: number;
+    helper: string;
   };
   metrics: ReportMetric[];
   dailyPoints: DailyTrendPoint[];
@@ -94,7 +93,8 @@ function getSummary(totalPunches: number, fullAttendanceDays: number, completion
     return "本月打卡 0 次，全勤 0 天，先攒一点数据再看趋势。";
   }
 
-  const rhythm = completionRate >= 80 ? "团队节奏稳住了" : "团队节奏还有上升空间";
+  const rhythm =
+    completionRate >= 80 ? "团队节奏稳住了" : "团队节奏还有上升空间";
   return `本月打卡 ${totalPunches} 次，全勤 ${fullAttendanceDays} 天，${rhythm}。`;
 }
 
@@ -165,18 +165,17 @@ export function buildReportData(state: BoardState, now = new Date()): ReportData
   }));
 
   const mostConsistentMember = getLongestStreak(state, elapsedDays);
-  const teamCoins = state.teamCoins ?? state.teamVaultTotal ?? 0;
-  const targetCoins = state.targetCoins ?? 0;
-  const vaultProgress =
-    targetCoins > 0 ? Math.min(100, Math.round((teamCoins / targetCoins) * 100)) : 0;
+  const teamVaultTotal = state.teamVaultTotal ?? 0;
+  const activeSeason = state.activeSeason ?? null;
 
   return {
     title: getDashboardTitle(now),
     summary: getSummary(totalPunches, fullAttendanceDays, completionRate),
     teamVault: {
-      current: teamCoins,
-      target: targetCoins,
-      progress: vaultProgress,
+      current: teamVaultTotal,
+      helper: activeSeason
+        ? `${activeSeason.goalName} · ${Math.min(activeSeason.filledSlots, activeSeason.targetSlots)}/${activeSeason.targetSlots}`
+        : "暂无进行中的赛季",
     },
     metrics: [
       {

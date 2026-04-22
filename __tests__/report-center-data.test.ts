@@ -5,17 +5,35 @@ import type { BoardState } from "@/lib/types";
 function createState(overrides: Partial<BoardState> = {}): BoardState {
   return {
     members: [
-      { id: "u1", name: "li", avatarKey: "male1" },
-      { id: "u2", name: "luo", avatarKey: "male2" },
-      { id: "u3", name: "liu", avatarKey: "female1" },
+      { id: "u1", name: "li", avatarKey: "male1", assetBalance: 120, seasonIncome: 30, slotContribution: 2 },
+      { id: "u2", name: "luo", avatarKey: "male2", assetBalance: 80, seasonIncome: 20, slotContribution: 1 },
+      { id: "u3", name: "liu", avatarKey: "female1", assetBalance: 60, seasonIncome: 10, slotContribution: 0 },
     ],
     gridData: [
       [true, true, false, true, null],
       [true, false, false, true, null],
       [true, true, false, false, null],
     ],
-    teamCoins: 1450,
-    targetCoins: 2000,
+    teamVaultTotal: 1450,
+    currentUser: {
+      assetBalance: 120,
+      currentStreak: 6,
+      nextReward: 20,
+      seasonIncome: 30,
+      isAdmin: false,
+    },
+    activeSeason: {
+      id: "season-1",
+      monthKey: "2026-04",
+      goalName: "减脂挑战",
+      targetSlots: 5,
+      filledSlots: 3,
+      contributions: [
+        { userId: "u1", name: "li", avatarKey: "male1", colorIndex: 0, slotContribution: 2, seasonIncome: 30 },
+        { userId: "u2", name: "luo", avatarKey: "male2", colorIndex: 1, slotContribution: 1, seasonIncome: 20 },
+        { userId: "u3", name: "liu", avatarKey: "female1", colorIndex: 2, slotContribution: 0, seasonIncome: 10 },
+      ],
+    },
     today: 4,
     totalDays: 5,
     logs: [],
@@ -31,7 +49,7 @@ describe("buildReportData", () => {
 
     expect(report.title).toBe("APRIL DASHBOARD");
     expect(report.summary).toBe("本月打卡 7 次，全勤 1 天，团队节奏还有上升空间。");
-    expect(report.teamVault).toEqual({ current: 1450, target: 2000, progress: 73 });
+    expect(report.teamVault).toEqual({ current: 1450, helper: "减脂挑战 · 3/5" });
     expect(report.metrics.map((metric) => [metric.label, metric.value])).toEqual([
       ["团队完成率", "58%"],
       ["总打卡次数", "7"],
@@ -110,8 +128,15 @@ describe("buildReportData", () => {
       createState({
         members: [],
         gridData: [],
-        teamCoins: 0,
-        targetCoins: 0,
+        teamVaultTotal: 0,
+        currentUser: {
+          assetBalance: 0,
+          currentStreak: 0,
+          nextReward: 0,
+          seasonIncome: 0,
+          isAdmin: false,
+        },
+        activeSeason: null,
         today: 0,
         totalDays: 0,
       }),
@@ -119,7 +144,7 @@ describe("buildReportData", () => {
     );
 
     expect(report.summary).toBe("本月打卡 0 次，全勤 0 天，先攒一点数据再看趋势。");
-    expect(report.teamVault).toEqual({ current: 0, target: 0, progress: 0 });
+    expect(report.teamVault).toEqual({ current: 0, helper: "暂无进行中的赛季" });
     expect(report.metrics.map((metric) => metric.value)).toEqual(["0%", "0", "0", "暂无高光"]);
     expect(report.dailyPoints).toEqual([]);
     expect(report.peakDay).toBeNull();

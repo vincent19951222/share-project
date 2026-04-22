@@ -10,12 +10,19 @@ import type { BoardState } from "@/lib/types";
 
 const initialState: BoardState = {
   members: [
-    { id: "user-1", name: "Li", avatarKey: "male1" },
-    { id: "user-2", name: "Luo", avatarKey: "male2" },
+    { id: "user-1", name: "Li", avatarKey: "male1", assetBalance: 0, seasonIncome: 0, slotContribution: 0 },
+    { id: "user-2", name: "Luo", avatarKey: "male2", assetBalance: 0, seasonIncome: 0, slotContribution: 0 },
   ],
   gridData: [[false], [false]],
-  teamCoins: 0,
-  targetCoins: 100,
+  teamVaultTotal: 0,
+  currentUser: {
+    assetBalance: 0,
+    currentStreak: 0,
+    nextReward: 10,
+    seasonIncome: 0,
+    isAdmin: false,
+  },
+  activeSeason: null,
   today: 1,
   totalDays: 1,
   logs: [],

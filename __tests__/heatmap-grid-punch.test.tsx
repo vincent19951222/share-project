@@ -10,12 +10,19 @@ import type { BoardSnapshot, BoardState } from "@/lib/types";
 
 const initialState: BoardState = {
   members: [
-    { id: "user-1", name: "Li", avatarKey: "male1" },
-    { id: "user-2", name: "Luo", avatarKey: "male2" },
+    { id: "user-1", name: "Li", avatarKey: "male1", assetBalance: 0, seasonIncome: 0, slotContribution: 0 },
+    { id: "user-2", name: "Luo", avatarKey: "male2", assetBalance: 0, seasonIncome: 0, slotContribution: 0 },
   ],
   gridData: [[false, null], [false, null]],
-  teamCoins: 0,
-  targetCoins: 100,
+  teamVaultTotal: 0,
+  currentUser: {
+    assetBalance: 0,
+    currentStreak: 0,
+    nextReward: 10,
+    seasonIncome: 0,
+    isAdmin: false,
+  },
+  activeSeason: null,
   today: 1,
   totalDays: 2,
   logs: [],
@@ -47,8 +54,9 @@ function createSnapshot(overrides: Partial<BoardSnapshot> = {}): BoardSnapshot {
   return {
     members: initialState.members,
     gridData: [[false, null], [false, null]],
-    teamCoins: 0,
-    targetCoins: 100,
+    teamVaultTotal: 0,
+    currentUser: initialState.currentUser,
+    activeSeason: null,
     today: 1,
     totalDays: 2,
     currentUserId: "user-1",
@@ -98,7 +106,9 @@ describe("HeatmapGrid punch flow", () => {
       plusButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) => button.textContent?.includes("确认打卡"));
+    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认打卡"),
+    );
     expect(confirmButton).toBeDefined();
 
     await act(async () => {
@@ -118,7 +128,14 @@ describe("HeatmapGrid punch flow", () => {
         json: async () => ({
           snapshot: createSnapshot({
             gridData: [[true, null], [false, null]],
-            teamCoins: 15,
+            teamVaultTotal: 15,
+            currentUser: {
+              assetBalance: 15,
+              currentStreak: 0,
+              nextReward: 10,
+              seasonIncome: 0,
+              isAdmin: false,
+            },
           }),
         }),
       });
@@ -158,8 +175,8 @@ describe("HeatmapGrid punch flow", () => {
       plusButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find(
-      (button) => button.textContent?.includes("确认打卡"),
+    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认打卡"),
     );
 
     await act(async () => {

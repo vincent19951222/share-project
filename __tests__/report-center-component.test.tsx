@@ -10,15 +10,32 @@ import type { BoardState } from "@/lib/types";
 
 const initialState: BoardState = {
   members: [
-    { id: "u1", name: "li", avatarKey: "male1" },
-    { id: "u2", name: "luo", avatarKey: "male2" },
+    { id: "u1", name: "li", avatarKey: "male1", assetBalance: 120, seasonIncome: 30, slotContribution: 2 },
+    { id: "u2", name: "luo", avatarKey: "male2", assetBalance: 80, seasonIncome: 20, slotContribution: 1 },
   ],
   gridData: [
     [true, true, false],
     [true, false, true],
   ],
-  teamCoins: 1450,
-  targetCoins: 2000,
+  teamVaultTotal: 1450,
+  currentUser: {
+    assetBalance: 120,
+    currentStreak: 6,
+    nextReward: 20,
+    seasonIncome: 30,
+    isAdmin: false,
+  },
+  activeSeason: {
+    id: "season-1",
+    monthKey: "2026-04",
+    goalName: "减脂挑战",
+    targetSlots: 5,
+    filledSlots: 3,
+    contributions: [
+      { userId: "u1", name: "li", avatarKey: "male1", colorIndex: 0, slotContribution: 2, seasonIncome: 30 },
+      { userId: "u2", name: "luo", avatarKey: "male2", colorIndex: 1, slotContribution: 1, seasonIncome: 20 },
+    ],
+  },
   today: 3,
   totalDays: 3,
   logs: [],
@@ -57,6 +74,7 @@ describe("ReportCenter", () => {
     expect(container.textContent).toContain("团队完成率");
     expect(container.textContent).toContain("总打卡次数");
     expect(container.textContent).toContain("牛马金库");
+    expect(container.textContent).toContain("减脂挑战 · 3/5");
     expect(container.textContent).toContain("ACTIVITY TREND / 活跃趋势");
     expect(container.textContent).toContain("气氛组播报");
     expect(container.textContent).not.toContain("OCTOBER REPORT");

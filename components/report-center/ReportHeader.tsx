@@ -23,14 +23,8 @@ export function ReportHeader({ title, summary, teamVault }: ReportHeaderProps) {
         <div className="text-xs font-bold text-sub">牛马金库</div>
         <div className="text-3xl font-black text-yellow-500">
           {teamVault.current.toLocaleString("zh-CN")}
-          <span className="text-base text-slate-300">/{teamVault.target.toLocaleString("zh-CN")}</span>
         </div>
-        <div className="mt-2 h-3 w-full overflow-hidden rounded-full border-2 border-slate-200 bg-slate-100 lg:ml-auto lg:w-44">
-          <div
-            className="h-full border-r-2 border-slate-800 bg-yellow-300 transition-all duration-500"
-            style={{ width: `${teamVault.progress}%` }}
-          />
-        </div>
+        <div className="mt-1 text-xs font-bold text-sub">{teamVault.helper}</div>
       </div>
     </div>
   );
