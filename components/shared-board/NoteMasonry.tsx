@@ -13,8 +13,8 @@ export function NoteMasonry({ notes, deletingIds, onDelete }: NoteMasonryProps) 
   if (notes.length === 0) {
     return (
       <div className="soft-card p-8 text-center">
-        <p className="font-black text-xl text-main">还没人贴便签</p>
-        <p className="font-bold text-sm text-sub mt-2">先来一张，给今天的团队小墙开个张。</p>
+        <p className="text-xl font-black text-main">还没人贴便签</p>
+        <p className="mt-2 text-sm font-bold text-sub">先来一张，给今天的团队小墙开个张。</p>
       </div>
     );
   }

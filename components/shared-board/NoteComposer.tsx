@@ -60,17 +60,17 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
   }
 
   return (
-    <section className="soft-card p-6 mb-4">
+    <section className="soft-card mb-4 p-6">
       <div className="flex gap-4">
-        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-200 shadow-sm shrink-0 overflow-hidden">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-blue-200 bg-blue-100 shadow-sm">
           <img
             src={getAvatarUrl(currentUser.avatarKey)}
             alt={currentUser.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <textarea
             value={content}
             onChange={(event) => setContent(event.target.value)}
@@ -86,7 +86,7 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
             maxLength={BOARD_NOTE_MAX_LENGTH + 1}
           />
 
-          <div className="flex flex-col gap-3 mt-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap items-center gap-4">
               <label className="flex items-center gap-2 text-xs font-bold text-sub">
                 类型:
@@ -119,7 +119,7 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
 
             <button
               type="button"
-              className="quest-btn px-6 py-2 text-sm gap-2 min-w-24"
+              className="quest-btn min-w-24 gap-2 px-6 py-2 text-sm"
               onClick={() => void submit()}
               disabled={!canSubmit}
             >
@@ -127,8 +127,8 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
             </button>
           </div>
 
-          <div className="flex items-center justify-between mt-2">
-            <p className="text-xs font-bold text-red-500 min-h-4">{error}</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="min-h-4 text-xs font-bold text-red-500">{error}</p>
             <p className={`text-xs font-bold ${isTooLong ? "text-red-500" : "text-sub"}`}>
               {content.length}/{BOARD_NOTE_MAX_LENGTH}
             </p>

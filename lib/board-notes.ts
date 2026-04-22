@@ -103,17 +103,47 @@ export function mapBoardNoteToDto(note: BoardNoteRecord, currentUserId: string):
   };
 }
 
+function pad(value: number): string {
+  return value.toString().padStart(2, "0");
+}
+
+function formatClock(date: Date): string {
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function formatMonthDay(date: Date): string {
+  return `${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${formatClock(date)}`;
+}
+
+function formatFullDate(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${formatClock(date)}`;
+}
+
+function startOfDay(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+}
+
 export function formatRelativeTime(value: string | Date): string {
   const date = value instanceof Date ? value : new Date(value);
-  const diff = Date.now() - date.getTime();
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+  const dayDiff = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
 
-  if (minutes < 1) return "刚刚";
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  if (days < 7) return `${days}天前`;
+  if (dayDiff === 0) {
+    if (minutes < 1) return "刚刚";
+    if (minutes < 60) return `${minutes}分钟前`;
+    return `${hours}小时前`;
+  }
 
-  return date.toLocaleDateString("zh-CN");
+  if (dayDiff === 1) {
+    return `昨天 ${formatClock(date)}`;
+  }
+
+  if (date.getFullYear() === now.getFullYear()) {
+    return formatMonthDay(date);
+  }
+
+  return formatFullDate(date);
 }

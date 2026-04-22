@@ -22,7 +22,7 @@ export function NoteCard({ note, deleting = false, onDelete }: NoteCardProps) {
   const colorClass = isAnnouncement ? "note-announcement" : COLOR_CLASS[note.color ?? "YELLOW"];
 
   return (
-    <article className={`note-card ${colorClass} ${deleting ? "opacity-60 pointer-events-none" : ""}`}>
+    <article className={`note-card ${colorClass} ${deleting ? "pointer-events-none opacity-60" : ""}`}>
       {note.canDelete && (
         <button
           type="button"
@@ -35,26 +35,26 @@ export function NoteCard({ note, deleting = false, onDelete }: NoteCardProps) {
         </button>
       )}
 
-      <div className="flex items-start gap-3 mb-3 pr-9">
-        <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center border-2 border-slate-300 shadow-sm shrink-0 overflow-hidden">
+      <div className="mb-3 flex items-start gap-3 pr-9">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-slate-300 bg-white/80 shadow-sm">
           <img
             src={getAvatarUrl(note.author.avatarKey)}
             alt={note.author.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="font-bold text-sm text-main truncate max-w-[9rem]">{note.author.name}</span>
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <span className="max-w-[9rem] truncate text-sm font-bold text-main">{note.author.name}</span>
             <span className={`type-badge ${isAnnouncement ? "badge-announcement" : "badge-free"}`}>
               {isAnnouncement ? "团队通告" : "自由笔记"}
             </span>
           </div>
-          <span className="text-xs text-sub font-bold">{formatRelativeTime(note.createdAt)}</span>
+          <span className="text-xs font-bold text-sub">{formatRelativeTime(note.createdAt)}</span>
         </div>
       </div>
 
-      <p className="text-sm font-bold text-main leading-relaxed whitespace-pre-wrap break-words">
+      <p className="whitespace-pre-wrap break-words text-sm font-bold leading-relaxed text-main">
         {note.content}
       </p>
     </article>

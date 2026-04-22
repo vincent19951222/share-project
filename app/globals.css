@@ -246,7 +246,27 @@ body {
 .note-free-blue { background-color: #dbeafe; border-color: #93c5fd; }
 .note-free-green { background-color: #dcfce7; border-color: #86efac; }
 .note-free-pink { background-color: #fce7f3; border-color: #f9a8d4; }
-.note-announcement { background-color: #ffffff; border-color: #e2e8f0; }
+.note-announcement {
+  background-color: #facc15;
+  border-color: #1f2937;
+  box-shadow: 0 6px 0 0 #1f2937;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.22) 12%,
+    rgba(250, 204, 21, 0.92) 12%,
+    rgba(250, 204, 21, 0.92) 100%
+  );
+}
+.note-announcement .text-main {
+  color: #111827;
+}
+.note-announcement .text-sub {
+  color: #78350f;
+}
+.note-announcement .note-close-btn {
+  background: rgba(255, 251, 235, 0.92);
+}
 
 .note-close-btn {
   position: absolute;
@@ -292,7 +312,8 @@ body {
 }
 .badge-announcement {
   background-color: #1f2937;
-  color: #fde047;
+  color: #fef3c7;
+  border: 2px solid #111827;
 }
 .badge-free {
   background-color: rgba(255, 255, 255, 0.8);

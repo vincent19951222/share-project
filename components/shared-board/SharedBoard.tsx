@@ -72,7 +72,7 @@ export function SharedBoard() {
       void fetchNotes();
       return true;
     } catch {
-      setMessage("发布失败，稍后再试");
+      setMessage("发布失败，请稍后再试");
       return false;
     } finally {
       setSubmitting(false);
@@ -93,7 +93,7 @@ export function SharedBoard() {
       setNotes((current) => current.filter((note) => note.id !== id));
       void fetchNotes();
     } catch {
-      setMessage("删除失败");
+      setMessage("删除失败，请稍后再试");
     } finally {
       setDeletingIds((current) => {
         const next = new Set(current);
@@ -105,7 +105,7 @@ export function SharedBoard() {
 
   return (
     <section className="h-full overflow-y-auto p-4 no-scrollbar">
-      <div className="flex justify-end mb-3">
+      <div className="mb-3 flex justify-end">
         <SyncStatus state={syncState} />
       </div>
 

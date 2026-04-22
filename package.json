@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prepare:prisma": "prisma generate",
+    "predev": "npm run prepare:prisma",
+    "prebuild": "npm run prepare:prisma",
+    "pretest": "npm run prepare:prisma",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
