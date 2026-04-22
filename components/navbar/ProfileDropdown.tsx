@@ -44,20 +44,6 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
           </div>
           <QuestBtn className="px-3 py-1 text-xs">提现</QuestBtn>
         </div>
-        <div className="p-5 flex flex-col gap-3">
-          <span className="text-xs font-bold text-sub">ACHIEVEMENTS (3)</span>
-          <div className="flex gap-3">
-            <div className="w-12 h-12 bg-orange-100 border-2 border-orange-200 rounded-xl flex items-center justify-center shadow-sm p-2 text-slate-800" title="初级举铁匠">
-              <span dangerouslySetInnerHTML={{ __html: SvgIcons.weightlift }} />
-            </div>
-            <div className="w-12 h-12 bg-blue-100 border-2 border-blue-200 rounded-xl flex items-center justify-center shadow-sm p-2 text-slate-800" title="慢跑达人">
-              <span dangerouslySetInnerHTML={{ __html: SvgIcons.runner }} />
-            </div>
-            <div className="w-12 h-12 bg-green-100 border-2 border-green-200 rounded-xl flex items-center justify-center shadow-sm p-2 text-slate-800" title="早起鸟">
-              <span dangerouslySetInnerHTML={{ __html: SvgIcons.bird }} />
-            </div>
-          </div>
-        </div>
         <div className="p-5 border-t-2 border-slate-100 bg-slate-50 flex flex-col gap-2">
           <div className="flex justify-between items-center text-sm font-bold">
             <span>关联 App</span>

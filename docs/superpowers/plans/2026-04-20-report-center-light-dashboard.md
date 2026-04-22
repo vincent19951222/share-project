@@ -4,7 +4,7 @@
 
 **Goal:** Rebuild `战报中心` as a lightweight dashboard driven by existing `BoardState` data.
 
-**Architecture:** Add one pure report-data helper that derives metrics, highlights, and chart points from `BoardState`. Keep the existing `components/report-center/` module boundary, but make the UI components receive derived props instead of rendering fixed prototype content.
+**Architecture:** Add one pure `report-data.ts` helper that derives the full dashboard view-model from `BoardState`. `ReportCenter` becomes the single state-aware boundary in this subtree, while `ReportHeader`, `Milestones`, `TrendChart`, and `Highlights` become props-only presentational components.
 
 **Tech Stack:** Next.js App Router, React 19 client components, TypeScript, Tailwind CSS utility classes, Vitest + jsdom.
 
@@ -15,20 +15,37 @@
 - Create: `components/report-center/report-data.ts`
   - Pure helper for all dashboard calculations.
   - Exports `buildReportData(state, now?)` and related types.
+  - Must not import React or read from context.
 - Create: `__tests__/report-center-data.test.ts`
-  - Unit coverage for total punches, completion rate, full-attendance days, peak/low days, member highlight, and sparse data.
+  - Unit coverage for total punches, completion rate, full-attendance days, peak/low days, member highlight, elapsed-day clamping, deterministic tie-breaking, and sparse data.
 - Create: `__tests__/report-center-component.test.tsx`
   - Lightweight render test for `ReportCenter` inside `BoardProvider`.
+  - Confirms old placeholder copy is gone.
 - Modify: `components/report-center/ReportCenter.tsx`
   - Reads `BoardState`, builds report data with `useMemo`, and lays out the dashboard.
+  - The only report-center component allowed to call `useBoard()`.
 - Modify: `components/report-center/ReportHeader.tsx`
   - Replaces hardcoded `OCTOBER REPORT` and fake score with report title, summary, and vault progress.
+  - Uses the product-facing vault label rather than a generic team score label.
 - Modify: `components/report-center/Milestones.tsx`
   - Keeps filename but changes role to four compact metric cards.
 - Modify: `components/report-center/TrendChart.tsx`
   - Renders SVG from real `dailyPoints`.
+  - Handles empty state and sparse tick labels.
 - Modify: `components/report-center/Highlights.tsx`
   - Replaces static Bob/Dave cards with lightweight report highlights.
+
+---
+
+## Implementation Rules
+
+- Count only elapsed days: `elapsedDays = clamp(today, 0, totalDays)`.
+- Ignore future columns even if they contain `true`.
+- `peakDay` and `lowDay` ties must resolve to the earliest elapsed day.
+- `mostConsistentMember` ties must resolve to the earliest member in `state.members`.
+- `ReportCenter.tsx` is the only component in this subtree that may call `useBoard()` or `buildReportData()`.
+- Keep the current route, tab structure, and file names.
+- Do not add APIs, persistence changes, or charting libraries.
 
 ---
 
@@ -71,7 +88,7 @@ function createState(overrides: Partial<BoardState> = {}): BoardState {
 }
 
 describe("buildReportData", () => {
-  it("derives lightweight dashboard metrics from board state", () => {
+  it("derives lightweight dashboard metrics from elapsed board state", () => {
     const report = buildReportData(createState(), new Date("2026-04-20T12:00:00+08:00"));
 
     expect(report.title).toBe("APRIL DASHBOARD");
@@ -97,6 +114,57 @@ describe("buildReportData", () => {
       "团队小结",
       "轻提醒",
     ]);
+  });
+
+  it("clamps elapsed days and ignores future columns", () => {
+    const report = buildReportData(
+      createState({
+        gridData: [
+          [true, false, true, true, true],
+          [false, false, true, false, true],
+          [true, false, false, false, true],
+        ],
+        today: 9,
+        totalDays: 4,
+      }),
+      new Date("2026-04-20T12:00:00+08:00"),
+    );
+
+    expect(report.dailyPoints.map((point) => [point.day, point.count])).toEqual([
+      [1, 2],
+      [2, 0],
+      [3, 2],
+      [4, 1],
+    ]);
+    expect(report.metrics.map((metric) => [metric.label, metric.value])).toEqual([
+      ["团队完成率", "42%"],
+      ["总打卡次数", "5"],
+      ["全勤日", "0"],
+      ["本月高光", "最稳：li"],
+    ]);
+  });
+
+  it("breaks ties predictably for peak day, low day, and most consistent member", () => {
+    const report = buildReportData(
+      createState({
+        gridData: [
+          [true, true, false, false, null],
+          [true, true, false, false, null],
+          [false, false, false, false, null],
+        ],
+        today: 4,
+        totalDays: 5,
+      }),
+      new Date("2026-04-20T12:00:00+08:00"),
+    );
+
+    expect(report.peakDay).toEqual({ day: 1, count: 2 });
+    expect(report.lowDay).toEqual({ day: 3, count: 0 });
+    expect(report.metrics[3]).toMatchObject({
+      label: "本月高光",
+      value: "最稳：li",
+      helper: "最长连续 2 天没掉链子",
+    });
   });
 
   it("uses safe fallbacks when there is no elapsed member data", () => {
@@ -442,7 +510,7 @@ export function ReportHeader({ title, summary, teamVault }: ReportHeaderProps) {
         </p>
       </div>
       <div className="lg:text-right min-w-48">
-        <div className="text-xs font-bold text-sub">TEAM VAULT</div>
+        <div className="text-xs font-bold text-sub">牛马金库</div>
         <div className="text-3xl font-black text-yellow-500">
           {teamVault.current.toLocaleString("zh-CN")}
           <span className="text-base text-slate-300">/{teamVault.target.toLocaleString("zh-CN")}</span>
@@ -803,13 +871,16 @@ describe("ReportCenter", () => {
     });
 
     expect(container.textContent).toContain("DASHBOARD");
+    expect(container.textContent).toContain("本月打卡 4 次，全勤 1 天，团队节奏还有上升空间。");
     expect(container.textContent).toContain("团队完成率");
     expect(container.textContent).toContain("总打卡次数");
+    expect(container.textContent).toContain("牛马金库");
     expect(container.textContent).toContain("ACTIVITY TREND / 活跃趋势");
     expect(container.textContent).toContain("气氛组播报");
     expect(container.textContent).not.toContain("OCTOBER REPORT");
     expect(container.textContent).not.toContain("+12,450");
     expect(container.textContent).not.toContain("Bob");
+    expect(container.textContent).not.toContain("10.01");
     expect(container.querySelector("svg[aria-label='团队每日打卡人数趋势']")).not.toBeNull();
   });
 });
@@ -881,10 +952,12 @@ Open the app, log in with the seeded user flow already used by the project, swit
 
 - Header shows a current dashboard title rather than `OCTOBER REPORT`.
 - Summary sentence uses real totals.
+- Vault block uses `牛马金库` and real progress values.
 - Four metric cards render and wrap cleanly.
 - Trend chart reflects the number of elapsed days.
 - Peak and low labels match the visible chart.
 - Highlight cards are friendly and not overly formal.
+- On a narrow viewport, metric cards and chart/highlights stack without overflow.
 - `协同打卡` and `共享看板` tabs still work.
 
 - [ ] **Step 4: Inspect final diff**
@@ -905,4 +978,4 @@ Expected: no uncommitted files after the task commits, unless the worker intenti
 - Spec coverage: The plan covers the header summary, lightweight metrics, real activity trend chart, highlight cards, existing module boundary, responsive layout, and test verification.
 - Scope: The plan does not add date pickers, archives, leaderboards, task integration, new APIs, new database tables, or external chart libraries.
 - Type consistency: `ReportData`, `ReportMetric`, `DailyTrendPoint`, `ReportDaySummary`, and `ReportHighlight` are defined once in `report-data.ts` and imported by components.
-- Test coverage: Data calculations are unit-tested and dashboard rendering is smoke-tested through `BoardProvider`.
+- Test coverage: Data calculations are unit-tested for clamp rules, tie-breaking, and sparse-state fallbacks, and dashboard rendering is smoke-tested through `BoardProvider`.

@@ -1,53 +1,87 @@
 "use client";
 
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
-import { BoardState, BoardAction } from "./types";
+import { createContext, useContext, useEffect, useReducer, useRef, type ReactNode } from "react";
+import { fetchBoardState } from "@/lib/api";
+import type { BoardAction, BoardState } from "./types";
+
+let nextPollRequestId = 0;
+let nextPunchEpoch = 0;
+
+export function reservePollRequestId() {
+  nextPollRequestId += 1;
+  return nextPollRequestId;
+}
+
+export function reservePunchEpoch() {
+  nextPunchEpoch += 1;
+  return nextPunchEpoch;
+}
 
 function boardReducer(state: BoardState, action: BoardAction): BoardState {
   switch (action.type) {
-    case "PUNCH": {
-      const newGrid = state.gridData.map((row) => [...row]);
-      newGrid[action.memberIndex][action.dayIndex] = true;
-      return {
-        ...state,
-        gridData: newGrid,
-        teamCoins: state.teamCoins + 15,
-        logs: [
-          ...state.logs,
-          {
-            id: `log-${Date.now()}`,
-            text: `<b>${state.members[action.memberIndex].name}</b> 完成了 <b>${action.punchType}</b>! Team Pts +15.`,
-            type: "success",
-            timestamp: new Date(),
-          },
-        ],
-      };
-    }
     case "ADD_LOG":
       return { ...state, logs: [...state.logs, action.log] };
     case "SET_TAB":
       return { ...state, activeTab: action.tab };
-    case "SIMULATE_REMOTE_PUNCH": {
-      const member = state.members[action.memberIndex];
-      const dayIdx = state.today - 1;
-      if (state.gridData[action.memberIndex][dayIdx] === true) return state;
-      const newGrid = state.gridData.map((row) => [...row]);
-      newGrid[action.memberIndex][dayIdx] = true;
+    case "BEGIN_PUNCH_SYNC":
+      if (action.punchEpoch <= (state.pendingPunchEpoch ?? 0)) {
+        return state;
+      }
+
       return {
         ...state,
-        gridData: newGrid,
-        teamCoins: state.teamCoins + 15,
-        logs: [
-          ...state.logs,
-          {
-            id: `log-${Date.now()}`,
-            text: `[实时推送] <b>${member.name}</b> 刚刚完成了 ${action.typeDesc}，点亮了格子！`,
-            type: "highlight",
-            timestamp: new Date(),
-          },
-        ],
+        pendingPunchEpoch: action.punchEpoch,
       };
-    }
+    case "END_PUNCH_SYNC":
+      if (state.pendingPunchEpoch !== action.punchEpoch) {
+        return state;
+      }
+
+      return {
+        ...state,
+        pendingPunchEpoch: undefined,
+      };
+    case "SYNC_REMOTE_STATE":
+      if (action.source === "poll") {
+        if (action.pendingPunchEpochAtStart > 0) {
+          return state;
+        }
+
+        if (action.settledPunchEpochAtStart < (state.latestSettledPunchEpoch ?? 0)) {
+          return state;
+        }
+
+        if (action.requestId < (state.lastAppliedPollRequestId ?? 0)) {
+          return state;
+        }
+      } else if (action.punchEpoch < (state.latestSettledPunchEpoch ?? 0)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        members: action.snapshot.members,
+        gridData: action.snapshot.gridData,
+        teamCoins: action.snapshot.teamCoins,
+        targetCoins: action.snapshot.targetCoins,
+        today: action.snapshot.today,
+        totalDays: action.snapshot.totalDays,
+        currentUserId: action.snapshot.currentUserId,
+        lastAppliedPollRequestId:
+          action.source === "poll"
+            ? action.requestId
+            : state.lastAppliedPollRequestId,
+        pendingPunchEpoch:
+          action.source === "punch"
+            ? state.pendingPunchEpoch === action.punchEpoch
+              ? undefined
+              : state.pendingPunchEpoch
+            : state.pendingPunchEpoch,
+        latestSettledPunchEpoch:
+          action.source === "punch"
+            ? Math.max(state.latestSettledPunchEpoch ?? 0, action.punchEpoch)
+            : state.latestSettledPunchEpoch,
+      };
     default:
       return state;
   }
@@ -68,19 +102,46 @@ export function BoardProvider({
   children: ReactNode;
 }) {
   const [state, dispatch] = useReducer(boardReducer, initialState);
+  const stateRef = useRef(state);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch({ type: "SIMULATE_REMOTE_PUNCH", memberIndex: 1, typeDesc: "力量训练" });
-    }, 5000);
-    return () => clearTimeout(timer);
+    stateRef.current = state;
+  }, [state]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const sync = async () => {
+      const requestId = reservePollRequestId();
+      const pendingPunchEpochAtStart = stateRef.current.pendingPunchEpoch ?? 0;
+      const settledPunchEpochAtStart =
+        stateRef.current.latestSettledPunchEpoch ?? 0;
+
+      try {
+        const snapshot = await fetchBoardState();
+        if (!cancelled) {
+          dispatch({
+            type: "SYNC_REMOTE_STATE",
+            snapshot,
+            source: "poll",
+            requestId,
+            pendingPunchEpochAtStart,
+            settledPunchEpochAtStart,
+          });
+        }
+      } catch {
+        // Keep the current UI usable when polling fails.
+      }
+    };
+
+    const timer = window.setInterval(sync, 5000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
   }, []);
 
-  return (
-    <BoardContext.Provider value={{ state, dispatch }}>
-      {children}
-    </BoardContext.Provider>
-  );
+  return <BoardContext.Provider value={{ state, dispatch }}>{children}</BoardContext.Provider>;
 }
 
 export function useBoard() {

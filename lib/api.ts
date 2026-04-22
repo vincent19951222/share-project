@@ -1,16 +1,31 @@
-export async function fetchTeamData(): Promise<{ teamCoins: number; targetCoins: number }> {
-  return { teamCoins: 1250, targetCoins: 2000 };
+import type { BoardSnapshot } from "@/lib/types";
+
+async function readSnapshot(response: Response): Promise<BoardSnapshot> {
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload.error ?? "请求失败");
+  }
+
+  return payload.snapshot as BoardSnapshot;
 }
 
-export async function submitPunch(
-  _memberId: string,
-  _type: string
-): Promise<{ success: boolean; coinsEarned: number }> {
-  return { success: true, coinsEarned: 15 };
+export async function fetchBoardState(): Promise<BoardSnapshot> {
+  const response = await fetch("/api/board/state", {
+    cache: "no-store",
+  });
+
+  return readSnapshot(response);
 }
 
-export async function fetchLogs(): Promise<never[]> {
-  return [];
-}
+export async function submitTodayPunch(): Promise<BoardSnapshot> {
+  const response = await fetch("/api/board/punch", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
 
-export async function sendPoke(_memberId: string): Promise<void> {}
+  return readSnapshot(response);
+}

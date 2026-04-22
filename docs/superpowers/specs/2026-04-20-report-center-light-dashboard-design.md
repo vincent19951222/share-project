@@ -2,27 +2,123 @@
 
 ## Goal
 
-Turn the current `战报中心` from a mostly static prototype panel into a lightweight team dashboard.
+Turn the current `战报中心` from a mostly static prototype panel into a lightweight team dashboard powered by the existing `BoardState`.
 
-The page should feel easy and playful: open it, understand the team's recent rhythm, smile at one or two team highlights, and leave. It should not become a heavy monthly report system, task workflow, or analytics product.
+The page should feel quick and readable: open it, understand the team's recent rhythm, see one or two useful highlights, and leave. It should not become a heavy monthly report system, workflow tool, or analytics product.
 
-## Direction
+## Problem Statement
 
-Use the existing visual foundation:
+The current report center visually matches the prototype, but its content is still placeholder-heavy:
 
-- Keep the dashboard-style card layout.
-- Keep the activity trend chart as the main visual anchor.
-- Keep the bold, rounded, brutalist product language already used by the punch board.
-- Replace placeholder/static report copy with data-aware, team-specific content.
+- fixed title such as `OCTOBER REPORT`
+- fixed score and metric values
+- fake highlight copy such as `Bob` and `Dave`
+- hardcoded trend points and October date labels
 
-Recommended information hierarchy:
+That makes the tab look finished while still reflecting demo data. The redesign should keep the existing route and component boundary, but make the whole page data-aware.
+
+## Product Scope
+
+This redesign covers only the current report-center tab and only with data that already exists in memory.
+
+Included:
+
+- rewrite the report center content structure into a lightweight dashboard
+- derive visible values from `BoardState`
+- keep the existing `components/report-center/` module boundary
+- add focused tests for data derivation and render coverage
+
+Not included:
+
+- new API routes
+- new database tables or persistence
+- archives, exports, date-range pickers, or leaderboards
+- task / quest integration
+- `teamCoins -> gp` migration
+
+## Success Criteria
+
+The redesign is successful when all of the following are true:
+
+- every visible summary value in `战报中心` is derived from current `BoardState`
+- placeholder content such as `OCTOBER REPORT`, `+12,450`, `Bob`, `Dave`, and fixed October axis labels is gone
+- the page remains readable on desktop and small widths
+- the tab still feels consistent with the product's brutalist style
+- existing `协同打卡` and `共享看板` behavior is unaffected
+
+## Information Hierarchy
+
+Recommended content order:
 
 1. Header summary
-2. Four lightweight metric cards
+2. Four compact metric cards
 3. Main activity trend chart
-4. Small right-side highlight cards
+4. Three lightweight highlight cards
 
-## Page Content
+The chart remains the visual anchor. The cards explain the chart; they must not compete with it.
+
+## Data Source
+
+The first version must use only the existing `BoardState` fields:
+
+- `members`
+- `gridData`
+- `teamCoins`
+- `targetCoins`
+- `today`
+- `totalDays`
+
+No client fetch, no API call, and no separate report-specific store is required.
+
+## Data Derivation Rules
+
+These rules are part of the spec, not left to implementation taste.
+
+### Time Window
+
+- Internal calculations use zero-based `dayIndex`.
+- UI labels use one-based day numbers.
+- `elapsedDays = clamp(state.today, 0, state.totalDays)`.
+- Only columns with `dayIndex < elapsedDays` are counted.
+- Future columns must be ignored even if they contain `true`.
+
+### Core Metrics
+
+- `elapsedMemberDays = members.length * elapsedDays`
+- `totalPunches = count of all elapsed cells where value === true`
+- `completionRate = round(totalPunches / elapsedMemberDays * 100)`
+- If `elapsedMemberDays === 0`, `completionRate = 0`
+- `fullAttendanceDays = count of elapsed days where punched member count === members.length`
+- If `members.length === 0`, `fullAttendanceDays = 0`
+
+### Trend Data
+
+- `dailyPoints` contains one point per elapsed day, ordered from day 1 to `elapsedDays`
+- Each point includes:
+  - `day`
+  - `count`
+  - `isFullAttendance`
+  - `isPeak`
+  - `isLow`
+- `peakDay` is the earliest elapsed day with the maximum punch count
+- `lowDay` is the earliest elapsed day with the minimum punch count
+- If there are no elapsed days, `dailyPoints = []`, `peakDay = null`, and `lowDay = null`
+
+### Highlight Selection
+
+- `mostConsistentMember` means the member with the longest consecutive `true` streak inside the elapsed window
+- This is overall longest streak, not current streak
+- Ties are resolved by existing member order in `state.members`
+- If nobody has a positive streak, the "本月高光" card must use a neutral fallback
+
+### Vault Progress
+
+- `teamVault.current = state.teamCoins`
+- `teamVault.target = state.targetCoins`
+- `teamVault.progress = clamp(round(current / target * 100), 0, 100)`
+- If `target <= 0`, progress must be `0`
+
+## Content Rules
 
 ### Header
 
@@ -34,91 +130,95 @@ Example:
 本月打卡 124 次，全勤 12 天，团队节奏稳住了。
 ```
 
-The header should also show team vault progress, using the existing `teamCoins` and `targetCoins` values.
+Rules:
 
-Avoid generic text such as `OCTOBER REPORT` unless the month is derived from the current context. If the page keeps an English title, use a current, neutral label such as `TEAM DASHBOARD`.
+- Title must be derived from current render time, not hardcoded.
+- `APRIL DASHBOARD` is acceptable for v1 if it reflects the actual month.
+- Summary sentence must use real totals.
+- The right-side progress block should use current vault values and align with the product vocabulary. `牛马金库` is preferred over a generic score label.
 
 ### Metric Cards
 
-Use four compact cards:
+Use exactly four compact cards:
 
-- `团队完成率` — completed punch cells divided by elapsed member-days
-- `总打卡次数` — count of punched cells through today
-- `全勤日` — days where every member punched
-- `本月高光` — one lightweight member/team highlight
+- `团队完成率`
+- `总打卡次数`
+- `全勤日`
+- `本月高光`
 
-The cards should explain the chart rather than compete with it. Short helper lines are enough.
+Rules:
 
-Examples:
-
-```text
-团队完成率 82% / 比上周 +6%
-总打卡次数 124 / 5 人 · 18 天
-全勤日 12 / 全员亮灯的日子
-本月高光 最稳：li / 连续 15 天没掉链子
-```
-
-If week-over-week comparison data is unavailable, omit the comparison instead of faking it.
+- Values come from the derived report object only.
+- Helper copy is short, explanatory, and friendly.
+- If week-over-week comparison data is unavailable, omit it rather than inventing it.
+- If there is no highlight yet, show a neutral fallback such as `暂无高光`.
 
 ### Activity Trend Chart
 
-The trend chart is the primary content. It should show daily punched member count from day 1 through `today`.
+The trend chart is the page's main visual.
 
-Keep it SVG-based for now. No external charting library is needed.
+Rules:
 
-The chart should include:
-
-- Subtle grid lines
-- A bold yellow trend line
-- Markers for full-attendance days
-- Labels or nearby summary copy for peak and low points
-- Date/day ticks that fit without clutter
-
-The chart should not use hardcoded October labels or fixed points.
+- Show daily punched member count from day 1 through `elapsedDays`
+- Keep SVG rendering; do not add an external chart library
+- Include subtle grid lines
+- Use a bold yellow trend line
+- Use stronger markers for full-attendance days
+- Show peak and low summaries near or below the chart
+- Tick labels should stay sparse enough to avoid clutter
+- If there are 1-3 points, showing every tick is acceptable
+- If there are more than 3 points, first / middle / last tick labels are enough for v1
+- When no points exist, render a clear empty state instead of an empty polyline
 
 ### Highlight Cards
 
-Use two or three small cards beside or below the chart.
+Render exactly three lightweight highlight cards:
 
-Suggested cards:
+- `气氛组播报`
+- `团队小结`
+- `轻提醒`
 
-- `气氛组播报` — a light team-flavored observation
-- `团队小结` — one plain-language interpretation of the trend
-- `轻提醒` — a soft note about weak spots, not a task assignment
+Rules:
 
-Examples:
+- Copy should be derived from peak day, low day, completion rate, and available streak data
+- Tone should be warm and observational, not judgmental
+- Avoid fake specificity when the state does not support it
+- Avoid pressure, KPI language, and long jokes
+
+## Component Boundaries
+
+Keep the current module boundary:
 
 ```text
-最近 7 天波动变小，说明节奏正在稳定。
-低谷通常出现在周末，提前约一波会更稳。
+components/report-center/
+  ReportCenter.tsx
+  ReportHeader.tsx
+  Milestones.tsx
+  Highlights.tsx
+  TrendChart.tsx
+  report-data.ts
 ```
 
-Keep the tone friendly. Avoid shame, pressure, formal KPI language, or overly elaborate jokes.
+Responsibilities:
 
-## Data Derivation
+- `report-data.ts`
+  - pure calculation module
+  - no React imports
+  - exports `buildReportData(state, now?)` and related types
+- `ReportCenter.tsx`
+  - the only report-center component allowed to read `useBoard()`
+  - builds `reportData` once with `useMemo`
+  - owns page-level layout
+- `ReportHeader.tsx`
+  - presentational component for title, summary, and vault progress
+- `Milestones.tsx`
+  - presentational component for the four metric cards
+- `TrendChart.tsx`
+  - presentational SVG chart fed by derived `dailyPoints`
+- `Highlights.tsx`
+  - presentational component for the three highlight cards
 
-The first version can derive all report data from the existing `BoardState`:
-
-- `members`
-- `gridData`
-- `teamCoins`
-- `targetCoins`
-- `today`
-- `totalDays`
-
-Useful derived values:
-
-- `elapsedDays = today`
-- `elapsedMemberDays = members.length * elapsedDays`
-- `totalPunches = count(true cells from day 1 through today)`
-- `completionRate = totalPunches / elapsedMemberDays`
-- `fullAttendanceDays = count(days where every member punched)`
-- `dailyCounts = punched member count per day`
-- `peakDay = day with highest daily count`
-- `lowDay = elapsed day with lowest daily count`
-- `mostConsistentMember = member with the longest current or overall streak`
-
-If there is not enough data for a highlight, show a neutral fallback rather than fabricated specificity.
+Subcomponents should not read store state directly and should not re-derive report values on their own.
 
 ## Layout
 
@@ -132,61 +232,43 @@ Main area: trend chart (2/3) + highlight stack (1/3)
 
 Responsive behavior:
 
-- Metric cards wrap to two columns on medium widths and one column on small widths.
-- Chart and highlight stack become a single column on smaller screens.
-- Text wraps inside cards and should not overflow.
-- The page remains scrollable inside the existing report center container.
+- metric cards wrap to two columns on medium widths and one column on small widths
+- chart and highlight stack collapse to one column on smaller screens
+- text should wrap inside cards and never depend on fixed English-length copy
+- the page remains scrollable inside the existing report center container
 
-## Component Shape
+## Visual Direction
 
-Keep the current module boundary:
+Preserve the existing product language:
 
-```text
-components/report-center/
-  ReportCenter.tsx
-  ReportHeader.tsx
-  Milestones.tsx
-  Highlights.tsx
-  TrendChart.tsx
-```
+- bold type
+- thick borders
+- yellow accent
+- rounded but not overly soft cards
 
-Suggested implementation refinement:
+Additional constraints:
 
-- Add a small report-data helper in `components/report-center/` or `lib/` if calculations become noisy.
-- Prefer passing one derived report object into subcomponents.
-- Keep each component presentational after data derivation.
+- highlight cards should feel lighter than the chart
+- avoid purple-heavy palettes as the dominant accent
+- do not keep decorative prototype filler such as fake milestone art if it competes with real data
+- avoid nested-card clutter and marketing-style sections
 
-No new route or API is required for the first version.
+## Accessibility And Robustness
 
-## Visual Notes
-
-- Preserve the existing product style: bold type, thick borders, yellow accent, rounded but not overly soft cards.
-- Avoid purple-heavy or one-note color palettes.
-- Use color as emphasis, not as the only meaning.
-- Keep highlight cards lighter than the chart.
-- Avoid decorative blobs, nested cards, or marketing-style sections.
-
-## Out Of Scope
-
-This design does not include:
-
-- A full monthly report archive
-- Date range picker
-- Export/share image
-- Leaderboard system
-- Task or quest integration
-- New persistence tables
-- New analytics API
-- External charting library
-- Admin controls
+- chart should expose a readable `aria-label`
+- empty states must render usable text, not blank boxes
+- long helper text should wrap without overflow
+- zero-data and sparse-data states must not throw or render `NaN`
 
 ## Testing And Verification
 
 Implementation should verify:
 
-- Derived values are correct for representative `gridData`.
-- Empty or sparse data does not crash the page.
-- The chart renders from real daily counts, not fixed demo points.
-- The page remains readable on desktop and small widths.
-- Existing tab switching still works.
-- Existing punch-board behavior is unaffected.
+- representative `gridData` produces correct totals, completion rate, streak highlight, and full-attendance count
+- elapsed-day clamping works and future columns are ignored
+- tie-breaking for `peakDay`, `lowDay`, and `mostConsistentMember` is deterministic
+- empty or sparse data renders safe fallbacks
+- the chart renders from real `dailyPoints`, not fixed demo points
+- the final render no longer contains the old placeholder strings
+- existing tab switching still works
+- existing punch-board behavior is unaffected

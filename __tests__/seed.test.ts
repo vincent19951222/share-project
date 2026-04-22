@@ -51,4 +51,24 @@ describe("seedDatabase", () => {
     const userCount = await prisma.user.count();
     expect(userCount).toBe(SEED_USERS.length);
   });
+
+  it("should remove extra users outside the seeded roster", async () => {
+    await seedDatabase();
+
+    const team = await prisma.team.findUniqueOrThrow({ where: { code: SEED_TEAM.code } });
+    await prisma.user.create({
+      data: {
+        username: "newuser",
+        password: "test",
+        avatarKey: "male1",
+        coins: 0,
+        teamId: team.id,
+      },
+    });
+
+    await seedDatabase();
+
+    const extraUser = await prisma.user.findUnique({ where: { username: "newuser" } });
+    expect(extraUser).toBeNull();
+  });
 });

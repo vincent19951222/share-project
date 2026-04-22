@@ -56,6 +56,9 @@ describe("SharedBoard polling", () => {
       vi.advanceTimersByTime(30000);
     });
 
-    expect(fetch).not.toHaveBeenCalled();
+    const allCalls = (fetch as ReturnType<typeof vi.fn>).mock.calls.map(
+      (c: unknown[]) => c[0] as string,
+    );
+    expect(allCalls.every((url) => url === "/api/board/state")).toBe(true);
   });
 });
