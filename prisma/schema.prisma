@@ -14,6 +14,7 @@ model Team {
   createdAt  DateTime    @default(now())
   users      User[]
   boardNotes BoardNote[]
+  seasons    Season[]
 }
 
 model User {
@@ -21,24 +22,67 @@ model User {
   username     String        @unique
   password     String
   avatarKey    String
+  role         String        @default("MEMBER")
+  currentStreak Int          @default(0)
+  lastPunchDayKey String?
   coins        Int           @default(0)
   teamId       String
   team         Team          @relation(fields: [teamId], references: [id])
   punchRecords PunchRecord[]
   boardNotes   BoardNote[]
+  seasonStats  SeasonMemberStat[]
   createdAt    DateTime      @default(now())
 }
 
-model PunchRecord {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  dayIndex  Int
-  punched   Boolean
-  punchType String?
-  createdAt DateTime @default(now())
+model Season {
+  id           String              @id @default(cuid())
+  teamId       String
+  team         Team                @relation(fields: [teamId], references: [id])
+  monthKey     String
+  goalName     String
+  status       String              @default("ACTIVE")
+  targetSlots  Int
+  filledSlots  Int                 @default(0)
+  startedAt    DateTime            @default(now())
+  endedAt      DateTime?
+  memberStats  SeasonMemberStat[]
+  punches      PunchRecord[]
 
-  @@unique([userId, dayIndex])
+  @@index([teamId, status, startedAt])
+}
+
+model SeasonMemberStat {
+  id                 String   @id @default(cuid())
+  seasonId           String
+  season             Season   @relation(fields: [seasonId], references: [id])
+  userId             String
+  user               User     @relation(fields: [userId], references: [id])
+  seasonIncome       Int      @default(0)
+  slotContribution   Int      @default(0)
+  colorIndex         Int
+  memberOrder        Int
+  firstContributionAt DateTime?
+
+  @@unique([seasonId, userId])
+  @@index([seasonId, slotContribution, memberOrder])
+}
+
+model PunchRecord {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id])
+  seasonId              String?
+  season                Season?  @relation(fields: [seasonId], references: [id])
+  dayIndex              Int
+  dayKey                String
+  punched               Boolean
+  punchType             String?
+  streakAfterPunch      Int      @default(0)
+  assetAwarded          Int      @default(0)
+  countedForSeasonSlot  Boolean  @default(false)
+  createdAt             DateTime @default(now())
+
+  @@unique([userId, dayKey])
 }
 
 model BoardNote {
