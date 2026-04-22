@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { QuestBtn } from "@/components/ui/QuestBtn";
+import { useBoard } from "@/lib/store";
 import { SvgIcons } from "@/components/ui/SvgIcons";
 
 interface ProfileDropdownProps {
@@ -13,6 +14,8 @@ interface ProfileDropdownProps {
 export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownProps) {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { state } = useBoard();
+  const currentUser = state.currentUser;
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -31,28 +34,38 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
 
   return (
     <>
-      {/* Invisible overlay to capture outside clicks */}
       <div className="fixed inset-0 z-[99]" onClick={onDismiss} />
-      <div ref={ref} className="dropdown-menu flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={ref}
+        className="dropdown-menu flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-5 border-b-2 border-slate-100 bg-slate-50 flex justify-between items-center">
           <div className="flex flex-col">
             <span className="text-xs font-bold text-sub">ASSET BALANCE</span>
             <div className="text-2xl font-black text-yellow-500 flex items-center gap-1">
               <span dangerouslySetInnerHTML={{ __html: SvgIcons.coin }} />
-              3,450
+              {currentUser?.assetBalance ?? 0}
             </div>
           </div>
-          <QuestBtn className="px-3 py-1 text-xs">提现</QuestBtn>
         </div>
         <div className="p-5 border-t-2 border-slate-100 bg-slate-50 flex flex-col gap-2">
           <div className="flex justify-between items-center text-sm font-bold">
-            <span>关联 App</span>
-            <span className="text-green-500 bg-green-100 px-2 py-0.5 rounded text-xs">Apple Health 已连</span>
+            <span>Current streak</span>
+            <span className="text-slate-700">{currentUser?.currentStreak ?? 0} days</span>
           </div>
           <div className="flex justify-between items-center text-sm font-bold">
-            <span>每日提醒</span>
-            <span className="text-sub">18:30</span>
+            <span>Next reward</span>
+            <span className="text-slate-700">{currentUser?.nextReward ?? 0} coins</span>
           </div>
+          {currentUser?.isAdmin ? (
+            <Link
+              href="/admin"
+              className="mt-2 w-full py-2 text-center text-sm font-bold text-slate-800 bg-slate-100 border-2 border-slate-200 rounded-xl hover:bg-slate-200 transition-colors"
+            >
+              赛季设置
+            </Link>
+          ) : null}
           <button
             onClick={onEditProfile}
             className="mt-2 w-full py-2 text-sm font-bold text-slate-800 bg-slate-100 border-2 border-slate-200 rounded-xl hover:bg-slate-200 transition-colors"

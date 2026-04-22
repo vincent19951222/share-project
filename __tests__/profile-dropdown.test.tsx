@@ -2,6 +2,8 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProfileDropdown } from "@/components/navbar/ProfileDropdown";
+import { BoardProvider } from "@/lib/store";
+import type { BoardState } from "@/lib/types";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
@@ -12,6 +14,24 @@ vi.mock("next/navigation", () => ({
     refresh: vi.fn(),
   }),
 }));
+
+const initialState: BoardState = {
+  members: [{ id: "user-1", name: "Li", avatarKey: "male1" }],
+  gridData: [[false]],
+  teamVaultTotal: 0,
+  currentUser: {
+    assetBalance: 3450,
+    currentStreak: 12,
+    nextReward: 40,
+    seasonIncome: 0,
+    isAdmin: true,
+  },
+  today: 1,
+  totalDays: 1,
+  currentUserId: "user-1",
+  logs: [],
+  activeTab: "punch",
+};
 
 describe("ProfileDropdown", () => {
   let container: HTMLDivElement;
@@ -30,13 +50,18 @@ describe("ProfileDropdown", () => {
     container.remove();
   });
 
-  it("does not render the achievements section", () => {
+  it("shows the real board values and admin entry point", () => {
     act(() => {
-      root.render(<ProfileDropdown onDismiss={() => {}} onEditProfile={() => {}} />);
+      root.render(
+        <BoardProvider initialState={initialState}>
+          <ProfileDropdown onDismiss={() => {}} onEditProfile={() => {}} />
+        </BoardProvider>,
+      );
     });
 
-    expect(container.textContent).not.toContain("ACHIEVEMENTS");
-    expect(container.textContent).not.toContain("初级举铁匠");
-    expect(container.textContent).not.toContain("慢跑达人");
+    expect(container.textContent).toContain("3450");
+    expect(container.textContent).toContain("12 days");
+    expect(container.textContent).toContain("40 coins");
+    expect(container.textContent).toContain("赛季设置");
   });
 });
