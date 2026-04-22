@@ -126,91 +126,152 @@
 
 ---
 
-## 🚧 进行中的功能
+## 🚧 近期研发状态
 
-### 📊 P2: Quest & GP 系统（分阶段实施）
+### ✅ P2: 共享打卡基础能力（2026年4月20日-22日）
 
-**设计完成时间：** 2026年4月19日
+#### 1. 战报中心轻量数据看板 ✅
+**状态：** 已设计并纳入近期版本
+
+**功能目标：**
+- 将 `战报中心` 从静态展示改成由 `BoardState` 驱动的轻量看板
+- 移除固定月份、固定分数和假人名等占位内容
+- 保留 Brutalist 风格，聚焦团队完成率、总打卡数、全勤日和高光成员
+
+**相关文档：**
+- [设计规范](docs/superpowers/specs/2026-04-20-report-center-light-dashboard-design.md)
+- [实施计划](docs/superpowers/plans/2026-04-20-report-center-light-dashboard.md)
+
+---
+
+#### 2. 共享看板 ✅
+**状态：** 已进入产品路线图
+
+**功能目标：**
+- 新增 `共享看板` Tab，作为团队内部轻量便签墙
+- 支持自由笔记和团队通告
+- 支持发布、删除、软删除、瀑布流展示和同步状态提示
+- 预留置顶和过期字段，但第一版不做完整公告系统
+
+**相关文档：**
+- [设计规范](docs/superpowers/specs/2026-04-19-shared-board-design.md)
+- [实施计划](docs/superpowers/plans/2026-04-19-shared-board.md)
+
+---
+
+#### 3. 打卡持久化 & 轻量同步 ✅
+**状态：** 已作为经济系统前置能力
+
+**功能目标：**
+- 将真实打卡从前端本地 state 迁移到数据库
+- 新增 `POST /api/board/punch` 持久化打卡
+- 新增 `GET /api/board/state` 获取团队快照
+- 通过 5 秒轮询让多端看板在单服务部署下保持同步
+- 重复打卡由服务端保护，避免重复加银子
+
+**相关文档：**
+- [设计规范](docs/superpowers/specs/2026-04-22-punch-persistence-and-sync-design.md)
+- [实施计划](docs/superpowers/plans/2026-04-22-punch-persistence-and-sync.md)
+
+---
+
+### 💰 P3: 经济系统 & 赛季冲刺（研发中）
+
+- **当前状态：** 研发中
+- **设计完成时间：** 2026年4月22日
+- **定位：** 先建立清晰的打卡经济模型，再继续推进 Quest / Todo / Rank。
 
 **系统概览：**
-- 📋 Todo List - 手动任务管理
-- 🤖 Auto Quest - 自动化重复任务
-- 💰 GP 积分体系 - 统一的游戏化积分
-- 📈 GP Rank 等级系统 - C/B/A/S 晋升机制
+- 💰 `我的银子` - 用户永久累计的个人资产
+- 🏦 `牛马金库` - 团队所有成员个人资产总和，仅用于展示
+- 🔥 `牛马冲刺条` - 赛季维度的团队目标进度
+- 📈 `赛季收入` - 当前赛季内的个人收入统计
+- 🧩 `streak` - 用户级连续打卡状态，不随赛季切换重置
+
+**核心规则：**
+- 有效打卡奖励按连续天数递增：`10 -> 20 -> 30 -> 40 -> 50`，第 5 天后维持 `50`
+- 每次有效打卡只推进赛季冲刺条 `+1` 格，不受 streak 奖励倍率影响
+- 赛季由管理员手动开启和结束，不按自然月自动切换
+- 赛季目标档位固定为 `50 / 80 / 100 / 120 / 150`
+- 当前保留数据库字段 `User.coins`，前台统一展示为“我的银子”
 
 **实施阶段：**
 
-#### 🔄 阶段 4: 数据持久化 & 统一积分
-**状态：** 设计完成，待实施
+#### 阶段 1: 经济规则与赛季主题基础 ✅
+**状态：** 已进入代码
 
 **功能目标：**
-- 将打卡操作从前端 state 迁移到数据库
-- 建立 GP 流水账系统（`GpLedger` 表）
-- 统一积分单位（`coins` → `gp`）
-- 打卡奖励 +5 GP（每日一次）
+- 新增 `lib/economy.ts`，集中处理上海时区 day key、streak、奖励和赛季档位校验
+- 新增 `lib/season-theme.ts`，提供每月固定赛季底色和 5 个成员贡献色
+- 增加对应单元测试，锁定经济规则边界
 
-**技术要点：**
-- `POST /api/board/punch` - 打卡API
-- `GET /api/board` - 从数据库读取真实数据
-- `GpLedger` 表记录所有积分变动
+---
+
+#### 阶段 2: 数据模型与种子数据 ✅
+**状态：** 已进入代码，仍需和完整结算链路联调
+
+**功能目标：**
+- `User` 增加 `role`、`currentStreak`、`lastPunchDayKey`
+- 新增 `Season` 和 `SeasonMemberStat`
+- `PunchRecord` 增加 `dayKey`、`seasonId`、`streakAfterPunch`、`assetAwarded`、`countedForSeasonSlot`
+- 种子数据指定首位用户 `li` 为管理员，并清理本团队赛季数据
+
+---
+
+#### 阶段 3: 服务端打卡结算 🚧
+**状态：** 研发中
+
+**功能目标：**
+- 将当前固定奖励打卡升级为 streak 奖励结算
+- 无 active 赛季时仍可正常增加“我的银子”和 streak
+- 有 active 赛季时同步增加“赛季收入”，并推进“牛马冲刺条”
+- 冲刺条满格后继续累计个人银子和赛季收入，但不再增加额外格子
+- 保持重复打卡、并发打卡和服务端快照一致性
+
+---
+
+#### 阶段 4: 管理员赛季管理 ⏳
+**状态：** 待实施
+
+**功能目标：**
+- 新增管理员赛季 API
+- 新增 `/admin` 赛季设置页
+- 支持创建赛季、结束当前赛季、查看赛季历史
+- 仅管理员可进入和操作
+
+---
+
+#### 阶段 5: 看板与战报语义升级 ⏳
+**状态：** 待实施
+
+**功能目标：**
+- 团队头部显示新的“牛马金库”“我的银子 / streak”“牛马冲刺条”
+- Profile 下拉菜单展示真实个人银子和连续打卡状态
+- 战报中心停止把金库当目标进度条，改为展示团队总资产和赛季辅助信息
+- 新增固定长度的赛季分段进度条组件
 
 **相关文档：**
-- [设计规范](docs/superpowers/specs/p2-2026-04-19-quest-and-gp-system-design.md)
-- [实施计划](docs/superpowers/plans/p2-2026-04-19-data-persistence-and-gp.md)
+- [经济与赛季系统设计](docs/superpowers/specs/2026-04-22-economy-and-season-system-design.md)
+- [经济与赛季系统实施计划](docs/superpowers/plans/2026-04-22-economy-and-season-system.md)
 
 ---
 
-#### 📋 阶段 5: Todo List（核心 Quest）
-**状态：** 设计完成，待阶段4完成后实施
+### 📋 P4: Quest / Todo / Rank（后续）
 
-**功能目标：**
-- Navbar 新增 "Quests" tab
-- 手动创建、完成、撤销任务
-- 任务完成奖励 GP
-- 权限控制（创建者可编辑/删除）
+**状态：** 后移，待经济系统稳定后继续
 
-**技术要点：**
-- `TodoItem` 表 - 任务数据
-- `GET/POST/PATCH/DELETE /api/quests` - 任务CRUD
-- GpLedger 记录任务完成积分
+**后续范围：**
+- 手动 Todo / Quest 管理
+- Auto Quest 自动化重复任务
+- GP / 银子流水历史
+- C/B/A/S Rank 等级体系
+- 任务奖励与赛季、个人资产的关系梳理
 
----
-
-#### 🤖 阶段 6: Auto Quest（自动化任务）
-**状态：** 设计完成，待阶段5完成后实施
-
-**功能目标：**
-- 创建重复性任务模板
-- 按星期几自动生成实例
-- 懒生成机制（打开面板时生成）
-- 防重复和同步机制
-
-**技术要点：**
-- `AutoQuest` 表 - 自动任务模板
-- 位掩码存储重复规则（周一~周日）
-- `GET /api/auto-quests/generate` - 触发生成
-
----
-
-#### 🏆 阶段 7: GP 展示 & Rank
-**状态：** 设计完成，待阶段6完成后实施
-
-**功能目标：**
-- GP Rank 等级体系（C/B/A/S）
-- Profile 页面显示 GP 统计
-- 周/月统计卡片
-- GP 流水历史记录
-
-**Rank 体系：**
-| Rank | GP 要求 | 视觉 |
-|------|---------|------|
-| C | 0+ | 灰色 |
-| B | 200+ | 蓝色 |
-| A | 600+ | 紫色 |
-| S | 1200+ | 金色 |
+**说明：** 旧版 Quest & GP 设计仍保留为参考，但近期实现优先级已经调整为“经济系统 & 赛季冲刺”。
 
 **相关文档：**
-- [设计规范](docs/superpowers/specs/p2-2026-04-19-quest-and-gp-system-design.md)
+- [Quest & GP 系统设计](docs/superpowers/specs/p2-2026-04-19-quest-and-gp-system-design.md)
+- [数据持久化和 GP 实施](docs/superpowers/plans/p2-2026-04-19-data-persistence-and-gp.md)
 
 ---
 
@@ -257,24 +318,30 @@
 ### 2026年4月
 - **4月18日：** 完成用户头像系统、登录页面、核心打卡板
 - **4月19日：** 完成品牌本土化，Quest & GP 系统设计
+- **4月20日：** 完成战报中心轻量数据看板设计
+- **4月22日：** 完成打卡持久化/同步设计，启动经济与赛季系统研发
 
-### 计划中
-- **4月下旬：** 开始实施阶段4（数据持久化）
-- **5月上旬：** 完成阶段5（Todo List）
-- **5月中旬：** 完成阶段6（Auto Quest）
-- **5月下旬：** 完成阶段7（GP Rank）
+### 近期计划
+- **当前：** 推进经济系统服务端结算（streak 奖励、个人银子、赛季收入、冲刺条）
+- **下一步：** 管理员赛季管理页与赛季 API
+- **随后：** 看板头部、Profile、战报中心的经济语义升级
+- **经济系统稳定后：** 重新评估 Quest / Todo / Auto Quest / Rank 的优先级
 
 ---
 
 ## 🎯 未来规划
 
 ### 短期目标（1-2个月）
-- ✅ 完成 Quest & GP 系统全部4个阶段
+- 🚧 完成经济系统 & 赛季冲刺闭环
+- 🧾 建立清晰的银子、赛季收入、牛马金库、冲刺条语义
+- 🛠️ 完成管理员赛季管理入口
 - 📱 移动端响应式优化
 - 🔔 浏览器通知提醒
 - 📊 更多数据统计图表
 
 ### 中期目标（3-6个月）
+- 📋 Todo / Quest 任务系统
+- 🤖 Auto Quest 自动化重复任务
 - 🏆 团队排行榜和竞赛
 - 🎁 积分商城（用银子兑换奖励）
 - 👥 多团队支持
@@ -294,6 +361,10 @@
 - [用户头像系统设计](docs/superpowers/specs/2026-04-18-user-avatar-system-design.md)
 - [登录页面设计](docs/superpowers/specs/2026-04-18-login-page-design.md)
 - [核心打卡板设计](docs/superpowers/specs/2026-04-18-core-board-design.md)
+- [共享看板设计](docs/superpowers/specs/2026-04-19-shared-board-design.md)
+- [战报中心轻量看板设计](docs/superpowers/specs/2026-04-20-report-center-light-dashboard-design.md)
+- [打卡持久化与同步设计](docs/superpowers/specs/2026-04-22-punch-persistence-and-sync-design.md)
+- [经济与赛季系统设计](docs/superpowers/specs/2026-04-22-economy-and-season-system-design.md)
 - [Quest & GP 系统设计](docs/superpowers/specs/p2-2026-04-19-quest-and-gp-system-design.md)
 - [品牌本土化设计](docs/superpowers/specs/2026-04-19-branding-localization-design.md)
 
@@ -301,6 +372,10 @@
 - [用户头像系统实施](docs/superpowers/plans/2026-04-18-user-avatar-system.md)
 - [登录页面实施](docs/superpowers/plans/2026-04-18-login-page.md)
 - [核心打卡板实施](docs/superpowers/plans/2026-04-18-core-board.md)
+- [共享看板实施](docs/superpowers/plans/2026-04-19-shared-board.md)
+- [战报中心轻量看板实施](docs/superpowers/plans/2026-04-20-report-center-light-dashboard.md)
+- [打卡持久化与同步实施](docs/superpowers/plans/2026-04-22-punch-persistence-and-sync.md)
+- [经济与赛季系统实施](docs/superpowers/plans/2026-04-22-economy-and-season-system.md)
 - [数据持久化和 GP 实施](docs/superpowers/plans/p2-2026-04-19-data-persistence-and-gp.md)
 - [品牌本土化实施](docs/superpowers/plans/2026-04-19-branding-localization.md)
 
@@ -318,6 +393,6 @@
 
 ---
 
-**最后更新：** 2026年4月19日  
-**版本：** 1.0.0  
-**状态：** 活跃开发中 🚀
+- **最后更新：** 2026年4月22日
+- **版本：** 1.1.0
+- **状态：** 经济系统研发中 🚧
