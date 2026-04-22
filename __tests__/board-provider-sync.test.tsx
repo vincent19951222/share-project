@@ -4,13 +4,30 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BoardProvider, useBoard } from "@/lib/store";
 import type { BoardSnapshot, BoardState } from "@/lib/types";
 
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
+  true;
 
 const initialState: BoardState = {
-  members: [{ id: "user-1", name: "Li", avatarKey: "male1" }],
+  members: [
+    {
+      id: "user-1",
+      name: "Li",
+      avatarKey: "male1",
+      assetBalance: 0,
+      seasonIncome: 0,
+      slotContribution: 0,
+    },
+  ],
   gridData: [[false, null]],
-  teamCoins: 0,
-  targetCoins: 100,
+  teamVaultTotal: 0,
+  currentUser: {
+    assetBalance: 0,
+    currentStreak: 0,
+    nextReward: 10,
+    seasonIncome: 0,
+    isAdmin: false,
+  },
+  activeSeason: null,
   today: 1,
   totalDays: 2,
   logs: [
@@ -32,10 +49,26 @@ function Probe() {
 
 function createSnapshot(overrides: Partial<BoardSnapshot> = {}): BoardSnapshot {
   return {
-    members: [{ id: "user-1", name: "Li", avatarKey: "male1" }],
+    members: [
+      {
+        id: "user-1",
+        name: "Li",
+        avatarKey: "male1",
+        assetBalance: 0,
+        seasonIncome: 0,
+        slotContribution: 0,
+      },
+    ],
     gridData: [[false, null]],
-    teamCoins: 0,
-    targetCoins: 100,
+    teamVaultTotal: 0,
+    currentUser: {
+      assetBalance: 0,
+      currentStreak: 0,
+      nextReward: 10,
+      seasonIncome: 0,
+      isAdmin: false,
+    },
+    activeSeason: null,
     today: 1,
     totalDays: 2,
     currentUserId: "user-1",
@@ -91,10 +124,26 @@ describe("BoardProvider sync", () => {
         ok: true,
         json: async () => ({
           snapshot: {
-            members: [{ id: "user-1", name: "Li", avatarKey: "male1" }],
+            members: [
+              {
+                id: "user-1",
+                name: "Li",
+                avatarKey: "male1",
+                assetBalance: 15,
+                seasonIncome: 0,
+                slotContribution: 0,
+              },
+            ],
             gridData: [[true, null]],
-            teamCoins: 15,
-            targetCoins: 100,
+            teamVaultTotal: 15,
+            currentUser: {
+              assetBalance: 15,
+              currentStreak: 0,
+              nextReward: 10,
+              seasonIncome: 0,
+              isAdmin: false,
+            },
+            activeSeason: null,
             today: 1,
             totalDays: 2,
             currentUserId: "user-1",
@@ -141,7 +190,7 @@ describe("BoardProvider sync", () => {
 
     const state = JSON.parse(container.querySelector("[data-testid='state']")!.textContent ?? "{}");
     expect(state.gridData[0][0]).toBe(true);
-    expect(state.teamCoins).toBe(15);
+    expect(state.teamVaultTotal).toBe(15);
     expect(state.activeTab).toBe("dash");
     expect(state.logs).toHaveLength(1);
     expect(state.logs[0].text).toBe("保留这条本地日志");
@@ -152,10 +201,26 @@ describe("BoardProvider sync", () => {
       ok: true,
       json: async () => ({
         snapshot: {
-          members: [{ id: "user-1", name: "Li", avatarKey: "male1" }],
+          members: [
+            {
+              id: "user-1",
+              name: "Li",
+              avatarKey: "male1",
+              assetBalance: 5,
+              seasonIncome: 0,
+              slotContribution: 0,
+            },
+          ],
           gridData: [[false, null]],
-          teamCoins: 5,
-          targetCoins: 100,
+          teamVaultTotal: 5,
+          currentUser: {
+            assetBalance: 5,
+            currentStreak: 0,
+            nextReward: 10,
+            seasonIncome: 0,
+            isAdmin: false,
+          },
+          activeSeason: null,
           today: 1,
           totalDays: 2,
           currentUserId: "user-1",
@@ -184,7 +249,14 @@ describe("BoardProvider sync", () => {
             punchEpoch={1}
             snapshot={createSnapshot({
               gridData: [[true, null]],
-              teamCoins: 15,
+              teamVaultTotal: 15,
+              currentUser: {
+                assetBalance: 15,
+                currentStreak: 0,
+                nextReward: 10,
+                seasonIncome: 0,
+                isAdmin: false,
+              },
             })}
           />
           <Probe />
@@ -206,7 +278,14 @@ describe("BoardProvider sync", () => {
             punchEpoch={1}
             snapshot={createSnapshot({
               gridData: [[true, null]],
-              teamCoins: 15,
+              teamVaultTotal: 15,
+              currentUser: {
+                assetBalance: 15,
+                currentStreak: 0,
+                nextReward: 10,
+                seasonIncome: 0,
+                isAdmin: false,
+              },
             })}
           />
           <Probe />
@@ -223,6 +302,39 @@ describe("BoardProvider sync", () => {
       container.querySelector("[data-testid='state']")!.textContent ?? "{}",
     );
     expect(state.gridData[0][0]).toBe(true);
-    expect(state.teamCoins).toBe(15);
+    expect(state.teamVaultTotal).toBe(15);
+  });
+
+  it("ignores an older punch snapshot while a newer punch sync is pending", async () => {
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={initialState}>
+          <BeginPunchSync active punchEpoch={2} />
+          <ApplyPunchSnapshot
+            active
+            punchEpoch={1}
+            snapshot={createSnapshot({
+              gridData: [[true, null]],
+              teamVaultTotal: 15,
+              currentUser: {
+                assetBalance: 15,
+                currentStreak: 1,
+                nextReward: 20,
+                seasonIncome: 0,
+                isAdmin: false,
+              },
+            })}
+          />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const state = JSON.parse(
+      container.querySelector("[data-testid='state']")!.textContent ?? "{}",
+    );
+    expect(state.gridData[0][0]).toBe(false);
+    expect(state.teamVaultTotal).toBe(0);
+    expect(state.pendingPunchEpoch).toBe(2);
   });
 });

@@ -43,7 +43,7 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
       };
     case "SYNC_REMOTE_STATE":
       if (action.source === "poll") {
-        if (action.pendingPunchEpochAtStart > 0) {
+        if ((state.pendingPunchEpoch ?? 0) > 0 || action.pendingPunchEpochAtStart > 0) {
           return state;
         }
 
@@ -54,16 +54,23 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
         if (action.requestId < (state.lastAppliedPollRequestId ?? 0)) {
           return state;
         }
-      } else if (action.punchEpoch < (state.latestSettledPunchEpoch ?? 0)) {
-        return state;
+      } else {
+        if (action.punchEpoch < (state.pendingPunchEpoch ?? 0)) {
+          return state;
+        }
+
+        if (action.punchEpoch < (state.latestSettledPunchEpoch ?? 0)) {
+          return state;
+        }
       }
 
       return {
         ...state,
         members: action.snapshot.members,
         gridData: action.snapshot.gridData,
-        teamCoins: action.snapshot.teamCoins,
-        targetCoins: action.snapshot.targetCoins,
+        teamVaultTotal: action.snapshot.teamVaultTotal,
+        currentUser: action.snapshot.currentUser,
+        activeSeason: action.snapshot.activeSeason,
         today: action.snapshot.today,
         totalDays: action.snapshot.totalDays,
         currentUserId: action.snapshot.currentUserId,

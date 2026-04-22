@@ -165,15 +165,17 @@ export function buildReportData(state: BoardState, now = new Date()): ReportData
   }));
 
   const mostConsistentMember = getLongestStreak(state, elapsedDays);
+  const teamCoins = state.teamCoins ?? state.teamVaultTotal ?? 0;
+  const targetCoins = state.targetCoins ?? 0;
   const vaultProgress =
-    state.targetCoins > 0 ? Math.min(100, Math.round((state.teamCoins / state.targetCoins) * 100)) : 0;
+    targetCoins > 0 ? Math.min(100, Math.round((teamCoins / targetCoins) * 100)) : 0;
 
   return {
     title: getDashboardTitle(now),
     summary: getSummary(totalPunches, fullAttendanceDays, completionRate),
     teamVault: {
-      current: state.teamCoins,
-      target: state.targetCoins,
+      current: teamCoins,
+      target: targetCoins,
       progress: vaultProgress,
     },
     metrics: [

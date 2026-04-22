@@ -16,7 +16,9 @@ describe("GET /api/board/state", () => {
 
   beforeAll(async () => {
     await seedDatabase();
-    userId = (await prisma.user.findUniqueOrThrow({ where: { username: "li" } })).id;
+    userId = (
+      await prisma.user.findUniqueOrThrow({ where: { username: "li" } })
+    ).id;
   });
 
   afterAll(async () => {
@@ -36,6 +38,14 @@ describe("GET /api/board/state", () => {
     expect(body.snapshot.currentUserId).toBe(userId);
     expect(body.snapshot.members).toHaveLength(5);
     expect(body.snapshot.gridData).toHaveLength(5);
-    expect(body.snapshot.teamCoins).toBeGreaterThan(0);
+    expect(body.snapshot.teamVaultTotal).toBeGreaterThan(0);
+    expect(body.snapshot.currentUser).toMatchObject({
+      assetBalance: expect.any(Number),
+      currentStreak: expect.any(Number),
+      nextReward: expect.any(Number),
+      seasonIncome: 0,
+      isAdmin: true,
+    });
+    expect(body.snapshot.activeSeason).toBeNull();
   });
 });

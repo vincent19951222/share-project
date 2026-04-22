@@ -5,7 +5,8 @@ import { HeatmapGrid } from "@/components/punch-board/HeatmapGrid";
 import { BoardProvider, useBoard } from "@/lib/store";
 import type { BoardSnapshot, BoardState } from "@/lib/types";
 
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
+  true;
 
 const initialState: BoardState = {
   members: [
@@ -75,7 +76,7 @@ describe("HeatmapGrid punch flow", () => {
     const request = deferred<{
       ok: boolean;
       json: () => Promise<{
-        snapshot: BoardState;
+        snapshot: BoardSnapshot;
       }>;
     }>();
 

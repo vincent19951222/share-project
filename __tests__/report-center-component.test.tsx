@@ -5,7 +5,8 @@ import { ReportCenter } from "@/components/report-center/ReportCenter";
 import { BoardProvider } from "@/lib/store";
 import type { BoardState } from "@/lib/types";
 
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
+  true;
 
 const initialState: BoardState = {
   members: [
