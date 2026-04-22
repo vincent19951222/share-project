@@ -82,6 +82,7 @@ describe("admin seasons api", () => {
   });
 
   beforeEach(async () => {
+    vi.setSystemTime(new Date("2026-04-22T12:00:00+08:00"));
     await seedDatabase();
   });
 
@@ -238,6 +239,8 @@ describe("admin seasons api", () => {
 
     const endResponse = await PATCH(makeRequest("PATCH", "/api/admin/seasons/current", admin.id));
     expect(endResponse.status).toBe(200);
+
+    vi.setSystemTime(new Date("2026-04-22T12:00:01+08:00"));
 
     const secondCreate = await POST(
       makeRequest("POST", "/api/admin/seasons", admin.id, {
