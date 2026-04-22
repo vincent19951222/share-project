@@ -5,8 +5,13 @@
 # Claude Code local config
 .claude/
 
+# Codex local config and logs
+.codex/
+.codex-dev-*.log
+
 # Superpowers local config
 .superpowers/
+.spec-workflow/
 
 # OS files
 Thumbs.db
@@ -18,6 +23,7 @@ node_modules/
 # Next.js
 .next/
 next-env.d.ts
+tsconfig.tsbuildinfo
 out/
 build/
 dist/
@@ -32,3 +38,8 @@ prisma/dev.db.bak-*
 
 # Environment
 .env
+
+# Local duplicate design exports
+design/female*.png
+design/male*.png
+docs/roadmap.md
