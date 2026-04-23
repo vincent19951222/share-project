@@ -19,7 +19,7 @@ describe("SeasonProgressBar", () => {
     container.remove();
   });
 
-  it("renders the expected grid template, slots, and contributor hover labels", () => {
+  it("renders the expected grid template, slots, and contributor hover cards", () => {
     const activeSeason: ActiveSeasonSnapshot = {
       id: "season-1",
       monthKey: "2026-04",
@@ -59,17 +59,23 @@ describe("SeasonProgressBar", () => {
     });
 
     const grid = container.querySelector<HTMLElement>("[data-testid='season-progress-grid']");
+    const liAvatar = container.querySelector<HTMLImageElement>("img[alt='li 的头像']");
+
     expect(grid).not.toBeNull();
     expect(grid!.style.gridTemplateColumns).toBe("repeat(5, minmax(0, 1fr))");
     expect(container.querySelectorAll("[data-slot-state='filled']")).toHaveLength(3);
     expect(container.querySelectorAll("[data-slot-state='empty']")).toHaveLength(2);
     expect(container.textContent).toContain("减脂挑战");
     expect(container.textContent).toContain("3/5");
-    expect(container.textContent).toContain("li · 贡献 2 格 · 赛季收入 30 银子");
-    expect(container.textContent).toContain("luo · 贡献 1 格 · 赛季收入 20 银子");
+    expect(container.textContent).toContain("li");
+    expect(container.textContent).toContain("贡献 2 格 · 赛季收入 30 银子");
+    expect(container.textContent).toContain("luo");
+    expect(container.textContent).toContain("贡献 1 格 · 赛季收入 20 银子");
     expect(
       container.querySelector("[aria-label='li · 贡献 2 格 · 赛季收入 30 银子']"),
     ).not.toBeNull();
+    expect(liAvatar).not.toBeNull();
+    expect(liAvatar?.getAttribute("src")).toBe("/avatars/male1.png");
   });
 
   it("shows a safe fallback when the season month is invalid", () => {

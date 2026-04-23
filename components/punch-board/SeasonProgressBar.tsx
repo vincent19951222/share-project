@@ -1,5 +1,6 @@
 "use client";
 
+import { getAvatarUrl } from "@/lib/avatars";
 import { getSeasonTheme } from "@/lib/season-theme";
 import type { ActiveSeasonSnapshot, BoardContribution } from "@/lib/types";
 
@@ -86,9 +87,17 @@ export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
               className="group relative h-full rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               style={{ backgroundColor }}
             >
-              {contributorLabel ? (
-                <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-slate-200 bg-white px-3 py-1 text-[11px] font-black text-slate-700 opacity-0 shadow-[0_4px_14px_rgba(15,23,42,0.12)] transition-opacity group-hover:opacity-100 group-focus:opacity-100">
-                  {contributorLabel}
+              {contributor ? (
+                <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 flex min-w-max -translate-x-1/2 items-center gap-2 rounded-full border-2 border-slate-200 bg-white py-1 pl-1 pr-3 text-[11px] font-black text-slate-700 opacity-0 shadow-[0_4px_14px_rgba(15,23,42,0.12)] transition-opacity group-hover:opacity-100 group-focus:opacity-100">
+                  <img
+                    src={getAvatarUrl(contributor.avatarKey)}
+                    alt={`${contributor.name} 的头像`}
+                    className="h-6 w-6 rounded-full border border-slate-200 bg-slate-50 object-cover"
+                  />
+                  <span className="text-slate-900">{contributor.name}</span>
+                  <span className="text-sub">
+                    贡献 {contributor.slotContribution} 格 · 赛季收入 {contributor.seasonIncome} 银子
+                  </span>
                 </span>
               ) : null}
             </div>
