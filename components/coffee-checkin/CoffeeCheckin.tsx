@@ -116,6 +116,7 @@ export function CoffeeCheckin() {
         snapshot={snapshot}
         busy={busy}
         onAddCup={() => void runMutation(addTodayCoffeeCup)}
+        onRemoveCup={() => void runMutation(removeLatestTodayCoffeeCup)}
       />
     </section>
   );

@@ -119,7 +119,7 @@ describe("CoffeeCheckin", () => {
     expect(container.textContent).not.toContain("正在打印今日咖啡小票");
   });
 
-  it("adds today's cup from the calendar plus cell", async () => {
+  it("asks for confirmation before adding the first cup from the calendar", async () => {
     vi.stubGlobal(
       "fetch",
       vi
@@ -134,7 +134,7 @@ describe("CoffeeCheckin", () => {
     });
 
     const calendarAddButton = container.querySelector(
-      'button[aria-label="给今天加一杯咖啡"]',
+      'button[aria-label="确认今天咖啡打卡"]',
     );
     expect(calendarAddButton).toBeDefined();
 
@@ -143,10 +143,94 @@ describe("CoffeeCheckin", () => {
       await Promise.resolve();
     });
 
+    expect(container.textContent).toContain("确认今天喝咖啡？");
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    const dialog = container.querySelector('[role="dialog"]');
+    const confirmButton = Array.from(dialog!.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认 1 杯"),
+    );
+    expect(confirmButton).toBeDefined();
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
     expect(fetch).toHaveBeenCalledWith(
       "/api/coffee/cups",
       expect.objectContaining({ method: "POST" }),
     );
     expect(container.textContent).toContain("今天已续命 1 杯");
+  });
+
+  it("lets the calendar dialog add or remove cups after coffee is already checked in", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(2) }) })
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(3) }) })
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(2) }) }),
+    );
+
+    await act(async () => {
+      root.render(<CoffeeCheckin />);
+      await Promise.resolve();
+    });
+
+    const calendarAdjustButton = container.querySelector(
+      'button[aria-label="调整今天咖啡杯数"]',
+    );
+    expect(calendarAdjustButton).toBeDefined();
+
+    await act(async () => {
+      calendarAdjustButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("调整今天的杯数");
+    expect(container.textContent).toContain("当前记录 2 杯");
+
+    let dialog = container.querySelector('[role="dialog"]');
+    const addCupButton = Array.from(dialog!.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("+1 杯"),
+    );
+    expect(addCupButton).toBeDefined();
+
+    await act(async () => {
+      addCupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/coffee/cups",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(container.textContent).toContain("今天已续命 3 杯");
+
+    await act(async () => {
+      container
+        .querySelector('button[aria-label="调整今天咖啡杯数"]')!
+        .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    dialog = container.querySelector('[role="dialog"]');
+    const removeCupButton = Array.from(dialog!.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("-1 杯"),
+    );
+    expect(removeCupButton).toBeDefined();
+
+    await act(async () => {
+      removeCupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/coffee/cups/latest",
+      expect.objectContaining({ method: "DELETE" }),
+    );
+    expect(container.textContent).toContain("今天已续命 2 杯");
   });
 });

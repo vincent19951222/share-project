@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { getAvatarUrl } from "@/lib/avatars";
 import type { CoffeeSnapshot } from "@/lib/types";
 
@@ -7,6 +8,7 @@ interface CoffeeGridProps {
   snapshot: CoffeeSnapshot;
   busy: boolean;
   onAddCup: () => void;
+  onRemoveCup: () => void;
 }
 
 function CoffeeCell({
@@ -14,28 +16,37 @@ function CoffeeCell({
   isFuture,
   isTodayForCurrentUser,
   busy,
-  onAddCup,
+  onOpenActions,
 }: {
   cups: number;
   isFuture: boolean;
   isTodayForCurrentUser: boolean;
   busy: boolean;
-  onAddCup: () => void;
+  onOpenActions: () => void;
 }) {
   if (isFuture) {
     return <div className="h-[3.25rem] w-[3.25rem] shrink-0 rounded-2xl border-2 border-dashed border-orange-300" />;
   }
 
-  if (isTodayForCurrentUser && cups === 0) {
+  if (isTodayForCurrentUser) {
     return (
       <button
         type="button"
         disabled={busy}
-        onClick={onAddCup}
-        aria-label="给今天加一杯咖啡"
-        className="grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 bg-yellow-300 text-xl font-black shadow-[0_4px_0_0_#1f2937] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"
+        onClick={onOpenActions}
+        aria-label={cups === 0 ? "确认今天咖啡打卡" : "调整今天咖啡杯数"}
+        className={`grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 font-black shadow-[0_4px_0_0_#1f2937] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60 ${
+          cups === 0 ? "bg-yellow-300 text-xl" : "bg-orange-100 text-amber-950"
+        }`}
       >
-        +
+        {cups === 0 ? (
+          "+"
+        ) : (
+          <span className="flex flex-col items-center text-xs leading-none">
+            <span aria-hidden="true">☕</span>
+            <span>☕ {cups}</span>
+          </span>
+        )}
       </button>
     );
   }
@@ -58,10 +69,17 @@ function CoffeeCell({
   );
 }
 
-export function CoffeeGrid({ snapshot, busy, onAddCup }: CoffeeGridProps) {
+export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGridProps) {
+  const [actionsOpen, setActionsOpen] = useState(false);
   const currentUserRowIndex = snapshot.members.findIndex(
     (member) => member.id === snapshot.currentUserId,
   );
+  const currentUserTodayCups = snapshot.stats.currentUserTodayCups;
+
+  function runAndClose(action: () => void) {
+    action();
+    setActionsOpen(false);
+  }
 
   return (
     <section className="flex min-h-0 flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-50 bg-white shadow-sm">
@@ -134,7 +152,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup }: CoffeeGridProps) {
                         rowIndex === currentUserRowIndex && day === snapshot.today
                       }
                       busy={busy}
-                      onAddCup={onAddCup}
+                      onOpenActions={() => setActionsOpen(true)}
                     />
                   );
                 })}
@@ -143,6 +161,59 @@ export function CoffeeGrid({ snapshot, busy, onAddCup }: CoffeeGridProps) {
           </div>
         </div>
       </div>
+
+      {actionsOpen ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/20 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="coffee-calendar-dialog-title"
+        >
+          <div className="w-full max-w-sm rounded-[1.25rem] border-[4px] border-slate-900 bg-orange-50 p-5 shadow-[8px_8px_0_0_rgba(63,42,29,0.9)]">
+            <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
+              Today Coffee
+            </div>
+            <h3
+              id="coffee-calendar-dialog-title"
+              className="mt-1 text-2xl font-black leading-tight text-amber-950"
+            >
+              {currentUserTodayCups === 0 ? "确认今天喝咖啡？" : "调整今天的杯数"}
+            </h3>
+            <p className="mt-3 text-sm font-bold text-amber-900">
+              {currentUserTodayCups === 0
+                ? "确认后会先记录为 1 杯，后面如果继续喝，可以再从这里加。"
+                : `当前记录 ${currentUserTodayCups} 杯，可以继续 +1，也可以撤回最新一杯。`}
+            </p>
+            <div className="mt-5 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setActionsOpen(false)}
+                className="rounded-full border-[3px] border-slate-900 bg-white px-4 py-2 text-sm font-black shadow-[0_3px_0_0_#1f2937]"
+              >
+                取消
+              </button>
+              {currentUserTodayCups > 0 ? (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => runAndClose(onRemoveCup)}
+                  className="rounded-full border-[3px] border-slate-900 bg-orange-200 px-4 py-2 text-sm font-black shadow-[0_3px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
+                >
+                  -1 杯
+                </button>
+              ) : null}
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => runAndClose(onAddCup)}
+                className="rounded-full border-[3px] border-slate-900 bg-teal-200 px-4 py-2 text-sm font-black shadow-[0_3px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
+              >
+                {currentUserTodayCups === 0 ? "确认 1 杯" : "+1 杯"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
