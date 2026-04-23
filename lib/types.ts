@@ -33,7 +33,7 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
-export type AppTab = "punch" | "board" | "coffee" | "dash";
+export type AppTab = "punch" | "board" | "coffee" | "dash" | "calendar";
 
 export interface CoffeeMemberSnapshot {
   id: string;
@@ -63,6 +63,22 @@ export interface CoffeeSnapshot {
     currentUserTodayCups: number;
     coffeeKing: CoffeeKingSnapshot | null;
   };
+}
+
+export interface CalendarDayRecord {
+  day: number;
+  workedOut: boolean;
+  coffeeCups: number;
+}
+
+export interface CalendarMonthSnapshot {
+  monthKey: string;
+  currentMonthKey: string;
+  todayDay: number | null;
+  totalDays: number;
+  workoutDays: number;
+  coffeeCupTotal: number;
+  days: CalendarDayRecord[];
 }
 
 export type CellStatus = boolean | null;
