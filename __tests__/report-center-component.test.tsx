@@ -69,13 +69,13 @@ describe("ReportCenter", () => {
       );
     });
 
-    expect(container.textContent).toContain("DASHBOARD");
+    expect(container.textContent).toContain("4月牛马战报");
     expect(container.textContent).toContain("本月打卡 4 次，全勤 1 天，团队节奏还有上升空间。");
     expect(container.textContent).toContain("团队完成率");
     expect(container.textContent).toContain("总打卡次数");
     expect(container.textContent).toContain("牛马金库");
     expect(container.textContent).toContain("减脂挑战 · 3/5");
-    expect(container.textContent).toContain("ACTIVITY TREND / 活跃趋势");
+    expect(container.textContent).toContain("活跃趋势");
     expect(container.textContent).toContain("气氛组播报");
     expect(container.textContent).not.toContain("OCTOBER REPORT");
     expect(container.textContent).not.toContain("+12,450");

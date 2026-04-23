@@ -42,7 +42,7 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
       >
         <div className="p-5 border-b-2 border-slate-100 bg-slate-50 flex justify-between items-center">
           <div className="flex flex-col">
-            <span className="text-xs font-bold text-sub">ASSET BALANCE</span>
+            <span className="text-xs font-bold text-sub">我的银子</span>
             <div className="text-2xl font-black text-yellow-500 flex items-center gap-1">
               <span dangerouslySetInnerHTML={{ __html: SvgIcons.coin }} />
               {currentUser?.assetBalance ?? 0}
@@ -51,12 +51,12 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
         </div>
         <div className="p-5 border-t-2 border-slate-100 bg-slate-50 flex flex-col gap-2">
           <div className="flex justify-between items-center text-sm font-bold">
-            <span>Current streak</span>
-            <span className="text-slate-700">{currentUser?.currentStreak ?? 0} days</span>
+            <span>连签</span>
+            <span className="text-slate-700">{currentUser?.currentStreak ?? 0} 天</span>
           </div>
           <div className="flex justify-between items-center text-sm font-bold">
-            <span>Next reward</span>
-            <span className="text-slate-700">{currentUser?.nextReward ?? 0} coins</span>
+            <span>下次奖励</span>
+            <span className="text-slate-700">{currentUser?.nextReward ?? 0} 银子</span>
           </div>
           {currentUser?.isAdmin ? (
             <Link

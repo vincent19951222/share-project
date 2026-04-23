@@ -79,12 +79,12 @@ export function getCurrentSeasonMonthKey(now: Date = new Date()): string {
 
 function validateGoalName(goalName: unknown): string {
   if (typeof goalName !== "string") {
-    throw new SeasonValidationError("goalName must be a non-empty string");
+    throw new SeasonValidationError("请填写冲刺目标名称");
   }
 
   const trimmed = goalName.trim();
   if (trimmed.length === 0) {
-    throw new SeasonValidationError("goalName must be a non-empty string");
+    throw new SeasonValidationError("请填写冲刺目标名称");
   }
 
   return trimmed;
@@ -92,12 +92,12 @@ function validateGoalName(goalName: unknown): string {
 
 function validateTargetSlots(targetSlots: unknown): number {
   if (typeof targetSlots !== "number" || !Number.isFinite(targetSlots)) {
-    throw new SeasonValidationError("targetSlots must be one of the allowed slot tiers");
+    throw new SeasonValidationError("目标格数只能从固定档位里选");
   }
 
   if (!isValidTargetSlots(targetSlots)) {
     throw new SeasonValidationError(
-      `targetSlots must be one of: ${ALLOWED_TARGET_SLOTS.join(", ")}`,
+      `目标格数只能选 ${ALLOWED_TARGET_SLOTS.join("、")}`,
     );
   }
 
@@ -134,7 +134,7 @@ export async function createSeasonForTeam(
   `;
 
   if (insertedCount === 0) {
-    throw new SeasonConflictError("An active season already exists for this team");
+    throw new SeasonConflictError("当前已经有进行中的赛季了");
   }
 
   const season = await prisma.season.findUniqueOrThrow({
@@ -154,7 +154,7 @@ export async function endActiveSeasonForTeam(
   });
 
   if (!activeSeason) {
-    throw new SeasonNotFoundError("No active season exists for this team");
+    throw new SeasonNotFoundError("当前没有可结束的赛季");
   }
 
   const season = await prisma.season.update({

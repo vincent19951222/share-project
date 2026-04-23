@@ -56,6 +56,17 @@ export function SharedBoard() {
     return () => window.clearInterval(timer);
   }, [fetchNotes, isActive]);
 
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleProfileUpdated = () => {
+      void fetchNotes();
+    };
+
+    window.addEventListener("board:profile-updated", handleProfileUpdated);
+    return () => window.removeEventListener("board:profile-updated", handleProfileUpdated);
+  }, [fetchNotes, isActive]);
+
   async function createNote(input: { type: BoardNoteType; content: string; color: BoardNoteColor | null }) {
     setSubmitting(true);
     setMessage(null);

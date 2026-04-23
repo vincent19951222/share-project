@@ -3,6 +3,7 @@ import {
   ALLOWED_TARGET_SLOTS,
   getNextPunchRewardPreview,
   getNextPunchStreak,
+  getUpcomingPunchRewardPreview,
   getPunchRewardForStreak,
   getShanghaiDayKey,
   isValidTargetSlots,
@@ -28,6 +29,12 @@ describe("economy rules", () => {
     expect(getNextPunchRewardPreview(3, "2026-04-21", "2026-04-22")).toBe(40);
     expect(getNextPunchRewardPreview(5, "2026-04-21", "2026-04-22")).toBe(50);
     expect(getNextPunchRewardPreview(5, "2026-04-20", "2026-04-22")).toBe(10);
+  });
+
+  it("previews the next effective reward after today's punch without resetting to 10", () => {
+    expect(getUpcomingPunchRewardPreview(2, "2026-04-22", "2026-04-22")).toBe(30);
+    expect(getUpcomingPunchRewardPreview(5, "2026-04-22", "2026-04-22")).toBe(50);
+    expect(getUpcomingPunchRewardPreview(2, "2026-04-21", "2026-04-22")).toBe(30);
   });
 
   it("handles UTC crossing into the next Shanghai day", () => {

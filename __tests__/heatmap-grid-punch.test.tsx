@@ -193,4 +193,127 @@ describe("HeatmapGrid punch flow", () => {
     expect(container.textContent).toContain("今天已经打过卡了");
     expect(container.textContent).toContain("确认打卡今天吗？");
   });
+
+  it("waits for the server snapshot before undoing today's punch and adds a rollback log", async () => {
+    const request = deferred<{
+      ok: boolean;
+      json: () => Promise<{
+        snapshot: BoardSnapshot;
+      }>;
+    }>();
+
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(request.promise));
+
+    const punchedState: BoardState = {
+      ...initialState,
+      gridData: [[true, null], [false, null]],
+      teamVaultTotal: 20,
+      currentUser: {
+        assetBalance: 20,
+        currentStreak: 1,
+        nextReward: 20,
+        seasonIncome: 10,
+        isAdmin: false,
+      },
+      activeSeason: {
+        id: "season-1",
+        monthKey: "2026-04",
+        goalName: "五月掉脂挑战",
+        targetSlots: 80,
+        filledSlots: 1,
+        contributions: [
+          {
+            userId: "user-1",
+            name: "Li",
+            avatarKey: "male1",
+            colorIndex: 0,
+            slotContribution: 1,
+            seasonIncome: 10,
+          },
+        ],
+      },
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={punchedState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const punchedCellButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "✓",
+    );
+    expect(punchedCellButton).toBeDefined();
+
+    await act(async () => {
+      punchedCellButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("撤销今天打卡");
+
+    const undoButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认撤销"),
+    );
+    expect(undoButton).toBeDefined();
+
+    await act(async () => {
+      undoButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    const stateBeforeResponse = readState(container);
+
+    expect(fetch).toHaveBeenCalledWith("/api/board/punch", expect.objectContaining({ method: "DELETE" }));
+    expect(stateBeforeResponse.gridData[0][0]).toBe(true);
+    expect(stateBeforeResponse.logs).toHaveLength(0);
+
+    await act(async () => {
+      request.resolve({
+        ok: true,
+        json: async () => ({
+          snapshot: createSnapshot({
+            gridData: [[false, null], [false, null]],
+            teamVaultTotal: 10,
+            currentUser: {
+              assetBalance: 10,
+              currentStreak: 0,
+              nextReward: 10,
+              seasonIncome: 0,
+              isAdmin: false,
+            },
+            activeSeason: {
+              id: "season-1",
+              monthKey: "2026-04",
+              goalName: "五月掉脂挑战",
+              targetSlots: 80,
+              filledSlots: 0,
+              contributions: [
+                {
+                  userId: "user-1",
+                  name: "Li",
+                  avatarKey: "male1",
+                  colorIndex: 0,
+                  slotContribution: 0,
+                  seasonIncome: 0,
+                },
+              ],
+            },
+          }),
+        }),
+      });
+      await request.promise;
+      await Promise.resolve();
+    });
+
+    const stateAfterResponse = readState(container);
+
+    expect(stateAfterResponse.gridData[0][0]).toBe(false);
+    expect(stateAfterResponse.logs).toHaveLength(1);
+    expect(stateAfterResponse.logs[0].type).toBe("highlight");
+    expect(stateAfterResponse.logs[0].text).toContain("已撤销今日健身打卡");
+    expect(container.textContent).toContain("+");
+  });
 });

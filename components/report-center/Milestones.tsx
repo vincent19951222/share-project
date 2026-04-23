@@ -7,15 +7,15 @@ interface MilestonesProps {
 }
 
 const toneClasses: Record<ReportMetric["tone"], string> = {
-  plain: "bg-white border-slate-200 text-slate-900",
-  good: "bg-green-50 border-green-200 text-green-900",
-  warm: "bg-yellow-50 border-yellow-300 text-yellow-900",
+  plain: "bg-white text-slate-900",
+  good: "bg-emerald-50 text-emerald-900",
+  warm: "bg-yellow-100 text-yellow-900",
 };
 
 const helperClasses: Record<ReportMetric["tone"], string> = {
   plain: "text-sub",
-  good: "text-green-700",
-  warm: "text-yellow-700",
+  good: "text-emerald-700",
+  warm: "text-yellow-800",
 };
 
 export function Milestones({ metrics }: MilestonesProps) {
@@ -24,11 +24,11 @@ export function Milestones({ metrics }: MilestonesProps) {
       {metrics.map((metric) => (
         <article
           key={metric.label}
-          className={`flex min-h-32 flex-col justify-between rounded-[1rem] border-4 p-4 shadow-sm ${toneClasses[metric.tone]}`}
+          className={`report-metric-card flex min-h-36 flex-col justify-between p-5 ${toneClasses[metric.tone]}`}
         >
-          <div className="text-xs font-black tracking-wide text-sub">{metric.label}</div>
-          <div className="mt-2 break-words text-3xl font-black">{metric.value}</div>
-          <p className={`mt-2 text-xs font-bold leading-relaxed ${helperClasses[metric.tone]}`}>{metric.helper}</p>
+          <div className="report-metric-label">{metric.label}</div>
+          <div className="mt-3 break-words text-4xl font-black leading-none">{metric.value}</div>
+          <p className={`mt-3 text-sm font-bold leading-relaxed ${helperClasses[metric.tone]}`}>{metric.helper}</p>
         </article>
       ))}
     </section>

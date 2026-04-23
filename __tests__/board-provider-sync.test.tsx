@@ -112,6 +112,23 @@ function ApplyPunchSnapshot({
   return null;
 }
 
+function ApplyManualSnapshot({
+  active,
+  snapshot,
+}: {
+  active: boolean;
+  snapshot: BoardSnapshot;
+}) {
+  const { dispatch } = useBoard();
+
+  useEffect(() => {
+    if (!active) return;
+    dispatch({ type: "APPLY_REMOTE_SNAPSHOT", snapshot });
+  }, [active, dispatch, snapshot]);
+
+  return null;
+}
+
 describe("BoardProvider sync", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -336,5 +353,47 @@ describe("BoardProvider sync", () => {
     expect(state.gridData[0][0]).toBe(false);
     expect(state.teamVaultTotal).toBe(0);
     expect(state.pendingPunchEpoch).toBe(2);
+  });
+
+  it("applies a manual snapshot immediately while preserving client-only UI state", async () => {
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={initialState}>
+          <ApplyManualSnapshot
+            active
+            snapshot={createSnapshot({
+              members: [
+                {
+                  id: "user-1",
+                  name: "Li",
+                  avatarKey: "female3",
+                  assetBalance: 25,
+                  seasonIncome: 0,
+                  slotContribution: 0,
+                },
+              ],
+              teamVaultTotal: 25,
+              currentUser: {
+                assetBalance: 25,
+                currentStreak: 2,
+                nextReward: 30,
+                seasonIncome: 0,
+                isAdmin: false,
+              },
+            })}
+          />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const state = JSON.parse(
+      container.querySelector("[data-testid='state']")!.textContent ?? "{}",
+    );
+    expect(state.members[0].avatarKey).toBe("female3");
+    expect(state.currentUser.assetBalance).toBe(25);
+    expect(state.activeTab).toBe("dash");
+    expect(state.logs).toHaveLength(1);
+    expect(state.logs[0].text).toBe("保留这条本地日志");
   });
 });

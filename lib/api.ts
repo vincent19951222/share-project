@@ -29,3 +29,14 @@ export async function submitTodayPunch(): Promise<BoardSnapshot> {
 
   return readSnapshot(response);
 }
+
+export async function deleteTodayPunch(): Promise<BoardSnapshot> {
+  const response = await fetch("/api/board/punch", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return readSnapshot(response);
+}

@@ -8,12 +8,29 @@ import {
   getShanghaiDayKey,
 } from "@/lib/economy";
 
+class TodayPunchNotFoundError extends Error {
+  constructor() {
+    super("今天还没打卡，撤销不了");
+    this.name = "TodayPunchNotFoundError";
+  }
+}
+
 function isPunchConflictError(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return error.code === "P2002" || error.code === "P2034";
   }
 
   return error instanceof Error && error.message.toLowerCase().includes("database is locked");
+}
+
+async function buildSnapshotResponse(userId: string, now: Date) {
+  const snapshot = await buildBoardSnapshotForUser(userId, now);
+
+  if (!snapshot) {
+    return NextResponse.json({ error: "snapshot-build-failed" }, { status: 500 });
+  }
+
+  return NextResponse.json({ snapshot });
 }
 
 export async function POST(request: NextRequest) {
@@ -68,6 +85,8 @@ export async function POST(request: NextRequest) {
       user.team.users.findIndex((member) => member.id === user.id),
       0,
     );
+    const countsForSeasonSlot =
+      activeSeason !== null && activeSeason.filledSlots < activeSeason.targetSlots;
 
     try {
       await prisma.$transaction(async (tx) => {
@@ -81,7 +100,7 @@ export async function POST(request: NextRequest) {
             punchType: "default",
             streakAfterPunch: nextStreak,
             assetAwarded: reward,
-            countedForSeasonSlot: activeSeason !== null,
+            countedForSeasonSlot: countsForSeasonSlot,
           },
         });
 
@@ -121,10 +140,14 @@ export async function POST(request: NextRequest) {
                 seasonIncome: {
                   increment: reward,
                 },
-                slotContribution: {
-                  increment: 1,
-                },
-                ...(existingStat.firstContributionAt ? {} : { firstContributionAt: now }),
+                ...(countsForSeasonSlot
+                  ? {
+                      slotContribution: {
+                        increment: 1,
+                      },
+                      ...(existingStat.firstContributionAt ? {} : { firstContributionAt: now }),
+                    }
+                  : {}),
               },
             });
           } else {
@@ -133,25 +156,24 @@ export async function POST(request: NextRequest) {
                 seasonId: activeSeason.id,
                 userId: user.id,
                 seasonIncome: reward,
-                slotContribution: 1,
+                slotContribution: countsForSeasonSlot ? 1 : 0,
                 colorIndex: memberOrder,
                 memberOrder,
-                firstContributionAt: now,
+                firstContributionAt: countsForSeasonSlot ? now : null,
               },
             });
           }
 
-          await tx.season.updateMany({
-            where: {
-              id: activeSeason.id,
-              filledSlots: { lt: activeSeason.targetSlots },
-            },
-            data: {
-              filledSlots: {
-                increment: 1,
+          if (countsForSeasonSlot) {
+            await tx.season.update({
+              where: { id: activeSeason.id },
+              data: {
+                filledSlots: {
+                  increment: 1,
+                },
               },
-            },
-          });
+            });
+          }
         }
       });
     } catch (error) {
@@ -162,13 +184,145 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    const snapshot = await buildBoardSnapshotForUser(user.id, now);
+    return buildSnapshotResponse(user.id, now);
+  } catch {
+    return NextResponse.json({ error: "server-error" }, { status: 500 });
+  }
+}
 
-    if (!snapshot) {
-      return NextResponse.json({ error: "snapshot-build-failed" }, { status: 500 });
+export async function DELETE(request: NextRequest) {
+  try {
+    const userId = request.cookies.get("userId")?.value;
+
+    if (!userId) {
+      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     }
 
-    return NextResponse.json({ snapshot });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "user-not-found" }, { status: 401 });
+    }
+
+    const now = new Date();
+    const todayDayKey = getShanghaiDayKey(now);
+
+    try {
+      await prisma.$transaction(async (tx) => {
+        const todayPunch = await tx.punchRecord.findUnique({
+          where: {
+            userId_dayKey: {
+              userId: user.id,
+              dayKey: todayDayKey,
+            },
+          },
+          select: {
+            id: true,
+            seasonId: true,
+            assetAwarded: true,
+            countedForSeasonSlot: true,
+          },
+        });
+
+        if (!todayPunch) {
+          throw new TodayPunchNotFoundError();
+        }
+
+        const previousPunch = await tx.punchRecord.findFirst({
+          where: {
+            userId: user.id,
+            dayKey: {
+              lt: todayDayKey,
+            },
+          },
+          orderBy: [{ dayKey: "desc" }, { createdAt: "desc" }],
+          select: {
+            dayKey: true,
+            streakAfterPunch: true,
+          },
+        });
+
+        await tx.punchRecord.delete({
+          where: { id: todayPunch.id },
+        });
+
+        await tx.user.update({
+          where: { id: user.id },
+          data: {
+            coins: {
+              decrement: todayPunch.assetAwarded,
+            },
+            currentStreak: previousPunch?.streakAfterPunch ?? 0,
+            lastPunchDayKey: previousPunch?.dayKey ?? null,
+          },
+        });
+
+        if (todayPunch.seasonId) {
+          const stat = await tx.seasonMemberStat.findUnique({
+            where: {
+              seasonId_userId: {
+                seasonId: todayPunch.seasonId,
+                userId: user.id,
+              },
+            },
+            select: {
+              slotContribution: true,
+            },
+          });
+
+          if (stat) {
+            await tx.seasonMemberStat.update({
+              where: {
+                seasonId_userId: {
+                  seasonId: todayPunch.seasonId,
+                  userId: user.id,
+                },
+              },
+              data: {
+                seasonIncome: {
+                  decrement: todayPunch.assetAwarded,
+                },
+                ...(todayPunch.countedForSeasonSlot
+                  ? {
+                      slotContribution: {
+                        decrement: 1,
+                      },
+                      ...(stat.slotContribution <= 1 ? { firstContributionAt: null } : {}),
+                    }
+                  : {}),
+              },
+            });
+          }
+
+          if (todayPunch.countedForSeasonSlot) {
+            await tx.season.updateMany({
+              where: {
+                id: todayPunch.seasonId,
+                filledSlots: {
+                  gt: 0,
+                },
+              },
+              data: {
+                filledSlots: {
+                  decrement: 1,
+                },
+              },
+            });
+          }
+        }
+      });
+    } catch (error) {
+      if (error instanceof TodayPunchNotFoundError) {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
+
+      throw error;
+    }
+
+    return buildSnapshotResponse(user.id, now);
   } catch {
     return NextResponse.json({ error: "server-error" }, { status: 500 });
   }

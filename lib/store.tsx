@@ -23,6 +23,18 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
       return { ...state, logs: [...state.logs, action.log] };
     case "SET_TAB":
       return { ...state, activeTab: action.tab };
+    case "APPLY_REMOTE_SNAPSHOT":
+      return {
+        ...state,
+        members: action.snapshot.members,
+        gridData: action.snapshot.gridData,
+        teamVaultTotal: action.snapshot.teamVaultTotal,
+        currentUser: action.snapshot.currentUser,
+        activeSeason: action.snapshot.activeSeason,
+        today: action.snapshot.today,
+        totalDays: action.snapshot.totalDays,
+        currentUserId: action.snapshot.currentUserId,
+      };
     case "BEGIN_PUNCH_SYNC":
       if (action.punchEpoch <= (state.pendingPunchEpoch ?? 0)) {
         return state;

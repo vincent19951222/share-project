@@ -1,14 +1,14 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { POST } from "@/app/api/board/punch/route";
+import { DELETE, POST } from "@/app/api/board/punch/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
 import { getCurrentBoardDay } from "@/lib/board-state";
 import { getShanghaiDayKey } from "@/lib/economy";
 
-function request(userId?: string) {
+function request(method: "POST" | "DELETE", userId?: string) {
   return new NextRequest("http://localhost/api/board/punch", {
-    method: "POST",
+    method,
     headers: {
       "Content-Type": "application/json",
       ...(userId ? { Cookie: `userId=${userId}` } : {}),
@@ -17,7 +17,7 @@ function request(userId?: string) {
   });
 }
 
-describe("POST /api/board/punch", () => {
+describe("/api/board/punch", () => {
   const fixedNow = new Date("2026-04-24T09:00:00+08:00");
   let userId: string;
   let today: number;
@@ -53,7 +53,6 @@ describe("POST /api/board/punch", () => {
     await prisma.punchRecord.deleteMany({
       where: {
         userId: { in: teamUsers.map((member) => member.id) },
-        dayKey: todayDayKey,
       },
     });
     await prisma.seasonMemberStat.deleteMany({
@@ -67,6 +66,7 @@ describe("POST /api/board/punch", () => {
     await prisma.user.updateMany({
       where: { id: { in: teamUsers.map((member) => member.id) } },
       data: {
+        coins: 10,
         currentStreak: 0,
         lastPunchDayKey: null,
       },
@@ -98,7 +98,7 @@ describe("POST /api/board/punch", () => {
   it("returns 401 when unauthenticated", async () => {
     await resetState();
 
-    const response = await POST(request());
+    const response = await POST(request("POST"));
     expect(response.status).toBe(401);
   });
 
@@ -114,7 +114,7 @@ describe("POST /api/board/punch", () => {
       },
     });
 
-    const response = await POST(request(userId));
+    const response = await POST(request("POST", userId));
     expect(response.status).toBe(200);
 
     const body = await response.json();
@@ -140,7 +140,7 @@ describe("POST /api/board/punch", () => {
     expect(body.snapshot.currentUser).toMatchObject({
       assetBalance: after.coins,
       currentStreak: 2,
-      nextReward: 10,
+      nextReward: 30,
       seasonIncome: 0,
       isAdmin: true,
     });
@@ -154,7 +154,7 @@ describe("POST /api/board/punch", () => {
     const season = await createActiveSeason({ filledSlots: 0, targetSlots: 5 });
     const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
-    const response = await POST(request(userId));
+    const response = await POST(request("POST", userId));
     expect(response.status).toBe(200);
 
     const body = await response.json();
@@ -184,15 +184,15 @@ describe("POST /api/board/punch", () => {
     expect(stat.slotContribution).toBe(1);
     expect(stat.firstContributionAt).not.toBeNull();
     expect(body.snapshot.activeSeason?.filledSlots).toBe(1);
-    expect(body.snapshot.currentUser.nextReward).toBe(10);
+    expect(body.snapshot.currentUser.nextReward).toBe(20);
   });
 
-  it("keeps filled slots capped when the season is already full", async () => {
+  it("keeps filled slots capped and skips slot contribution when the season is already full", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 1, targetSlots: 1 });
     const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
-    const response = await POST(request(userId));
+    const response = await POST(request("POST", userId));
     expect(response.status).toBe(200);
 
     const body = await response.json();
@@ -215,8 +215,9 @@ describe("POST /api/board/punch", () => {
     expect(after.coins).toBe(before.coins + 10);
     expect(afterSeason.filledSlots).toBe(1);
     expect(stat.seasonIncome).toBe(10);
-    expect(stat.slotContribution).toBe(1);
-    expect(record.countedForSeasonSlot).toBe(true);
+    expect(stat.slotContribution).toBe(0);
+    expect(stat.firstContributionAt).toBeNull();
+    expect(record.countedForSeasonSlot).toBe(false);
     expect(body.snapshot.activeSeason?.filledSlots).toBe(1);
   });
 
@@ -225,11 +226,11 @@ describe("POST /api/board/punch", () => {
 
     const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
-    const firstResponse = await POST(request(userId));
+    const firstResponse = await POST(request("POST", userId));
     expect(firstResponse.status).toBe(200);
 
     const middle = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
-    const response = await POST(request(userId));
+    const response = await POST(request("POST", userId));
     expect(response.status).toBe(409);
 
     const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -251,8 +252,8 @@ describe("POST /api/board/punch", () => {
     const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
     const [firstResponse, secondResponse] = await Promise.all([
-      POST(request(userId)),
-      POST(request(userId)),
+      POST(request("POST", userId)),
+      POST(request("POST", userId)),
     ]);
 
     const statuses = [firstResponse.status, secondResponse.status].sort((a, b) => a - b);
@@ -268,5 +269,163 @@ describe("POST /api/board/punch", () => {
     expect(records).toHaveLength(1);
     expect(records[0]?.punched).toBe(true);
     expect(after.coins).toBe(before.coins + 10);
+  });
+
+  it("undoes today's punch and restores the previous streak and coins", async () => {
+    await resetState();
+
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: today - 1,
+        dayKey: "2026-04-23",
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 4,
+        assetAwarded: 40,
+      },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        coins: 100,
+        currentStreak: 5,
+        lastPunchDayKey: todayDayKey,
+      },
+    });
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: today,
+        dayKey: todayDayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 5,
+        assetAwarded: 50,
+        countedForSeasonSlot: false,
+      },
+    });
+
+    const response = await DELETE(request("DELETE", userId));
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const todayRecord = await prisma.punchRecord.findUnique({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+
+    expect(todayRecord).toBeNull();
+    expect(after.coins).toBe(50);
+    expect(after.currentStreak).toBe(4);
+    expect(after.lastPunchDayKey).toBe("2026-04-23");
+    expect(body.snapshot.currentUser).toMatchObject({
+      assetBalance: 50,
+      currentStreak: 4,
+      nextReward: 50,
+    });
+  });
+
+  it("undoes today's season punch and rolls back season income plus progress", async () => {
+    await resetState();
+    const season = await createActiveSeason({ filledSlots: 3, targetSlots: 5 });
+
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: today - 1,
+        dayKey: "2026-04-23",
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 1,
+        assetAwarded: 10,
+      },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        coins: 70,
+        currentStreak: 2,
+        lastPunchDayKey: todayDayKey,
+      },
+    });
+    await prisma.seasonMemberStat.create({
+      data: {
+        seasonId: season.id,
+        userId,
+        seasonIncome: 20,
+        slotContribution: 2,
+        colorIndex: 0,
+        memberOrder: 0,
+        firstContributionAt: new Date("2026-04-20T08:00:00+08:00"),
+      },
+    });
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: season.id,
+        dayIndex: today,
+        dayKey: todayDayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 2,
+        assetAwarded: 20,
+        countedForSeasonSlot: true,
+      },
+    });
+    await prisma.season.update({
+      where: { id: season.id },
+      data: { filledSlots: 4 },
+    });
+    await prisma.seasonMemberStat.update({
+      where: {
+        seasonId_userId: {
+          seasonId: season.id,
+          userId,
+        },
+      },
+      data: {
+        seasonIncome: 40,
+        slotContribution: 3,
+      },
+    });
+
+    const response = await DELETE(request("DELETE", userId));
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const afterSeason = await prisma.season.findUniqueOrThrow({ where: { id: season.id } });
+    const afterStat = await prisma.seasonMemberStat.findUniqueOrThrow({
+      where: {
+        seasonId_userId: {
+          seasonId: season.id,
+          userId,
+        },
+      },
+    });
+
+    expect(after.coins).toBe(50);
+    expect(after.currentStreak).toBe(1);
+    expect(after.lastPunchDayKey).toBe("2026-04-23");
+    expect(afterSeason.filledSlots).toBe(3);
+    expect(afterStat.seasonIncome).toBe(20);
+    expect(afterStat.slotContribution).toBe(2);
+    expect(body.snapshot.activeSeason?.filledSlots).toBe(3);
+    expect(body.snapshot.currentUser?.seasonIncome).toBe(20);
+  });
+
+  it("rejects undo when today's punch does not exist", async () => {
+    await resetState();
+
+    const response = await DELETE(request("DELETE", userId));
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({
+      error: "今天还没打卡，撤销不了",
+    });
   });
 });

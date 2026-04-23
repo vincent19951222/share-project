@@ -69,11 +69,13 @@ describe("SeasonAdminPanel", () => {
     });
 
     expect(container.textContent).toContain("赛季设置");
-    expect(container.textContent).toContain("Goal name");
-    expect(container.textContent).toContain("Target slots");
+    expect(container.textContent).toContain("回到打卡页");
+    expect(container.textContent).toContain("冲刺目标");
+    expect(container.textContent).toContain("目标格数");
     expect(container.textContent).toContain("五月掉脂挑战");
     expect(container.textContent).toContain("三月冲刺");
-    expect(container.textContent).toContain("End season");
+    expect(container.textContent).toContain("结束当前赛季");
+    expect(container.querySelector('a[href="/"]')).not.toBeNull();
     expect(container.querySelector('select[name="targetSlots"]')).not.toBeNull();
   });
 
@@ -156,7 +158,7 @@ describe("SeasonAdminPanel", () => {
     });
 
     const endButton = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("End season"),
+      button.textContent?.includes("结束当前赛季"),
     );
 
     expect(endButton).not.toBeUndefined();

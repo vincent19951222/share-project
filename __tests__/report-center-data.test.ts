@@ -47,7 +47,7 @@ describe("buildReportData", () => {
   it("derives lightweight dashboard metrics from elapsed board state", () => {
     const report = buildReportData(createState(), new Date("2026-04-20T12:00:00+08:00"));
 
-    expect(report.title).toBe("APRIL DASHBOARD");
+    expect(report.title).toBe("4月牛马战报");
     expect(report.summary).toBe("本月打卡 7 次，全勤 1 天，团队节奏还有上升空间。");
     expect(report.teamVault).toEqual({ current: 1450, helper: "减脂挑战 · 3/5" });
     expect(report.metrics.map((metric) => [metric.label, metric.value])).toEqual([

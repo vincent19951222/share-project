@@ -60,8 +60,9 @@ describe("ProfileDropdown", () => {
     });
 
     expect(container.textContent).toContain("3450");
-    expect(container.textContent).toContain("12 days");
-    expect(container.textContent).toContain("40 coins");
+    expect(container.textContent).toContain("我的银子");
+    expect(container.textContent).toContain("12 天");
+    expect(container.textContent).toContain("40 银子");
     expect(container.textContent).toContain("赛季设置");
   });
 });

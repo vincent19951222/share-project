@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
-import { submitTodayPunch } from "@/lib/api";
+import { deleteTodayPunch, submitTodayPunch } from "@/lib/api";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
 
@@ -53,6 +53,50 @@ export function HeatmapGrid() {
         log: {
           id: `punch-error-${Date.now()}`,
           text: `打卡失败：${message}`,
+          type: "alert",
+          timestamp: new Date(),
+        },
+      });
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handlePunchUndo() {
+    setSubmitting(true);
+    setError(null);
+    const punchEpoch = reservePunchEpoch();
+    dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
+
+    try {
+      const snapshot = await deleteTodayPunch();
+
+      dispatch({
+        type: "SYNC_REMOTE_STATE",
+        snapshot,
+        source: "punch",
+        punchEpoch,
+      });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `undo-punch-${Date.now()}`,
+          text: "<b>你</b> 已撤销今日健身打卡，服务器状态已同步。",
+          type: "highlight",
+          timestamp: new Date(),
+        },
+      });
+      return true;
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "撤销失败";
+      setError(message);
+      dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `undo-punch-error-${Date.now()}`,
+          text: `撤销失败：${message}`,
           type: "alert",
           timestamp: new Date(),
         },
@@ -124,6 +168,24 @@ export function HeatmapGrid() {
                         busy={submitting}
                         error={error}
                         onConfirm={handlePunchConfirm}
+                      />
+                    );
+                  }
+
+                  if (day === state.today && status && isCurrentUser) {
+                    return (
+                      <PunchPopup
+                        key={day}
+                        busy={submitting}
+                        error={error}
+                        onConfirm={handlePunchUndo}
+                        triggerContent="✓"
+                        triggerClassName="cell cell-punched cursor-pointer disabled:opacity-50"
+                        title="撤销今天打卡"
+                        description="确认撤销今天的打卡吗？"
+                        helperText="撤销后会回滚今天获得的银子、连签和赛季进度。"
+                        confirmLabel="确认撤销"
+                        busyLabel="撤销中..."
                       />
                     );
                   }

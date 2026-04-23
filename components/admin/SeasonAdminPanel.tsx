@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ALLOWED_TARGET_SLOTS } from "@/lib/economy";
 
@@ -52,7 +53,7 @@ async function readErrorMessage(response: Response): Promise<string> {
     // Fall through to the generic message below.
   }
 
-  return "Request failed";
+  return "操作没成功，请稍后再试";
 }
 
 export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
@@ -99,7 +100,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
       }
     } catch (syncError) {
       if (requestId === latestListRequestRef.current) {
-        setError(syncError instanceof Error ? syncError.message : "Request failed");
+        setError(syncError instanceof Error ? syncError.message : "操作没成功，请稍后再试");
       }
     } finally {
       if (requestId === latestListRequestRef.current) {
@@ -146,9 +147,9 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         goalName: "",
         targetSlots: String(ALLOWED_TARGET_SLOTS[1] ?? ALLOWED_TARGET_SLOTS[0]),
       });
-      setMessage("Season created");
+      setMessage("新赛季已开启");
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Request failed");
+      setError(submitError instanceof Error ? submitError.message : "操作没成功，请稍后再试");
     } finally {
       setIsSubmitting(false);
     }
@@ -176,9 +177,9 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
 
       latestMutationRef.current += 1;
       setSeasons((current) => normalizeSeasonList(season, current));
-      setMessage("Current season ended");
+      setMessage("当前赛季已结束");
     } catch (endError) {
-      setError(endError instanceof Error ? endError.message : "Request failed");
+      setError(endError instanceof Error ? endError.message : "操作没成功，请稍后再试");
     } finally {
       setIsSubmitting(false);
     }
@@ -186,9 +187,17 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
 
   return (
     <section className="soft-card flex flex-col gap-4 p-5">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-black text-slate-800">赛季设置</h1>
-        <p className="text-sm text-sub">Create and manage the team season schedule.</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-black text-slate-800">赛季设置</h1>
+          <p className="text-sm text-sub">给团队开新赛季，顺手看看这一期冲到哪了。</p>
+        </div>
+        <Link
+          href="/"
+          className="rounded-full border-2 border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+        >
+          回到打卡页
+        </Link>
       </div>
 
       <form
@@ -196,7 +205,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         onSubmit={handleSubmit}
       >
         <label className="flex flex-col gap-1 text-sm font-bold text-slate-700">
-          Goal name
+          冲刺目标
           <input
             name="goalName"
             value={form.goalName}
@@ -208,7 +217,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-bold text-slate-700">
-          Target slots
+          目标格数
           <select
             name="targetSlots"
             value={form.targetSlots}
@@ -229,18 +238,18 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
           disabled={isSubmitting}
           className="rounded-xl border-2 border-slate-800 bg-yellow-300 px-4 py-2 text-sm font-black text-slate-900 shadow-[0_3px_0_0_#1f2937] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? "Saving..." : "Create season"}
+          {isSubmitting ? "正在开赛季..." : "开启新赛季"}
         </button>
       </form>
 
       <div className="flex items-center justify-between text-sm text-sub">
-        <span>{isLoading ? "Syncing latest seasons..." : "Season data ready."}</span>
+        <span>{isLoading ? "正在同步赛季状态..." : "赛季数据已就位。"}</span>
         <button
           type="button"
           onClick={() => void syncSeasons()}
           className="rounded-full border-2 border-slate-200 px-3 py-1 font-bold text-slate-700"
         >
-          Refresh
+          刷新一下
         </button>
       </div>
 
@@ -258,7 +267,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
 
       <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-black text-slate-800">Active season</h2>
+          <h2 className="text-lg font-black text-slate-800">当前赛季</h2>
           {activeSeason ? (
             <button
               type="button"
@@ -266,7 +275,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
               disabled={isSubmitting}
               className="rounded-full border-2 border-slate-800 bg-white px-3 py-1 text-xs font-black text-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              End season
+              结束当前赛季
             </button>
           ) : null}
         </div>
@@ -274,38 +283,40 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         {activeSeason ? (
           <div className="space-y-1 text-sm text-slate-700">
             <div className="font-black text-slate-900">{activeSeason.goalName}</div>
-            <div>Month: {activeSeason.monthKey}</div>
+            <div>赛季月份：{activeSeason.monthKey}</div>
             <div>
-              Target slots: {activeSeason.targetSlots} / Filled: {activeSeason.filledSlots}
+              目标格数：{activeSeason.targetSlots} · 已完成 {activeSeason.filledSlots}
             </div>
-            <div>Status: {activeSeason.status}</div>
+            <div>状态：{activeSeason.status === "ACTIVE" ? "进行中" : activeSeason.status}</div>
           </div>
         ) : (
-          <p className="text-sm text-sub">No active season right now.</p>
+          <p className="text-sm text-sub">这会儿还没有进行中的赛季。</p>
         )}
       </div>
 
       <div className="rounded-2xl border-2 border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-lg font-black text-slate-800">Season history</h2>
+        <h2 className="mb-3 text-lg font-black text-slate-800">赛季历史</h2>
         {historySeasons.length > 0 ? (
           <ul className="flex flex-col gap-3">
             {historySeasons.map((season) => (
               <li key={season.id} className="rounded-xl border-2 border-slate-100 bg-slate-50 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-black text-slate-900">{season.goalName}</span>
-                  <span className="text-xs font-bold text-sub">{season.status}</span>
+                  <span className="text-xs font-bold text-sub">
+                    {season.status === "ENDED" ? "已结束" : season.status}
+                  </span>
                 </div>
                 <div className="mt-1 text-xs text-sub">
                   <div>{season.monthKey}</div>
                   <div>
-                    Target {season.targetSlots} | Filled {season.filledSlots}
+                    目标 {season.targetSlots} 格 · 完成 {season.filledSlots} 格
                   </div>
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-sub">No past seasons yet.</p>
+          <p className="text-sm text-sub">还没有历史赛季。</p>
         )}
       </div>
     </section>

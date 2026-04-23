@@ -13,7 +13,7 @@ export function ReportCenter() {
   const report = useMemo(() => buildReportData(state), [state]);
 
   return (
-    <div className="absolute inset-0 flex flex-col gap-4 overflow-y-auto bg-white p-4 transition-opacity duration-300 soft-card sm:p-6">
+    <div className="report-board absolute inset-0 flex flex-col gap-5 overflow-y-auto p-4 transition-opacity duration-300 sm:p-6">
       <ReportHeader title={report.title} summary={report.summary} teamVault={report.teamVault} />
       <Milestones metrics={report.metrics} />
       <div className="grid grid-cols-1 gap-4 pb-2 xl:grid-cols-3">

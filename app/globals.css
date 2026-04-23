@@ -403,3 +403,118 @@ body {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.5); opacity: 0.5; }
 }
+
+/* Report Center */
+.report-board {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98)),
+    radial-gradient(circle at top left, rgba(250, 204, 21, 0.12), transparent 30%);
+  border: 6px solid #f1f5f9;
+  border-radius: 1.75rem;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.report-hero {
+  position: relative;
+  max-width: 42rem;
+  padding: 1.25rem 1.25rem 1rem;
+  background: linear-gradient(180deg, #fffdf5, #fff9db);
+  border: 3px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+}
+
+.report-vault-card {
+  padding: 1.25rem 1.25rem 1rem;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 3px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+}
+
+.report-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.9rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 9999px;
+  background-color: #fff7cc;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.report-chip-muted {
+  background-color: #ffffff;
+  color: #475569;
+}
+
+.report-metric-card {
+  border: 3px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+}
+
+.report-metric-label {
+  width: fit-content;
+  padding: 0.25rem 0.75rem;
+  border: 2px solid #dbe4ee;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.report-chart-card {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 3px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+}
+
+.report-chart-frame {
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, #ffffff, #f8fafc),
+    radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: auto, 16px 16px;
+  background-position: 0 0, 0 0;
+}
+
+.report-chart-badge {
+  width: fit-content;
+  border: 2px solid #dbe4ee;
+  border-radius: 9999px;
+  background-color: #f8fafc;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.report-stat-chip {
+  border: 2px solid #e2e8f0;
+  border-radius: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+}
+
+.report-highlight-card {
+  border: 3px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+}
+
+.report-highlight-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #dbe4ee;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.65);
+  padding: 0.45rem;
+}

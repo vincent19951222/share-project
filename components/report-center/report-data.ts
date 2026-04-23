@@ -84,8 +84,8 @@ function getLongestStreak(state: BoardState, elapsedDays: number): StreakSummary
 }
 
 function getDashboardTitle(now: Date) {
-  const month = now.toLocaleString("en-US", { month: "long" }).toUpperCase();
-  return `${month} DASHBOARD`;
+  const month = now.toLocaleString("en-US", { month: "numeric", timeZone: "Asia/Shanghai" });
+  return `${month}月牛马战报`;
 }
 
 function getSummary(totalPunches: number, fullAttendanceDays: number, completionRate: number) {

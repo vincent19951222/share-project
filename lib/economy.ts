@@ -108,6 +108,21 @@ export function getNextPunchRewardPreview(
   return getPunchRewardForStreak(getNextPunchStreak(currentStreak, lastPunchDayKey, todayDayKey));
 }
 
+export function getUpcomingPunchRewardPreview(
+  currentStreak: number,
+  lastPunchDayKey: string | null | undefined,
+  todayDayKey: string,
+): number {
+  assertValidShanghaiDayKey(todayDayKey);
+
+  const previewDayKey =
+    lastPunchDayKey === todayDayKey
+      ? shiftShanghaiDayKey(todayDayKey, 1)
+      : todayDayKey;
+
+  return getNextPunchRewardPreview(currentStreak, lastPunchDayKey, previewDayKey);
+}
+
 export function isValidTargetSlots(value: number): value is AllowedTargetSlot {
   return ALLOWED_TARGET_SLOTS.includes(value as AllowedTargetSlot);
 }

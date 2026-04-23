@@ -8,15 +8,15 @@ interface HighlightsProps {
 }
 
 const toneClasses: Record<ReportHighlight["tone"], string> = {
-  blue: "bg-blue-50 border-blue-100 text-blue-900",
-  green: "bg-green-50 border-green-100 text-green-900",
-  rose: "bg-rose-50 border-rose-100 text-rose-900",
+  blue: "bg-sky-100 text-sky-950",
+  green: "bg-emerald-100 text-emerald-950",
+  rose: "bg-rose-100 text-rose-950",
 };
 
 const bodyClasses: Record<ReportHighlight["tone"], string> = {
-  blue: "text-blue-700",
-  green: "text-green-700",
-  rose: "text-rose-700",
+  blue: "text-sky-800",
+  green: "text-emerald-800",
+  rose: "text-rose-800",
 };
 
 const iconByTone: Record<ReportHighlight["tone"], string> = {
@@ -31,11 +31,13 @@ export function Highlights({ highlights }: HighlightsProps) {
       {highlights.map((highlight) => (
         <article
           key={highlight.title}
-          className={`min-h-32 flex-1 rounded-[1.25rem] border-4 p-5 ${toneClasses[highlight.tone]}`}
+          className={`report-highlight-card min-h-36 flex-1 p-5 ${toneClasses[highlight.tone]}`}
         >
-          <div className="mb-3 h-9 w-9" dangerouslySetInnerHTML={{ __html: iconByTone[highlight.tone] }} />
-          <h3 className="text-lg font-black">{highlight.title}</h3>
-          <p className={`mt-2 text-sm font-bold leading-relaxed ${bodyClasses[highlight.tone]}`}>{highlight.body}</p>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h3 className="text-lg font-black">{highlight.title}</h3>
+            <div className="report-highlight-icon h-10 w-10" dangerouslySetInnerHTML={{ __html: iconByTone[highlight.tone] }} />
+          </div>
+          <p className={`text-sm font-bold leading-relaxed ${bodyClasses[highlight.tone]}`}>{highlight.body}</p>
         </article>
       ))}
     </aside>

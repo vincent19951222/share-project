@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { BoardSnapshot, CellStatus } from "@/lib/types";
 import {
-  getNextPunchRewardPreview,
+  getUpcomingPunchRewardPreview,
   getShanghaiDayKey,
 } from "@/lib/economy";
 
@@ -99,7 +99,7 @@ export async function buildBoardSnapshotForUser(
   });
 
   const currentUserSeasonStats = statsByUserId.get(user.id);
-  const currentReward = getNextPunchRewardPreview(
+  const currentReward = getUpcomingPunchRewardPreview(
     user.currentStreak,
     user.lastPunchDayKey,
     todayDayKey,

@@ -1,15 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { QuestBtn } from "./QuestBtn";
 
 interface PunchPopupProps {
   onConfirm: () => Promise<boolean> | boolean;
   busy?: boolean;
   error?: string | null;
+  triggerContent?: ReactNode;
+  triggerClassName?: string;
+  title?: string;
+  description?: string;
+  helperText?: string;
+  confirmLabel?: string;
+  busyLabel?: string;
 }
 
-export function PunchPopup({ onConfirm, busy = false, error = null }: PunchPopupProps) {
+export function PunchPopup({
+  onConfirm,
+  busy = false,
+  error = null,
+  triggerContent = "+",
+  triggerClassName = "cell my-punch-btn text-xl cursor-pointer disabled:opacity-50",
+  title = "确认打卡",
+  description = "确认打卡今天吗？",
+  helperText = "确认后会直接记为今日健身打卡。",
+  confirmLabel = "确认打卡",
+  busyLabel = "提交中...",
+}: PunchPopupProps) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -28,21 +46,21 @@ export function PunchPopup({ onConfirm, busy = false, error = null }: PunchPopup
   return (
     <div style={{ position: "relative" }}>
       <button
-        className="cell my-punch-btn text-xl cursor-pointer disabled:opacity-50"
+        className={triggerClassName}
         disabled={busy}
         onClick={(event) => {
           event.stopPropagation();
           setShow(true);
         }}
       >
-        +
+        {triggerContent}
       </button>
       {show && (
         <>
           <div className="fixed inset-0 bg-black/30 z-[200]" onClick={() => !busy && setShow(false)} />
           <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-slate-800 rounded-2xl shadow-[4px_4px_0_0_#1f2937] z-[201] w-full max-w-sm p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-black text-slate-800">确认打卡</h3>
+              <h3 className="text-xl font-black text-slate-800">{title}</h3>
               <button
                 type="button"
                 onClick={() => !busy && setShow(false)}
@@ -51,8 +69,8 @@ export function PunchPopup({ onConfirm, busy = false, error = null }: PunchPopup
                 ✕
               </button>
             </div>
-            <p className="text-sm font-bold text-main leading-relaxed">确认打卡今天吗？</p>
-            <p className="text-xs font-bold text-sub mt-2">确认后会直接记为今日健身打卡。</p>
+            <p className="text-sm font-bold text-main leading-relaxed">{description}</p>
+            <p className="text-xs font-bold text-sub mt-2">{helperText}</p>
             {error ? <p className="mt-3 text-xs font-bold text-orange-500">{error}</p> : null}
             <div className="flex gap-3 mt-6">
               <button
@@ -73,7 +91,7 @@ export function PunchPopup({ onConfirm, busy = false, error = null }: PunchPopup
                   }
                 }}
               >
-                {busy ? "提交中..." : "确认打卡"}
+                {busy ? busyLabel : confirmLabel}
               </QuestBtn>
             </div>
           </div>

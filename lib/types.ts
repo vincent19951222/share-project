@@ -70,6 +70,7 @@ export type BoardAction =
   | { type: "SET_TAB"; tab: "punch" | "board" | "dash" }
   | { type: "BEGIN_PUNCH_SYNC"; punchEpoch: number }
   | { type: "END_PUNCH_SYNC"; punchEpoch: number }
+  | { type: "APPLY_REMOTE_SNAPSHOT"; snapshot: BoardSnapshot }
   | {
       type: "SYNC_REMOTE_STATE";
       snapshot: BoardSnapshot;

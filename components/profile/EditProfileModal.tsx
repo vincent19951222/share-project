@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchBoardState } from "@/lib/api";
 import { AVATAR_OPTIONS, type AvatarKey } from "@/lib/avatars";
+import { useBoard } from "@/lib/store";
 
 interface EditProfileModalProps {
   currentUsername: string;
@@ -10,17 +12,25 @@ interface EditProfileModalProps {
   onClose: () => void;
 }
 
-export function EditProfileModal({ currentUsername, currentAvatarKey, onClose }: EditProfileModalProps) {
+export function EditProfileModal({
+  currentUsername,
+  currentAvatarKey,
+  onClose,
+}: EditProfileModalProps) {
   const router = useRouter();
+  const { dispatch } = useBoard();
   const [username, setUsername] = useState(currentUsername);
-  const [selectedAvatar, setSelectedAvatar] = useState<AvatarKey>(currentAvatarKey as AvatarKey);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarKey>(
+    currentAvatarKey as AvatarKey,
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
     };
+
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
@@ -30,57 +40,60 @@ export function EditProfileModal({ currentUsername, currentAvatarKey, onClose }:
     setLoading(true);
 
     try {
-      const res = await fetch("/api/user/profile", {
+      const response = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, avatarKey: selectedAvatar }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string };
         setError(data.error || "更新失败");
         setLoading(false);
         return;
       }
 
+      const snapshot = await fetchBoardState();
+      dispatch({ type: "APPLY_REMOTE_SNAPSHOT", snapshot });
+      window.dispatchEvent(new Event("board:profile-updated"));
       router.refresh();
       onClose();
     } catch {
-      setError("网络错误，请重试");
+      setError("网络异常，请稍后再试");
       setLoading(false);
     }
   }
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/30 z-[200]" onClick={onClose} />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-slate-800 rounded-2xl shadow-[4px_4px_0_0_#1f2937] z-[201] w-full max-w-md p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="fixed inset-0 z-[200] bg-black/30" onClick={onClose} />
+      <div className="fixed left-1/2 top-1/2 z-[201] w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-slate-800 bg-white p-6 shadow-[4px_4px_0_0_#1f2937]">
+        <div className="mb-6 flex items-center justify-between">
           <h3 className="text-xl font-black text-slate-800">编辑资料</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg border-2 border-slate-200 hover:border-slate-800 transition-colors text-slate-400 hover:text-slate-800"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-slate-200 text-slate-400 transition-colors hover:border-slate-800 hover:text-slate-800"
           >
-            ✕
+            ×
           </button>
         </div>
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-bold text-sub tracking-wider uppercase pl-1">
+            <label className="pl-1 text-xs font-bold uppercase tracking-wider text-sub">
               用户名
             </label>
             <input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(event) => setUsername(event.target.value)}
               className="brutal-input"
               disabled={loading}
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-bold text-sub tracking-wider uppercase pl-1">
+            <label className="pl-1 text-xs font-bold uppercase tracking-wider text-sub">
               头像
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -90,29 +103,33 @@ export function EditProfileModal({ currentUsername, currentAvatarKey, onClose }:
                   type="button"
                   onClick={() => setSelectedAvatar(avatar.key)}
                   disabled={loading}
-                  className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                  className={`aspect-square w-full overflow-hidden rounded-xl border-2 transition-all ${
                     selectedAvatar === avatar.key
-                      ? "border-slate-800 shadow-[0_3px_0_0_#1f2937] scale-105 ring-2 ring-yellow-300"
+                      ? "scale-105 border-slate-800 shadow-[0_3px_0_0_#1f2937] ring-2 ring-yellow-300"
                       : "border-slate-200 hover:border-slate-400"
                   }`}
                 >
-                  <img src={avatar.url} alt={avatar.label} className="w-full h-full object-cover" />
+                  <img
+                    src={avatar.url}
+                    alt={avatar.label}
+                    className="h-full w-full object-cover"
+                  />
                 </button>
               ))}
             </div>
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm font-bold bg-red-50 border-2 border-red-200 rounded-lg p-3">
+            <div className="rounded-lg border-2 border-red-200 bg-red-50 p-3 text-sm font-bold text-red-500">
               {error}
             </div>
           )}
 
-          <div className="flex gap-3 mt-2">
+          <div className="mt-2 flex gap-3">
             <button
               onClick={onClose}
               disabled={loading}
-              className="flex-1 py-3 text-sm font-bold border-2 border-slate-200 rounded-xl hover:border-slate-800 transition-colors disabled:opacity-50"
+              className="flex-1 rounded-xl border-2 border-slate-200 py-3 text-sm font-bold transition-colors hover:border-slate-800 disabled:opacity-50"
             >
               取消
             </button>
