@@ -1,4 +1,8 @@
-import type { BoardSnapshot, CoffeeSnapshot } from "@/lib/types";
+import type {
+  BoardSnapshot,
+  CalendarMonthSnapshot,
+  CoffeeSnapshot,
+} from "@/lib/types";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -10,11 +14,25 @@ export class ApiError extends Error {
   }
 }
 
+async function readJsonPayload(
+  response: Response,
+  fallbackMessage: string,
+): Promise<Record<string, unknown>> {
+  try {
+    return (await response.json()) as Record<string, unknown>;
+  } catch {
+    throw new ApiError(fallbackMessage, response.status);
+  }
+}
+
 async function readSnapshot(response: Response): Promise<BoardSnapshot> {
-  const payload = await response.json();
+  const payload = await readJsonPayload(response, "响应解析失败");
 
   if (!response.ok) {
-    throw new ApiError(payload.error ?? "请求失败", response.status);
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
   }
 
   return payload.snapshot as BoardSnapshot;
@@ -55,13 +73,31 @@ export async function deleteTodayPunch(): Promise<BoardSnapshot> {
 }
 
 async function readCoffeeSnapshot(response: Response): Promise<CoffeeSnapshot> {
-  const payload = await response.json();
+  const payload = await readJsonPayload(response, "响应解析失败");
 
   if (!response.ok) {
-    throw new ApiError(payload.error ?? "请求失败", response.status);
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
   }
 
   return payload.snapshot as CoffeeSnapshot;
+}
+
+async function readCalendarSnapshot(
+  response: Response,
+): Promise<CalendarMonthSnapshot> {
+  const payload = await readJsonPayload(response, "响应解析失败");
+
+  if (!response.ok) {
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
+  }
+
+  return payload.snapshot as CalendarMonthSnapshot;
 }
 
 export async function fetchCoffeeState(): Promise<CoffeeSnapshot> {
@@ -71,6 +107,20 @@ export async function fetchCoffeeState(): Promise<CoffeeSnapshot> {
   });
 
   return readCoffeeSnapshot(response);
+}
+
+export async function fetchCalendarState(
+  monthKey?: string,
+): Promise<CalendarMonthSnapshot> {
+  const search = monthKey
+    ? `?${new URLSearchParams({ month: monthKey }).toString()}`
+    : "";
+  const response = await fetch(`/api/calendar/state${search}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  return readCalendarSnapshot(response);
 }
 
 export async function addTodayCoffeeCup(): Promise<CoffeeSnapshot> {
