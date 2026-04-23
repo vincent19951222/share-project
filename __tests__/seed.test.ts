@@ -45,6 +45,11 @@ describe("seedDatabase", () => {
         OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
       },
     });
+    await prisma.coffeeRecord.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
     await prisma.punchRecord.deleteMany({
       where: {
         OR: [{ userId: { in: fixtureUserIds } }, { seasonId: { in: fixtureSeasonIds } }],
@@ -135,6 +140,28 @@ describe("seedDatabase", () => {
     expect(await prisma.season.findUnique({ where: { id: season.id } })).toBeNull();
     expect(await prisma.seasonMemberStat.count({ where: { seasonId: season.id } })).toBe(0);
     expect(await prisma.punchRecord.count({ where: { seasonId: season.id } })).toBe(0);
+  });
+
+  it("should clear coffee records for the seeded team", async () => {
+    await seedDatabase();
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { username: SEED_USERS[0].username },
+    });
+
+    await prisma.coffeeRecord.create({
+      data: {
+        userId: user.id,
+        teamId: user.teamId,
+        dayKey: "2026-04-23",
+      },
+    });
+
+    expect(await prisma.coffeeRecord.count({ where: { teamId: user.teamId } })).toBe(1);
+
+    await seedDatabase();
+
+    expect(await prisma.coffeeRecord.count({ where: { teamId: user.teamId } })).toBe(0);
   });
 
   it("should not delete seasons that belong to another team", async () => {

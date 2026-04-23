@@ -33,6 +33,38 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
+export type AppTab = "punch" | "board" | "coffee" | "dash";
+
+export interface CoffeeMemberSnapshot {
+  id: string;
+  name: string;
+  avatarKey: string;
+}
+
+export interface CoffeeDayCell {
+  cups: number;
+}
+
+export interface CoffeeKingSnapshot {
+  userId: string;
+  name: string;
+  cups: number;
+}
+
+export interface CoffeeSnapshot {
+  members: CoffeeMemberSnapshot[];
+  gridData: CoffeeDayCell[][];
+  today: number;
+  totalDays: number;
+  currentUserId: string;
+  stats: {
+    todayTotalCups: number;
+    todayDrinkers: number;
+    currentUserTodayCups: number;
+    coffeeKing: CoffeeKingSnapshot | null;
+  };
+}
+
 export type CellStatus = boolean | null;
 
 export interface ActivityLog {
@@ -59,7 +91,7 @@ export interface BoardSnapshot {
 
 export interface BoardState extends BoardSnapshot {
   logs: ActivityLog[];
-  activeTab: "punch" | "board" | "dash";
+  activeTab: AppTab;
   lastAppliedPollRequestId?: number;
   pendingPunchEpoch?: number;
   latestSettledPunchEpoch?: number;
@@ -67,7 +99,7 @@ export interface BoardState extends BoardSnapshot {
 
 export type BoardAction =
   | { type: "ADD_LOG"; log: ActivityLog }
-  | { type: "SET_TAB"; tab: "punch" | "board" | "dash" }
+  | { type: "SET_TAB"; tab: AppTab }
   | { type: "BEGIN_PUNCH_SYNC"; punchEpoch: number }
   | { type: "END_PUNCH_SYNC"; punchEpoch: number }
   | { type: "APPLY_REMOTE_SNAPSHOT"; snapshot: BoardSnapshot }

@@ -16,6 +16,7 @@ model Team {
   boardNotes     BoardNote[]
   seasons        Season[]
   activityEvents ActivityEvent[]
+  coffeeRecords  CoffeeRecord[]
 }
 
 model User {
@@ -33,6 +34,7 @@ model User {
   boardNotes      BoardNote[]
   seasonStats     SeasonMemberStat[]
   activityEvents  ActivityEvent[]
+  coffeeRecords   CoffeeRecord[]
   createdAt       DateTime           @default(now())
 }
 
@@ -119,4 +121,18 @@ model ActivityEvent {
 
   @@index([teamId, createdAt])
   @@index([userId, createdAt])
+}
+
+model CoffeeRecord {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  teamId    String
+  team      Team      @relation(fields: [teamId], references: [id])
+  dayKey    String
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([teamId, dayKey, createdAt])
+  @@index([userId, dayKey, createdAt])
 }
