@@ -38,6 +38,7 @@ prisma/dev.db.bak-*
 
 # Environment
 .env
+.auth-secret
 
 # Local duplicate design exports
 design/female*.png

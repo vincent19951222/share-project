@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isValidAvatarKey } from "@/lib/avatars";
+import { parseCookieValue } from "@/lib/auth";
 
 export async function PATCH(request: NextRequest) {
   try {
-    const userId = request.cookies.get("userId")?.value;
+    const userId = parseCookieValue(request.cookies.get("userId")?.value);
     if (!userId) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
     }

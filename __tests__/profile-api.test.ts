@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { PATCH } from "@/app/api/user/profile/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
+import { createCookieValue } from "@/lib/auth";
 
 describe("PATCH /api/user/profile", () => {
   let userId: string;
@@ -32,7 +33,7 @@ describe("PATCH /api/user/profile", () => {
       body: JSON.stringify({ avatarKey: "female3" }),
       headers: {
         "Content-Type": "application/json",
-        Cookie: `userId=${userId}`,
+        Cookie: `userId=${createCookieValue(userId)}`,
       },
     });
 
@@ -49,7 +50,7 @@ describe("PATCH /api/user/profile", () => {
       body: JSON.stringify({ username: "li_updated" }),
       headers: {
         "Content-Type": "application/json",
-        Cookie: `userId=${userId}`,
+        Cookie: `userId=${createCookieValue(userId)}`,
       },
     });
 
@@ -77,7 +78,7 @@ describe("PATCH /api/user/profile", () => {
       body: JSON.stringify({ avatarKey: "nonexistent" }),
       headers: {
         "Content-Type": "application/json",
-        Cookie: `userId=${userId}`,
+        Cookie: `userId=${createCookieValue(userId)}`,
       },
     });
 

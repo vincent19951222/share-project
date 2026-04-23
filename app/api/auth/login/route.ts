@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, hashPassword } from "@/lib/auth";
+import { createCookieValue, verifyPassword, hashPassword } from "@/lib/auth";
 import { isValidAvatarKey } from "@/lib/avatars";
 
 export async function POST(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         success: true,
         user: { id: user.id, username: user.username, avatarKey: user.avatarKey, coins: user.coins },
       });
-      response.cookies.set("userId", user.id, {
+      response.cookies.set("userId", createCookieValue(user.id), {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       success: true,
       user: { id: newUser.id, username: newUser.username, avatarKey: newUser.avatarKey, coins: newUser.coins },
     });
-    response.cookies.set("userId", newUser.id, {
+    response.cookies.set("userId", createCookieValue(newUser.id), {
       httpOnly: true,
       sameSite: "lax",
       path: "/",

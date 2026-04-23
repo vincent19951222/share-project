@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseCookieValue } from "@/lib/auth";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -16,7 +17,7 @@ async function getCurrentUser(userId: string | undefined) {
 
 export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
-    const user = await getCurrentUser(request.cookies.get("userId")?.value);
+    const user = await getCurrentUser(parseCookieValue(request.cookies.get("userId")?.value) ?? undefined);
 
     if (!user) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });

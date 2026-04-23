@@ -5,6 +5,7 @@ import { seedDatabase } from "@/lib/db-seed";
 import { GET, POST } from "@/app/api/admin/seasons/route";
 import { PATCH } from "@/app/api/admin/seasons/current/route";
 import { ALLOWED_TARGET_SLOTS } from "@/lib/economy";
+import { createCookieValue } from "@/lib/auth";
 
 const TEMP_TEAM_CODE_PREFIX = "ADMIN-SEASON-TEST-";
 
@@ -17,7 +18,7 @@ function makeRequest(
   const headers: Record<string, string> = {};
 
   if (userId) {
-    headers.cookie = `userId=${userId}`;
+    headers.cookie = `userId=${createCookieValue(userId)}`;
   }
 
   if (body !== undefined) {
@@ -169,7 +170,7 @@ describe("admin seasons api", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Cookie: `userId=${admin.id}`,
+          Cookie: `userId=${createCookieValue(admin.id)}`,
         },
         body: "{bad-json",
       }),

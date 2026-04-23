@@ -9,6 +9,15 @@ export const BOARD_TOTAL_DAYS = 30;
 export const BOARD_TARGET_COINS = 2000;
 export const PUNCH_REWARD_COINS = 15;
 
+export function getCurrentBoardTotalDays(now: Date = new Date()): number {
+  const currentMonthKey = getShanghaiDayKey(now).slice(0, 7);
+  const [yearText, monthText] = currentMonthKey.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
 export function getCurrentBoardDay(now: Date = new Date()): number {
   const dayText = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Shanghai",
@@ -16,13 +25,18 @@ export function getCurrentBoardDay(now: Date = new Date()): number {
   }).format(now);
 
   const day = Number(dayText);
-  return Math.max(1, Math.min(day, BOARD_TOTAL_DAYS));
+  return Math.max(1, Math.min(day, getCurrentBoardTotalDays(now)));
 }
 
 export async function buildBoardSnapshotForUser(
   userId: string,
   now: Date = new Date(),
 ): Promise<BoardSnapshot | null> {
+  const today = getCurrentBoardDay(now);
+  const totalDays = getCurrentBoardTotalDays(now);
+  const todayDayKey = getShanghaiDayKey(now);
+  const currentMonthKey = todayDayKey.slice(0, 7);
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -31,6 +45,11 @@ export async function buildBoardSnapshotForUser(
           users: {
             include: {
               punchRecords: {
+                where: {
+                  dayKey: {
+                    startsWith: currentMonthKey,
+                  },
+                },
                 select: {
                   dayIndex: true,
                   dayKey: true,
@@ -67,8 +86,6 @@ export async function buildBoardSnapshotForUser(
     return null;
   }
 
-  const today = getCurrentBoardDay(now);
-  const todayDayKey = getShanghaiDayKey(now);
   const activeSeason = user.team.seasons[0] ?? null;
   const statsByUserId = new Map(
     activeSeason?.memberStats.map((stat) => [stat.userId, stat]) ?? [],
@@ -84,7 +101,7 @@ export async function buildBoardSnapshotForUser(
   }));
 
   const gridData: CellStatus[][] = user.team.users.map((member) => {
-    return Array.from({ length: BOARD_TOTAL_DAYS }, (_, index) => {
+    return Array.from({ length: totalDays }, (_, index) => {
       const dayIndex = index + 1;
 
       if (dayIndex > today) {
@@ -152,7 +169,7 @@ export async function buildBoardSnapshotForUser(
     },
     activeSeason: activeSeasonSnapshot,
     today,
-    totalDays: BOARD_TOTAL_DAYS,
+    totalDays,
     currentUserId: user.id,
   };
 }

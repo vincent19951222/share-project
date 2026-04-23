@@ -3,11 +3,12 @@ import { NextRequest } from "next/server";
 import { GET } from "@/app/api/board/state/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
+import { createCookieValue } from "@/lib/auth";
 
 function request(userId?: string) {
   return new NextRequest("http://localhost/api/board/state", {
     method: "GET",
-    headers: userId ? { Cookie: `userId=${userId}` } : undefined,
+    headers: userId ? { Cookie: `userId=${createCookieValue(userId)}` } : undefined,
   });
 }
 

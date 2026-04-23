@@ -4,6 +4,7 @@ import { GET, POST } from "@/app/api/board-notes/route";
 import { DELETE } from "@/app/api/board-notes/[id]/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
+import { createCookieValue } from "@/lib/auth";
 
 function request(method: string, userId?: string, body?: unknown) {
   return new NextRequest("http://localhost/api/board-notes", {
@@ -11,7 +12,7 @@ function request(method: string, userId?: string, body?: unknown) {
     body: body === undefined ? undefined : JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
-      ...(userId ? { Cookie: `userId=${userId}` } : {}),
+      ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
     },
   });
 }

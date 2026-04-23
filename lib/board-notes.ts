@@ -21,7 +21,7 @@ export interface BoardNoteDto {
   canDelete: boolean;
 }
 
-interface BoardNoteRecord {
+export interface BoardNoteRecord {
   id: string;
   type: string;
   content: string;

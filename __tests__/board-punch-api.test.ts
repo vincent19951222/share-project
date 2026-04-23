@@ -5,13 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
 import { getCurrentBoardDay } from "@/lib/board-state";
 import { getShanghaiDayKey } from "@/lib/economy";
+import { createCookieValue } from "@/lib/auth";
 
 function request(method: "POST" | "DELETE", userId?: string) {
   return new NextRequest("http://localhost/api/board/punch", {
     method,
     headers: {
       "Content-Type": "application/json",
-      ...(userId ? { Cookie: `userId=${userId}` } : {}),
+      ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
     },
     body: JSON.stringify({}),
   });
@@ -269,6 +270,39 @@ describe("/api/board/punch", () => {
     expect(records).toHaveLength(1);
     expect(records[0]?.punched).toBe(true);
     expect(after.coins).toBe(before.coins + 10);
+  });
+
+  it("caps season slot growth when different users punch concurrently", async () => {
+    await resetState();
+    const currentUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const otherUser = await prisma.user.findFirstOrThrow({
+      where: {
+        teamId: currentUser.teamId,
+        id: { not: userId },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+    const season = await createActiveSeason({ filledSlots: 0, targetSlots: 1 });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      POST(request("POST", userId)),
+      POST(request("POST", otherUser.id)),
+    ]);
+
+    const afterSeason = await prisma.season.findUniqueOrThrow({
+      where: { id: season.id },
+    });
+    const records = await prisma.punchRecord.findMany({
+      where: { seasonId: season.id },
+    });
+    const stats = await prisma.seasonMemberStat.findMany({
+      where: { seasonId: season.id },
+    });
+
+    expect([firstResponse.status, secondResponse.status].sort((a, b) => a - b)).toEqual([200, 200]);
+    expect(afterSeason.filledSlots).toBe(1);
+    expect(records.filter((record) => record.countedForSeasonSlot)).toHaveLength(1);
+    expect(stats.reduce((sum, stat) => sum + stat.slotContribution, 0)).toBe(1);
   });
 
   it("undoes today's punch and restores the previous streak and coins", async () => {

@@ -5,6 +5,7 @@ import {
   BOARD_TOTAL_DAYS,
   buildBoardSnapshotForUser,
   getCurrentBoardDay,
+  getCurrentBoardTotalDays,
 } from "@/lib/board-state";
 
 describe("board-state", () => {
@@ -24,9 +25,8 @@ describe("board-state", () => {
 
   it("derives the current board day in Asia/Shanghai and clamps to total days", () => {
     expect(getCurrentBoardDay(new Date("2026-04-05T01:00:00Z"))).toBe(5);
-    expect(getCurrentBoardDay(new Date("2026-05-30T20:00:00Z"))).toBe(
-      BOARD_TOTAL_DAYS,
-    );
+    expect(getCurrentBoardDay(new Date("2026-05-30T20:00:00Z"))).toBe(31);
+    expect(getCurrentBoardTotalDays(new Date("2026-05-30T20:00:00Z"))).toBe(31);
   });
 
   it("builds a normalized snapshot with season-aware member economy data", async () => {
@@ -158,5 +158,47 @@ describe("board-state", () => {
       new Date("2026-04-18T09:00:00+08:00"),
     );
     expect(snapshot).toBeNull();
+  });
+
+  it("scopes punch records to the current Shanghai month", async () => {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    const teamUsers = await prisma.user.findMany({
+      where: { teamId: user.teamId },
+      select: { id: true },
+    });
+
+    await prisma.punchRecord.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
+
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: 2,
+        dayKey: "2026-04-02",
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 1,
+        assetAwarded: 10,
+        countedForSeasonSlot: false,
+      },
+    });
+
+    const snapshot = await buildBoardSnapshotForUser(
+      userId,
+      new Date("2026-05-02T09:00:00+08:00"),
+    );
+    const currentUserRowIndex = snapshot!.members.findIndex(
+      (member) => member.id === snapshot!.currentUserId,
+    );
+
+    expect(snapshot!.today).toBe(2);
+    expect(snapshot!.totalDays).toBe(31);
+    expect(snapshot!.gridData[currentUserRowIndex][1]).toBe(false);
   });
 });

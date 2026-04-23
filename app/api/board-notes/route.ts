@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { mapBoardNoteToDto, normalizeBoardNoteInput } from "@/lib/board-notes";
+import { parseCookieValue } from "@/lib/auth";
+import {
+  type BoardNoteRecord,
+  mapBoardNoteToDto,
+  normalizeBoardNoteInput,
+} from "@/lib/board-notes";
 
 async function getCurrentUser(userId: string | undefined) {
   if (!userId) return null;
@@ -13,13 +18,13 @@ async function getCurrentUser(userId: string | undefined) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser(request.cookies.get("userId")?.value);
+    const user = await getCurrentUser(parseCookieValue(request.cookies.get("userId")?.value) ?? undefined);
 
     if (!user) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
     }
 
-    const notes = await prisma.boardNote.findMany({
+    const notes: BoardNoteRecord[] = await prisma.boardNote.findMany({
       where: {
         teamId: user.teamId,
         isDeleted: false,
@@ -49,7 +54,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser(request.cookies.get("userId")?.value);
+    const user = await getCurrentUser(parseCookieValue(request.cookies.get("userId")?.value) ?? undefined);
 
     if (!user) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
@@ -62,7 +67,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: normalized.error }, { status: 400 });
     }
 
-    const note = await prisma.boardNote.create({
+    const note: BoardNoteRecord = await prisma.boardNote.create({
       data: {
         teamId: user.teamId,
         authorId: user.id,

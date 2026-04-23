@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { parseCookieValue } from "@/lib/auth";
 import { buildBoardSnapshotForUser, getCurrentBoardDay } from "@/lib/board-state";
 import {
   getNextPunchRewardPreview,
@@ -35,7 +36,7 @@ async function buildSnapshotResponse(userId: string, now: Date) {
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = request.cookies.get("userId")?.value;
+    const userId = parseCookieValue(request.cookies.get("userId")?.value);
 
     if (!userId) {
       return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
@@ -85,11 +86,30 @@ export async function POST(request: NextRequest) {
       user.team.users.findIndex((member) => member.id === user.id),
       0,
     );
-    const countsForSeasonSlot =
-      activeSeason !== null && activeSeason.filledSlots < activeSeason.targetSlots;
 
     try {
       await prisma.$transaction(async (tx) => {
+        let countsForSeasonSlot = false;
+
+        if (activeSeason) {
+          const seasonUpdate = await tx.season.updateMany({
+            where: {
+              id: activeSeason.id,
+              status: "ACTIVE",
+              filledSlots: {
+                lt: activeSeason.targetSlots,
+              },
+            },
+            data: {
+              filledSlots: {
+                increment: 1,
+              },
+            },
+          });
+
+          countsForSeasonSlot = seasonUpdate.count === 1;
+        }
+
         await tx.punchRecord.create({
           data: {
             userId: user.id,
@@ -164,16 +184,6 @@ export async function POST(request: NextRequest) {
             });
           }
 
-          if (countsForSeasonSlot) {
-            await tx.season.update({
-              where: { id: activeSeason.id },
-              data: {
-                filledSlots: {
-                  increment: 1,
-                },
-              },
-            });
-          }
         }
       });
     } catch (error) {
@@ -192,7 +202,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const userId = request.cookies.get("userId")?.value;
+    const userId = parseCookieValue(request.cookies.get("userId")?.value);
 
     if (!userId) {
       return NextResponse.json({ error: "unauthenticated" }, { status: 401 });

@@ -18,12 +18,20 @@ describe("createCookieValue & parseCookieValue", () => {
   it("should create and parse cookie value", () => {
     const userId = "clx12345abcde";
     const cookieValue = createCookieValue(userId);
-    expect(cookieValue).toBe(userId);
+    expect(cookieValue).not.toBe(userId);
     expect(parseCookieValue(cookieValue)).toBe(userId);
   });
 
   it("should return null for empty cookie value", () => {
     expect(parseCookieValue("")).toBeNull();
     expect(parseCookieValue(undefined as unknown as string)).toBeNull();
+  });
+
+  it("should reject unsigned or tampered cookie values", () => {
+    const userId = "clx12345abcde";
+    const cookieValue = createCookieValue(userId);
+
+    expect(parseCookieValue(userId)).toBeNull();
+    expect(parseCookieValue(`${cookieValue}x`)).toBeNull();
   });
 });

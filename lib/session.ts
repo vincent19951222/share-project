@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { parseCookieValue } from "@/lib/auth";
 
 export interface CookieReader {
   get(name: string): { value: string } | { value?: string } | string | null | undefined;
@@ -31,7 +32,7 @@ function readCookieValue(cookieReader: CookieReader, name: string): string | nul
 }
 
 export function getUserIdFromCookies(cookieReader: CookieReader): string | null {
-  return readCookieValue(cookieReader, "userId");
+  return parseCookieValue(readCookieValue(cookieReader, "userId"));
 }
 
 export async function loadCurrentUser(cookieReader: CookieReader): Promise<SessionUser | null> {
