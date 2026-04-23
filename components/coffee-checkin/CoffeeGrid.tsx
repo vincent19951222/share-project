@@ -5,16 +5,22 @@ import type { CoffeeSnapshot } from "@/lib/types";
 
 interface CoffeeGridProps {
   snapshot: CoffeeSnapshot;
+  busy: boolean;
+  onAddCup: () => void;
 }
 
 function CoffeeCell({
   cups,
   isFuture,
   isTodayForCurrentUser,
+  busy,
+  onAddCup,
 }: {
   cups: number;
   isFuture: boolean;
   isTodayForCurrentUser: boolean;
+  busy: boolean;
+  onAddCup: () => void;
 }) {
   if (isFuture) {
     return <div className="h-[3.25rem] w-[3.25rem] shrink-0 rounded-2xl border-2 border-dashed border-orange-300" />;
@@ -22,9 +28,15 @@ function CoffeeCell({
 
   if (isTodayForCurrentUser && cups === 0) {
     return (
-      <div className="grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 bg-yellow-300 text-xl font-black shadow-[0_4px_0_0_#1f2937]">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={onAddCup}
+        aria-label="给今天加一杯咖啡"
+        className="grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 bg-yellow-300 text-xl font-black shadow-[0_4px_0_0_#1f2937] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"
+      >
         +
-      </div>
+      </button>
     );
   }
 
@@ -46,7 +58,7 @@ function CoffeeCell({
   );
 }
 
-export function CoffeeGrid({ snapshot }: CoffeeGridProps) {
+export function CoffeeGrid({ snapshot, busy, onAddCup }: CoffeeGridProps) {
   const currentUserRowIndex = snapshot.members.findIndex(
     (member) => member.id === snapshot.currentUserId,
   );
@@ -121,6 +133,8 @@ export function CoffeeGrid({ snapshot }: CoffeeGridProps) {
                       isTodayForCurrentUser={
                         rowIndex === currentUserRowIndex && day === snapshot.today
                       }
+                      busy={busy}
+                      onAddCup={onAddCup}
                     />
                   );
                 })}

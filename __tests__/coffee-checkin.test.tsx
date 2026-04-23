@@ -118,4 +118,35 @@ describe("CoffeeCheckin", () => {
     expect(container.textContent).toContain("重新登录");
     expect(container.textContent).not.toContain("正在打印今日咖啡小票");
   });
+
+  it("adds today's cup from the calendar plus cell", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(0) }) })
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(1) }) }),
+    );
+
+    await act(async () => {
+      root.render(<CoffeeCheckin />);
+      await Promise.resolve();
+    });
+
+    const calendarAddButton = container.querySelector(
+      'button[aria-label="给今天加一杯咖啡"]',
+    );
+    expect(calendarAddButton).toBeDefined();
+
+    await act(async () => {
+      calendarAddButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/coffee/cups",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(container.textContent).toContain("今天已续命 1 杯");
+  });
 });

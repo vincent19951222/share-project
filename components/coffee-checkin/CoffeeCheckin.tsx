@@ -112,7 +112,11 @@ export function CoffeeCheckin() {
         onAddCup={() => void runMutation(addTodayCoffeeCup)}
         onRemoveCup={() => void runMutation(removeLatestTodayCoffeeCup)}
       />
-      <CoffeeGrid snapshot={snapshot} />
+      <CoffeeGrid
+        snapshot={snapshot}
+        busy={busy}
+        onAddCup={() => void runMutation(addTodayCoffeeCup)}
+      />
     </section>
   );
 }
