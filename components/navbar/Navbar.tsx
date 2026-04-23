@@ -59,6 +59,7 @@ export function Navbar() {
           </TabBtn>
           <TabBtn
             active={state.activeTab === "coffee"}
+            className="coffee-tab"
             onClick={() => dispatch({ type: "SET_TAB", tab: "coffee" })}
           >
             <span className="w-4 h-4" aria-hidden="true">
