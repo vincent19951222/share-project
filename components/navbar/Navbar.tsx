@@ -52,6 +52,7 @@ export function Navbar() {
           </TabBtn>
           <TabBtn
             active={state.activeTab === "board"}
+            className="board-tab"
             onClick={() => dispatch({ type: "SET_TAB", tab: "board" })}
           >
             <span className="w-4 h-4" dangerouslySetInnerHTML={{ __html: SvgIcons.megaphone }} />
@@ -69,6 +70,7 @@ export function Navbar() {
           </TabBtn>
           <TabBtn
             active={state.activeTab === "dash"}
+            className="report-tab"
             onClick={() => dispatch({ type: "SET_TAB", tab: "dash" })}
           >
             <span dangerouslySetInnerHTML={{ __html: SvgIcons.chart }} />
