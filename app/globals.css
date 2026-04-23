@@ -15,6 +15,131 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+.team-header {
+  display: flex;
+  min-height: 6.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+}
+
+.team-header-account {
+  align-self: stretch;
+  width: 18.75rem;
+  flex-shrink: 0;
+  border-left: 2px solid #f1f5f9;
+  padding-left: 1.5rem;
+}
+
+.team-header-account-inner {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.team-header-account-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.team-header-account-subtitle {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.team-header-account-balance {
+  color: #1e293b;
+  font-size: 1.875rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.team-header-account-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.team-header-account-kpi {
+  border-radius: 9999px;
+  padding: 0.25rem 0.5rem;
+}
+
+.team-header-account-kpi-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+.team-header-account-kpi-value {
+  color: #1e293b;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+@media (max-height: 760px) {
+  .team-header {
+    min-height: 5.5rem;
+    gap: 1.25rem;
+    padding: 0.65rem 1.5rem;
+  }
+
+  .team-header-account {
+    width: 18rem;
+    padding-left: 1.25rem;
+  }
+
+  .team-header-account-inner {
+    gap: 0.45rem;
+  }
+
+  .team-header-account-subtitle {
+    display: none;
+  }
+
+  .team-header-account-balance {
+    font-size: 1.65rem;
+  }
+
+  .team-header-account-kpis {
+    gap: 0.4rem;
+  }
+
+  .team-header-account-kpi {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.3rem 0.45rem;
+  }
+
+  .team-header-account-kpi-label {
+    font-size: 0.58rem;
+  }
+
+  .team-header-account-kpi-value {
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 1180px) {
+  .team-header {
+    gap: 1rem;
+    padding-inline: 1.5rem;
+  }
+
+  .team-header-account {
+    width: 17rem;
+    padding-left: 1rem;
+  }
+}
+
 .quest-btn {
   background-color: #fde047;
   border: 3px solid #1f2937;

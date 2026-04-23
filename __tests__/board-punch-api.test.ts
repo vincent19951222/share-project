@@ -56,6 +56,11 @@ describe("/api/board/punch", () => {
         userId: { in: teamUsers.map((member) => member.id) },
       },
     });
+    await prisma.activityEvent.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
     await prisma.seasonMemberStat.deleteMany({
       where: {
         seasonId: { in: seasonIds },
@@ -148,6 +153,16 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.activeSeason).toBeNull();
     expect(currentUserRowIndex).toBeGreaterThanOrEqual(0);
     expect(body.snapshot.gridData[currentUserRowIndex][today - 1]).toBe(true);
+
+    const activity = await prisma.activityEvent.findFirstOrThrow({
+      where: {
+        userId,
+        type: "PUNCH",
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    expect(activity.message).toBe("li 刚刚打卡，拿下 20 银子");
+    expect(activity.assetAwarded).toBe(20);
   });
 
   it("awards coins from the user's consecutive punch streak globally", async () => {
@@ -520,6 +535,16 @@ describe("/api/board/punch", () => {
     expect(afterStat.slotContribution).toBe(2);
     expect(body.snapshot.activeSeason?.filledSlots).toBe(3);
     expect(body.snapshot.currentUser?.seasonIncome).toBe(20);
+
+    const activity = await prisma.activityEvent.findFirstOrThrow({
+      where: {
+        userId,
+        type: "UNDO_PUNCH",
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    expect(activity.message).toBe("li 撤销了今天的打卡");
+    expect(activity.assetAwarded).toBeNull();
   });
 
   it("rejects undo when today's punch does not exist", async () => {

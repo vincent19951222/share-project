@@ -45,6 +45,10 @@ export async function seedDatabase(): Promise<void> {
     });
   }
 
+  await prisma.activityEvent.deleteMany({
+    where: { teamId: team.id },
+  });
+
   const seededUsernames = new Set(SEED_USERS.map((user) => user.username));
   const seededUserIds: string[] = [];
 
@@ -114,6 +118,7 @@ export async function seedDatabase(): Promise<void> {
   if (extraUsers.length > 0) {
     const extraUserIds = extraUsers.map((user) => user.id);
     await prisma.boardNote.deleteMany({ where: { authorId: { in: extraUserIds } } });
+    await prisma.activityEvent.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.punchRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.seasonMemberStat.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.user.deleteMany({ where: { id: { in: extraUserIds } } });

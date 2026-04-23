@@ -25,14 +25,7 @@ export default async function BoardLayout({
 
   const initialState: BoardState = {
     ...snapshot,
-    logs: [
-      {
-        id: "seed-1",
-        text: "已连接共享战场，当前数据来自服务器快照。",
-        type: "system",
-        timestamp: new Date(0),
-      },
-    ],
+    logs: [],
     activeTab: "punch",
     lastAppliedPollRequestId: 0,
     pendingPunchEpoch: 0,

@@ -18,8 +18,8 @@ export function TeamHeader() {
       : state.gridData.filter((row) => row[todayIndex] === true).length;
 
   return (
-    <header className="h-[12vh] w-full soft-card flex items-center justify-between gap-6 px-8 shrink-0 z-20">
-      <div className="flex items-center gap-4">
+    <header className="team-header w-full soft-card shrink-0 z-20">
+      <div className="flex shrink-0 items-center gap-4">
         <div className="h-10 w-10 flex items-center justify-center bg-orange-100 rounded-full border-2 border-orange-200 shadow-sm text-orange-500 p-2">
           <span dangerouslySetInnerHTML={{ __html: SvgIcons.trophy }} />
         </div>
@@ -31,20 +31,38 @@ export function TeamHeader() {
         </div>
       </div>
 
-      <div className="flex-1 max-w-2xl mx-2">
+      <div className="mx-2 max-w-2xl flex-1">
         <SeasonProgressBar activeSeason={state.activeSeason ?? null} />
       </div>
 
-      <div className="flex flex-col items-end gap-1 text-right">
-        <span className="text-[10px] font-bold text-sub tracking-wider uppercase">我的银子</span>
-        <div className="text-2xl font-extrabold text-main">
-          {assetBalance.toLocaleString("zh-CN")}
-        </div>
-        <div className="text-xs font-bold text-sub">
-          连签 {currentStreak} 天 · 下次奖励 {nextReward} 银子
-        </div>
-        <div className="text-xs font-bold text-sub">
-          今日已打卡 {todayPunchedCount}/{state.members.length}
+      <div className="team-header-account">
+        <div className="team-header-account-inner">
+          <div className="team-header-account-summary">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-black text-sub tracking-wider">我的银子</span>
+              <span className="team-header-account-subtitle">今天的战利品账本</span>
+            </div>
+            <div className="team-header-account-balance">
+              {assetBalance.toLocaleString("zh-CN")}
+            </div>
+          </div>
+
+          <div className="team-header-account-kpis">
+            <div className="team-header-account-kpi bg-slate-100/80">
+              <div className="team-header-account-kpi-label text-slate-400">连签</div>
+              <div className="team-header-account-kpi-value">{currentStreak} 天</div>
+            </div>
+            <div className="team-header-account-kpi bg-amber-100/70">
+              <div className="team-header-account-kpi-label text-amber-500">下次奖励</div>
+              <div className="team-header-account-kpi-value">{nextReward} 银子</div>
+            </div>
+            <div className="team-header-account-kpi bg-slate-100/80">
+              <div className="team-header-account-kpi-label text-slate-400">今日打卡</div>
+              <div className="team-header-account-kpi-value">
+                {todayPunchedCount}/{state.members.length}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>

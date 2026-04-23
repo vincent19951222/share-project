@@ -8,30 +8,32 @@ datasource db {
 }
 
 model Team {
-  id         String      @id @default(cuid())
-  name       String
-  code       String      @unique
-  createdAt  DateTime    @default(now())
-  users      User[]
-  boardNotes BoardNote[]
-  seasons    Season[]
+  id             String          @id @default(cuid())
+  name           String
+  code           String          @unique
+  createdAt      DateTime        @default(now())
+  users          User[]
+  boardNotes     BoardNote[]
+  seasons        Season[]
+  activityEvents ActivityEvent[]
 }
 
 model User {
-  id           String        @id @default(cuid())
-  username     String        @unique
-  password     String
-  avatarKey    String
-  role         String        @default("MEMBER")
-  currentStreak Int          @default(0)
+  id              String             @id @default(cuid())
+  username        String             @unique
+  password        String
+  avatarKey       String
+  role            String             @default("MEMBER")
+  currentStreak   Int                @default(0)
   lastPunchDayKey String?
-  coins        Int           @default(0)
-  teamId       String
-  team         Team          @relation(fields: [teamId], references: [id])
-  punchRecords PunchRecord[]
-  boardNotes   BoardNote[]
-  seasonStats  SeasonMemberStat[]
-  createdAt    DateTime      @default(now())
+  coins           Int                @default(0)
+  teamId          String
+  team            Team               @relation(fields: [teamId], references: [id])
+  punchRecords    PunchRecord[]
+  boardNotes      BoardNote[]
+  seasonStats     SeasonMemberStat[]
+  activityEvents  ActivityEvent[]
+  createdAt       DateTime           @default(now())
 }
 
 model Season {
@@ -102,4 +104,19 @@ model BoardNote {
 
   @@index([teamId, isDeleted, pinned, createdAt])
   @@index([authorId])
+}
+
+model ActivityEvent {
+  id           String   @id @default(cuid())
+  teamId       String
+  team         Team     @relation(fields: [teamId], references: [id])
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  type         String
+  message      String
+  assetAwarded Int?
+  createdAt    DateTime @default(now())
+
+  @@index([teamId, createdAt])
+  @@index([userId, createdAt])
 }

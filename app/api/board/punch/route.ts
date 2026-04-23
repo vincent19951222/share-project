@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { parseCookieValue } from "@/lib/auth";
+import {
+  ACTIVITY_EVENT_TYPES,
+  buildPunchActivityMessage,
+  buildUndoPunchActivityMessage,
+} from "@/lib/activity-events";
 import { buildBoardSnapshotForUser, getCurrentBoardDay } from "@/lib/board-state";
 import {
   getNextPunchRewardPreview,
@@ -135,6 +140,17 @@ export async function POST(request: NextRequest) {
           },
         });
 
+        await tx.activityEvent.create({
+          data: {
+            teamId: user.teamId,
+            userId: user.id,
+            type: ACTIVITY_EVENT_TYPES.PUNCH,
+            message: buildPunchActivityMessage(user.username, reward),
+            assetAwarded: reward,
+            createdAt: now,
+          },
+        });
+
         if (activeSeason) {
           const existingStat = await tx.seasonMemberStat.findUnique({
             where: {
@@ -210,7 +226,11 @@ export async function DELETE(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true },
+      select: {
+        id: true,
+        teamId: true,
+        username: true,
+      },
     });
 
     if (!user) {
@@ -267,6 +287,17 @@ export async function DELETE(request: NextRequest) {
             },
             currentStreak: previousPunch?.streakAfterPunch ?? 0,
             lastPunchDayKey: previousPunch?.dayKey ?? null,
+          },
+        });
+
+        await tx.activityEvent.create({
+          data: {
+            teamId: user.teamId,
+            userId: user.id,
+            type: ACTIVITY_EVENT_TYPES.UNDO_PUNCH,
+            message: buildUndoPunchActivityMessage(user.username),
+            assetAwarded: null,
+            createdAt: now,
           },
         });
 

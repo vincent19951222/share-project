@@ -43,6 +43,7 @@ export function HeatmapGrid() {
           timestamp: new Date(),
         },
       });
+      window.dispatchEvent(new Event("activity-events:refresh"));
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "打卡失败";
@@ -87,6 +88,7 @@ export function HeatmapGrid() {
           timestamp: new Date(),
         },
       });
+      window.dispatchEvent(new Event("activity-events:refresh"));
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "撤销失败";

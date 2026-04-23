@@ -40,6 +40,11 @@ describe("seedDatabase", () => {
         OR: [{ authorId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
       },
     });
+    await prisma.activityEvent.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
     await prisma.punchRecord.deleteMany({
       where: {
         OR: [{ userId: { in: fixtureUserIds } }, { seasonId: { in: fixtureSeasonIds } }],
@@ -166,6 +171,7 @@ describe("seedDatabase", () => {
         await prisma.season.deleteMany({ where: { id: otherSeasonId } });
       }
       if (otherTeamId) {
+        await prisma.activityEvent.deleteMany({ where: { teamId: otherTeamId } });
         await prisma.team.deleteMany({ where: { id: otherTeamId } });
       }
     }
@@ -296,6 +302,7 @@ describe("seedDatabase", () => {
         await prisma.season.deleteMany({ where: { id: otherSeasonId } });
       }
       if (otherTeamId) {
+        await prisma.activityEvent.deleteMany({ where: { teamId: otherTeamId } });
         await prisma.team.deleteMany({ where: { id: otherTeamId } });
       }
     }
