@@ -145,7 +145,7 @@ The positive state should use a clear but compact mark, such as a check or stamp
 
 Coffee uses the generated pixel-art icon saved at:
 
-`/Users/vincent/Projects/share-project/public/assets/calendar/coffee-pixel-16bit-v1.png`
+`/assets/calendar/coffee-pixel-16bit-v1.png`
 
 Rules:
 
@@ -294,7 +294,9 @@ This version does not include:
 - future month browsing
 - report-style trend charts inside the calendar page
 - team-wide calendar comparisons
-- new APIs or database schema changes
+- database schema changes
+
+Implementation note: historical month navigation uses a narrow read-only route, `GET /api/calendar/state?month=YYYY-MM`, because current-month-only snapshots cannot represent past months accurately. Keep that route private to the calendar feature.
 
 ## Testing Scope
 

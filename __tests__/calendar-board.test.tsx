@@ -63,6 +63,31 @@ async function clickButtonByText(container: HTMLElement, text: string) {
   });
 }
 
+async function clickDayCell(cell: HTMLElement) {
+  await act(async () => {
+    cell.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+}
+
+function getDayCell(container: HTMLElement, day: number) {
+  const cell = Array.from(container.querySelectorAll(".calendar-day-cell")).find((candidate) => {
+    const firstText = candidate.querySelector("span")?.textContent?.trim();
+    return firstText === String(day);
+  });
+
+  expect(cell).toBeDefined();
+  return cell as HTMLElement;
+}
+
+function getVisibleState(container: HTMLElement) {
+  return {
+    monthLabel: container.textContent?.match(/20\d{2}年\d{1,2}月/)?.[0] ?? null,
+    workoutSummary: container.textContent?.match(/本月练了 \d+ 天/)?.[0] ?? null,
+    coffeeSummary: container.textContent?.match(/本月喝了 \d+ 杯/)?.[0] ?? null,
+    buttonLabels: Array.from(container.querySelectorAll("button")).map((button) => button.textContent),
+  };
+}
+
 describe("CalendarBoard", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -115,7 +140,7 @@ describe("CalendarBoard", () => {
         json: async () => ({
           snapshot: buildSnapshot("2026-04", "2026-04", [
             { day: 1, workedOut: true, coffeeCups: 0 },
-            { day: 2, workedOut: false, coffeeCups: 2 },
+            { day: 2, workedOut: true, coffeeCups: 2 },
           ]),
         }),
       });
@@ -125,12 +150,33 @@ describe("CalendarBoard", () => {
     await waitFor(() => {
       expect(container.textContent).toContain("牛马日历");
       expect(container.textContent).toContain("2026年4月");
-      expect(container.textContent).toContain("本月练了 1 天");
+      expect(container.textContent).toContain("本月练了 2 天");
       expect(container.textContent).toContain("本月喝了 2 杯");
       expect(container.textContent).not.toContain("回到本月");
+      expect(container.querySelectorAll("button")).toHaveLength(1);
+      expect(
+        Array.from(container.querySelectorAll("button")).some((button) =>
+          button.textContent?.includes("下个月"),
+        ),
+      ).toBe(false);
+      expect(container.textContent).not.toContain("下个月");
       expect(container.querySelectorAll("img[alt='']").length).toBe(2);
       expect(container.querySelectorAll("img[alt='咖啡记录']").length).toBe(0);
+      expect(getDayCell(container, 1).textContent).toContain("1");
+      expect(getDayCell(container, 1).querySelector("[aria-label='已训练']")).not.toBeNull();
+      expect(getDayCell(container, 1).querySelectorAll("img[alt='']").length).toBe(0);
+      expect(getDayCell(container, 2).textContent).toContain("2");
+      expect(getDayCell(container, 2).querySelector("[aria-label='已训练']")).not.toBeNull();
+      expect(getDayCell(container, 2).querySelectorAll("img[alt='']").length).toBe(2);
+      expect(getDayCell(container, 4).textContent).toContain("4");
+      expect(getDayCell(container, 4).querySelector("[aria-label='已训练']")).toBeNull();
+      expect(getDayCell(container, 4).querySelectorAll("img[alt='']").length).toBe(0);
     });
+
+    const visibleStateBeforeCellClick = getVisibleState(container);
+    await clickDayCell(getDayCell(container, 2));
+
+    expect(getVisibleState(container)).toEqual(visibleStateBeforeCellClick);
 
     await clickButtonByText(container, "上个月");
 
@@ -169,7 +215,7 @@ describe("CalendarBoard", () => {
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(2);
       expect(container.textContent).toContain("2026年4月");
-      expect(container.textContent).toContain("本月练了 1 天");
+      expect(container.textContent).toContain("本月练了 2 天");
       expect(container.textContent).toContain("本月喝了 2 杯");
       expect(container.textContent).not.toContain("回到本月");
       expect(container.textContent).not.toContain("详情");
