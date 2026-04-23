@@ -203,7 +203,10 @@ describe("BoardProvider sync", () => {
       await Promise.resolve();
     });
 
-    expect(fetch).toHaveBeenCalledWith("/api/board/state", { cache: "no-store" });
+    expect(fetch).toHaveBeenCalledWith("/api/board/state", {
+      cache: "no-store",
+      credentials: "same-origin",
+    });
 
     const state = JSON.parse(container.querySelector("[data-testid='state']")!.textContent ?? "{}");
     expect(state.gridData[0][0]).toBe(true);

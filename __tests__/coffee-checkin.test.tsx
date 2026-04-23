@@ -97,4 +97,25 @@ describe("CoffeeCheckin", () => {
       expect.objectContaining({ method: "DELETE" }),
     );
   });
+
+  it("shows an actionable error when the initial coffee state is unauthorized", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: "未登录" }),
+      }),
+    );
+
+    await act(async () => {
+      root.render(<CoffeeCheckin />);
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("咖啡小票没打出来");
+    expect(container.textContent).toContain("登录状态过期，请重新登录。");
+    expect(container.textContent).toContain("重新登录");
+    expect(container.textContent).not.toContain("正在打印今日咖啡小票");
+  });
 });
