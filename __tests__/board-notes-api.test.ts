@@ -168,6 +168,42 @@ describe("/api/board-notes", () => {
     expect(contents).not.toContain("外队便签");
   });
 
+  it("marks teammate notes as deletable for admins", async () => {
+    const note = await prisma.boardNote.create({
+      data: {
+        teamId,
+        authorId: otherUserId,
+        type: "FREE",
+        content: "admin can delete teammate note",
+        color: "GREEN",
+      },
+    });
+
+    const response = await GET(request("GET", userId));
+    const body = await response.json();
+    const returnedNote = body.notes.find((item: { id: string }) => item.id === note.id);
+
+    expect(returnedNote.canDelete).toBe(true);
+  });
+
+  it("does not mark teammate notes as deletable for regular members", async () => {
+    const note = await prisma.boardNote.create({
+      data: {
+        teamId,
+        authorId: userId,
+        type: "FREE",
+        content: "member cannot delete teammate note",
+        color: "BLUE",
+      },
+    });
+
+    const response = await GET(request("GET", otherUserId));
+    const body = await response.json();
+    const returnedNote = body.notes.find((item: { id: string }) => item.id === note.id);
+
+    expect(returnedNote.canDelete).toBe(false);
+  });
+
   it("excludes soft-deleted notes", async () => {
     await prisma.boardNote.create({
       data: {
@@ -194,6 +230,24 @@ describe("/api/board-notes", () => {
         authorId: userId,
         type: "FREE",
         content: "我自己删",
+        color: "GREEN",
+      },
+    });
+
+    const response = await DELETE(request("DELETE", userId), { params: Promise.resolve({ id: note.id }) });
+    expect(response.status).toBe(200);
+
+    const deleted = await prisma.boardNote.findUnique({ where: { id: note.id } });
+    expect(deleted!.isDeleted).toBe(true);
+  });
+
+  it("soft-deletes another team member's note for admins", async () => {
+    const note = await prisma.boardNote.create({
+      data: {
+        teamId,
+        authorId: otherUserId,
+        type: "FREE",
+        content: "admin deletes teammate note",
         color: "GREEN",
       },
     });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parseCookieValue } from "@/lib/auth";
+import { isAdminUser } from "@/lib/session";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -11,7 +12,7 @@ async function getCurrentUser(userId: string | undefined) {
 
   return prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, teamId: true },
+    select: { id: true, teamId: true, role: true },
   });
 }
 
@@ -38,7 +39,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "便签不存在" }, { status: 404 });
     }
 
-    if (note.authorId !== user.id) {
+    if (!isAdminUser(user) && note.authorId !== user.id) {
       return NextResponse.json({ error: "只能删除自己的便签" }, { status: 403 });
     }
 

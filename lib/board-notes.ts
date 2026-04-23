@@ -86,7 +86,11 @@ export function normalizeBoardNoteInput(body: unknown):
   return { ok: true, value: { type: input.type, content, color: input.color } };
 }
 
-export function mapBoardNoteToDto(note: BoardNoteRecord, currentUserId: string): BoardNoteDto {
+export function mapBoardNoteToDto(
+  note: BoardNoteRecord,
+  currentUserId: string,
+  currentUserIsAdmin = false,
+): BoardNoteDto {
   return {
     id: note.id,
     type: note.type as BoardNoteType,
@@ -99,7 +103,7 @@ export function mapBoardNoteToDto(note: BoardNoteRecord, currentUserId: string):
       name: note.author.username,
       avatarKey: note.author.avatarKey,
     },
-    canDelete: note.authorId === currentUserId,
+    canDelete: currentUserIsAdmin || note.authorId === currentUserId,
   };
 }
 

@@ -6,13 +6,14 @@ import {
   mapBoardNoteToDto,
   normalizeBoardNoteInput,
 } from "@/lib/board-notes";
+import { isAdminUser } from "@/lib/session";
 
 async function getCurrentUser(userId: string | undefined) {
   if (!userId) return null;
 
   return prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, teamId: true },
+    select: { id: true, teamId: true, role: true },
   });
 }
 
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      notes: notes.map((note) => mapBoardNoteToDto(note, user.id)),
+      notes: notes.map((note) => mapBoardNoteToDto(note, user.id, isAdminUser(user))),
     });
   } catch {
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      note: mapBoardNoteToDto(note, user.id),
+      note: mapBoardNoteToDto(note, user.id, isAdminUser(user)),
     });
   } catch {
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });
