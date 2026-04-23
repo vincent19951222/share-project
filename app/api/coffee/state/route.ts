@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildCoffeeSnapshotForUser } from "@/lib/coffee-state";
+import { parseCookieValue } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.cookies.get("userId")?.value;
+    const userId = parseCookieValue(request.cookies.get("userId")?.value);
 
     if (!userId) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });

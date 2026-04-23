@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseCookieValue } from "@/lib/auth";
 import { buildCoffeeSnapshotForUser } from "@/lib/coffee-state";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = request.cookies.get("userId")?.value;
+    const userId = parseCookieValue(request.cookies.get("userId")?.value);
 
     if (!userId) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });

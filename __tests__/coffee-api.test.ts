@@ -6,12 +6,13 @@ import { DELETE } from "@/app/api/coffee/cups/latest/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
+import { createCookieValue } from "@/lib/auth";
 
 function request(url: string, userId?: string, method = "GET") {
   return new NextRequest(`http://localhost${url}`, {
     method,
     headers: {
-      ...(userId ? { Cookie: `userId=${userId}` } : {}),
+      ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
       "Content-Type": "application/json",
     },
   });
