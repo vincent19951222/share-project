@@ -1,5 +1,5 @@
-import { createRoot, type Root } from "react-dom/client";
 import { act } from "react";
+import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { SeasonProgressBar } from "@/components/punch-board/SeasonProgressBar";
 import type { ActiveSeasonSnapshot } from "@/lib/types";
@@ -19,7 +19,7 @@ describe("SeasonProgressBar", () => {
     container.remove();
   });
 
-  it("renders the expected grid template and filled/empty slot counts", () => {
+  it("renders the expected grid template, slots, and contributor hover labels", () => {
     const activeSeason: ActiveSeasonSnapshot = {
       id: "season-1",
       monthKey: "2026-04",
@@ -65,6 +65,11 @@ describe("SeasonProgressBar", () => {
     expect(container.querySelectorAll("[data-slot-state='empty']")).toHaveLength(2);
     expect(container.textContent).toContain("减脂挑战");
     expect(container.textContent).toContain("3/5");
+    expect(container.textContent).toContain("li · 贡献 2 格 · 赛季收入 30 银子");
+    expect(container.textContent).toContain("luo · 贡献 1 格 · 赛季收入 20 银子");
+    expect(
+      container.querySelector("[aria-label='li · 贡献 2 格 · 赛季收入 30 银子']"),
+    ).not.toBeNull();
   });
 
   it("shows a safe fallback when the season month is invalid", () => {

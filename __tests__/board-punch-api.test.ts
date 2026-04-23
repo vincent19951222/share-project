@@ -150,6 +150,76 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.gridData[currentUserRowIndex][today - 1]).toBe(true);
   });
 
+  it("awards coins from the user's consecutive punch streak globally", async () => {
+    const cases = [
+      {
+        label: "first consecutive day",
+        currentStreak: 0,
+        lastPunchDayKey: null,
+        expectedStreak: 1,
+        expectedReward: 10,
+        expectedNextReward: 20,
+      },
+      {
+        label: "second consecutive day",
+        currentStreak: 1,
+        lastPunchDayKey: "2026-04-23",
+        expectedStreak: 2,
+        expectedReward: 20,
+        expectedNextReward: 30,
+      },
+      {
+        label: "third consecutive day",
+        currentStreak: 2,
+        lastPunchDayKey: "2026-04-23",
+        expectedStreak: 3,
+        expectedReward: 30,
+        expectedNextReward: 40,
+      },
+      {
+        label: "capped reward after five consecutive days",
+        currentStreak: 5,
+        lastPunchDayKey: "2026-04-23",
+        expectedStreak: 6,
+        expectedReward: 50,
+        expectedNextReward: 50,
+      },
+    ] as const;
+
+    for (const testCase of cases) {
+      await resetState();
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          currentStreak: testCase.currentStreak,
+          lastPunchDayKey: testCase.lastPunchDayKey,
+        },
+      });
+
+      const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+      const response = await POST(request("POST", userId));
+
+      expect(response.status, testCase.label).toBe(200);
+
+      const body = await response.json();
+      const record = await prisma.punchRecord.findUniqueOrThrow({
+        where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+      });
+      const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+      expect(record.assetAwarded, testCase.label).toBe(testCase.expectedReward);
+      expect(record.streakAfterPunch, testCase.label).toBe(testCase.expectedStreak);
+      expect(after.coins, testCase.label).toBe(before.coins + testCase.expectedReward);
+      expect(after.currentStreak, testCase.label).toBe(testCase.expectedStreak);
+      expect(after.lastPunchDayKey, testCase.label).toBe(todayDayKey);
+      expect(body.snapshot.currentUser).toMatchObject({
+        assetBalance: after.coins,
+        currentStreak: testCase.expectedStreak,
+        nextReward: testCase.expectedNextReward,
+      });
+    }
+  });
+
   it("adds a season slot and season income when an active season exists", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 0, targetSlots: 5 });
