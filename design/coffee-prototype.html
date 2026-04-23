@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>续命咖啡 - 原型图</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #2b2118;
+      --espresso: #3f2a1d;
+      --roast: #b45309;
+      --latte: #fed7aa;
+      --cream: #fff7ed;
+      --foam: #fffbeb;
+      --mint: #99f6e4;
+      --yellow: #fde047;
+      --paper: #fffaf0;
+      --slate: #64748b;
+      --line: #1f2937;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
+      color: var(--ink);
+      background-color: #fff7ed;
+      background-image:
+        linear-gradient(90deg, rgba(180, 83, 9, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(180, 83, 9, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(63, 42, 29, 0.18) 1px, transparent 1px);
+      background-size: 44px 44px, 44px 44px, 18px 18px;
+      overflow: hidden;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .top-nav {
+      height: 3.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 2.4rem;
+      height: 2.4rem;
+      border: 3px solid var(--line);
+      border-radius: 0.7rem;
+      background: var(--yellow);
+      box-shadow: 0 3px 0 0 var(--line);
+      display: grid;
+      place-items: center;
+    }
+
+    .tab-strip {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.35rem;
+      border: 2px solid #fed7aa;
+      border-radius: 999px;
+      background: rgba(255, 251, 235, 0.75);
+      overflow-x: auto;
+      max-width: min(58vw, 760px);
+    }
+
+    .tab-btn {
+      white-space: nowrap;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 900;
+      color: #7c5a3b;
+      border: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .tab-btn.active {
+      color: var(--ink);
+      background: var(--mint);
+      border-color: var(--line);
+      box-shadow: 0 3px 0 0 var(--line);
+    }
+
+    .profile-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: #fffaf0;
+      border: 3px solid #fed7aa;
+      border-radius: 999px;
+      padding: 0.35rem 0.8rem 0.35rem 0.35rem;
+      box-shadow: 0 3px 0 0 rgba(63, 42, 29, 0.18);
+      flex-shrink: 0;
+    }
+
+    .profile-pill img {
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 999px;
+      border: 2px solid var(--line);
+      background: #fff;
+      object-fit: cover;
+    }
+
+    .main-view {
+      min-height: 0;
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(320px, 0.94fr) minmax(520px, 1.9fr);
+      gap: 1rem;
+    }
+
+    .receipt-panel {
+      min-height: 0;
+      position: relative;
+      border: 4px solid var(--line);
+      border-radius: 1.2rem;
+      background: var(--paper);
+      box-shadow: 8px 8px 0 0 rgba(63, 42, 29, 0.9);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .receipt-panel::before,
+    .receipt-panel::after {
+      content: "";
+      position: absolute;
+      top: 5.8rem;
+      width: 1.6rem;
+      height: 1.6rem;
+      background: #fff7ed;
+      border: 4px solid var(--line);
+      border-radius: 999px;
+      z-index: 3;
+    }
+
+    .receipt-panel::before { left: -0.9rem; }
+    .receipt-panel::after { right: -0.9rem; }
+
+    .receipt-head {
+      padding: clamp(1.1rem, 2vw, 1.7rem);
+      background:
+        linear-gradient(135deg, rgba(153, 246, 228, 0.55), transparent 45%),
+        var(--foam);
+      border-bottom: 3px dashed rgba(63, 42, 29, 0.45);
+    }
+
+    .eyebrow {
+      color: var(--roast);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .receipt-title {
+      margin-top: 0.35rem;
+      font-size: clamp(2rem, 3.8vw, 4rem);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: 0;
+      color: var(--espresso);
+    }
+
+    .ticket-meta {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    .ticket-stamp {
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 900;
+      box-shadow: 0 2px 0 0 var(--line);
+    }
+
+    .stats-list {
+      padding: clamp(1rem, 2vw, 1.4rem);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      border-bottom: 3px dashed rgba(63, 42, 29, 0.28);
+    }
+
+    .stat-tile {
+      min-height: 5.6rem;
+      padding: 0.85rem;
+      border: 3px solid var(--line);
+      border-radius: 0.9rem;
+      background: #fff;
+      box-shadow: 4px 4px 0 0 rgba(63, 42, 29, 0.25);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-tile.mint { background: #ccfbf1; }
+    .stat-tile.latte { background: #ffedd5; }
+    .stat-tile.yellow { background: #fef08a; }
+    .stat-tile.paper { background: #fff; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #7c5a3b;
+    }
+
+    .stat-value {
+      font-size: clamp(1.55rem, 2.6vw, 2.3rem);
+      line-height: 1;
+      font-weight: 900;
+      color: var(--espresso);
+    }
+
+    .today-controls {
+      padding: clamp(1rem, 2vw, 1.4rem);
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .control-card {
+      border: 3px solid var(--line);
+      border-radius: 1rem;
+      background: var(--cream);
+      padding: 1rem;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .cup-counter {
+      display: grid;
+      grid-template-columns: 3rem 1fr 3rem;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .counter-btn {
+      height: 3rem;
+      width: 3rem;
+      border: 3px solid var(--line);
+      border-radius: 999px;
+      background: var(--yellow);
+      box-shadow: 0 4px 0 0 var(--line);
+      font-size: 1.4rem;
+      font-weight: 900;
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+    }
+
+    .counter-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 0 var(--line);
+    }
+
+    .counter-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .counter-screen {
+      min-width: 0;
+      border: 3px solid var(--line);
+      border-radius: 1rem;
+      background: #fff;
+      padding: 0.75rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .counter-number {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--espresso);
+      white-space: nowrap;
+    }
+
+    .cup-stack {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .mini-cup {
+      width: 1.4rem;
+      height: 1.6rem;
+      border: 2px solid var(--line);
+      border-radius: 0.2rem 0.2rem 0.55rem 0.55rem;
+      background: linear-gradient(#fff 0 28%, var(--latte) 28% 100%);
+      transform: rotate(var(--tilt));
+      flex-shrink: 0;
+    }
+
+    .activity-ticket {
+      min-height: 0;
+      padding: 0 1.4rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      overflow: auto;
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.55rem;
+      align-items: start;
+      padding: 0.65rem 0;
+      border-bottom: 2px dotted rgba(63, 42, 29, 0.16);
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: #5c4030;
+    }
+
+    .log-time {
+      font-size: 0.7rem;
+      color: #a16207;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .board-panel {
+      min-width: 0;
+      min-height: 0;
+      border: 6px solid rgba(255, 251, 235, 0.95);
+      border-radius: 1.45rem;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 251, 235, 0.94)),
+        #fff;
+      box-shadow: 0 8px 18px rgba(63, 42, 29, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .board-head {
+      min-height: 5.2rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 3px solid #ffedd5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background:
+        repeating-linear-gradient(90deg, rgba(254, 215, 170, 0.45) 0 12px, transparent 12px 24px),
+        #fffaf0;
+    }
+
+    .board-title {
+      font-size: clamp(1.4rem, 2.3vw, 2.3rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--espresso);
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: #7c5a3b;
+    }
+
+    .legend-dot {
+      width: 0.85rem;
+      height: 0.85rem;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .coffee-grid-shell {
+      min-height: 0;
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .members-rail {
+      width: 7.5rem;
+      flex-shrink: 0;
+      border-right: 3px solid #ffedd5;
+      background: #fffaf0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rail-label,
+    .days-row {
+      height: 2.9rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      border-bottom: 3px solid #ffedd5;
+      background: #fff7ed;
+      font-size: 0.74rem;
+      font-weight: 900;
+      color: #a16207;
+    }
+
+    .rail-label { justify-content: center; }
+
+    .member-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.8rem 0.65rem;
+      gap: 0.5rem;
+    }
+
+    .member-item {
+      height: 3.45rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+
+    .member-item img {
+      width: 2.35rem;
+      height: 2.35rem;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      object-fit: cover;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .member-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.76rem;
+      font-weight: 900;
+      color: var(--espresso);
+    }
+
+    .grid-scroll {
+      min-width: 0;
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: column;
+      scroll-behavior: smooth;
+    }
+
+    .days-row {
+      gap: 0.55rem;
+      padding: 0 1rem;
+      width: max-content;
+    }
+
+    .day-label {
+      width: 3.25rem;
+      height: 1.75rem;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+    }
+
+    .day-label.today {
+      color: var(--ink);
+      background: var(--mint);
+      border: 2px solid var(--line);
+      box-shadow: 0 2px 0 0 var(--line);
+    }
+
+    .matrix {
+      flex: 1;
+      width: max-content;
+      padding: 0.8rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .grid-row {
+      height: 3.45rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .coffee-cell {
+      width: 3.25rem;
+      height: 3.25rem;
+      border-radius: 0.9rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-weight: 900;
+      border: 2px solid transparent;
+      position: relative;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    .coffee-cell.empty {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      color: rgba(161, 98, 7, 0.32);
+    }
+
+    .coffee-cell.future {
+      background: transparent;
+      border: 2px dashed #fdba74;
+    }
+
+    .coffee-cell.cups {
+      background: #ffedd5;
+      border-color: var(--line);
+      color: var(--espresso);
+      box-shadow: 0 3px 0 0 rgba(63, 42, 29, 0.65);
+      transform: rotate(-1deg);
+    }
+
+    .coffee-cell.today-me {
+      background: var(--yellow);
+      border: 3px solid var(--line);
+      box-shadow: 0 4px 0 0 var(--line);
+      cursor: pointer;
+    }
+
+    .coffee-cell.today-me:hover {
+      transform: translateY(-2px) rotate(-1deg);
+    }
+
+    .coffee-cell .cell-cup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+      font-size: 0.78rem;
+      line-height: 1;
+    }
+
+    .coffee-cell .cell-cup svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .today-popover {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 0.55rem);
+      width: 13rem;
+      border: 3px solid var(--line);
+      border-radius: 1rem;
+      background: #fffaf0;
+      box-shadow: 0 6px 0 0 var(--line);
+      padding: 0.8rem;
+      z-index: 10;
+      display: none;
+    }
+
+    .today-popover.show { display: block; }
+
+    .popover-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-top: 0.65rem;
+    }
+
+    .mini-action {
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 900;
+      box-shadow: 0 2px 0 0 var(--line);
+    }
+
+    .mini-action.primary { background: var(--mint); }
+    .mini-action.warn { background: #ffedd5; }
+    .mini-action:disabled { opacity: 0.4; }
+
+    .receipt-tear {
+      height: 0.9rem;
+      background:
+        radial-gradient(circle at 0 0, transparent 0.62rem, var(--paper) 0.64rem) 0 0 / 1.3rem 0.9rem repeat-x;
+      border-top: 3px solid var(--line);
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    .coffee-icon {
+      display: inline-block;
+      width: 1.15em;
+      height: 1.15em;
+      vertical-align: -0.18em;
+    }
+
+    @media (max-width: 980px) {
+      body { overflow: auto; }
+      .app-shell { min-height: auto; }
+      .top-nav { height: auto; align-items: flex-start; }
+      .tab-strip { max-width: 100%; }
+      .main-view {
+        min-height: auto;
+        grid-template-columns: 1fr;
+      }
+      .receipt-panel,
+      .board-panel {
+        min-height: 560px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="top-nav">
+      <div class="flex items-center gap-5 min-w-0">
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="brand-mark">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 8h12l-1.2 11H7.2L6 8Z" fill="#fff7ed"/>
+              <path d="M8 5h8"/>
+              <path d="M10 3h4"/>
+              <path d="M8 12h8"/>
+            </svg>
+          </div>
+          <div class="font-black text-xl sm:text-2xl tracking-tight text-[#2b2118] whitespace-nowrap">脱脂牛马</div>
+        </div>
+        <div class="tab-strip">
+          <button class="tab-btn">协同打卡</button>
+          <button class="tab-btn">共享看板</button>
+          <button class="tab-btn active">
+            <span class="coffee-icon" data-cup-icon></span>
+            续命咖啡
+          </button>
+          <button class="tab-btn">战报中心</button>
+        </div>
+      </div>
+      <div class="profile-pill">
+        <img src="male1.png" alt="li">
+        <div class="leading-tight">
+          <div class="text-xs font-black text-[#a16207]">今天我的杯数</div>
+          <div class="font-black text-[#2b2118]"><span id="nav-my-cups">2</span> 杯</div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-view">
+      <section class="receipt-panel" aria-label="今日咖啡小票">
+        <div class="receipt-head">
+          <div class="eyebrow">Daily Coffee Receipt</div>
+          <h1 class="receipt-title">今日咖啡小票</h1>
+          <div class="ticket-meta">
+            <span class="ticket-stamp">04.23 周四</span>
+            <span class="ticket-stamp">只记录今天</span>
+            <span class="ticket-stamp">不参与银子</span>
+          </div>
+        </div>
+
+        <div class="stats-list">
+          <article class="stat-tile mint">
+            <div class="stat-label">今日总杯数</div>
+            <div class="stat-value"><span id="stat-total">8</span></div>
+          </article>
+          <article class="stat-tile latte">
+            <div class="stat-label">今日续命人数</div>
+            <div class="stat-value"><span id="stat-drinkers">4</span>/5</div>
+          </article>
+          <article class="stat-tile yellow">
+            <div class="stat-label">我的今日杯数</div>
+            <div class="stat-value"><span id="stat-mine">2</span></div>
+          </article>
+          <article class="stat-tile paper">
+            <div class="stat-label">今日咖啡王</div>
+            <div class="stat-value text-[1.55rem] sm:text-[1.75rem]" id="stat-king">luo · 3</div>
+          </article>
+        </div>
+
+        <div class="today-controls">
+          <div class="control-card">
+            <div>
+              <div class="eyebrow">My Coffee Today</div>
+              <div class="mt-1 text-lg font-black text-[#3f2a1d]">今天只管今天，喝了就记一杯。</div>
+            </div>
+            <div class="cup-counter">
+              <button class="counter-btn" id="minus-btn" aria-label="减少一杯">−</button>
+              <div class="counter-screen">
+                <div>
+                  <div class="text-xs font-black text-[#a16207]">当前杯数</div>
+                  <div class="counter-number"><span id="counter-cups">2</span> 杯</div>
+                </div>
+                <div class="cup-stack" id="cup-stack" aria-hidden="true"></div>
+              </div>
+              <button class="counter-btn" id="plus-btn" aria-label="增加一杯">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity-ticket" id="activity-ticket">
+          <div class="log-row">
+            <span class="log-time">09:18</span>
+            <span><b>li</b> 续命 1 杯，早会前的防御姿态。</span>
+          </div>
+          <div class="log-row">
+            <span class="log-time">10:42</span>
+            <span><b>luo</b> 今日已 3 杯，咖啡王暂时上岗。</span>
+          </div>
+          <div class="log-row">
+            <span class="log-time">13:06</span>
+            <span><b>wu</b> 撤回一杯，理智回归。</span>
+          </div>
+        </div>
+        <div class="receipt-tear" aria-hidden="true"></div>
+      </section>
+
+      <section class="board-panel" aria-label="团队咖啡月历">
+        <header class="board-head">
+          <div>
+            <div class="eyebrow">Team Coffee Calendar</div>
+            <h2 class="board-title">团队续命月历</h2>
+          </div>
+          <div class="legend">
+            <span><i class="legend-dot" style="background:#fed7aa"></i> 已续命</span>
+            <span><i class="legend-dot" style="background:#fff7ed"></i> 空杯</span>
+            <span><i class="legend-dot" style="background:#99f6e4"></i> 今天</span>
+          </div>
+        </header>
+
+        <div class="coffee-grid-shell">
+          <aside class="members-rail">
+            <div class="rail-label">MEMBERS</div>
+            <div class="member-list" id="member-list"></div>
+          </aside>
+          <div class="grid-scroll" id="grid-scroll">
+            <div class="days-row" id="days-row"></div>
+            <div class="matrix" id="matrix"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const cupSvg = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1f2937" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z" fill="#fed7aa"/>
+        <path d="M16 10h1.2a2.8 2.8 0 0 1 0 5.6H16"/>
+        <path d="M7 5c.8-.8.8-1.6 0-2.4M11 5c.8-.8.8-1.6 0-2.4M15 5c.8-.8.8-1.6 0-2.4"/>
+      </svg>`;
+
+    const members = [
+      { id: "li", name: "li", avatar: "male1.png" },
+      { id: "luo", name: "luo", avatar: "male2.png" },
+      { id: "liu", name: "liu", avatar: "female1.png" },
+      { id: "wu", name: "wu", avatar: "male3.png" },
+      { id: "ji", name: "ji", avatar: "female2.png" }
+    ];
+
+    const today = 23;
+    const totalDays = 30;
+    const currentUserId = "li";
+
+    const coffeeData = members.map((member, rowIndex) => {
+      return Array.from({ length: totalDays }, (_, index) => {
+        const day = index + 1;
+        if (day > today) return 0;
+        const base = ((day + rowIndex * 3) % 5 === 0) ? 0 : ((day + rowIndex) % 3);
+        return Math.min(base, 2);
+      });
+    });
+
+    coffeeData[0][today - 1] = 2;
+    coffeeData[1][today - 1] = 3;
+    coffeeData[2][today - 1] = 1;
+    coffeeData[3][today - 1] = 0;
+    coffeeData[4][today - 1] = 2;
+
+    let popoverOpen = false;
+
+    document.querySelectorAll("[data-cup-icon]").forEach((el) => {
+      el.innerHTML = cupSvg;
+    });
+
+    function renderMembers() {
+      const container = document.getElementById("member-list");
+      container.innerHTML = members.map((member) => `
+        <div class="member-item">
+          <img src="${member.avatar}" alt="${member.name}">
+          <div class="member-name">${member.name}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderDays() {
+      const container = document.getElementById("days-row");
+      container.innerHTML = Array.from({ length: totalDays }, (_, index) => {
+        const day = index + 1;
+        return `<div class="day-label ${day === today ? "today" : ""}">${day}</div>`;
+      }).join("");
+    }
+
+    function cellMarkup(cups, day, member, rowIndex) {
+      const isFuture = day > today;
+      const isMeToday = member.id === currentUserId && day === today;
+      const hasCups = cups > 0;
+
+      if (isMeToday) {
+        return `
+          <button class="coffee-cell today-me" id="today-cell" aria-label="调整今天咖啡杯数">
+            ${hasCups ? `<span class="cell-cup">${cupSvg}<span>${cups}</span></span>` : "+"}
+            <div class="today-popover ${popoverOpen ? "show" : ""}" id="today-popover">
+              <div class="text-xs font-black text-[#a16207]">今天我的咖啡</div>
+              <div class="mt-1 text-lg font-black text-[#3f2a1d]">${cups} 杯</div>
+              <div class="popover-actions">
+                <button class="mini-action warn" data-pop-minus ${cups === 0 ? "disabled" : ""}>-1 杯</button>
+                <button class="mini-action primary" data-pop-plus>+1 杯</button>
+              </div>
+            </div>
+          </button>
+        `;
+      }
+
+      if (isFuture) {
+        return `<div class="coffee-cell future"></div>`;
+      }
+
+      if (hasCups) {
+        return `<div class="coffee-cell cups"><span class="cell-cup">${cupSvg}<span>${cups}</span></span></div>`;
+      }
+
+      return `<div class="coffee-cell empty">·</div>`;
+    }
+
+    function renderMatrix() {
+      const matrix = document.getElementById("matrix");
+      matrix.innerHTML = members.map((member, rowIndex) => {
+        const cells = coffeeData[rowIndex].map((cups, dayIndex) => cellMarkup(cups, dayIndex + 1, member, rowIndex)).join("");
+        return `<div class="grid-row">${cells}</div>`;
+      }).join("");
+
+      const todayCell = document.getElementById("today-cell");
+      if (todayCell) {
+        todayCell.addEventListener("click", (event) => {
+          const target = event.target;
+          if (target.closest("[data-pop-plus]")) {
+            addCup();
+            event.stopPropagation();
+            return;
+          }
+          if (target.closest("[data-pop-minus]")) {
+            removeCup();
+            event.stopPropagation();
+            return;
+          }
+          popoverOpen = !popoverOpen;
+          renderMatrix();
+        });
+      }
+    }
+
+    function getTodayCupsByMember() {
+      return members.map((member, index) => ({
+        ...member,
+        cups: coffeeData[index][today - 1]
+      }));
+    }
+
+    function renderStats() {
+      const todayRows = getTodayCupsByMember();
+      const total = todayRows.reduce((sum, row) => sum + row.cups, 0);
+      const drinkers = todayRows.filter((row) => row.cups > 0).length;
+      const mine = todayRows.find((row) => row.id === currentUserId).cups;
+      const king = todayRows
+        .filter((row) => row.cups > 0)
+        .sort((a, b) => b.cups - a.cups || a.name.localeCompare(b.name))[0];
+
+      document.getElementById("stat-total").textContent = total;
+      document.getElementById("stat-drinkers").textContent = drinkers;
+      document.getElementById("stat-mine").textContent = mine;
+      document.getElementById("nav-my-cups").textContent = mine;
+      document.getElementById("counter-cups").textContent = mine;
+      document.getElementById("stat-king").textContent = king ? `${king.name} · ${king.cups}` : "暂无";
+      document.getElementById("minus-btn").disabled = mine === 0;
+
+      const stack = document.getElementById("cup-stack");
+      const visibleCups = Math.min(mine, 6);
+      stack.innerHTML = Array.from({ length: visibleCups }, (_, index) => {
+        const tilt = [-5, 3, -2, 5, -4, 2][index % 6];
+        return `<span class="mini-cup" style="--tilt:${tilt}deg"></span>`;
+      }).join("");
+    }
+
+    function addLog(text) {
+      const ticket = document.getElementById("activity-ticket");
+      const time = new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+      const row = document.createElement("div");
+      row.className = "log-row";
+      row.innerHTML = `<span class="log-time">${time}</span><span>${text}</span>`;
+      ticket.prepend(row);
+    }
+
+    function addCup() {
+      coffeeData[0][today - 1] += 1;
+      popoverOpen = true;
+      addLog("<b>li</b> 新增 1 杯，今日小票继续变长。");
+      rerender();
+    }
+
+    function removeCup() {
+      if (coffeeData[0][today - 1] === 0) return;
+      coffeeData[0][today - 1] -= 1;
+      popoverOpen = true;
+      addLog("<b>li</b> 撤回 1 杯，理智回归一点点。");
+      rerender();
+    }
+
+    function scrollToToday() {
+      const scroller = document.getElementById("grid-scroll");
+      scroller.scrollLeft = Math.max(0, (today - 5) * 61);
+    }
+
+    function rerender() {
+      renderStats();
+      renderMatrix();
+    }
+
+    document.getElementById("plus-btn").addEventListener("click", addCup);
+    document.getElementById("minus-btn").addEventListener("click", removeCup);
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("#today-cell")) {
+        if (popoverOpen) {
+          popoverOpen = false;
+          renderMatrix();
+        }
+      }
+    });
+
+    renderMembers();
+    renderDays();
+    rerender();
+    requestAnimationFrame(scrollToToday);
+  </script>
+</body>
+</html>
