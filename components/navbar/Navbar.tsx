@@ -58,6 +58,15 @@ export function Navbar() {
             共享看板
           </TabBtn>
           <TabBtn
+            active={state.activeTab === "coffee"}
+            onClick={() => dispatch({ type: "SET_TAB", tab: "coffee" })}
+          >
+            <span className="w-4 h-4" aria-hidden="true">
+              ☕
+            </span>
+            续命咖啡
+          </TabBtn>
+          <TabBtn
             active={state.activeTab === "dash"}
             onClick={() => dispatch({ type: "SET_TAB", tab: "dash" })}
           >

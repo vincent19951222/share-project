@@ -4,6 +4,7 @@ import { useBoard } from "@/lib/store";
 import { Navbar } from "@/components/navbar/Navbar";
 import { PunchBoard } from "@/components/punch-board/PunchBoard";
 import { SharedBoard } from "@/components/shared-board/SharedBoard";
+import { CoffeeCheckin } from "@/components/coffee-checkin/CoffeeCheckin";
 import { ReportCenter } from "@/components/report-center/ReportCenter";
 
 export default function Home() {
@@ -26,6 +27,13 @@ export default function Home() {
           }`}
         >
           <SharedBoard />
+        </div>
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${
+            state.activeTab === "coffee" ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <CoffeeCheckin />
         </div>
         <div
           className={`absolute inset-0 transition-opacity duration-300 ${
