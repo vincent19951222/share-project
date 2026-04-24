@@ -13,7 +13,7 @@ The page should behave like a lightweight monthly record viewer, not a new actio
 
 The product currently separates daily actions across:
 
-- `协同打卡` for fitness check-in
+- `健身打卡` for fitness check-in
 - `续命咖啡` for coffee logging
 - `战报中心` for summary and trend reporting
 
@@ -27,7 +27,7 @@ That need does not belong inside `战报中心`, because the calendar is a raw r
 
 Add `牛马日历` as a new top-level tab alongside:
 
-- `协同打卡`
+- `健身打卡`
 - `共享看板`
 - `续命咖啡`
 - `战报中心`
@@ -58,7 +58,7 @@ The feature is successful when all of the following are true:
 
 Top-level navigation after this change:
 
-- `协同打卡`: daily fitness action page
+- `健身打卡`: daily fitness action page
 - `共享看板`: shared team board
 - `续命咖啡`: daily coffee action page
 - `牛马日历`: personal monthly record view

@@ -54,7 +54,7 @@ export function Navbar() {
                 onClick={() => dispatch({ type: "SET_TAB", tab: "punch" })}
               >
                 <AssetIcon name="workout" className="h-4 w-4 object-contain" />
-                协同打卡
+                健身打卡
               </TabBtn>
               <TabBtn
                 active={state.activeTab === "board"}

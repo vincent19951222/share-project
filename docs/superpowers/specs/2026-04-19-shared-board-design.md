@@ -8,7 +8,7 @@
 
 该原型定义了第一版共享看板的主要体验：
 
-- 顶部主导航中新增 `共享看板` Tab，与 `协同打卡`、`战报中心` 并列
+- 顶部主导航中新增 `共享看板` Tab，与 `健身打卡`、`战报中心` 并列
 - 顶部发布区：当前用户头像、多行输入框、类型选择、颜色选择、发布按钮
 - 内容区：不同长度卡片组成的响应式瀑布流
 - 内容类型：`自由笔记` 和 `普通通告`。实现时统一产品文案为 `团队通告`
@@ -83,12 +83,12 @@
 主导航从两个 Tab 扩展为三个 Tab：
 
 ```text
-协同打卡 / 共享看板 / 战报中心
+健身打卡 / 共享看板 / 战报中心
 ```
 
 推荐顺序：
 
-1. `协同打卡`：核心行动入口
+1. `健身打卡`：核心行动入口
 2. `共享看板`：团队轻量消息空间
 3. `战报中心`：阶段性总结与数据回看
 
@@ -498,7 +498,7 @@ Where practical:
 
 ### Manual Verification
 
-- Three-tab navigation works: `协同打卡` / `共享看板` / `战报中心`
+- Three-tab navigation works: `健身打卡` / `共享看板` / `战报中心`
 - Shared board matches `design/board-prototype.html` layout and tone
 - Notes render in responsive masonry layout
 - Publishing inserts a new note at the top

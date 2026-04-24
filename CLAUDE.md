@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-"脱脂牛马"（原 Room Todo）是一个为健身团队打造的协同打卡与战报看板应用。采用纯 Next.js 架构，无独立后端服务，所有数据通过 API Routes 访问。
+"脱脂牛马"（原 Room Todo）是一个为健身团队打造的健身打卡与战报看板应用。采用纯 Next.js 架构，无独立后端服务，所有数据通过 API Routes 访问。
 
 ## 常用命令
 

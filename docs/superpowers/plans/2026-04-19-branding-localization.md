@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 将产品品牌从 "Room Todo" 更改为 "脱脂牛马"，并将界面文本中文化，打造健身团队专属的协作打卡平台
+**Goal:** 将产品品牌从 "Room Todo" 更改为 "脱脂牛马"，并将界面文本中文化，打造健身团队专属的健身打卡平台
 
 **Architecture:** 通过全局文本替换的方式，在不改变组件结构和样式的情况下，更新品牌名称和界面文本。这是一个纯粹的文本替换任务，不涉及逻辑变更或功能修改。
 
@@ -36,7 +36,7 @@
 ```typescript
 export const metadata: Metadata = {
   title: "脱脂牛马 - 团队打卡看板",
-  description: "脱脂牛马团队协同打卡与战报看板",
+  description: "脱脂牛马团队健身打卡与战报看板",
 };
 ```
 
@@ -344,7 +344,7 @@ git commit -m "test: 添加品牌本土化验证报告"
 
 ## 预期成果
 
-完成本实施计划后，"脱脂牛马" 将成为一个具有鲜明团队特色的协作打卡平台：
+完成本实施计划后，"脱脂牛马" 将成为一个具有鲜明团队特色的健身打卡平台：
 
 1. **品牌统一**：所有产品触点统一使用 "脱脂牛马" 品牌
 2. **文化契合**：界面文本符合健身团队"脱脂牛马"的轻松氛围

@@ -1127,7 +1127,7 @@ Update `components/navbar/Navbar.tsx` inside the tab strip:
 
 Keep order:
 
-1. `协同打卡`
+1. `健身打卡`
 2. `共享看板`
 3. `续命咖啡`
 4. `战报中心`

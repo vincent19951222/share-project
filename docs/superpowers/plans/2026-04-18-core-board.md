@@ -356,7 +356,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Room Todo - 团队打卡看板",
-  description: "团队协同打卡与战报看板",
+  description: "团队健身打卡与战报看板",
 };
 
 export default function RootLayout({
@@ -1000,7 +1000,7 @@ export function Navbar() {
             onClick={() => dispatch({ type: "SET_TAB", tab: "punch" })}
           >
             <span dangerouslySetInnerHTML={{ __html: SvgIcons.target }} />
-            协同打卡
+            健身打卡
           </TabBtn>
           <TabBtn
             active={state.activeTab === "dash"}
@@ -1658,7 +1658,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Room Todo - 团队打卡看板",
-  description: "团队协同打卡与战报看板",
+  description: "团队健身打卡与战报看板",
 };
 
 export default function RootLayout({

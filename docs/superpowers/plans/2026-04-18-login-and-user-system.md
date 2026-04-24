@@ -816,7 +816,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Room Todo - 团队打卡看板",
-  description: "团队协同打卡与战报看板",
+  description: "团队健身打卡与战报看板",
 };
 
 export default function RootLayout({
@@ -1267,7 +1267,7 @@ export default function LoginPage() {
         <div className="w-full md:w-1/2 p-8 md:p-14 flex flex-col justify-center bg-white">
           <div className="mb-10">
             <h2 className="text-3xl font-black mb-2 text-slate-800">Join Room</h2>
-            <p className="text-sub font-bold text-sm">输入你的用户名和密码，准备开始协同挑战。</p>
+            <p className="text-sub font-bold text-sm">输入你的用户名和密码，准备开始健身挑战。</p>
           </div>
 
           <LoginForm />
@@ -1416,7 +1416,7 @@ export function Navbar() {
             onClick={() => dispatch({ type: "SET_TAB", tab: "punch" })}
           >
             <span dangerouslySetInnerHTML={{ __html: SvgIcons.target }} />
-            协同打卡
+            健身打卡
           </TabBtn>
           <TabBtn
             active={state.activeTab === "dash"}

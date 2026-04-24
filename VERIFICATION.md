@@ -27,7 +27,7 @@
 - [x] 今日打卡统计上方显示 "今日脱脂率"
 - [x] 进度条上方显示 "本周牛马放纵餐: 星巴克下午茶"
 - [x] 目标积分单位显示 "银子"
-- [x] 导航标签显示 "协同打卡" 和 "战报中心"
+- [x] 导航标签显示 "健身打卡" 和 "战报中心"
 
 ### 布局和样式验证
 - [x] 所有文本没有溢出或换行问题
@@ -43,7 +43,7 @@
 ### 文件修改记录
 1. **E:\Projects\share-project\app\layout.tsx**
    - 更新 title: "脱脂牛马 - 团队打卡看板"
-   - 更新 description: "脱脂牛马团队协同打卡与战报看板"
+   - 更新 description: "脱脂牛马团队健身打卡与战报看板"
    - 添加 Noto Sans SC 字体
 
 2. **E:\Projects\share-project\app\(auth)\login\page.tsx**
@@ -53,7 +53,7 @@
 
 3. **E:\Projects\share-project\components\navbar\Navbar.tsx**
    - 更新品牌标识为 "脱脂牛马"
-   - 更新导航标签为 "协同打卡" 和 "战报中心"
+   - 更新导航标签为 "健身打卡" 和 "战报中心"
 
 ## 后续建议
 1. 考虑将登录表单的 "Username" 和 "Password" 标签也中文化

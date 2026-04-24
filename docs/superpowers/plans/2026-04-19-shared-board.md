@@ -1248,7 +1248,7 @@ Update `BoardAction`:
 
 - [ ] **Step 2: Add Shared Board tab to Navbar**
 
-In `components/navbar/Navbar.tsx`, add this `TabBtn` between `协同打卡` and `战报中心`:
+In `components/navbar/Navbar.tsx`, add this `TabBtn` between `健身打卡` and `战报中心`:
 
 ```tsx
 <TabBtn
@@ -1498,7 +1498,7 @@ Expected: Next.js starts and prints a local URL, usually `http://localhost:3000`
 
 Open the app in a browser and verify:
 
-- `协同打卡` tab still renders the existing punch board.
+- `健身打卡` tab still renders the existing punch board.
 - `共享看板` tab renders the composer and note area.
 - `战报中心` tab still renders the report center.
 - Switching tabs does not throw console errors.

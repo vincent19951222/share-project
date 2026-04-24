@@ -958,7 +958,7 @@ Open the app, log in with the seeded user flow already used by the project, swit
 - Peak and low labels match the visible chart.
 - Highlight cards are friendly and not overly formal.
 - On a narrow viewport, metric cards and chart/highlights stack without overflow.
-- `协同打卡` and `共享看板` tabs still work.
+- `健身打卡` and `共享看板` tabs still work.
 
 - [ ] **Step 4: Inspect final diff**
 

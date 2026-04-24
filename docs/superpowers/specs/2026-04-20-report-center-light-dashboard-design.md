@@ -44,7 +44,7 @@ The redesign is successful when all of the following are true:
 - placeholder content such as `OCTOBER REPORT`, `+12,450`, `Bob`, `Dave`, and fixed October axis labels is gone
 - the page remains readable on desktop and small widths
 - the tab still feels consistent with the product's brutalist style
-- existing `协同打卡` and `共享看板` behavior is unaffected
+- existing `健身打卡` and `共享看板` behavior is unaffected
 
 ## Information Hierarchy
 
