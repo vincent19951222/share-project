@@ -161,6 +161,10 @@ describe("CalendarBoard", () => {
       ).toBe(false);
       expect(container.textContent).not.toContain("下个月");
       expect(container.querySelectorAll("img[alt='']").length).toBe(2);
+      expect(
+        getDayCell(container, 2).querySelectorAll('img[src*="/assets/icons/coffee-pixel.svg"]')
+          .length,
+      ).toBe(2);
       expect(container.querySelectorAll("img[alt='咖啡记录']").length).toBe(0);
       expect(getDayCell(container, 1).textContent).toContain("1");
       expect(getDayCell(container, 1).querySelector("[aria-label='已训练']")).not.toBeNull();

@@ -1,6 +1,5 @@
 import type { CalendarDayCell as CalendarGridDayCell } from "./calendar-data";
-
-const COFFEE_ICON_SRC = "/assets/calendar/coffee-pixel-16bit-v1.png";
+import { AssetIcon } from "@/components/ui/AssetIcon";
 
 export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
   const hasActivity = cell.workedOut || cell.coffeeCups > 0;
@@ -26,11 +25,9 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
           role="img"
         >
           {Array.from({ length: cell.coffeeCups }, (_, index) => (
-            <img
+            <AssetIcon
               key={`${cell.day}-${index}`}
-              src={COFFEE_ICON_SRC}
-              alt=""
-              aria-hidden="true"
+              name="coffee"
               className="image-render-pixel h-4 w-4 shrink-0 sm:h-5 sm:w-5"
             />
           ))}

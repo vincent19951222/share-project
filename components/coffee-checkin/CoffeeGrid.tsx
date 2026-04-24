@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { getAvatarUrl } from "@/lib/avatars";
+import { AssetIcon } from "@/components/ui/AssetIcon";
 import type { CoffeeSnapshot } from "@/lib/types";
-
-const COFFEE_ICON_SRC = "/assets/calendar/coffee-pixel-16bit-v1.svg";
 
 interface CoffeeGridProps {
   snapshot: CoffeeSnapshot;
@@ -16,12 +15,9 @@ interface CoffeeGridProps {
 function CoffeeCupIcon({ cups }: { cups: number }) {
   return (
     <span className="flex flex-col items-center gap-0.5 text-xs leading-none">
-      <img
-        src={COFFEE_ICON_SRC}
-        alt=""
-        aria-hidden="true"
+      <AssetIcon
+        name="coffee"
         className="h-6 w-6 object-contain"
-        style={{ imageRendering: "pixelated" }}
       />
       <span>{cups}</span>
     </span>

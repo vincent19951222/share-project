@@ -5,11 +5,9 @@ import { useState, useRef, useCallback } from "react";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
-import { SvgIcons } from "@/components/ui/SvgIcons";
+import { AssetIcon } from "@/components/ui/AssetIcon";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
-
-const COFFEE_ICON_SRC = "/assets/calendar/coffee-pixel-16bit-v1.svg";
 
 export function Navbar() {
   const { state, dispatch } = useBoard();
@@ -55,7 +53,7 @@ export function Navbar() {
                 active={state.activeTab === "punch"}
                 onClick={() => dispatch({ type: "SET_TAB", tab: "punch" })}
               >
-                <span dangerouslySetInnerHTML={{ __html: SvgIcons.target }} />
+                <AssetIcon name="workout" className="h-4 w-4 object-contain" />
                 协同打卡
               </TabBtn>
               <TabBtn
@@ -63,7 +61,7 @@ export function Navbar() {
                 className="board-tab"
                 onClick={() => dispatch({ type: "SET_TAB", tab: "board" })}
               >
-                <span className="w-4 h-4" dangerouslySetInnerHTML={{ __html: SvgIcons.megaphone }} />
+                <AssetIcon name="board" className="h-4 w-4 object-contain" />
                 共享看板
               </TabBtn>
               <TabBtn
@@ -71,13 +69,7 @@ export function Navbar() {
                 className="coffee-tab"
                 onClick={() => dispatch({ type: "SET_TAB", tab: "coffee" })}
               >
-                <img
-                  src={COFFEE_ICON_SRC}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-4 w-4 object-contain"
-                  style={{ imageRendering: "pixelated" }}
-                />
+                <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
                 续命咖啡
               </TabBtn>
               <TabBtn
@@ -85,9 +77,7 @@ export function Navbar() {
                 className="calendar-tab"
                 onClick={() => dispatch({ type: "SET_TAB", tab: "calendar" })}
               >
-                <span className="text-sm leading-none" aria-hidden="true">
-                  📅
-                </span>
+                <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
                 牛马日历
               </TabBtn>
               <TabBtn
@@ -95,7 +85,7 @@ export function Navbar() {
                 className="report-tab"
                 onClick={() => dispatch({ type: "SET_TAB", tab: "dash" })}
               >
-                <span dangerouslySetInnerHTML={{ __html: SvgIcons.chart }} />
+                <AssetIcon name="report" className="h-4 w-4 object-contain" />
                 战报中心
               </TabBtn>
             </div>

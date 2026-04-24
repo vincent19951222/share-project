@@ -60,7 +60,7 @@ describe("coffee tab navigation", () => {
 
     expect(coffeeButton).toBeDefined();
     expect(
-      coffeeButton!.querySelector('img[src*="/assets/calendar/coffee-pixel-16bit-v1.svg"]'),
+      coffeeButton!.querySelector('img[src*="/assets/icons/coffee-pixel.svg"]'),
     ).not.toBeNull();
 
     await act(async () => {
@@ -68,5 +68,37 @@ describe("coffee tab navigation", () => {
     });
 
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "coffee" });
+  });
+
+  it("uses managed pixel SVG assets for the primary navigation tabs", async () => {
+    const { Navbar } = await import("@/components/navbar/Navbar");
+
+    await act(async () => {
+      root.render(<Navbar />);
+    });
+
+    const tabIconSources = Array.from(container.querySelectorAll(".tab-btn img")).map((image) =>
+      image.getAttribute("src"),
+    );
+
+    expect(tabIconSources).toEqual([
+      "/assets/icons/workout-pixel.svg",
+      "/assets/icons/board-pixel.svg",
+      "/assets/icons/coffee-pixel.svg",
+      "/assets/icons/calendar-pixel.svg",
+      "/assets/icons/report-pixel.svg",
+    ]);
+  });
+
+  it("uses the managed vault trophy icon in the team header", async () => {
+    const { TeamHeader } = await import("@/components/punch-board/TeamHeader");
+
+    await act(async () => {
+      root.render(<TeamHeader />);
+    });
+
+    expect(
+      container.querySelector('img[src*="/assets/icons/vault-trophy-pixel.svg"]'),
+    ).not.toBeNull();
   });
 });

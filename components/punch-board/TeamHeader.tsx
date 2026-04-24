@@ -1,7 +1,7 @@
 "use client";
 
 import { useBoard } from "@/lib/store";
-import { SvgIcons } from "@/components/ui/SvgIcons";
+import { AssetIcon } from "@/components/ui/AssetIcon";
 import { SeasonProgressBar } from "./SeasonProgressBar";
 
 export function TeamHeader() {
@@ -21,7 +21,7 @@ export function TeamHeader() {
     <header className="team-header w-full soft-card shrink-0 z-20">
       <div className="flex shrink-0 items-center gap-4">
         <div className="h-10 w-10 flex items-center justify-center bg-orange-100 rounded-full border-2 border-orange-200 shadow-sm text-orange-500 p-2">
-          <span dangerouslySetInnerHTML={{ __html: SvgIcons.trophy }} />
+          <AssetIcon name="vaultTrophy" className="h-full w-full object-contain" />
         </div>
         <div className="flex flex-col">
           <span className="text-[10px] font-bold text-sub tracking-wider uppercase">牛马金库</span>

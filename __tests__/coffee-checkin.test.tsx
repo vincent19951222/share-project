@@ -153,7 +153,7 @@ describe("CoffeeCheckin", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "activity-events:refresh" }));
     expect(container.textContent).toContain("我的今日杯数");
     expect(
-      container.querySelector('img[src*="/assets/calendar/coffee-pixel-16bit-v1.svg"]'),
+      container.querySelector('img[src*="/assets/icons/coffee-pixel.svg"]'),
     ).not.toBeNull();
 
     const removeButton = Array.from(container.querySelectorAll("button")).find((button) =>
@@ -249,7 +249,7 @@ describe("CoffeeCheckin", () => {
     });
 
     const coffeeCalendarIcons = container.querySelectorAll(
-      'img[src*="/assets/calendar/coffee-pixel-16bit-v1.svg"]',
+      'img[src*="/assets/icons/coffee-pixel.svg"]',
     );
 
     expect(coffeeCalendarIcons.length).toBeGreaterThan(0);
