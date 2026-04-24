@@ -100,5 +100,7 @@ describe("coffee tab navigation", () => {
     expect(
       container.querySelector('img[src*="/assets/icons/vault-trophy-pixel.svg"]'),
     ).not.toBeNull();
+    expect(container.textContent).toContain("全队个人银子总和");
+    expect(container.textContent).toContain("个人长期累计资产");
   });
 });

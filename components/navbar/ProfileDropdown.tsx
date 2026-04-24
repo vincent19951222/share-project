@@ -16,6 +16,7 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
   const router = useRouter();
   const { state } = useBoard();
   const currentUser = state.currentUser;
+  const assetBalance = currentUser?.assetBalance ?? 0;
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -45,7 +46,7 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
             <span className="text-xs font-bold text-sub">我的银子</span>
             <div className="text-2xl font-black text-yellow-500 flex items-center gap-1">
               <span dangerouslySetInnerHTML={{ __html: SvgIcons.coin }} />
-              {currentUser?.assetBalance ?? 0}
+              {assetBalance.toLocaleString("zh-CN")}
             </div>
             <span className="mt-1 text-xs font-medium text-sub">
               个人长期累计资产，不是团队公共钱包。
