@@ -4,11 +4,28 @@ import { useState } from "react";
 import { getAvatarUrl } from "@/lib/avatars";
 import type { CoffeeSnapshot } from "@/lib/types";
 
+const COFFEE_ICON_SRC = "/assets/calendar/coffee-pixel-16bit-v1.svg";
+
 interface CoffeeGridProps {
   snapshot: CoffeeSnapshot;
   busy: boolean;
   onAddCup: () => void;
   onRemoveCup: () => void;
+}
+
+function CoffeeCupIcon({ cups }: { cups: number }) {
+  return (
+    <span className="flex flex-col items-center gap-0.5 text-xs leading-none">
+      <img
+        src={COFFEE_ICON_SRC}
+        alt=""
+        aria-hidden="true"
+        className="h-6 w-6 object-contain"
+        style={{ imageRendering: "pixelated" }}
+      />
+      <span>{cups}</span>
+    </span>
+  );
 }
 
 function CoffeeCell({
@@ -39,14 +56,7 @@ function CoffeeCell({
           cups === 0 ? "bg-yellow-300 text-xl" : "bg-orange-100 text-amber-950"
         }`}
       >
-        {cups === 0 ? (
-          "+"
-        ) : (
-          <span className="flex flex-col items-center text-xs leading-none">
-            <span aria-hidden="true">☕</span>
-            <span>☕ {cups}</span>
-          </span>
-        )}
+        {cups === 0 ? "+" : <CoffeeCupIcon cups={cups} />}
       </button>
     );
   }
@@ -54,10 +64,7 @@ function CoffeeCell({
   if (cups > 0) {
     return (
       <div className="grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-slate-900 bg-orange-100 font-black text-amber-950 shadow-[0_3px_0_0_rgba(63,42,29,0.65)]">
-        <span className="flex flex-col items-center text-xs leading-none">
-          <span aria-hidden="true">☕</span>
-          <span>☕ {cups}</span>
-        </span>
+        <CoffeeCupIcon cups={cups} />
       </div>
     );
   }

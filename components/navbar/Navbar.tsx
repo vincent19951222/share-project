@@ -9,6 +9,8 @@ import { SvgIcons } from "@/components/ui/SvgIcons";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 
+const COFFEE_ICON_SRC = "/assets/calendar/coffee-pixel-16bit-v1.svg";
+
 export function Navbar() {
   const { state, dispatch } = useBoard();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -69,9 +71,13 @@ export function Navbar() {
                 className="coffee-tab"
                 onClick={() => dispatch({ type: "SET_TAB", tab: "coffee" })}
               >
-                <span className="w-4 h-4" aria-hidden="true">
-                  ☕
-                </span>
+                <img
+                  src={COFFEE_ICON_SRC}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-4 w-4 object-contain"
+                  style={{ imageRendering: "pixelated" }}
+                />
                 续命咖啡
               </TabBtn>
               <TabBtn

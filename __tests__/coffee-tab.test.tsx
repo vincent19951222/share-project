@@ -59,6 +59,9 @@ describe("coffee tab navigation", () => {
     );
 
     expect(coffeeButton).toBeDefined();
+    expect(
+      coffeeButton!.querySelector('img[src*="/assets/calendar/coffee-pixel-16bit-v1.svg"]'),
+    ).not.toBeNull();
 
     await act(async () => {
       coffeeButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));

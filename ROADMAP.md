@@ -175,11 +175,11 @@
 
 ---
 
-#### 4. 续命咖啡 ✅
+#### 4. 咖啡打卡（续命咖啡） ✅
 **状态：** 已接入为独立生活化打卡页
 
 **功能目标：**
-- 新增 `续命咖啡` Tab，和健身打卡平行
+- 新增 `续命咖啡` / 咖啡打卡 Tab，和健身打卡平行
 - 每杯咖啡持久化为一条 `CoffeeRecord`
 - 只允许当前用户操作今天，支持 `+1 杯` 和撤销最近一杯
 - 页面展示今日咖啡小票和团队 30 天咖啡月历
@@ -188,6 +188,28 @@
 **相关文档：**
 - [设计规范](docs/superpowers/specs/2026-04-23-coffee-checkin-design.md)
 - [实施计划](docs/superpowers/plans/2026-04-23-coffee-checkin.md)
+
+---
+
+#### 5. 牛马日历 ✅
+**状态：** 已接入为只读月历页
+
+**功能目标：**
+- 新增 `牛马日历` 顶层 Tab，集中查看个人月度记录
+- 以只读月历合并展示健身打卡状态和咖啡杯数
+- 新增 `GET /api/calendar/state?month=YYYY-MM`，支持按月获取日历快照
+- 支持查看上个月、本月回跳和当前月自动刷新
+- 咖啡打卡与健身打卡完成后触发日历刷新，保持跨 Tab 数据一致
+
+**界面组件：**
+- `components/calendar/CalendarBoard.tsx` - 日历页容器
+- `components/calendar/CalendarHeader.tsx` - 月份切换和统计头部
+- `components/calendar/CalendarGrid.tsx` - 月历网格
+- `components/calendar/CalendarDayCell.tsx` - 单日健身和咖啡记录展示
+
+**相关文档：**
+- [设计规范](docs/superpowers/specs/2026-04-23-niuma-calendar-design.md)
+- [实施计划](docs/superpowers/plans/2026-04-23-niuma-calendar.md)
 
 ---
 
@@ -336,7 +358,7 @@
 - **4月19日：** 完成品牌本土化，Quest & GP 系统设计
 - **4月20日：** 完成战报中心轻量数据看板设计
 - **4月22日：** 完成打卡持久化/同步设计，启动经济与赛季系统研发
-- **4月23日：** 完成续命咖啡设计、原型与实现计划，并接入独立咖啡打卡页
+- **4月23日：** 完成咖啡打卡、牛马日历设计与实现，接入独立咖啡打卡页和只读个人月历
 
 ### 近期计划
 - **当前：** 推进经济系统服务端结算（streak 奖励、个人银子、赛季收入、冲刺条）
@@ -352,7 +374,8 @@
 - 🚧 完成经济系统 & 赛季冲刺闭环
 - 🧾 建立清晰的银子、赛季收入、牛马金库、冲刺条语义
 - 🛠️ 完成管理员赛季管理入口
-- ☕ 打磨续命咖啡页面体验与移动端适配
+- ☕ 打磨咖啡打卡页面体验与移动端适配
+- 📅 打磨牛马日历的历史月份浏览和移动端密度
 - 📱 移动端响应式优化
 - 🔔 浏览器通知提醒
 - 📊 更多数据统计图表
@@ -383,7 +406,8 @@
 - [战报中心轻量看板设计](docs/superpowers/specs/2026-04-20-report-center-light-dashboard-design.md)
 - [打卡持久化与同步设计](docs/superpowers/specs/2026-04-22-punch-persistence-and-sync-design.md)
 - [经济与赛季系统设计](docs/superpowers/specs/2026-04-22-economy-and-season-system-design.md)
-- [续命咖啡设计](docs/superpowers/specs/2026-04-23-coffee-checkin-design.md)
+- [咖啡打卡设计](docs/superpowers/specs/2026-04-23-coffee-checkin-design.md)
+- [牛马日历设计](docs/superpowers/specs/2026-04-23-niuma-calendar-design.md)
 - [Quest & GP 系统设计](docs/superpowers/specs/p2-2026-04-19-quest-and-gp-system-design.md)
 - [品牌本土化设计](docs/superpowers/specs/2026-04-19-branding-localization-design.md)
 
@@ -395,7 +419,8 @@
 - [战报中心轻量看板实施](docs/superpowers/plans/2026-04-20-report-center-light-dashboard.md)
 - [打卡持久化与同步实施](docs/superpowers/plans/2026-04-22-punch-persistence-and-sync.md)
 - [经济与赛季系统实施](docs/superpowers/plans/2026-04-22-economy-and-season-system.md)
-- [续命咖啡实施](docs/superpowers/plans/2026-04-23-coffee-checkin.md)
+- [咖啡打卡实施](docs/superpowers/plans/2026-04-23-coffee-checkin.md)
+- [牛马日历实施](docs/superpowers/plans/2026-04-23-niuma-calendar.md)
 - [数据持久化和 GP 实施](docs/superpowers/plans/p2-2026-04-19-data-persistence-and-gp.md)
 - [品牌本土化实施](docs/superpowers/plans/2026-04-19-branding-localization.md)
 
@@ -413,6 +438,6 @@
 
 ---
 
-- **最后更新：** 2026年4月22日
-- **版本：** 1.1.0
-- **状态：** 经济系统研发中 🚧
+- **最后更新：** 2026年4月24日
+- **版本：** 1.2.0
+- **状态：** 经济系统研发中，咖啡打卡与牛马日历已接入 🚧
