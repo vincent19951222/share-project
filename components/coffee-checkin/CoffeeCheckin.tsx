@@ -1,76 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  addTodayCoffeeCup,
-  ApiError,
-  fetchCoffeeState,
-  removeLatestTodayCoffeeCup,
-} from "@/lib/api";
-import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
-import type { CoffeeSnapshot } from "@/lib/types";
+import { useCoffee } from "@/lib/coffee-store";
 import { CoffeeGrid } from "./CoffeeGrid";
 import { CoffeeReceipt } from "./CoffeeReceipt";
 
 export function CoffeeCheckin() {
-  const [snapshot, setSnapshot] = useState<CoffeeSnapshot | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    let timer: number | undefined;
-
-    async function sync() {
-      try {
-        const next = await fetchCoffeeState();
-        if (!cancelled) {
-          setSnapshot(next);
-          setError(null);
-        }
-      } catch (caught) {
-        if (!cancelled) {
-          const isUnauthorized = caught instanceof ApiError && caught.status === 401;
-          setError(
-            isUnauthorized
-              ? "登录状态过期，请重新登录。"
-              : caught instanceof Error
-                ? caught.message
-                : "咖啡小票同步失败，稍后再试。",
-          );
-
-          if (isUnauthorized && timer) {
-            window.clearInterval(timer);
-          }
-        }
-      }
-    }
-
-    void sync();
-    timer = window.setInterval(sync, 5000);
-
-    return () => {
-      cancelled = true;
-      if (timer) {
-        window.clearInterval(timer);
-      }
-    };
-  }, []);
-
-  async function runMutation(action: () => Promise<CoffeeSnapshot>) {
-    setBusy(true);
-    setError(null);
-
-    try {
-      setSnapshot(await action());
-      dispatchCalendarRefresh();
-      window.dispatchEvent(new Event("activity-events:refresh"));
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "操作失败");
-    } finally {
-      setBusy(false);
-    }
-  }
+  const { snapshot, busy, error, addCup, removeCup } = useCoffee();
 
   if (!snapshot) {
     if (error) {
@@ -112,14 +47,14 @@ export function CoffeeCheckin() {
         snapshot={snapshot}
         busy={busy}
         error={error}
-        onAddCup={() => void runMutation(addTodayCoffeeCup)}
-        onRemoveCup={() => void runMutation(removeLatestTodayCoffeeCup)}
+        onAddCup={() => void addCup()}
+        onRemoveCup={() => void removeCup()}
       />
       <CoffeeGrid
         snapshot={snapshot}
         busy={busy}
-        onAddCup={() => void runMutation(addTodayCoffeeCup)}
-        onRemoveCup={() => void runMutation(removeLatestTodayCoffeeCup)}
+        onAddCup={() => void addCup()}
+        onRemoveCup={() => void removeCup()}
       />
     </section>
   );

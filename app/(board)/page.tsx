@@ -8,6 +8,7 @@ import { SharedBoard } from "@/components/shared-board/SharedBoard";
 import { CoffeeCheckin } from "@/components/coffee-checkin/CoffeeCheckin";
 import { ReportCenter } from "@/components/report-center/ReportCenter";
 import { CalendarBoard } from "@/components/calendar/CalendarBoard";
+import { CoffeeProvider } from "@/lib/coffee-store";
 
 export default function Home() {
   const { state } = useBoard();
@@ -21,7 +22,7 @@ export default function Home() {
   }, [state.activeTab]);
 
   return (
-    <>
+    <CoffeeProvider>
       <Navbar />
       <div className="flex-1 w-full relative overflow-hidden">
         <div
@@ -62,6 +63,6 @@ export default function Home() {
           <ReportCenter />
         </div>
       </div>
-    </>
+    </CoffeeProvider>
   );
 }

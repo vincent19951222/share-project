@@ -2,6 +2,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CoffeeCheckin } from "@/components/coffee-checkin/CoffeeCheckin";
+import { CoffeeProvider } from "@/lib/coffee-store";
 import type { CoffeeSnapshot } from "@/lib/types";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
@@ -96,6 +97,14 @@ function mockCoffeeFetch({
   );
 }
 
+function renderCoffeeCheckin() {
+  return (
+    <CoffeeProvider>
+      <CoffeeCheckin />
+    </CoffeeProvider>
+  );
+}
+
 describe("CoffeeCheckin", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -123,7 +132,7 @@ describe("CoffeeCheckin", () => {
     });
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 
@@ -186,7 +195,7 @@ describe("CoffeeCheckin", () => {
     );
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 
@@ -203,7 +212,7 @@ describe("CoffeeCheckin", () => {
     });
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 
@@ -244,7 +253,7 @@ describe("CoffeeCheckin", () => {
     });
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 
@@ -255,6 +264,28 @@ describe("CoffeeCheckin", () => {
     expect(coffeeCalendarIcons.length).toBeGreaterThan(0);
   });
 
+  it("centers today's column when the coffee calendar loads", async () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(2)],
+    });
+
+    await act(async () => {
+      root.render(renderCoffeeCheckin());
+      await Promise.resolve();
+    });
+
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  });
+
   it("lets the calendar dialog add or remove cups after coffee is already checked in", async () => {
     mockCoffeeFetch({
       stateSnapshots: [snapshot(2)],
@@ -263,7 +294,7 @@ describe("CoffeeCheckin", () => {
     });
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 
@@ -342,7 +373,7 @@ describe("CoffeeCheckin", () => {
     });
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 
@@ -363,7 +394,7 @@ describe("CoffeeCheckin", () => {
     });
 
     await act(async () => {
-      root.render(<CoffeeCheckin />);
+      root.render(renderCoffeeCheckin());
       await Promise.resolve();
     });
 

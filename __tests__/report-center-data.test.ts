@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildReportData } from "@/components/report-center/report-data";
-import type { BoardState } from "@/lib/types";
+import type { BoardState, CoffeeSnapshot } from "@/lib/types";
 
 function createState(overrides: Partial<BoardState> = {}): BoardState {
   return {
@@ -43,9 +43,43 @@ function createState(overrides: Partial<BoardState> = {}): BoardState {
   };
 }
 
+function createCoffeeSnapshot(): CoffeeSnapshot {
+  return {
+    members: [
+      { id: "u1", name: "li", avatarKey: "male1" },
+      { id: "u2", name: "luo", avatarKey: "male2" },
+      { id: "u3", name: "liu", avatarKey: "female1" },
+    ],
+    gridData: [
+      Array.from({ length: 30 }, (_, index) => ({
+        cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 2][index] ?? 0,
+      })),
+      Array.from({ length: 30 }, (_, index) => ({
+        cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 3, 1][index] ?? 0,
+      })),
+      Array.from({ length: 30 }, (_, index) => ({
+        cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0][index] ?? 0,
+      })),
+    ],
+    today: 24,
+    totalDays: 30,
+    currentUserId: "u1",
+    stats: {
+      todayTotalCups: 3,
+      todayDrinkers: 2,
+      currentUserTodayCups: 2,
+      coffeeKing: { userId: "u1", name: "li", cups: 2 },
+    },
+  };
+}
+
 describe("buildReportData", () => {
   it("derives lightweight dashboard metrics from elapsed board state", () => {
-    const report = buildReportData(createState(), new Date("2026-04-20T12:00:00+08:00"));
+    const report = buildReportData(
+      createState(),
+      new Date("2026-04-24T12:00:00+08:00"),
+      createCoffeeSnapshot(),
+    );
 
     expect(report.title).toBe("4月牛马战报");
     expect(report.summary).toBe("本月打卡 7 次，全勤 1 天，团队节奏还有上升空间。");
@@ -65,10 +99,22 @@ describe("buildReportData", () => {
     ]);
     expect(report.peakDay).toEqual({ day: 1, count: 3 });
     expect(report.lowDay).toEqual({ day: 3, count: 0 });
-    expect(report.highlights.map((highlight) => highlight.title)).toEqual([
-      "气氛组播报",
-      "团队小结",
-      "轻提醒",
+    expect(report.coffee).toMatchObject({
+      todayTotalCups: 3,
+      todayDrinkers: 2,
+      memberCount: 3,
+      monthTotalCups: 14,
+      weekKing: { name: "luo", cups: 7 },
+      roast: "轻度续命，问题不大。",
+    });
+    expect(report.coffee.recentDays.map((point) => [point.day, point.cups])).toEqual([
+      [18, 0],
+      [19, 0],
+      [20, 3],
+      [21, 3],
+      [22, 0],
+      [23, 5],
+      [24, 3],
     ]);
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getAvatarUrl } from "@/lib/avatars";
 import { AssetIcon } from "@/components/ui/AssetIcon";
 import type { CoffeeSnapshot } from "@/lib/types";
@@ -74,10 +74,19 @@ function CoffeeCell({
 
 export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGridProps) {
   const [actionsOpen, setActionsOpen] = useState(false);
+  const todayColumnRef = useRef<HTMLDivElement | null>(null);
   const currentUserRowIndex = snapshot.members.findIndex(
     (member) => member.id === snapshot.currentUserId,
   );
   const currentUserTodayCups = snapshot.stats.currentUserTodayCups;
+
+  useEffect(() => {
+    todayColumnRef.current?.scrollIntoView?.({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [snapshot.today, snapshot.totalDays]);
 
   function runAndClose(action: () => void) {
     action();
@@ -130,6 +139,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
               return (
                 <div
                   key={day}
+                  ref={day === snapshot.today ? todayColumnRef : undefined}
                   className={`grid h-7 w-[3.25rem] place-items-center self-center rounded-full text-xs font-black ${
                     day === snapshot.today
                       ? "border-2 border-slate-900 bg-teal-200 text-slate-900 shadow-[0_2px_0_0_#1f2937]"
