@@ -13,6 +13,13 @@ function parseSeasonMonth(monthKey: string) {
   return Number.isInteger(month) && month >= 1 && month <= 12 ? month : null;
 }
 
+function getSeasonMonthLabel(month: number) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "long",
+    timeZone: "Asia/Shanghai",
+  }).format(new Date(Date.UTC(2026, month - 1, 1)));
+}
+
 function getSlotColor(month: number, colorIndex: number) {
   const theme = getSeasonTheme(month);
   return theme.memberColors[colorIndex % theme.memberColors.length];
@@ -33,8 +40,11 @@ const EMPTY_SLOT_COLOR = "#f8fafc";
 export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
   if (!activeSeason) {
     return (
-      <div className="flex h-full min-h-12 items-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 text-sm font-bold text-sub">
-        暂无进行中的赛季
+      <div className="flex min-h-16 flex-col justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-3">
+        <p className="text-sm font-bold text-main">暂无进行中的团队冲刺</p>
+        <p className="text-xs font-bold text-sub">
+          打卡仍会累计我的银子，等管理员开启下一期赛季。
+        </p>
       </div>
     );
   }
@@ -53,17 +63,24 @@ export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
   const filledSlots = Math.max(0, Math.min(activeSeason.filledSlots, targetSlots));
   const segments = targetSlots > 0 ? targetSlots : 1;
   const filledSlotContributors = buildFilledSlots(activeSeason.contributions);
+  const seasonLabel = getSeasonMonthLabel(month);
   const helperText =
     targetSlots > 0
-      ? `${activeSeason.goalName} · ${filledSlots}/${targetSlots}`
-      : `${activeSeason.goalName} · 0/0`;
+      ? `${seasonLabel}${activeSeason.goalName} · ${filledSlots}/${targetSlots}`
+      : `${seasonLabel}${activeSeason.goalName} · 0/0`;
+  const isCompleted = targetSlots > 0 && filledSlots >= targetSlots;
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-3 text-xs font-bold text-sub">
-        <span className="text-main">赛季进度</span>
+        <span className="text-main">本期团队冲刺进度</span>
         <span>{helperText}</span>
       </div>
+      <p className="text-xs font-bold text-sub">
+        {isCompleted
+          ? "已冲满，继续打卡仍累计我的银子和赛季收入。"
+          : "每次有效健身打卡推进 1 格，和个人银子分开结算。"}
+      </p>
       <div
         data-testid="season-progress-grid"
         className="grid h-4 gap-px rounded-full border-2 border-slate-800 bg-slate-800 p-px"

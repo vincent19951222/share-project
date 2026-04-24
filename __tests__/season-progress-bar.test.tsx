@@ -96,4 +96,44 @@ describe("SeasonProgressBar", () => {
 
     expect(container.textContent).toContain("赛季信息暂不可用");
   });
+
+  it("renders the empty state copy when there is no active season", () => {
+    act(() => {
+      root.render(<SeasonProgressBar activeSeason={null} />);
+    });
+
+    expect(container.textContent).toContain("暂无进行中的团队冲刺");
+    expect(container.textContent).toContain("打卡仍会累计我的银子");
+  });
+
+  it("renders the completed season copy when the sprint is fully filled", () => {
+    act(() => {
+      root.render(
+        <SeasonProgressBar
+          activeSeason={{
+            id: "season-complete",
+            monthKey: "2026-04",
+            goalName: "掉脂挑战",
+            targetSlots: 2,
+            filledSlots: 2,
+            contributions: [
+              {
+                userId: "u1",
+                name: "li",
+                avatarKey: "male1",
+                colorIndex: 0,
+                slotContribution: 2,
+                seasonIncome: 80,
+              },
+            ],
+          }}
+        />,
+      );
+    });
+
+    expect(container.textContent).toContain("本期团队冲刺进度");
+    expect(container.textContent).toContain("四月掉脂挑战 · 2/2");
+    expect(container.textContent).toContain("已冲满");
+    expect(container.textContent).toContain("继续打卡仍累计我的银子和赛季收入");
+  });
 });
