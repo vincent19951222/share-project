@@ -107,7 +107,8 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
     targetSlots: String(ALLOWED_TARGET_SLOTS[1] ?? ALLOWED_TARGET_SLOTS[0]),
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreatingSeason, setIsCreatingSeason] = useState(false);
+  const [isEndingSeason, setIsEndingSeason] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const latestListRequestRef = useRef(0);
@@ -165,7 +166,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
       return;
     }
 
-    setIsSubmitting(true);
+    setIsCreatingSeason(true);
     setMessage(null);
     setError(null);
 
@@ -201,12 +202,12 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "操作没成功，请稍后再试");
     } finally {
-      setIsSubmitting(false);
+      setIsCreatingSeason(false);
     }
   }
 
   async function handleEndSeason() {
-    setIsSubmitting(true);
+    setIsEndingSeason(true);
     setMessage(null);
     setError(null);
 
@@ -231,7 +232,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
     } catch (endError) {
       setError(endError instanceof Error ? endError.message : "操作没成功，请稍后再试");
     } finally {
-      setIsSubmitting(false);
+      setIsEndingSeason(false);
     }
   }
 
@@ -271,7 +272,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
               setForm((current) => ({ ...current, goalName: event.target.value }))
             }
             placeholder="例如: 五月掉脂挑战"
-            disabled={!canCreateSeason || isSubmitting}
+            disabled={!canCreateSeason || isCreatingSeason || isEndingSeason}
             className="rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-slate-800"
           />
         </label>
@@ -283,7 +284,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
             onChange={(event) =>
               setForm((current) => ({ ...current, targetSlots: event.target.value }))
             }
-            disabled={!canCreateSeason || isSubmitting}
+            disabled={!canCreateSeason || isCreatingSeason || isEndingSeason}
             className="rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-slate-800"
           >
             {ALLOWED_TARGET_SLOTS.map((slot) => (
@@ -295,10 +296,10 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         </label>
         <button
           type="submit"
-          disabled={!canCreateSeason || isSubmitting}
+          disabled={!canCreateSeason || isCreatingSeason || isEndingSeason}
           className="rounded-xl border-2 border-slate-800 bg-yellow-300 px-4 py-2 text-sm font-black text-slate-900 shadow-[0_3px_0_0_#1f2937] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? "正在开赛季..." : canCreateSeason ? "开启新赛季" : "已有赛季进行中"}
+          {isCreatingSeason ? "正在开赛季..." : canCreateSeason ? "开启新赛季" : "已有赛季进行中"}
         </button>
       </form>
 
@@ -332,10 +333,10 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
             <button
               type="button"
               onClick={() => void handleEndSeason()}
-              disabled={isSubmitting}
+              disabled={isCreatingSeason || isEndingSeason}
               className="rounded-full border-2 border-slate-800 bg-white px-3 py-1 text-xs font-black text-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              结束当前赛季
+              {isEndingSeason ? "正在结束..." : "结束当前赛季"}
             </button>
           ) : null}
         </div>

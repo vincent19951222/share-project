@@ -40,6 +40,17 @@ function createJsonResponse(payload: unknown, status = 200) {
   });
 }
 
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((nextResolve, nextReject) => {
+    resolve = nextResolve;
+    reject = nextReject;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe("SeasonAdminPanel", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -80,6 +91,9 @@ describe("SeasonAdminPanel", () => {
     expect(container.textContent).toContain("还差 68 格");
     expect(container.textContent).toContain("开始于 2026/04/22");
     expect(container.textContent).toContain("已有进行中的赛季，先结束当前赛季再开启新赛季");
+    expect(container.textContent).toContain("已结束");
+    expect(container.textContent).toContain("开始于 2026/03/01");
+    expect(container.textContent).toContain("结束于 2026/03/31");
     const submitButton = Array.from(container.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("已有赛季进行中"),
     );
@@ -247,16 +261,9 @@ describe("SeasonAdminPanel", () => {
 
   it("ends the active season through the current season endpoint", async () => {
     const fetchMock = fetch as ReturnType<typeof vi.fn>;
-    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: initialSeasons }));
-    fetchMock.mockResolvedValueOnce(
-      createJsonResponse({
-        season: {
-          ...initialSeasons[0],
-          status: "ENDED",
-          endedAt: "2026-04-22T14:00:00.000Z",
-        },
-      }),
-    );
+    const deferredResponse = createDeferred<Response>();
+    fetchMock.mockReturnValueOnce(Promise.resolve(createJsonResponse({ seasons: initialSeasons })));
+    fetchMock.mockReturnValueOnce(deferredResponse.promise);
 
     await act(async () => {
       root.render(<SeasonAdminPanel initialSeasons={initialSeasons} />);
@@ -265,11 +272,33 @@ describe("SeasonAdminPanel", () => {
     const endButton = Array.from(container.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("结束当前赛季"),
     );
+    const createButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("已有赛季进行中"),
+    );
 
     expect(endButton).not.toBeUndefined();
+    expect(createButton).not.toBeUndefined();
 
     await act(async () => {
       endButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(endButton?.textContent).toContain("正在结束...");
+    expect(createButton?.textContent).toContain("已有赛季进行中");
+    expect(container.textContent).not.toContain("正在开赛季...");
+
+    await act(async () => {
+      deferredResponse.resolve(
+        createJsonResponse({
+          season: {
+            ...initialSeasons[0],
+            status: "ENDED",
+            endedAt: "2026-04-22T14:00:00.000Z",
+          },
+        }),
+      );
+      await deferredResponse.promise;
     });
 
     expect(fetchMock).toHaveBeenCalledWith("/api/admin/seasons/current", {
