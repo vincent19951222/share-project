@@ -262,6 +262,9 @@ describe("CoffeeCheckin", () => {
     );
 
     expect(coffeeCalendarIcons.length).toBeGreaterThan(0);
+    expect(container.querySelector(".coffee-grid-mobile-scroll")).not.toBeNull();
+    expect(container.querySelectorAll(".coffee-grid-mobile-row")).toHaveLength(1);
+    expect(container.querySelectorAll(".coffee-grid-mobile-member")).toHaveLength(1);
   });
 
   it("centers today's column when the coffee calendar loads", async () => {

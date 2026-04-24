@@ -64,6 +64,24 @@ function createSnapshot(overrides: Partial<BoardSnapshot> = {}): BoardSnapshot {
   };
 }
 
+function createMembersState(memberCount: number): BoardState {
+  const members = Array.from({ length: memberCount }, (_, index) => ({
+    id: `user-${index + 1}`,
+    name: `Member ${index + 1}`,
+    avatarKey: index % 2 === 0 ? "male1" : "female1",
+    assetBalance: 0,
+    seasonIncome: 0,
+    slotContribution: 0,
+  }));
+
+  return {
+    ...initialState,
+    members,
+    gridData: members.map(() => Array.from({ length: initialState.totalDays }, () => false)),
+    currentUserId: members[0]?.id ?? initialState.currentUserId,
+  };
+}
+
 describe("HeatmapGrid punch flow", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -78,6 +96,27 @@ describe("HeatmapGrid punch flow", () => {
     act(() => root.unmount());
     container.remove();
     vi.unstubAllGlobals();
+  });
+
+  it("renders a compact member rail structure that can hold all mobile avatars", async () => {
+    const denseState = createMembersState(5);
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={denseState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    expect(container.querySelector(".heatmap-shell")).not.toBeNull();
+    expect(container.querySelector(".heatmap-members-column")).not.toBeNull();
+    expect(container.querySelectorAll(".heatmap-member-item")).toHaveLength(5);
+    expect(container.querySelectorAll(".heatmap-member-avatar")).toHaveLength(5);
+    expect(container.querySelectorAll(".heatmap-grid-row")).toHaveLength(5);
+    expect(container.querySelector(".heatmap-mobile-scroll")).not.toBeNull();
+    expect(container.querySelectorAll(".heatmap-mobile-row")).toHaveLength(5);
+    expect(container.querySelectorAll(".heatmap-mobile-member")).toHaveLength(5);
   });
 
   it("waits for the server snapshot before marking the punch and adds a success log", async () => {

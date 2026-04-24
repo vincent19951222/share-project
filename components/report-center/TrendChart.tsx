@@ -148,7 +148,7 @@ export function TrendChart({ dailyPoints, peakDay, lowDay }: TrendChartProps) {
           <div className="flex min-h-[280px] items-center justify-center text-sm font-bold text-sub">暂无趋势数据</div>
         ) : (
           <>
-            <div className="relative min-h-[280px] w-full">
+            <div className="report-chart-canvas relative min-h-[280px] w-full">
               <svg
                 viewBox={`0 0 ${chartWidth} ${chartHeight}`}
                 className="h-auto w-full"

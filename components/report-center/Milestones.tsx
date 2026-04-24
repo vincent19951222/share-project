@@ -24,7 +24,11 @@ export function Milestones({ metrics }: MilestonesProps) {
       {metrics.map((metric) => (
         <article
           key={metric.label}
-          className={`report-metric-card flex min-h-36 flex-col justify-between p-5 ${toneClasses[metric.tone]}`}
+          className={`report-metric-card ${
+            metric.label === "团队完成率" || metric.label === "总打卡次数"
+              ? "report-metric-card-primary"
+              : ""
+          } flex min-h-36 flex-col justify-between p-5 ${toneClasses[metric.tone]}`}
         >
           <div className="report-metric-label">{metric.label}</div>
           <div className="mt-3 break-words text-4xl font-black leading-none">{metric.value}</div>

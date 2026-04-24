@@ -62,7 +62,7 @@ export function CoffeeReceipt({
     : "暂无";
 
   return (
-    <section className="flex min-h-0 flex-col overflow-hidden rounded-[1.2rem] border-4 border-slate-900 bg-orange-50 shadow-[8px_8px_0_0_rgba(63,42,29,0.9)]">
+    <section className="coffee-receipt flex min-h-0 flex-col overflow-hidden rounded-[1.2rem] border-4 border-slate-900 bg-orange-50 shadow-[8px_8px_0_0_rgba(63,42,29,0.9)]">
       <header className="border-b-[3px] border-dashed border-amber-900/40 bg-yellow-50 p-6">
         <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
           Daily Coffee Receipt
@@ -88,26 +88,26 @@ export function CoffeeReceipt({
       </div>
 
       <div className="grid gap-3 p-4">
-        <div className="rounded-2xl border-[3px] border-slate-900 bg-orange-100 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
+        <div className="coffee-today-panel rounded-2xl border-[3px] border-slate-900 bg-orange-100 p-4">
+          <div className="coffee-today-eyebrow text-xs font-black uppercase tracking-[0.12em] text-amber-700">
             My Coffee Today
           </div>
-          <div className="mt-1 text-lg font-black text-amber-950">
+          <div className="coffee-today-title mt-1 text-lg font-black text-amber-950">
             {myCups === 0 ? "今天还没续命" : `今天已续命 ${myCups} 杯`}
           </div>
-          <div className="mt-3 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+          <div className="coffee-today-controls mt-3 grid grid-cols-[auto_1fr_auto] items-center gap-3">
             <button
               type="button"
               disabled={busy || myCups === 0}
               onClick={onRemoveCup}
-              className="h-12 rounded-full border-[3px] border-slate-900 bg-orange-200 px-4 text-sm font-black shadow-[0_4px_0_0_#1f2937] disabled:cursor-not-allowed disabled:opacity-40"
+              className="coffee-cup-action h-12 rounded-full border-[3px] border-slate-900 bg-orange-200 px-4 text-sm font-black shadow-[0_4px_0_0_#1f2937] disabled:cursor-not-allowed disabled:opacity-40"
             >
               -1 杯
             </button>
-            <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border-[3px] border-slate-900 bg-white px-4 py-3">
+            <div className="coffee-cup-summary flex min-w-0 items-center justify-between gap-3 rounded-2xl border-[3px] border-slate-900 bg-white px-4 py-3">
               <div>
-                <div className="text-xs font-black text-amber-700">当前杯数</div>
-                <div className="text-2xl font-black text-amber-950">{myCups} 杯</div>
+                <div className="coffee-cup-summary-label text-xs font-black text-amber-700">当前杯数</div>
+                <div className="coffee-cup-summary-value text-2xl font-black text-amber-950">{myCups} 杯</div>
               </div>
               <CupStack cups={myCups} />
             </div>
@@ -115,7 +115,7 @@ export function CoffeeReceipt({
               type="button"
               disabled={busy}
               onClick={onAddCup}
-              className="h-12 rounded-full border-[3px] border-slate-900 bg-teal-200 px-4 text-sm font-black shadow-[0_4px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
+              className="coffee-cup-action h-12 rounded-full border-[3px] border-slate-900 bg-teal-200 px-4 text-sm font-black shadow-[0_4px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
             >
               +1 杯
             </button>

@@ -7,9 +7,13 @@ interface ReportHeaderProps {
   title: string;
   summary: string;
   teamVault: ReportData["teamVault"];
+  metrics: ReportData["metrics"];
 }
 
-export function ReportHeader({ title, summary, teamVault }: ReportHeaderProps) {
+export function ReportHeader({ title, summary, teamVault, metrics }: ReportHeaderProps) {
+  const completionMetric = metrics.find((metric) => metric.label === "团队完成率");
+  const totalPunchMetric = metrics.find((metric) => metric.label === "总打卡次数");
+
   return (
     <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div className="report-hero">
@@ -19,6 +23,25 @@ export function ReportHeader({ title, summary, teamVault }: ReportHeaderProps) {
           {summary}
           <span className="h-5 w-5 shrink-0" dangerouslySetInnerHTML={{ __html: SvgIcons.medal }} />
         </p>
+        <div className="report-mobile-kpis mt-4">
+          <div className="report-mobile-kpi">
+            <span>牛马金库</span>
+            <strong>{teamVault.current.toLocaleString("zh-CN")}</strong>
+          </div>
+          {completionMetric ? (
+            <div className="report-mobile-kpi">
+              <span>{completionMetric.label}</span>
+              <strong>{completionMetric.value}</strong>
+            </div>
+          ) : null}
+          {totalPunchMetric ? (
+            <div className="report-mobile-kpi">
+              <span>{totalPunchMetric.label}</span>
+              <strong>{totalPunchMetric.value}</strong>
+            </div>
+          ) : null}
+        </div>
+        <div className="report-mobile-season mt-2">{teamVault.helper}</div>
       </div>
       <div className="report-vault-card min-w-48 lg:max-w-xs lg:text-right">
         <div className="text-[11px] font-black uppercase tracking-[0.18em] text-sub">牛马金库</div>

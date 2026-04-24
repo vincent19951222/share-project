@@ -33,15 +33,15 @@ export function CalendarGrid({ snapshot }: { snapshot: CalendarMonthSnapshot }) 
   const cells = buildCalendarGrid(snapshot, getFirstDayOffset(snapshot.monthKey));
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-black text-slate-500 sm:text-xs">
+    <section className="calendar-grid-section flex min-h-0 flex-1 flex-col gap-3">
+      <div className="calendar-weekday-row grid grid-cols-7 gap-2 text-center text-[11px] font-black text-slate-500 sm:text-xs">
         {WEEKDAY_LABELS.map((label) => (
-          <div key={label} className="rounded-full bg-slate-100 py-2">
-            周{label}
+          <div key={label} className="calendar-weekday rounded-full bg-slate-100 py-2">
+            <span className="calendar-week-prefix">周</span>{label}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-2 pb-1">
+      <div className="calendar-month-grid grid grid-cols-7 gap-2 pb-1">
         {cells.map((cell, index) =>
           cell.kind === "blank" ? (
             <div

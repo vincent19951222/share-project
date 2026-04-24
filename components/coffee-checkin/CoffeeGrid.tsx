@@ -38,7 +38,7 @@ function CoffeeCell({
   onOpenActions: () => void;
 }) {
   if (isFuture) {
-    return <div className="h-[3.25rem] w-[3.25rem] shrink-0 rounded-2xl border-2 border-dashed border-orange-300" />;
+    return <div className="coffee-calendar-cell h-[3.25rem] w-[3.25rem] shrink-0 rounded-2xl border-2 border-dashed border-orange-300" />;
   }
 
   if (isTodayForCurrentUser) {
@@ -48,7 +48,7 @@ function CoffeeCell({
         disabled={busy}
         onClick={onOpenActions}
         aria-label={cups === 0 ? "确认今天咖啡打卡" : "调整今天咖啡杯数"}
-        className={`grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 font-black shadow-[0_4px_0_0_#1f2937] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60 ${
+        className={`coffee-calendar-cell grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 font-black shadow-[0_4px_0_0_#1f2937] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60 ${
           cups === 0 ? "bg-yellow-300 text-xl" : "bg-orange-100 text-amber-950"
         }`}
       >
@@ -59,14 +59,14 @@ function CoffeeCell({
 
   if (cups > 0) {
     return (
-      <div className="grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-slate-900 bg-orange-100 font-black text-amber-950 shadow-[0_3px_0_0_rgba(63,42,29,0.65)]">
+      <div className="coffee-calendar-cell grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-slate-900 bg-orange-100 font-black text-amber-950 shadow-[0_3px_0_0_rgba(63,42,29,0.65)]">
         <CoffeeCupIcon cups={cups} />
       </div>
     );
   }
 
   return (
-    <div className="grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-orange-200 bg-orange-50 font-black text-orange-200">
+    <div className="coffee-calendar-cell grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-orange-200 bg-orange-50 font-black text-orange-200">
       ·
     </div>
   );
@@ -74,14 +74,20 @@ function CoffeeCell({
 
 export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGridProps) {
   const [actionsOpen, setActionsOpen] = useState(false);
-  const todayColumnRef = useRef<HTMLDivElement | null>(null);
+  const desktopTodayColumnRef = useRef<HTMLDivElement | null>(null);
+  const mobileTodayColumnRef = useRef<HTMLDivElement | null>(null);
   const currentUserRowIndex = snapshot.members.findIndex(
     (member) => member.id === snapshot.currentUserId,
   );
   const currentUserTodayCups = snapshot.stats.currentUserTodayCups;
 
   useEffect(() => {
-    todayColumnRef.current?.scrollIntoView?.({
+    desktopTodayColumnRef.current?.scrollIntoView?.({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+    mobileTodayColumnRef.current?.scrollIntoView?.({
       behavior: "smooth",
       block: "nearest",
       inline: "center",
@@ -94,7 +100,8 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
   }
 
   return (
-    <section className="flex min-h-0 flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-50 bg-white shadow-sm">
+    <>
+    <section className="coffee-grid-desktop-shell flex min-h-0 flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-50 bg-white shadow-sm">
       <header className="flex min-h-20 items-center justify-between gap-4 border-b-[3px] border-orange-100 bg-orange-50 px-5 py-4">
         <div>
           <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
@@ -139,7 +146,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
               return (
                 <div
                   key={day}
-                  ref={day === snapshot.today ? todayColumnRef : undefined}
+                  ref={day === snapshot.today ? desktopTodayColumnRef : undefined}
                   className={`grid h-7 w-[3.25rem] place-items-center self-center rounded-full text-xs font-black ${
                     day === snapshot.today
                       ? "border-2 border-slate-900 bg-teal-200 text-slate-900 shadow-[0_2px_0_0_#1f2937]"
@@ -175,7 +182,82 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
         </div>
       </div>
 
-      {actionsOpen ? (
+    </section>
+
+    <section className="coffee-grid-mobile-shell hidden min-h-0 flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-50 bg-white shadow-sm">
+      <header className="flex min-h-16 items-center justify-between gap-3 border-b-[3px] border-orange-100 bg-orange-50 px-4 py-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.12em] text-amber-700">
+            Team Coffee Calendar
+          </div>
+          <h2 className="mt-1 text-2xl font-black leading-none text-amber-950">
+            团队续命月历
+          </h2>
+        </div>
+        <div className="flex shrink-0 flex-wrap justify-end gap-2 text-[10px] font-black text-amber-800">
+          <span>已续命</span>
+          <span>空杯</span>
+          <span>今天</span>
+        </div>
+      </header>
+
+      <div className="coffee-grid-mobile-scroll min-h-0 flex-1 overflow-auto scroll-smooth">
+        <div className="coffee-grid-mobile-table w-max">
+          <div className="coffee-grid-mobile-header flex items-center">
+            <div className="coffee-grid-mobile-member-head sticky left-0 z-20 flex items-center justify-center border-r-[3px] border-orange-100 bg-orange-50 text-xs font-black text-amber-700">
+              MEMBERS
+            </div>
+            {Array.from({ length: snapshot.totalDays }, (_, index) => {
+              const day = index + 1;
+              return (
+                <div
+                  key={day}
+                  ref={day === snapshot.today ? mobileTodayColumnRef : undefined}
+                  className={`coffee-grid-mobile-day grid place-items-center rounded-full text-xs font-black ${
+                    day === snapshot.today
+                      ? "border-2 border-slate-900 bg-teal-200 text-slate-900 shadow-[0_2px_0_0_#1f2937]"
+                      : "text-amber-700"
+                  }`}
+                >
+                  {day}
+                </div>
+              );
+            })}
+          </div>
+          {snapshot.members.map((member, rowIndex) => (
+            <div key={member.id} className="coffee-grid-mobile-row flex items-center">
+              <div className="coffee-grid-mobile-member sticky left-0 z-10 flex items-center gap-2 border-r-[3px] border-orange-100 bg-white">
+                <img
+                  src={getAvatarUrl(member.avatarKey)}
+                  alt={member.name}
+                  className="coffee-grid-mobile-avatar shrink-0 rounded-full border-2 border-slate-900 bg-white object-cover"
+                />
+                <span className="coffee-grid-mobile-name min-w-0 truncate font-black text-amber-950">
+                  {member.name}
+                </span>
+              </div>
+              {Array.from({ length: snapshot.totalDays }, (_, index) => {
+                const day = index + 1;
+                return (
+                  <CoffeeCell
+                    key={day}
+                    cups={snapshot.gridData[rowIndex]?.[index]?.cups ?? 0}
+                    isFuture={day > snapshot.today}
+                    isTodayForCurrentUser={
+                      rowIndex === currentUserRowIndex && day === snapshot.today
+                    }
+                    busy={busy}
+                    onOpenActions={() => setActionsOpen(true)}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {actionsOpen ? (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/20 p-4"
           role="dialog"
@@ -226,7 +308,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
             </div>
           </div>
         </div>
-      ) : null}
-    </section>
+    ) : null}
+    </>
   );
 }

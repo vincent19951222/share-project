@@ -10,8 +10,8 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
         hasActivity ? "calendar-day-cell-active" : ""
       }`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-base font-black text-slate-900 sm:text-lg">{cell.day}</span>
+      <div className="calendar-day-top flex items-start justify-between gap-2">
+        <span className="calendar-day-number text-base font-black text-slate-900 sm:text-lg">{cell.day}</span>
         {cell.workedOut ? (
           <span className="calendar-workout-chip" aria-label="已训练">
             练

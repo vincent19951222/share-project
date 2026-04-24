@@ -11,12 +11,17 @@ export function HeatmapGrid() {
   const { state, dispatch } = useBoard();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const desktopScrollRef = useRef<HTMLDivElement>(null);
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
   const currentUserIndex = state.members.findIndex((member) => member.id === state.currentUserId);
 
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollLeft = (state.today - 2) * 60;
+    const scrollLeft = (state.today - 2) * 60;
+    if (desktopScrollRef.current) {
+      desktopScrollRef.current.scrollLeft = scrollLeft;
+    }
+    if (mobileScrollRef.current) {
+      mobileScrollRef.current.scrollLeft = scrollLeft;
     }
   }, [state.today]);
 
@@ -112,100 +117,153 @@ export function HeatmapGrid() {
     }
   }
 
+  function renderPunchCell(rowIndex: number, index: number) {
+    const day = index + 1;
+    const status = state.gridData[rowIndex][index];
+    const isCurrentUser = rowIndex === currentUserIndex;
+
+    if (day < state.today) {
+      return <div key={day} className={`cell ${status ? "cell-punched" : "cell-missed"}`}>{status ? "✓" : ""}</div>;
+    }
+
+    if (day === state.today && !status && isCurrentUser) {
+      return (
+        <PunchPopup
+          key={day}
+          busy={submitting}
+          error={error}
+          onConfirm={handlePunchConfirm}
+        />
+      );
+    }
+
+    if (day === state.today && status && isCurrentUser) {
+      return (
+        <PunchPopup
+          key={day}
+          busy={submitting}
+          error={error}
+          onConfirm={handlePunchUndo}
+          triggerContent="✓"
+          triggerClassName="cell cell-punched cursor-pointer disabled:opacity-50"
+          title="撤销今天打卡"
+          description="确认撤销今天的打卡吗？"
+          helperText="撤销后会回滚今天获得的银子、连签和赛季进度。"
+          confirmLabel="确认撤销"
+          busyLabel="撤销中..."
+        />
+      );
+    }
+
+    if (day === state.today && status) {
+      return <div key={day} className="cell cell-punched">✓</div>;
+    }
+
+    return <div key={day} className="cell cell-future opacity-50" />;
+  }
+
   return (
-    <main className="flex-1 w-full soft-card flex relative overflow-hidden">
-      <div className="w-28 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
-        <div className="h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">
-          MEMBERS
-        </div>
-        <div className="flex-1 flex flex-col py-2 justify-between items-center">
-          {state.members.map((member, index) => (
-            <div key={member.id} className="flex flex-col items-center gap-1 relative">
-              <div
-                className={`h-10 w-10 flex items-center justify-center rounded-full shadow-sm border overflow-hidden bg-slate-50 ${
-                  index === currentUserIndex ? "border-2 border-slate-800 ring-2 ring-yellow-300" : "border-slate-200"
-                } relative`}
-              >
-                <img src={getAvatarUrl(member.avatarKey)} alt={member.name} className="w-full h-full object-cover" />
-              </div>
-              <span className="text-[10px] font-bold text-sub truncate max-w-[4rem] text-center">{member.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div ref={containerRef} className="flex-1 overflow-x-auto no-scrollbar relative flex flex-col scroll-smooth">
-        <div className="h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center px-4 gap-3 shrink-0 w-max sticky top-0 z-0">
-          {Array.from({ length: state.totalDays }, (_, index) => {
-            const day = index + 1;
-            const isToday = day === state.today;
-
-            return (
-              <div
-                key={day}
-                className={`w-12 flex justify-center items-center text-xs font-bold rounded-full h-6 ${
-                  isToday
-                    ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]"
-                    : "text-slate-400"
-                }`}
-              >
-                {day}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex-1 py-2 px-4 w-max relative">
-          <div className="flex flex-col justify-between h-full relative z-10">
-            {state.members.map((member, rowIndex) => (
-              <div key={member.id} className="flex gap-3 h-12 items-center">
-                {Array.from({ length: state.totalDays }, (_, index) => {
-                  const day = index + 1;
-                  const status = state.gridData[rowIndex][index];
-                  const isCurrentUser = rowIndex === currentUserIndex;
-
-                  if (day < state.today) {
-                    return <div key={day} className={`cell ${status ? "cell-punched" : "cell-missed"}`}>{status ? "✓" : ""}</div>;
-                  }
-
-                  if (day === state.today && !status && isCurrentUser) {
-                    return (
-                      <PunchPopup
-                        key={day}
-                        busy={submitting}
-                        error={error}
-                        onConfirm={handlePunchConfirm}
-                      />
-                    );
-                  }
-
-                  if (day === state.today && status && isCurrentUser) {
-                    return (
-                      <PunchPopup
-                        key={day}
-                        busy={submitting}
-                        error={error}
-                        onConfirm={handlePunchUndo}
-                        triggerContent="✓"
-                        triggerClassName="cell cell-punched cursor-pointer disabled:opacity-50"
-                        title="撤销今天打卡"
-                        description="确认撤销今天的打卡吗？"
-                        helperText="撤销后会回滚今天获得的银子、连签和赛季进度。"
-                        confirmLabel="确认撤销"
-                        busyLabel="撤销中..."
-                      />
-                    );
-                  }
-
-                  if (day === state.today && status) {
-                    return <div key={day} className="cell cell-punched">✓</div>;
-                  }
-
-                  return <div key={day} className="cell cell-future opacity-50" />;
-                })}
+    <>
+      <main className="heatmap-shell heatmap-desktop-shell flex-1 w-full soft-card flex relative overflow-hidden">
+        <div className="heatmap-members-column w-28 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
+          <div className="heatmap-members-heading h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">
+            MEMBERS
+          </div>
+          <div className="heatmap-members-list flex-1 flex flex-col py-2 justify-between items-center">
+            {state.members.map((member, index) => (
+              <div key={member.id} className="heatmap-member-item flex flex-col items-center gap-1 relative">
+                <div
+                  className={`heatmap-member-avatar h-10 w-10 flex items-center justify-center rounded-full shadow-sm border overflow-hidden bg-slate-50 ${
+                    index === currentUserIndex ? "border-2 border-slate-800 ring-2 ring-yellow-300" : "border-slate-200"
+                  } relative`}
+                >
+                  <img src={getAvatarUrl(member.avatarKey)} alt={member.name} className="w-full h-full object-cover" />
+                </div>
+                <span className="heatmap-member-name text-[10px] font-bold text-sub truncate max-w-[4rem] text-center">
+                  {member.name}
+                </span>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </main>
+        <div
+          ref={desktopScrollRef}
+          className="heatmap-scroll-pane flex-1 overflow-x-auto no-scrollbar relative flex flex-col scroll-smooth"
+        >
+          <div className="heatmap-days-header h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center px-4 gap-3 shrink-0 w-max sticky top-0 z-0">
+            {Array.from({ length: state.totalDays }, (_, index) => {
+              const day = index + 1;
+              const isToday = day === state.today;
+
+              return (
+                <div
+                  key={day}
+                  className={`heatmap-day-label w-12 flex justify-center items-center text-xs font-bold rounded-full h-6 ${
+                    isToday
+                      ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {day}
+                </div>
+              );
+            })}
+          </div>
+          <div className="heatmap-grid-body flex-1 py-2 px-4 w-max relative">
+            <div className="flex flex-col justify-between h-full relative z-10">
+              {state.members.map((member, rowIndex) => (
+                <div key={member.id} className="heatmap-grid-row flex gap-3 h-12 items-center">
+                  {Array.from({ length: state.totalDays }, (_, index) => renderPunchCell(rowIndex, index))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <main className="heatmap-mobile-shell flex-1 w-full soft-card relative overflow-hidden">
+        <div ref={mobileScrollRef} className="heatmap-mobile-scroll no-scrollbar overflow-auto scroll-smooth">
+          <div className="heatmap-mobile-table w-max">
+            <div className="heatmap-mobile-header flex items-center">
+              <div className="heatmap-mobile-member-head sticky left-0 z-20 flex items-center justify-center border-r-2 border-slate-100 bg-slate-50 font-bold text-sub">
+                MEMBERS
+              </div>
+              {Array.from({ length: state.totalDays }, (_, index) => {
+                const day = index + 1;
+                const isToday = day === state.today;
+
+                return (
+                  <div
+                    key={day}
+                    className={`heatmap-mobile-day flex items-center justify-center text-xs font-bold rounded-full ${
+                      isToday
+                        ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    {day}
+                  </div>
+                );
+              })}
+            </div>
+            {state.members.map((member, rowIndex) => (
+              <div key={member.id} className="heatmap-mobile-row flex items-center">
+                <div className="heatmap-mobile-member sticky left-0 z-10 flex flex-col items-center justify-center bg-white border-r-2 border-slate-100">
+                  <div
+                    className={`heatmap-mobile-avatar flex items-center justify-center rounded-full shadow-sm border overflow-hidden bg-slate-50 ${
+                      rowIndex === currentUserIndex ? "border-2 border-slate-800 ring-2 ring-yellow-300" : "border-slate-200"
+                    } relative`}
+                  >
+                    <img src={getAvatarUrl(member.avatarKey)} alt={member.name} className="w-full h-full object-cover" />
+                  </div>
+                  <span className="heatmap-mobile-name font-bold text-sub truncate text-center">{member.name}</span>
+                </div>
+                {Array.from({ length: state.totalDays }, (_, index) => renderPunchCell(rowIndex, index))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    </>
   );
 }

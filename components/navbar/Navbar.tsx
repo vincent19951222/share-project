@@ -13,11 +13,17 @@ export function Navbar() {
   const { state, dispatch } = useBoard();
   const [profileOpen, setProfileOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const currentMember =
     state.members.find((member) => member.id === state.currentUserId) ??
     state.members[0] ??
     null;
+
+  function handleTabChange(tab: "punch" | "board" | "coffee" | "calendar" | "dash") {
+    dispatch({ type: "SET_TAB", tab });
+    setMobileTabsOpen(false);
+  }
 
   const handleProfileClick = useCallback(() => {
     if (!currentMember) {
@@ -29,6 +35,8 @@ export function Navbar() {
   const handleClickOutside = useCallback(() => {
     setProfileOpen(false);
   }, []);
+
+  const mobileNavLabel = mobileTabsOpen ? "收起导航" : "展开导航";
 
   return (
     <>
@@ -48,10 +56,10 @@ export function Navbar() {
               </div>
               脱脂牛马
             </div>
-            <div className="calendar-tab-strip flex min-w-0 gap-2 overflow-x-auto rounded-full border-2 border-slate-200 bg-slate-100 p-1">
+            <div className="calendar-tab-strip hidden min-w-0 gap-2 overflow-x-auto rounded-full border-2 border-slate-200 bg-slate-100 p-1 min-[761px]:flex">
               <TabBtn
                 active={state.activeTab === "punch"}
-                onClick={() => dispatch({ type: "SET_TAB", tab: "punch" })}
+                onClick={() => handleTabChange("punch")}
               >
                 <AssetIcon name="workout" className="h-4 w-4 object-contain" />
                 健身打卡
@@ -59,7 +67,7 @@ export function Navbar() {
               <TabBtn
                 active={state.activeTab === "board"}
                 className="board-tab"
-                onClick={() => dispatch({ type: "SET_TAB", tab: "board" })}
+                onClick={() => handleTabChange("board")}
               >
                 <AssetIcon name="board" className="h-4 w-4 object-contain" />
                 共享看板
@@ -67,7 +75,7 @@ export function Navbar() {
               <TabBtn
                 active={state.activeTab === "coffee"}
                 className="coffee-tab"
-                onClick={() => dispatch({ type: "SET_TAB", tab: "coffee" })}
+                onClick={() => handleTabChange("coffee")}
               >
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
                 续命咖啡
@@ -75,7 +83,7 @@ export function Navbar() {
               <TabBtn
                 active={state.activeTab === "calendar"}
                 className="calendar-tab"
-                onClick={() => dispatch({ type: "SET_TAB", tab: "calendar" })}
+                onClick={() => handleTabChange("calendar")}
               >
                 <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
                 牛马日历
@@ -83,14 +91,23 @@ export function Navbar() {
               <TabBtn
                 active={state.activeTab === "dash"}
                 className="report-tab"
-                onClick={() => dispatch({ type: "SET_TAB", tab: "dash" })}
+                onClick={() => handleTabChange("dash")}
               >
                 <AssetIcon name="report" className="h-4 w-4 object-contain" />
                 战报中心
               </TabBtn>
             </div>
           </div>
-          <div className="relative shrink-0">
+          <div className="relative flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label={mobileNavLabel}
+              aria-expanded={mobileTabsOpen}
+              onClick={() => setMobileTabsOpen((open) => !open)}
+              className="mobile-nav-toggle flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-800 bg-white text-xl font-black text-slate-800 shadow-[0_3px_0_0_#1f2937] min-[761px]:hidden"
+            >
+              <span aria-hidden="true">{mobileTabsOpen ? "×" : "≡"}</span>
+            </button>
             <button
               onClick={handleProfileClick}
               disabled={!currentMember}
@@ -105,9 +122,71 @@ export function Navbar() {
               </div>
               <span className="font-bold text-sm">{currentMember?.name ?? "未分配成员"}</span>
             </button>
-            {profileOpen && currentMember ? <ProfileDropdown onDismiss={handleClickOutside} onEditProfile={() => { setProfileOpen(false); setEditModalOpen(true); }} /> : null}
+            {profileOpen && currentMember ? (
+              <ProfileDropdown
+                onDismiss={handleClickOutside}
+                onEditProfile={() => {
+                  setProfileOpen(false);
+                  setEditModalOpen(true);
+                }}
+              />
+            ) : null}
           </div>
         </div>
+        {mobileTabsOpen ? (
+          <div className="mobile-tab-panel mt-3 flex flex-col gap-2 rounded-[1.5rem] border-4 border-slate-800 bg-white p-3 shadow-[0_8px_0_0_#1f2937] min-[761px]:hidden">
+            <TabBtn
+              active={state.activeTab === "punch"}
+              className="mobile-tab-btn justify-between"
+              onClick={() => handleTabChange("punch")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="workout" className="h-4 w-4 object-contain" />
+                健身打卡
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={state.activeTab === "board"}
+              className="mobile-tab-btn board-tab justify-between"
+              onClick={() => handleTabChange("board")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="board" className="h-4 w-4 object-contain" />
+                共享看板
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={state.activeTab === "coffee"}
+              className="mobile-tab-btn coffee-tab justify-between"
+              onClick={() => handleTabChange("coffee")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
+                续命咖啡
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={state.activeTab === "calendar"}
+              className="mobile-tab-btn calendar-tab justify-between"
+              onClick={() => handleTabChange("calendar")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
+                牛马日历
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={state.activeTab === "dash"}
+              className="mobile-tab-btn report-tab justify-between"
+              onClick={() => handleTabChange("dash")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="report" className="h-4 w-4 object-contain" />
+                战报中心
+              </span>
+            </TabBtn>
+          </div>
+        ) : null}
       </nav>
       {editModalOpen && currentMember ? (
         <EditProfileModal

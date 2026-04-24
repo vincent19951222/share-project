@@ -42,7 +42,7 @@ export function CoffeeCheckin() {
   }
 
   return (
-    <section className="grid h-full min-h-0 grid-cols-[minmax(320px,0.95fr)_minmax(520px,1.9fr)] gap-4 max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto">
+    <section className="coffee-checkin-shell grid h-full min-h-0 grid-cols-[minmax(320px,0.95fr)_minmax(520px,1.9fr)] gap-4 max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto">
       <CoffeeReceipt
         snapshot={snapshot}
         busy={busy}

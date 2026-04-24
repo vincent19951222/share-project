@@ -34,9 +34,17 @@ vi.mock("@/lib/store", () => ({
 describe("coffee tab navigation", () => {
   let container: HTMLDivElement;
   let root: Root;
+  const setViewportWidth = (width: number) => {
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      writable: true,
+      value: width,
+    });
+  };
 
   beforeEach(() => {
     dispatch.mockClear();
+    setViewportWidth(1280);
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
@@ -88,6 +96,42 @@ describe("coffee tab navigation", () => {
       "/assets/icons/calendar-pixel.svg",
       "/assets/icons/report-pixel.svg",
     ]);
+  });
+
+  it("keeps mobile navigation collapsed until the toggle is opened", async () => {
+    setViewportWidth(390);
+    const { Navbar } = await import("@/components/navbar/Navbar");
+
+    await act(async () => {
+      root.render(<Navbar />);
+    });
+
+    const toggleButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.getAttribute("aria-label") === "展开导航",
+    );
+
+    expect(toggleButton).toBeDefined();
+    expect(toggleButton?.getAttribute("aria-expanded")).toBe("false");
+    expect(container.querySelector(".mobile-tab-panel")).toBeNull();
+
+    await act(async () => {
+      toggleButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(toggleButton?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector(".mobile-tab-panel")).not.toBeNull();
+
+    const coffeeButton = Array.from(container.querySelectorAll(".mobile-tab-panel button")).find(
+      (button) => button.textContent?.includes("续命咖啡"),
+    );
+    expect(coffeeButton).toBeDefined();
+
+    await act(async () => {
+      coffeeButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "coffee" });
+    expect(container.querySelector(".mobile-tab-panel")).toBeNull();
   });
 
   it("uses the managed vault trophy icon in the team header", async () => {

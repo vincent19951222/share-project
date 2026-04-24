@@ -25,7 +25,7 @@ function CoffeeBars({ days }: { days: CoffeeReportData["recentDays"] }) {
   const maxCups = Math.max(1, ...days.map((day) => day.cups));
 
   return (
-    <div className="mt-4 rounded-2xl border-[3px] border-slate-900 bg-white p-4">
+    <div className="coffee-report-bars mt-4 rounded-2xl border-[3px] border-slate-900 bg-white p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
           Caffeine Wave
@@ -106,7 +106,7 @@ function CoffeeReceiptScene({
   const receiptSummary = receiptLines.map((line) => `${line.label} ${line.value}`).join("，");
 
   return (
-    <div className="relative z-10 mt-2 flex min-h-0 flex-1 items-center justify-center gap-1 py-1 sm:gap-3 xl:gap-2">
+    <div className="coffee-report-scene relative z-10 mt-2 flex min-h-0 flex-1 items-center justify-center gap-1 py-1 sm:gap-3 xl:gap-2">
       <div className="relative grid min-w-0 flex-[0_1_56%] place-items-center">
         <div className="relative aspect-[2/3] w-full max-w-[292px]">
           <div className="pointer-events-none absolute left-1/2 top-[5%] h-14 w-28 -translate-x-1/2" aria-hidden="true">
@@ -167,16 +167,16 @@ export function CoffeeReportPanel({
   error,
 }: CoffeeReportPanelProps) {
   return (
-    <aside className="relative flex min-h-[620px] flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-100 bg-[radial-gradient(circle_at_50%_12%,rgba(255,248,214,0.95),transparent_34%),linear-gradient(180deg,#fff8ea,#ffedd5)] p-5 shadow-sm xl:col-span-1 xl:min-h-0">
+    <aside className="coffee-report-panel relative flex min-h-[620px] flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-100 bg-[radial-gradient(circle_at_50%_12%,rgba(255,248,214,0.95),transparent_34%),linear-gradient(180deg,#fff8ea,#ffedd5)] p-5 shadow-sm xl:col-span-1 xl:min-h-0">
       <div className="pointer-events-none absolute inset-x-4 top-16 h-28 rounded-full bg-white/50 blur-2xl" aria-hidden="true" />
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className="coffee-report-heading flex items-start justify-between gap-4">
+        <div className="min-w-0">
           <div className="report-chip bg-white text-amber-900">团队咖啡打卡</div>
-          <h2 className="mt-3 text-2xl font-black leading-tight text-amber-950">
+          <h2 className="coffee-report-title mt-3 text-2xl font-black leading-tight text-amber-950">
             咖啡能量站
           </h2>
         </div>
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 bg-yellow-200 shadow-[0_4px_0_0_#1f2937]">
+        <div className="coffee-report-icon grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 bg-yellow-200 shadow-[0_4px_0_0_#1f2937]">
           <AssetIcon name="coffee" className="h-8 w-8 object-contain" />
         </div>
       </div>

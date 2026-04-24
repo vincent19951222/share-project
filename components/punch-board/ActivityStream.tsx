@@ -138,7 +138,7 @@ export function ActivityStream() {
   const hasActivity = sortedEvents.length > 0 || state.logs.length > 0;
 
   return (
-    <footer className="soft-card relative flex h-[20vh] w-full shrink-0 flex-col overflow-hidden">
+    <footer className="activity-stream soft-card relative flex h-[20vh] w-full shrink-0 flex-col overflow-hidden">
       <div className="flex justify-between rounded-t-[1.25rem] border-b-2 border-slate-100 bg-slate-50 px-6 py-2 text-[10px] font-bold tracking-wider text-sub">
         <span>活动动态（实时）</span>
         <span

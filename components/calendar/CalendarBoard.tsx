@@ -123,7 +123,7 @@ export function CalendarBoard() {
     snapshot !== null && snapshot.monthKey !== snapshot.currentMonthKey;
 
   return (
-    <section className="absolute inset-0 overflow-y-auto p-4 sm:p-6">
+    <section className="calendar-board-viewport absolute inset-0 overflow-y-auto p-4 sm:p-6">
       <div className="soft-card calendar-board-shell flex min-h-full flex-col gap-4 overflow-hidden p-4 sm:p-6">
         <CalendarHeader
           monthLabel={monthLabel}
@@ -141,7 +141,7 @@ export function CalendarBoard() {
                 {error}
               </div>
             ) : null}
-            <div className="flex flex-wrap gap-3 text-sm font-black text-slate-900">
+            <div className="calendar-summary-row flex flex-wrap gap-3 text-sm font-black text-slate-900">
               <div className="calendar-summary-chip bg-yellow-200">
                 本月练了 {snapshot.workoutDays} 天
               </div>
