@@ -75,8 +75,44 @@ describe("SeasonAdminPanel", () => {
     expect(container.textContent).toContain("五月掉脂挑战");
     expect(container.textContent).toContain("三月冲刺");
     expect(container.textContent).toContain("结束当前赛季");
+    expect(container.textContent).toContain("当前正在冲刺");
+    expect(container.textContent).toContain("完成率 15%");
+    expect(container.textContent).toContain("还差 68 格");
+    expect(container.textContent).toContain("开始于 2026/04/22");
+    expect(container.textContent).toContain("已有进行中的赛季，先结束当前赛季再开启新赛季");
+    const submitButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("已有赛季进行中"),
+    );
+    expect(submitButton).not.toBeUndefined();
+    expect(submitButton).toHaveProperty("disabled", true);
     expect(container.querySelector('a[href="/"]')).not.toBeNull();
     expect(container.querySelector('select[name="targetSlots"]')).not.toBeNull();
+  });
+
+  it("shows a create-ready empty state when there is no active season", async () => {
+    const endedOnly: SeasonListItem[] = [
+      {
+        id: "season-ended",
+        teamId: "team-1",
+        monthKey: "2026-04",
+        goalName: "四月冲刺",
+        targetSlots: 80,
+        filledSlots: 72,
+        status: "ENDED",
+        startedAt: "2026-04-01T00:00:00.000Z",
+        endedAt: "2026-04-20T00:00:00.000Z",
+      },
+    ];
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: endedOnly }));
+
+    await act(async () => {
+      root.render(<SeasonAdminPanel initialSeasons={endedOnly} />);
+    });
+
+    expect(container.textContent).toContain("现在没有进行中的赛季");
+    expect(container.textContent).toContain("可以直接开启下一期团队冲刺");
+    expect(container.textContent).toContain("完成率 90%");
   });
 
   it("submits a new season with goalName and targetSlots", async () => {

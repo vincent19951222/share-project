@@ -56,6 +56,50 @@ async function readErrorMessage(response: Response): Promise<string> {
   return "操作没成功，请稍后再试";
 }
 
+function getSeasonProgress(season: SeasonListItem) {
+  const filledSlots = season.filledSlots;
+  const targetSlots = season.targetSlots;
+  const remainingSlots = Math.max(targetSlots - filledSlots, 0);
+  const percent = targetSlots > 0 ? Math.round((filledSlots / targetSlots) * 100) : 0;
+
+  return {
+    filledSlots,
+    remainingSlots,
+    percent,
+    targetSlots,
+  };
+}
+
+function formatDateLabel(value: string | null) {
+  if (!value) {
+    return "未记录";
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "未记录";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(parsed);
+}
+
+function getStatusLabel(status: SeasonStatus) {
+  if (status === "ACTIVE") {
+    return "进行中";
+  }
+
+  if (status === "ENDED") {
+    return "已结束";
+  }
+
+  return status;
+}
+
 export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
   const [seasons, setSeasons] = useState(() => sortNewestFirst(initialSeasons));
   const [form, setForm] = useState<SeasonFormState>({
@@ -77,6 +121,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
     () => seasons.filter((season) => season.id !== activeSeason?.id),
     [activeSeason?.id, seasons],
   );
+  const canCreateSeason = !activeSeason;
 
   async function syncSeasons() {
     const requestId = latestListRequestRef.current + 1;
@@ -204,6 +249,14 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         className="flex flex-col gap-3 rounded-2xl border-2 border-slate-200 bg-white p-4"
         onSubmit={handleSubmit}
       >
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-black text-slate-800">开启新赛季</h2>
+          <p className="text-sm text-sub">
+            {canCreateSeason
+              ? "现在没有进行中的赛季，可以直接开启下一期团队冲刺。"
+              : "已有进行中的赛季，先结束当前赛季再开启新赛季。"}
+          </p>
+        </div>
         <label className="flex flex-col gap-1 text-sm font-bold text-slate-700">
           冲刺目标
           <input
@@ -213,6 +266,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
               setForm((current) => ({ ...current, goalName: event.target.value }))
             }
             placeholder="例如: 五月掉脂挑战"
+            disabled={!canCreateSeason || isSubmitting}
             className="rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-slate-800"
           />
         </label>
@@ -224,6 +278,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
             onChange={(event) =>
               setForm((current) => ({ ...current, targetSlots: event.target.value }))
             }
+            disabled={!canCreateSeason || isSubmitting}
             className="rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-slate-800"
           >
             {ALLOWED_TARGET_SLOTS.map((slot) => (
@@ -235,10 +290,10 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         </label>
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={!canCreateSeason || isSubmitting}
           className="rounded-xl border-2 border-slate-800 bg-yellow-300 px-4 py-2 text-sm font-black text-slate-900 shadow-[0_3px_0_0_#1f2937] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? "正在开赛季..." : "开启新赛季"}
+          {isSubmitting ? "正在开赛季..." : canCreateSeason ? "开启新赛季" : "已有赛季进行中"}
         </button>
       </form>
 
@@ -281,16 +336,32 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         </div>
 
         {activeSeason ? (
-          <div className="space-y-1 text-sm text-slate-700">
-            <div className="font-black text-slate-900">{activeSeason.goalName}</div>
-            <div>赛季月份：{activeSeason.monthKey}</div>
-            <div>
-              目标格数：{activeSeason.targetSlots} · 已完成 {activeSeason.filledSlots}
-            </div>
-            <div>状态：{activeSeason.status === "ACTIVE" ? "进行中" : activeSeason.status}</div>
-          </div>
+          (() => {
+            const progress = getSeasonProgress(activeSeason);
+
+            return (
+              <div className="space-y-3 rounded-2xl border-2 border-slate-800 bg-white p-4 text-sm text-slate-700 shadow-[0_4px_0_0_#1f2937]">
+                <span className="inline-flex w-fit rounded-full border-2 border-slate-800 bg-yellow-300 px-3 py-1 text-xs font-black text-slate-900">
+                  当前正在冲刺
+                </span>
+                <div className="font-black text-slate-900">{activeSeason.goalName}</div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  <span>赛季月份 {activeSeason.monthKey}</span>
+                  <span>状态 {getStatusLabel(activeSeason.status)}</span>
+                  <span>
+                    进度 {progress.filledSlots}/{progress.targetSlots}
+                  </span>
+                  <span>完成率 {progress.percent}%</span>
+                  <span>还差 {progress.remainingSlots} 格</span>
+                  <span>开始于 {formatDateLabel(activeSeason.startedAt)}</span>
+                </div>
+              </div>
+            );
+          })()
         ) : (
-          <p className="text-sm text-sub">这会儿还没有进行中的赛季。</p>
+          <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-white px-4 py-5 text-sm text-sub">
+            现在没有进行中的赛季，可以直接开启下一期团队冲刺。
+          </div>
         )}
       </div>
 
@@ -298,22 +369,32 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         <h2 className="mb-3 text-lg font-black text-slate-800">赛季历史</h2>
         {historySeasons.length > 0 ? (
           <ul className="flex flex-col gap-3">
-            {historySeasons.map((season) => (
-              <li key={season.id} className="rounded-xl border-2 border-slate-100 bg-slate-50 p-3">
+            {historySeasons.map((season) => {
+              const progress = getSeasonProgress(season);
+
+              return (
+                <li
+                  key={season.id}
+                  className="rounded-xl border-2 border-slate-100 bg-slate-50 p-3"
+                >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-black text-slate-900">{season.goalName}</span>
-                  <span className="text-xs font-bold text-sub">
-                    {season.status === "ENDED" ? "已结束" : season.status}
+                  <span className="rounded-full border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-sub">
+                    {getStatusLabel(season.status)}
                   </span>
                 </div>
-                <div className="mt-1 text-xs text-sub">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-sub">
                   <div>{season.monthKey}</div>
                   <div>
-                    目标 {season.targetSlots} 格 · 完成 {season.filledSlots} 格
+                    进度 {progress.filledSlots}/{progress.targetSlots}
                   </div>
+                  <div>完成率 {progress.percent}%</div>
+                  <div>开始于 {formatDateLabel(season.startedAt)}</div>
+                  <div>结束于 {formatDateLabel(season.endedAt)}</div>
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         ) : (
           <p className="text-sm text-sub">还没有历史赛季。</p>
