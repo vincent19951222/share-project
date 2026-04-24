@@ -43,13 +43,17 @@ function normalizeSeasonList(nextSeason: SeasonListItem, seasons: SeasonListItem
   return sortNewestFirst([nextSeason, ...remaining]);
 }
 
+function hasChineseCharacters(value: string) {
+  return /[\u3400-\u9fff]/.test(value);
+}
+
 function mapAdminErrorMessage(error: string | null, code: string | null): string {
   if (code === "SEASON_CONFLICT") {
     return error || "当前已经有进行中的赛季了，请先结束当前赛季";
   }
 
   if (code === "SEASON_NOT_FOUND") {
-    return error || "当前没有可结束的赛季";
+    return error && hasChineseCharacters(error) ? error : "当前没有可结束的赛季";
   }
 
   if (error === "Unauthorized") {
