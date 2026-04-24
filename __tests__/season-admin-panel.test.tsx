@@ -305,4 +305,69 @@ describe("SeasonAdminPanel", () => {
       method: "PATCH",
     });
   });
+
+  it("shows a friendly admin-only message when create season is forbidden", async () => {
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: [] }));
+    fetchMock.mockResolvedValueOnce(
+      createJsonResponse({ error: "Forbidden", code: "FORBIDDEN" }, 403),
+    );
+
+    await act(async () => {
+      root.render(<SeasonAdminPanel initialSeasons={[]} />);
+    });
+
+    const goalInput = container.querySelector<HTMLInputElement>('input[name="goalName"]');
+    const form = container.querySelector("form");
+
+    expect(goalInput).not.toBeNull();
+    expect(form).not.toBeNull();
+
+    await act(async () => {
+      const setInputValue = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set;
+
+      setInputValue?.call(goalInput, "六月掉脂挑战");
+      goalInput!.dispatchEvent(new Event("input", { bubbles: true }));
+      form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    });
+
+    expect(container.textContent).toContain("只有管理员可以管理赛季");
+  });
+
+  it("shows the server conflict message when there is already an active season", async () => {
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: [] }));
+    fetchMock.mockResolvedValueOnce(
+      createJsonResponse(
+        { error: "当前已经有进行中的赛季了", code: "SEASON_CONFLICT" },
+        409,
+      ),
+    );
+
+    await act(async () => {
+      root.render(<SeasonAdminPanel initialSeasons={[]} />);
+    });
+
+    const goalInput = container.querySelector<HTMLInputElement>('input[name="goalName"]');
+    const form = container.querySelector("form");
+
+    expect(goalInput).not.toBeNull();
+    expect(form).not.toBeNull();
+
+    await act(async () => {
+      const setInputValue = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set;
+
+      setInputValue?.call(goalInput, "六月掉脂挑战");
+      goalInput!.dispatchEvent(new Event("input", { bubbles: true }));
+      form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    });
+
+    expect(container.textContent).toContain("当前已经有进行中的赛季了");
+  });
 });

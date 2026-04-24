@@ -43,12 +43,41 @@ function normalizeSeasonList(nextSeason: SeasonListItem, seasons: SeasonListItem
   return sortNewestFirst([nextSeason, ...remaining]);
 }
 
+function mapAdminErrorMessage(error: string | null, code: string | null): string {
+  if (code === "SEASON_CONFLICT") {
+    return error || "当前已经有进行中的赛季了，请先结束当前赛季";
+  }
+
+  if (code === "SEASON_NOT_FOUND") {
+    return error || "当前没有可结束的赛季";
+  }
+
+  if (error === "Unauthorized") {
+    return "登录状态过期了，请重新登录";
+  }
+
+  if (error === "Forbidden") {
+    return "只有管理员可以管理赛季";
+  }
+
+  if (error === "Invalid request body") {
+    return "提交内容有误，请检查后再试";
+  }
+
+  if (error === "Internal server error") {
+    return "赛季操作没成功，请稍后再试";
+  }
+
+  return error || "操作没成功，请稍后再试";
+}
+
 async function readErrorMessage(response: Response): Promise<string> {
   try {
-    const data = (await response.json()) as { error?: unknown };
-    if (typeof data.error === "string" && data.error.trim()) {
-      return data.error;
-    }
+    const data = (await response.json()) as { error?: unknown; code?: unknown };
+    const error = typeof data.error === "string" ? data.error.trim() : null;
+    const code = typeof data.code === "string" ? data.code.trim() : null;
+
+    return mapAdminErrorMessage(error, code);
   } catch {
     // Fall through to the generic message below.
   }
