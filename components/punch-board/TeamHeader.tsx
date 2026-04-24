@@ -32,7 +32,7 @@ export function TeamHeader() {
         </div>
       </div>
 
-      <div className="mx-2 max-w-2xl flex-1">
+      <div className="team-header-progress mx-2 max-w-2xl flex-1">
         <SeasonProgressBar activeSeason={state.activeSeason ?? null} />
       </div>
 

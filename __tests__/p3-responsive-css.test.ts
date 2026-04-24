@@ -48,6 +48,7 @@ describe("p3 responsive CSS", () => {
 
     expect(css).toContain("@media (max-width: 760px)");
     expect(css).toMatch(/\.team-header[\s\S]*flex-direction:\s*column/);
+    expect(css).toMatch(/\.team-header-progress[\s\S]*width:\s*100%/);
     expect(css).toMatch(/\.team-header-account[\s\S]*width:\s*100%/);
     expect(css).toMatch(/\.dropdown-menu[\s\S]*max-width:\s*calc\(100vw - 2rem\)/);
   });
@@ -77,6 +78,7 @@ describe("p3 responsive CSS", () => {
       const header = container.querySelector(".team-header");
       expect(header).not.toBeNull();
       expect(header?.tagName).toBe("HEADER");
+      expect(container.querySelector(".team-header-progress")).not.toBeNull();
       expect(container.querySelector(".team-header-account")).not.toBeNull();
     });
 

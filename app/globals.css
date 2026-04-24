@@ -152,7 +152,7 @@ body {
     padding: 1rem;
   }
 
-  .team-header > .mx-2 {
+  .team-header-progress {
     margin-inline: 0;
     max-width: none;
     width: 100%;
