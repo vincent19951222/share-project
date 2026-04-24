@@ -57,8 +57,8 @@ async function readErrorMessage(response: Response): Promise<string> {
 }
 
 function getSeasonProgress(season: SeasonListItem) {
-  const filledSlots = season.filledSlots;
-  const targetSlots = season.targetSlots;
+  const targetSlots = Math.max(season.targetSlots, 0);
+  const filledSlots = Math.min(Math.max(season.filledSlots, 0), targetSlots);
   const remainingSlots = Math.max(targetSlots - filledSlots, 0);
   const percent = targetSlots > 0 ? Math.round((filledSlots / targetSlots) * 100) : 0;
 
@@ -160,6 +160,11 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!canCreateSeason) {
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage(null);
     setError(null);

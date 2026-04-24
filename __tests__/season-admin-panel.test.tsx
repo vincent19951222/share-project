@@ -116,8 +116,21 @@ describe("SeasonAdminPanel", () => {
   });
 
   it("submits a new season with goalName and targetSlots", async () => {
+    const endedOnly: SeasonListItem[] = [
+      {
+        id: "season-ended",
+        teamId: "team-1",
+        monthKey: "2026-04",
+        goalName: "四月冲刺",
+        targetSlots: 80,
+        filledSlots: 72,
+        status: "ENDED",
+        startedAt: "2026-04-01T00:00:00.000Z",
+        endedAt: "2026-04-20T00:00:00.000Z",
+      },
+    ];
     const fetchMock = fetch as ReturnType<typeof vi.fn>;
-    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: initialSeasons }));
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: endedOnly }));
     fetchMock.mockResolvedValueOnce(
       createJsonResponse(
         {
@@ -138,7 +151,7 @@ describe("SeasonAdminPanel", () => {
     );
 
     await act(async () => {
-      root.render(<SeasonAdminPanel initialSeasons={initialSeasons} />);
+      root.render(<SeasonAdminPanel initialSeasons={endedOnly} />);
     });
 
     const goalInput = container.querySelector<HTMLInputElement>('input[name="goalName"]');
@@ -174,6 +187,62 @@ describe("SeasonAdminPanel", () => {
         body: JSON.stringify({ goalName: "六月掉脂挑战", targetSlots: 100 }),
       }),
     );
+  });
+
+  it("does not create a season when one is already active", async () => {
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: initialSeasons }));
+
+    await act(async () => {
+      root.render(<SeasonAdminPanel initialSeasons={initialSeasons} />);
+    });
+
+    const goalInput = container.querySelector<HTMLInputElement>('input[name="goalName"]');
+    const targetSelect = container.querySelector<HTMLSelectElement>('select[name="targetSlots"]');
+    const form = container.querySelector("form");
+    const submitButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("已有赛季进行中"),
+    );
+
+    expect(goalInput?.disabled).toBe(true);
+    expect(targetSelect?.disabled).toBe(true);
+    expect(submitButton?.disabled).toBe(true);
+    expect(form).not.toBeNull();
+
+    await act(async () => {
+      form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    });
+
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      "/api/admin/seasons",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("clamps progress details for invalid season counts", async () => {
+    const endedOnly: SeasonListItem[] = [
+      {
+        id: "season-ended",
+        teamId: "team-1",
+        monthKey: "2026-04",
+        goalName: "异常冲刺",
+        targetSlots: -5,
+        filledSlots: 12,
+        status: "ENDED",
+        startedAt: "2026-04-01T00:00:00.000Z",
+        endedAt: "2026-04-20T00:00:00.000Z",
+      },
+    ];
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: endedOnly }));
+
+    await act(async () => {
+      root.render(<SeasonAdminPanel initialSeasons={endedOnly} />);
+    });
+
+    expect(container.textContent).toContain("进度 0/0");
+    expect(container.textContent).toContain("完成率 0%");
+    expect(container.textContent).not.toContain("还差 -");
   });
 
   it("ends the active season through the current season endpoint", async () => {
