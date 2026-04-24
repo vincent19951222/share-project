@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖啡打卡与日历 (Coffee Tracker)</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts: Quicksand & Noto Sans SC -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* * 色彩定义：
+         * 深咖啡 (Dark Roast): #451a03 (主文字与边框)
+         * 焦糖色 (Caramel): #d97706 (重点按钮)
+         * 奶白色 (Cream): #fefce8 (背景)
+         * 拿铁色 (Latte): #fcd34d (高亮/打卡色)
+         */
+        body {
+            font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
+            background-color: #faf8f5; /* 柔和的燕麦奶色 */
+            background-image: radial-gradient(#d6d3d1 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+            color: #451a03;
+        }
+
+        .soft-card {
+            background-color: #ffffff;
+            border: 6px solid #f5f5f4;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 咖啡主题按钮 */
+        .quest-btn {
+            background-color: #d97706;
+            border: 3px solid #451a03;
+            border-radius: 9999px;
+            box-shadow: 0 4px 0 0 #451a03;
+            color: #ffffff;
+            font-weight: 800;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quest-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 0 #451a03;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .tab-btn.active {
+            background-color: #fcd34d; /* 拿铁黄 */
+            border: 2px solid #451a03;
+            box-shadow: 0 3px 0 0 #451a03;
+            color: #451a03;
+        }
+        .tab-btn.inactive {
+            background-color: transparent;
+            color: #a8a29e;
+        }
+        .tab-btn.inactive:hover {
+            background-color: #f5f5f4;
+            color: #451a03;
+        }
+
+        /* 矩阵格子样式 (适配咖啡杯数) */
+        .cell {
+            width: 3.5rem;
+            height: 3.5rem;
+            flex-shrink: 0;
+            border-radius: 1rem;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+        .cell-missed { background-color: #f5f5f4; border: 2px solid #e7e5e4; color: #d6d3d1; }
+        .cell-future { background-color: transparent; border: 2px dashed #d6d3d1; }
+        
+        /* 根据喝了几杯，咖啡颜色加深 */
+        .cell-punched-1 { background-color: #fde68a; border: 2px solid #451a03; box-shadow: 0 3px 0 0 #451a03; color: #451a03; }
+        .cell-punched-2 { background-color: #f59e0b; border: 2px solid #451a03; box-shadow: 0 3px 0 0 #451a03; color: #451a03; }
+        .cell-punched-3 { background-color: #b45309; border: 2px solid #451a03; box-shadow: 0 3px 0 0 #451a03; color: #fff; }
+        
+        .cell-today {
+            background-color: #ffffff;
+            border: 2px dashed #a8a29e;
+            color: #a8a29e;
+            cursor: pointer;
+        }
+        .cell-today:hover {
+            border-color: #451a03;
+            border-style: solid;
+            color: #451a03;
+            transform: translateY(-2px);
+        }
+
+        /* 我的打卡按钮发光效果 (咖啡因脉冲) */
+        .my-punch-btn {
+            background-color: #451a03;
+            border: 2px solid #451a03;
+            color: #fcd34d;
+            box-shadow: 0 4px 0 0 #d6d3d1;
+            animation: pulse-caffeine 2s infinite;
+        }
+        @keyframes pulse-caffeine {
+            0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(217, 119, 6, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+        }
+
+        /* 咖啡菜单弹窗 */
+        .punch-popup {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background-color: white;
+            border: 4px solid #451a03;
+            border-radius: 1.5rem;
+            padding: 0.75rem;
+            display: flex;
+            gap: 0.75rem;
+            box-shadow: 0 8px 0 0 #451a03;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+        }
+        .punch-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .coffee-option {
+            display: flex;
+            flex-col;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid transparent;
+            transition: all 0.1s;
+        }
+        .coffee-option:hover {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+            transform: translateY(-2px);
+        }
+
+        /* 日历专属样式 */
+        .cal-day {
+            min-height: 100px;
+            border: 2px solid #e7e5e4;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+            background-color: #ffffff;
+        }
+        .cal-day.has-coffee {
+            border-color: #fcd34d;
+            background-color: #fffbeb; /* 极浅的黄色 */
+        }
+        .cal-day.today {
+            border-color: #451a03;
+            border-width: 3px;
+            box-shadow: 0 4px 0 0 #451a03;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes beanBump {
+            0% { transform: scale(1) rotate(0); }
+            50% { transform: scale(1.3) rotate(15deg); color: #d97706; }
+            100% { transform: scale(1) rotate(0); }
+        }
+        .animate-bump { animation: beanBump 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .text-sub { color: #78716c; } /* 石头灰偏暖 */
+        .text-main { color: #451a03; }
+        
+        .svg-icon svg { display: inline-block; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col p-4 gap-4 text-main relative">
+
+    <!-- ================= 顶部全局导航栏 ================= -->
+    <nav class="h-14 w-full flex items-center justify-between shrink-0 px-2 z-50">
+        <!-- 左侧 Logo & Tabs -->
+        <div class="flex items-center gap-6">
+            <div class="font-black text-2xl tracking-tighter flex items-center gap-2">
+                <div class="w-10 h-10 bg-[#fcd34d] border-[3px] border-[#451a03] rounded-xl flex items-center justify-center shadow-[0_3px_0_0_#451a03] p-1.5 text-[#451a03]">
+                    <!-- ☕ 咖啡杯 Logo SVG -->
+                    <svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+                        <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" fill="#fff" />
+                        <line x1="6" y1="2" x2="6" y2="4" />
+                        <line x1="10" y1="2" x2="10" y2="4" />
+                        <line x1="14" y1="2" x2="14" y2="4" />
+                    </svg>
+                </div>
+                CAFE SYNC
+            </div>
+            <div class="flex gap-2 bg-[#f5f5f4] p-1.5 rounded-full border-2 border-[#e7e5e4]">
+                <button onclick="switchTab('punch')" id="tab-punch" class="tab-btn active text-sm">
+                    <!-- 👥 Team SVG -->
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    咖啡搭子
+                </button>
+                <button onclick="switchTab('dash')" id="tab-dash" class="tab-btn inactive text-sm">
+                    <!-- 📅 Calendar SVG -->
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" fill="#fff"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    我的日历
+                </button>
+            </div>
+        </div>
+
+        <!-- 右侧 个人资料 -->
+        <div class="relative">
+            <button class="flex items-center gap-2 bg-white border-[3px] border-[#f5f5f4] rounded-full pl-2 pr-4 py-1 hover:border-[#451a03] transition-colors shadow-sm">
+                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center border-2 border-white shadow-sm p-1 text-[#451a03]" id="nav-avatar-container">
+                    <!-- Avatar Alen JS注入 -->
+                </div>
+                <span class="font-bold text-sm">晓风 (Xiaofeng)</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ================= 视图容器 ================= -->
+    <div class="flex-1 w-full relative overflow-hidden">
+
+        <!-- ☕ 视图 1：团队咖啡看板 -->
+        <div id="view-punch" class="absolute inset-0 flex flex-col gap-4 transition-opacity duration-300">
+            <!-- Zone A: 咖啡豆战况 -->
+            <header class="h-[12vh] w-full soft-card flex items-center justify-between px-8 shrink-0 z-20">
+                <div class="flex items-center gap-4">
+                    <div class="h-12 w-12 flex items-center justify-center bg-orange-100 rounded-2xl border-2 border-orange-200 shadow-sm text-amber-700 p-2">
+                        <!-- 🫘 咖啡豆 SVG -->
+                        <svg viewBox="0 0 24 24" class="w-full h-full" fill="currentColor" stroke="#451a03" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" transform="rotate(-45 10 10)"/>
+                            <path d="M3 13s3-2 7 0 5-2 5-2" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-sub tracking-wider uppercase">Team Caffeine Level</span>
+                        <div class="text-2xl font-extrabold flex items-baseline gap-1" id="team-coins-display">3,250 <span class="text-sm text-sub font-bold">mg</span></div>
+                    </div>
+                </div>
+                <div class="flex-1 max-w-xl mx-8 flex flex-col gap-2">
+                    <div class="flex justify-between text-xs font-bold text-sub">
+                        <span class="text-main flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" class="w-4 h-4 text-orange-500" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            本周目标: 积攒 5000mg 解锁周末甜品基金
+                        </span>
+                        <span>65%</span>
+                    </div>
+                    <div class="h-4 w-full bg-[#f5f5f4] border-2 border-[#e7e5e4] rounded-full relative overflow-hidden">
+                        <div id="progress-bar" class="h-full bg-amber-500 border-r-2 border-[#451a03] transition-all duration-500 ease-out" style="width: 65%;"></div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] font-bold text-sub tracking-wider uppercase">Cups Today</span>
+                    <div class="text-2xl font-extrabold text-main">
+                        <span id="today-punched">8</span><span class="text-lg text-[#a8a29e]"> 杯</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Zone B: 多维时间轴热力图 -->
+            <main class="flex-1 w-full soft-card flex relative overflow-hidden">
+                <div class="w-24 border-r-2 border-[#f5f5f4] flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
+                    <div class="h-12 border-b-2 border-[#f5f5f4] bg-[#faf8f5] flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">搭子们</div>
+                    <div id="members-column" class="flex-1 flex flex-col py-2 justify-between items-center"></div>
+                </div>
+                <div id="grid-container" class="flex-1 overflow-x-auto no-scrollbar relative flex flex-col scroll-smooth">
+                    <div id="days-header" class="h-12 border-b-2 border-[#f5f5f4] bg-[#faf8f5] flex items-center px-4 gap-4 shrink-0 w-max sticky top-0 z-0"></div>
+                    <div class="flex-1 py-2 px-4 w-max relative">
+                        <div id="grid-matrix" class="flex flex-col justify-between h-full relative z-10"></div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Zone C: 动态流 -->
+            <footer class="h-[15vh] w-full soft-card flex flex-col shrink-0 overflow-hidden relative">
+                <div class="bg-[#faf8f5] text-sub text-[10px] px-6 py-2 font-bold border-b-2 border-[#f5f5f4] flex justify-between rounded-t-[1.25rem] tracking-wider">
+                    <span>COFFEE STREAM (LIVE)</span>
+                    <span class="text-amber-600 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse"></span> 萃取中...
+                    </span>
+                </div>
+                <div id="console-stream" class="flex-1 p-3 px-6 text-sm overflow-y-auto flex flex-col gap-2"></div>
+            </footer>
+        </div>
+
+        <!-- 📅 视图 2：我的咖啡日历 -->
+        <div id="view-dash" class="absolute inset-0 flex flex-col gap-4 opacity-0 pointer-events-none transition-opacity duration-300 bg-white soft-card p-6 overflow-y-auto">
+            
+            <div class="flex justify-between items-end mb-4 relative z-10 border-b-4 border-[#f5f5f4] pb-4">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tight">MY COFFEE CALENDAR</h1>
+                    <p class="text-sub font-bold mt-1 flex items-center gap-2">
+                        10月 · 咖啡因续命记录册 ☕
+                    </p>
+                </div>
+                <div class="flex gap-6 text-right">
+                    <div>
+                        <div class="text-xs font-bold text-sub">本月累计 (CUPS)</div>
+                        <div class="text-3xl font-black text-amber-600" id="cal-total-cups">0</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-sub">最高记录 (1天)</div>
+                        <div class="text-3xl font-black text-orange-600" id="cal-max-cups">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日历网格区域 -->
+            <div class="flex-1 flex flex-col gap-2">
+                <!-- 星期表头 -->
+                <div class="grid grid-cols-7 gap-2 text-center font-bold text-xs text-sub mb-2">
+                    <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+                </div>
+                <!-- 日期网格 -->
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2 flex-1 auto-rows-fr">
+                    <!-- JS 注入日期 -->
+                </div>
+            </div>
+            
+        </div>
+
+    </div>
+
+    <!-- ================= JavaScript 逻辑及全局 SVG 定义 ================= -->
+    <script>
+        // --- 咖啡主题 SVG 图标库 ---
+        const SvgIcons = {
+            // 人物头像 (采用柔和颜色)
+            me: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="6" fill="#fed7aa"/><path d="M7 14s1.5 2 5 2 5-2 5-2" stroke-linecap="round"/><circle cx="9" cy="10" r="1.5" fill="#451a03" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="#451a03" stroke="none"/></svg>`,
+            bob: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="6" fill="#bbf7d0"/><path d="M6 9h12" stroke-width="3" stroke-linecap="round"/><path d="M10 15v-2M14 15v-2" stroke-linecap="round"/></svg>`,
+            cindy: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="6" fill="#fbcfe8"/><circle cx="8" cy="11" r="2" fill="#451a03" stroke="none"/><circle cx="16" cy="11" r="2" fill="#451a03" stroke="none"/><path d="M12 16h.01" stroke-width="3" stroke-linecap="round"/></svg>`,
+            dave: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="6" fill="#bae6fd"/><rect x="7" y="10" width="3" height="3" fill="#451a03" rx="1"/><rect x="14" y="10" width="3" height="3" fill="#451a03" rx="1"/><path d="M9 16h6" stroke-linecap="round"/></svg>`,
+            
+            // 咖啡种类图标 (用于打卡选择和日历展示)
+            americano: `<svg viewBox="0 0 24 24" class="w-8 h-8 text-[#451a03]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" fill="#3e2723"/><path d="M6 2v2M10 2v2M14 2v2" stroke="#d97706"/></svg>`,
+            latte: `<svg viewBox="0 0 24 24" class="w-8 h-8 text-[#451a03]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" fill="#fef08a"/><path d="M8 13c1.5-1 3-1 4 0s2.5 1 4 0" stroke="#d97706"/></svg>`,
+            pourover: `<svg viewBox="0 0 24 24" class="w-8 h-8 text-[#451a03]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-2 8H10z" fill="#fefce8"/><path d="M4 11h16v2a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z" fill="#3e2723"/></svg>`,
+            miniBean: `<svg viewBox="0 0 24 24" class="w-4 h-4 inline-block" fill="#d97706" stroke="#451a03" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" transform="rotate(-45 10 10)"/><path d="M3 13s3-2 7 0 5-2 5-2" stroke-width="2" fill="none"/></svg>`,
+            
+            // 日志小图标
+            logInfo: `<svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-amber-500" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+        };
+
+        const CoffeeTypes = {
+            americano: { name: '冰美式', icon: SvgIcons.americano, caffeine: 150 },
+            latte:     { name: '热拿铁', icon: SvgIcons.latte, caffeine: 100 },
+            pourover:  { name: '手冲',   icon: SvgIcons.pourover, caffeine: 180 }
+        };
+
+        // --- 核心状态 ---
+        const state = {
+            teamCaffeine: 3250, targetCaffeine: 5000,
+            today: 18, totalDays: 31, // 假设10月有31天
+            currentUserIndex: 0, 
+            members: [
+                { id: 'Me', name: '晓风', avatar: SvgIcons.me },
+                { id: 'B', name: 'Bob',  avatar: SvgIcons.bob },
+                { id: 'C', name: 'Cindy',avatar: SvgIcons.cindy },
+                { id: 'D', name: 'Dave', avatar: SvgIcons.dave }
+            ],
+            // gridData[memberIndex][dayIndex] = { count: 0, types: [] }
+            gridData: [], 
+        };
+
+        // --- 初始化数据 ---
+        function initData() {
+            document.getElementById('nav-avatar-container').innerHTML = state.members[0].avatar;
+
+            const typeKeys = Object.keys(CoffeeTypes);
+
+            for (let i = 0; i < state.members.length; i++) {
+                const memberData = [];
+                for (let day = 1; day <= state.totalDays; day++) {
+                    if (day < state.today) {
+                        // 随机生成 0 到 3 杯咖啡
+                        const isDrink = Math.random() > 0.3;
+                        if(isDrink) {
+                            const cups = Math.floor(Math.random() * 3) + 1;
+                            const types = [];
+                            for(let c=0; c<cups; c++) types.push(typeKeys[Math.floor(Math.random() * typeKeys.length)]);
+                            memberData.push({ count: cups, types: types });
+                        } else {
+                            memberData.push({ count: 0, types: [] });
+                        }
+                    } else if (day === state.today) {
+                        // 今天：其他人随机喝了，自己初始没喝
+                        if(i !== 0 && Math.random() > 0.5) {
+                            memberData.push({ count: 1, types: ['americano'] });
+                        } else {
+                            memberData.push({ count: 0, types: [] });
+                        }
+                    } else {
+                        // 未来
+                        memberData.push(null);
+                    }
+                }
+                state.gridData.push(memberData);
+            }
+            addLog('☕ 咖啡机预热完成，协同网络已连接。', 'system');
+        }
+
+        // --- 视图渲染主入口 ---
+        function renderAll() {
+            renderZoneA();
+            renderTeamMatrix();
+            renderCalendar();
+            scrollToToday();
+        }
+
+        // 渲染顶部数据条
+        function renderZoneA() {
+            document.getElementById('team-coins-display').innerHTML = `${state.teamCaffeine.toLocaleString()} <span class="text-sm text-sub font-bold">mg</span>`;
+            const progress = Math.min((state.teamCaffeine / state.targetCaffeine) * 100, 100);
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            let todayCups = 0;
+            state.gridData.forEach(row => { 
+                if (row[state.today - 1] && row[state.today - 1].count > 0) {
+                    todayCups += row[state.today - 1].count;
+                }
+            });
+            document.getElementById('today-punched').innerText = todayCups;
+        }
+
+        // 渲染团队打卡矩阵 (支持多杯)
+        function renderTeamMatrix() {
+            const memCol = document.getElementById('members-column');
+            const dayHeader = document.getElementById('days-header');
+            const matrix = document.getElementById('grid-matrix');
+
+            memCol.innerHTML = ''; dayHeader.innerHTML = ''; matrix.innerHTML = '';
+
+            // Y轴头像
+            state.members.forEach((m, idx) => {
+                const isMe = idx === state.currentUserIndex;
+                memCol.innerHTML += `
+                    <div class="h-12 w-12 flex items-center justify-center rounded-2xl shadow-sm border p-1 text-[#451a03] bg-white ${isMe ? 'border-[3px] border-[#451a03] ring-2 ring-amber-300' : 'border-[#e7e5e4]'} relative" title="${m.name}">
+                        ${m.avatar}
+                        ${isMe ? '<div class="absolute -top-1.5 -right-1.5 text-xs bg-amber-400 border-2 border-[#451a03] rounded-full w-5 h-5 flex items-center justify-center font-black">我</div>' : ''}
+                    </div>
+                `;
+            });
+
+            // X轴日期
+            for (let d = 1; d <= state.totalDays; d++) {
+                const isToday = d === state.today;
+                const baseClass = "w-14 flex justify-center items-center text-xs font-bold rounded-xl h-8";
+                const todayClass = isToday ? "bg-[#fcd34d] text-[#451a03] border-2 border-[#451a03] shadow-[0_2px_0_0_#451a03]" : "text-[#a8a29e]";
+                dayHeader.innerHTML += `<div class="${baseClass} ${todayClass}">${d}日</div>`;
+            }
+
+            // 矩阵方块渲染
+            state.members.forEach((member, rIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex gap-4 h-14 items-center';
+                const isMe = rIndex === state.currentUserIndex;
+                
+                for (let d = 1; d <= state.totalDays; d++) {
+                    const cIndex = d - 1;
+                    const data = state.gridData[rIndex][cIndex];
+                    const cell = document.createElement('div');
+                    
+                    if (d < state.today || (d === state.today && data && data.count > 0 && !isMe)) {
+                        // 过去的时间，或今天其他人已打卡
+                        if (data && data.count > 0) {
+                            // 根据杯数分配颜色深度
+                            let colorClass = 'cell-punched-1';
+                            if(data.count === 2) colorClass = 'cell-punched-2';
+                            if(data.count >= 3) colorClass = 'cell-punched-3';
+                            
+                            cell.className = `cell ${colorClass}`;
+                            // 只显示咖啡豆图标
+                            cell.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" stroke="currentColor" stroke-width="1"><path d="M10 2c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" transform="rotate(-45 10 10)"/><path d="M3 13s3-2 7 0 5-2 5-2" stroke-width="2" stroke="#fff" fill="none"/></svg>`;
+                            
+                            // 多杯角标
+                            if(data.count > 1) {
+                                cell.innerHTML += `<div class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white font-black">x${data.count}</div>`;
+                            }
+                        } else {
+                            cell.className = `cell cell-missed`;
+                            cell.innerHTML = '';
+                        }
+                    } else if (d === state.today && isMe) {
+                        // 当前用户今天的格子 (无论喝没喝过都可以继续点)
+                        const hasPunched = data && data.count > 0;
+                        cell.className = `cell my-punch-btn text-2xl cursor-pointer ${hasPunched ? '' : 'animate-pulse'}`;
+                        cell.innerHTML = hasPunched ? `<span class="text-lg">☕</span><div class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white font-black">+</div>` : '+';
+                        
+                        // 生成咖啡选择弹窗
+                        const popup = document.createElement('div');
+                        popup.className = 'punch-popup';
+                        popup.innerHTML = `
+                            <div class="flex flex-col items-center">
+                                <span class="text-[10px] font-bold text-sub mb-2">来杯什么？</span>
+                                <div class="flex gap-2">
+                                    <button class="coffee-option flex flex-col items-center gap-1" data-type="americano" title="冰美式">
+                                        ${CoffeeTypes.americano.icon}
+                                        <span class="text-[10px] font-bold mt-1">美式</span>
+                                    </button>
+                                    <button class="coffee-option flex flex-col items-center gap-1" data-type="latte" title="热拿铁">
+                                        ${CoffeeTypes.latte.icon}
+                                        <span class="text-[10px] font-bold mt-1">拿铁</span>
+                                    </button>
+                                    <button class="coffee-option flex flex-col items-center gap-1" data-type="pourover" title="手冲">
+                                        ${CoffeeTypes.pourover.icon}
+                                        <span class="text-[10px] font-bold mt-1">手冲</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        cell.onclick = (e) => {
+                            e.stopPropagation();
+                            document.querySelectorAll('.punch-popup').forEach(p => p.classList.remove('show'));
+                            popup.classList.toggle('show');
+                        };
+                        
+                        popup.querySelectorAll('.coffee-option').forEach(btn => {
+                            btn.onclick = (e) => {
+                                e.stopPropagation();
+                                popup.classList.remove('show');
+                                handlePunch(btn.dataset.type);
+                            };
+                        });
+                        
+                        cell.appendChild(popup);
+                    } else {
+                        // 未来
+                        cell.className = 'cell cell-future opacity-50';
+                    }
+                    rowDiv.appendChild(cell);
+                }
+                matrix.appendChild(rowDiv);
+            });
+        }
+
+        // 渲染个人咖啡日历 (View 2)
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            const myData = state.gridData[state.currentUserIndex];
+            let totalCups = 0;
+            let maxCups = 0;
+
+            // 假设1号是周二 (偏移量2)
+            const firstDayOffset = 2; 
+            for(let i=0; i<firstDayOffset; i++) {
+                grid.innerHTML += `<div class="cal-day opacity-0"></div>`; // 占位
+            }
+
+            for (let d = 1; d <= state.totalDays; d++) {
+                const data = myData[d - 1];
+                const isToday = d === state.today;
+                const hasData = data && data.count > 0;
+                
+                if (hasData) {
+                    totalCups += data.count;
+                    if (data.count > maxCups) maxCups = data.count;
+                }
+
+                const dayDiv = document.createElement('div');
+                let classes = 'cal-day relative overflow-hidden group';
+                if (isToday) classes += ' today';
+                if (hasData) classes += ' has-coffee';
+                dayDiv.className = classes;
+
+                // 日期头
+                let innerHTML = `<div class="font-bold text-sm ${isToday ? 'text-amber-600' : 'text-sub'}">${d}</div>`;
+                
+                // 咖啡内容区
+                if (hasData) {
+                    innerHTML += `<div class="mt-auto flex flex-wrap gap-1 justify-end">`;
+                    data.types.forEach(t => {
+                        const iconData = CoffeeTypes[t];
+                        innerHTML += `<div class="w-6 h-6 transform transition-transform group-hover:scale-110" title="${iconData.name}">${iconData.icon}</div>`;
+                    });
+                    innerHTML += `</div>`;
+                    
+                    // 背景大数字水印
+                    innerHTML += `<div class="absolute -bottom-4 -left-2 text-6xl font-black opacity-10 text-amber-500 pointer-events-none">${data.count}</div>`;
+                } else if (d < state.today) {
+                    innerHTML += `<div class="mt-auto text-xs text-[#d6d3d1] font-bold text-right">无</div>`;
+                }
+
+                dayDiv.innerHTML = innerHTML;
+                grid.appendChild(dayDiv);
+            }
+
+            document.getElementById('cal-total-cups').innerText = totalCups;
+            document.getElementById('cal-max-cups').innerText = maxCups;
+        }
+
+        function scrollToToday() {
+            const container = document.getElementById('grid-container');
+            const offset = (state.today - 2) * 72; // cell width + gap
+            container.scrollLeft = offset;
+        }
+
+        // --- 交互逻辑 ---
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.punch-popup').forEach(p => p.classList.remove('show'));
+        });
+
+        function switchTab(tabId) {
+            const viewPunch = document.getElementById('view-punch');
+            const viewDash = document.getElementById('view-dash');
+            const tabPunch = document.getElementById('tab-punch');
+            const tabDash = document.getElementById('tab-dash');
+
+            if(tabId === 'punch') {
+                viewPunch.style.opacity = '1'; viewPunch.style.pointerEvents = 'auto';
+                viewDash.style.opacity = '0'; viewDash.style.pointerEvents = 'none';
+                tabPunch.className = 'tab-btn active text-sm';
+                tabDash.className = 'tab-btn inactive text-sm';
+            } else {
+                viewDash.style.opacity = '1'; viewDash.style.pointerEvents = 'auto';
+                viewPunch.style.opacity = '0'; viewPunch.style.pointerEvents = 'none';
+                tabDash.className = 'tab-btn active text-sm';
+                tabPunch.className = 'tab-btn inactive text-sm';
+                renderCalendar(); // 切换时重新渲染日历确保数据最新
+            }
+        }
+
+        // 处理打卡逻辑 (当前用户)
+        function handlePunch(typeKey) {
+            const rIndex = state.currentUserIndex;
+            const cIndex = state.today - 1;
+            const coffee = CoffeeTypes[typeKey];
+
+            if (!state.gridData[rIndex][cIndex]) {
+                state.gridData[rIndex][cIndex] = { count: 0, types: [] };
+            }
+            
+            state.gridData[rIndex][cIndex].count++;
+            state.gridData[rIndex][cIndex].types.push(typeKey);
+            state.teamCaffeine += coffee.caffeine;
+            
+            const coinEl = document.getElementById('team-coins-display');
+            coinEl.classList.remove('animate-bump');
+            void coinEl.offsetWidth;
+            coinEl.classList.add('animate-bump');
+
+            addLog(`<div class="w-4 h-4 inline-block align-middle">${SvgIcons.miniBean}</div> <b>晓风</b> 刚刚来了一杯 <b>${coffee.name}</b> (+${coffee.caffeine}mg).`, 'success');
+
+            renderZoneA(); 
+            renderTeamMatrix();
+            renderCalendar();
+        }
+
+        function addLog(text, type) {
+            const stream = document.getElementById('console-stream');
+            const logDiv = document.createElement('div');
+            
+            const timeStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+            
+            logDiv.className = `w-full flex items-start gap-2 text-main bg-white p-2 rounded-xl border border-[#e7e5e4] shadow-sm`;
+            logDiv.innerHTML = `<span class="text-[#a8a29e] font-mono text-[10px] mt-1 shrink-0">[${timeStr}]</span> <span class="flex items-center pt-0.5">${SvgIcons.logInfo}</span> <span class="text-xs leading-relaxed flex-1">${text}</span>`;
+            
+            stream.prepend(logDiv); // 新日志插在最前面
+        }
+
+        window.onload = () => {
+            initData();
+            renderAll();
+        };
+
+    </script>
+</body>
+</html>
