@@ -113,7 +113,7 @@ describe("SeasonProgressBar", () => {
           activeSeason={{
             id: "season-complete",
             monthKey: "2026-04",
-            goalName: "掉脂挑战",
+            goalName: "四月掉脂挑战",
             targetSlots: 2,
             filledSlots: 2,
             contributions: [
@@ -131,8 +131,15 @@ describe("SeasonProgressBar", () => {
       );
     });
 
+    const titleRow = container.querySelector<HTMLElement>("[data-testid='season-progress-title-row']");
+
+    expect(titleRow).not.toBeNull();
+    expect(titleRow?.className).toContain("flex-wrap");
+    expect(titleRow?.className).toContain("gap-x-3");
+    expect(titleRow?.className).toContain("gap-y-1");
     expect(container.textContent).toContain("本期团队冲刺进度");
     expect(container.textContent).toContain("四月掉脂挑战 · 2/2");
+    expect(container.textContent).not.toContain("四月四月掉脂挑战 · 2/2");
     expect(container.textContent).toContain("已冲满");
     expect(container.textContent).toContain("继续打卡仍累计我的银子和赛季收入");
   });

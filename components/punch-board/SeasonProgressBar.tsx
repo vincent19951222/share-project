@@ -13,13 +13,6 @@ function parseSeasonMonth(monthKey: string) {
   return Number.isInteger(month) && month >= 1 && month <= 12 ? month : null;
 }
 
-function getSeasonMonthLabel(month: number) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "long",
-    timeZone: "Asia/Shanghai",
-  }).format(new Date(Date.UTC(2026, month - 1, 1)));
-}
-
 function getSlotColor(month: number, colorIndex: number) {
   const theme = getSeasonTheme(month);
   return theme.memberColors[colorIndex % theme.memberColors.length];
@@ -63,16 +56,18 @@ export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
   const filledSlots = Math.max(0, Math.min(activeSeason.filledSlots, targetSlots));
   const segments = targetSlots > 0 ? targetSlots : 1;
   const filledSlotContributors = buildFilledSlots(activeSeason.contributions);
-  const seasonLabel = getSeasonMonthLabel(month);
   const helperText =
     targetSlots > 0
-      ? `${seasonLabel}${activeSeason.goalName} · ${filledSlots}/${targetSlots}`
-      : `${seasonLabel}${activeSeason.goalName} · 0/0`;
+      ? `${activeSeason.goalName} · ${filledSlots}/${targetSlots}`
+      : `${activeSeason.goalName} · 0/0`;
   const isCompleted = targetSlots > 0 && filledSlots >= targetSlots;
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-3 text-xs font-bold text-sub">
+      <div
+        data-testid="season-progress-title-row"
+        className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-bold text-sub"
+      >
         <span className="text-main">本期团队冲刺进度</span>
         <span>{helperText}</span>
       </div>
