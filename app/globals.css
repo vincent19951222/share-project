@@ -140,6 +140,41 @@ body {
   }
 }
 
+@media (max-width: 760px) {
+  body {
+    overflow: auto;
+  }
+
+  .team-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .team-header > .mx-2 {
+    margin-inline: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .team-header-account {
+    width: 100%;
+    border-left: 0;
+    border-top: 2px solid #f1f5f9;
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+
+  .team-header-account-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dropdown-menu {
+    right: 0;
+  }
+}
+
 .quest-btn {
   background-color: #fde047;
   border: 3px solid #1f2937;
@@ -388,6 +423,7 @@ body {
   top: calc(100% + 15px);
   right: 0;
   width: 280px;
+  max-width: calc(100vw - 2rem);
   background-color: white;
   border: 4px solid #1f2937;
   border-radius: 1.5rem;
