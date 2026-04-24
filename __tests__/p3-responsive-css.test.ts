@@ -42,14 +42,63 @@ vi.mock("@/lib/store", () => ({
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
 
+function extractBlock(css: string, marker: string) {
+  const markerIndex = css.indexOf(marker);
+  expect(markerIndex).toBeGreaterThanOrEqual(0);
+
+  const blockStart = css.indexOf("{", markerIndex);
+  expect(blockStart).toBeGreaterThan(markerIndex);
+
+  let depth = 1;
+  let cursor = blockStart + 1;
+
+  while (depth > 0 && cursor < css.length) {
+    const char = css[cursor];
+    if (char === "{") depth += 1;
+    if (char === "}") depth -= 1;
+    cursor += 1;
+  }
+
+  expect(depth).toBe(0);
+  return css.slice(blockStart + 1, cursor - 1);
+}
+
+function extractRuleBody(block: string, selector: string) {
+  const selectorIndex = block.indexOf(selector);
+  expect(selectorIndex).toBeGreaterThanOrEqual(0);
+
+  const blockStart = block.indexOf("{", selectorIndex);
+  expect(blockStart).toBeGreaterThan(selectorIndex);
+
+  let depth = 1;
+  let cursor = blockStart + 1;
+
+  while (depth > 0 && cursor < block.length) {
+    const char = block[cursor];
+    if (char === "{") depth += 1;
+    if (char === "}") depth -= 1;
+    cursor += 1;
+  }
+
+  expect(depth).toBe(0);
+  return block.slice(blockStart + 1, cursor - 1);
+}
+
 describe("p3 responsive CSS", () => {
   it("adds the mobile safety rules for the team header and dropdown", () => {
     const css = readFileSync("app/globals.css", "utf8");
+    const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
+    const teamHeaderRule = extractRuleBody(mobileBlock, ".team-header");
+    const teamHeaderProgressRule = extractRuleBody(mobileBlock, ".team-header-progress");
+    const teamHeaderAccountRule = extractRuleBody(mobileBlock, ".team-header-account");
 
     expect(css).toContain("@media (max-width: 760px)");
-    expect(css).toMatch(/\.team-header[\s\S]*flex-direction:\s*column/);
-    expect(css).toMatch(/\.team-header-progress[\s\S]*width:\s*100%/);
-    expect(css).toMatch(/\.team-header-account[\s\S]*width:\s*100%/);
+    expect(teamHeaderRule).toMatch(/flex-direction:\s*column/);
+    expect(teamHeaderRule).toMatch(/align-items:\s*stretch/);
+    expect(teamHeaderProgressRule).toMatch(/width:\s*100%/);
+    expect(teamHeaderProgressRule).toMatch(/max-width:\s*none/);
+    expect(teamHeaderAccountRule).toMatch(/width:\s*100%/);
+    expect(teamHeaderAccountRule).toMatch(/border-top:\s*2px solid #f1f5f9/);
     expect(css).toMatch(/\.dropdown-menu[\s\S]*max-width:\s*calc\(100vw - 2rem\)/);
   });
 
