@@ -61,8 +61,11 @@ describe("ProfileDropdown", () => {
 
     expect(container.textContent).toContain("3450");
     expect(container.textContent).toContain("我的银子");
+    expect(container.textContent).toContain("个人长期累计资产");
     expect(container.textContent).toContain("12 天");
+    expect(container.textContent).toContain("连续有效健身打卡");
     expect(container.textContent).toContain("40 银子");
+    expect(container.textContent).toContain("下一次有效打卡可得");
     expect(container.textContent).toContain("赛季设置");
   });
 });

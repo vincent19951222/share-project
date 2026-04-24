@@ -47,15 +47,24 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
               <span dangerouslySetInnerHTML={{ __html: SvgIcons.coin }} />
               {currentUser?.assetBalance ?? 0}
             </div>
+            <span className="mt-1 text-xs font-medium text-sub">
+              个人长期累计资产，不是团队公共钱包。
+            </span>
           </div>
         </div>
         <div className="p-5 border-t-2 border-slate-100 bg-slate-50 flex flex-col gap-2">
           <div className="flex justify-between items-center text-sm font-bold">
-            <span>连签</span>
+            <div className="flex flex-col">
+              <span>连签</span>
+              <span className="text-xs font-medium text-sub">连续有效健身打卡</span>
+            </div>
             <span className="text-slate-700">{currentUser?.currentStreak ?? 0} 天</span>
           </div>
           <div className="flex justify-between items-center text-sm font-bold">
-            <span>下次奖励</span>
+            <div className="flex flex-col">
+              <span>下次奖励</span>
+              <span className="text-xs font-medium text-sub">下一次有效打卡可得</span>
+            </div>
             <span className="text-slate-700">{currentUser?.nextReward ?? 0} 银子</span>
           </div>
           {currentUser?.isAdmin ? (

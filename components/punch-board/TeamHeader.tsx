@@ -28,6 +28,7 @@ export function TeamHeader() {
           <div className="text-2xl font-extrabold flex items-baseline gap-1">
             {teamVaultTotal.toLocaleString("zh-CN")}
           </div>
+          <span className="text-xs font-medium text-sub">全队个人银子总和</span>
         </div>
       </div>
 
@@ -40,7 +41,7 @@ export function TeamHeader() {
           <div className="team-header-account-summary">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-black text-sub tracking-wider">我的银子</span>
-              <span className="team-header-account-subtitle">今天的战利品账本</span>
+              <span className="team-header-account-subtitle">个人长期累计资产</span>
             </div>
             <div className="team-header-account-balance">
               {assetBalance.toLocaleString("zh-CN")}
