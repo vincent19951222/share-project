@@ -369,7 +369,7 @@ describe("SeasonAdminPanel", () => {
     expect(container.textContent).toContain("当前已经有进行中的赛季了");
   });
 
-  it("shows a friendly message when ending a missing active season", async () => {
+  it("shows a friendly message and hides raw English text when ending a missing active season", async () => {
     const fetchMock = fetch as ReturnType<typeof vi.fn>;
     fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: initialSeasons }));
     fetchMock.mockResolvedValueOnce(
@@ -391,5 +391,30 @@ describe("SeasonAdminPanel", () => {
     });
 
     expect(container.textContent).toContain("当前没有可结束的赛季");
+    expect(container.textContent).not.toContain("Season not found");
+  });
+
+  it("preserves explicit Chinese backend text when ending a missing active season", async () => {
+    const fetchMock = fetch as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(createJsonResponse({ seasons: initialSeasons }));
+    fetchMock.mockResolvedValueOnce(
+      createJsonResponse({ error: "当前赛季已经结束了", code: "SEASON_NOT_FOUND" }, 404),
+    );
+
+    await act(async () => {
+      root.render(<SeasonAdminPanel initialSeasons={initialSeasons} />);
+    });
+
+    const endButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("结束当前赛季"),
+    );
+
+    expect(endButton).not.toBeUndefined();
+
+    await act(async () => {
+      endButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("当前赛季已经结束了");
   });
 });
