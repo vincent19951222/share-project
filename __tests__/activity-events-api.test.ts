@@ -6,8 +6,8 @@ import { ACTIVITY_EVENT_TYPES } from "@/lib/activity-events";
 import { seedDatabase } from "@/lib/db-seed";
 import { prisma } from "@/lib/prisma";
 
-function request(userId?: string) {
-  return new NextRequest("http://localhost/api/activity-events", {
+function request(userId?: string, search = "") {
+  return new NextRequest(`http://localhost/api/activity-events${search}`, {
     method: "GET",
     headers: userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {},
   });
@@ -122,5 +122,53 @@ describe("/api/activity-events", () => {
     ]);
     expect(teammateBody.events).toEqual(firstLoginBody.events);
     expect(reloginBody.events).toEqual(firstLoginBody.events);
+  });
+
+  it("filters coffee events to the current Shanghai day and punch events by kind", async () => {
+    await prisma.activityEvent.deleteMany({ where: { teamId } });
+
+    await prisma.activityEvent.createMany({
+      data: [
+        {
+          teamId,
+          userId,
+          type: ACTIVITY_EVENT_TYPES.COFFEE_ADD,
+          message: "li 续命 1 杯，今日累计 1 杯",
+          assetAwarded: null,
+          createdAt: new Date("2026-04-23T09:18:00+08:00"),
+        },
+        {
+          teamId,
+          userId,
+          type: ACTIVITY_EVENT_TYPES.COFFEE_REMOVE,
+          message: "li 撤回 1 杯咖啡，今日累计 0 杯",
+          assetAwarded: null,
+          createdAt: new Date("2026-04-22T23:30:00+08:00"),
+        },
+        {
+          teamId,
+          userId: teammateId,
+          type: ACTIVITY_EVENT_TYPES.PUNCH,
+          message: "luo 刚刚打卡，拿下 20 银子",
+          assetAwarded: 20,
+          createdAt: new Date("2026-04-23T11:18:00+08:00"),
+        },
+      ],
+    });
+
+    const coffeeResponse = await GET(request(userId, "?kind=coffee"));
+    const coffeeBody = await coffeeResponse.json();
+    const punchResponse = await GET(request(userId, "?kind=punch"));
+    const punchBody = await punchResponse.json();
+
+    expect(coffeeResponse.status).toBe(200);
+    expect(coffeeBody.events.map((event: { text: string }) => event.text)).toEqual([
+      "li 续命 1 杯，今日累计 1 杯",
+    ]);
+
+    expect(punchResponse.status).toBe(200);
+    expect(punchBody.events.map((event: { text: string }) => event.text)).toEqual([
+      "luo 刚刚打卡，拿下 20 银子",
+    ]);
   });
 });

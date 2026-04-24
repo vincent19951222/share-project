@@ -7,6 +7,7 @@ import {
   fetchCoffeeState,
   removeLatestTodayCoffeeCup,
 } from "@/lib/api";
+import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import type { CoffeeSnapshot } from "@/lib/types";
 import { CoffeeGrid } from "./CoffeeGrid";
 import { CoffeeReceipt } from "./CoffeeReceipt";
@@ -62,6 +63,8 @@ export function CoffeeCheckin() {
 
     try {
       setSnapshot(await action());
+      dispatchCalendarRefresh();
+      window.dispatchEvent(new Event("activity-events:refresh"));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "操作失败");
     } finally {

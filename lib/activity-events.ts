@@ -1,6 +1,8 @@
 export const ACTIVITY_EVENT_TYPES = {
   PUNCH: "PUNCH",
   UNDO_PUNCH: "UNDO_PUNCH",
+  COFFEE_ADD: "COFFEE_ADD",
+  COFFEE_REMOVE: "COFFEE_REMOVE",
 } as const;
 
 export type ActivityEventType =
@@ -38,6 +40,26 @@ export function buildPunchActivityMessage(username: string, reward: number) {
 
 export function buildUndoPunchActivityMessage(username: string) {
   return `${username} 撤销了今天的打卡`;
+}
+
+export function buildCoffeeAddActivityMessage(username: string, totalCups: number) {
+  return `${username} 续命 1 杯，今日累计 ${totalCups} 杯`;
+}
+
+export function buildCoffeeRemoveActivityMessage(username: string, totalCups: number) {
+  return `${username} 撤回 1 杯咖啡，今日累计 ${totalCups} 杯`;
+}
+
+export function getActivityEventTypesByKind(kind: string | null | undefined) {
+  if (kind === "punch") {
+    return [ACTIVITY_EVENT_TYPES.PUNCH, ACTIVITY_EVENT_TYPES.UNDO_PUNCH];
+  }
+
+  if (kind === "coffee") {
+    return [ACTIVITY_EVENT_TYPES.COFFEE_ADD, ACTIVITY_EVENT_TYPES.COFFEE_REMOVE];
+  }
+
+  return null;
 }
 
 export function mapActivityEventToDto(event: ActivityEventWithUser): ActivityEventDto {

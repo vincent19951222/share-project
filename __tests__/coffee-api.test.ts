@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { createCookieValue } from "@/lib/auth";
+import { ACTIVITY_EVENT_TYPES } from "@/lib/activity-events";
 
 function request(url: string, userId?: string, method = "GET") {
   return new NextRequest(`http://localhost${url}`, {
@@ -54,6 +55,15 @@ describe("coffee API", () => {
     const body = await response.json();
     expect(body.snapshot.currentUserId).toBe(userId);
     expect(body.snapshot.stats.currentUserTodayCups).toBe(1);
+    await expect(
+      prisma.activityEvent.findFirstOrThrow({
+        where: { userId, teamId, type: ACTIVITY_EVENT_TYPES.COFFEE_ADD },
+        orderBy: { createdAt: "desc" },
+      }),
+    ).resolves.toMatchObject({
+      message: "li 续命 1 杯，今日累计 1 杯",
+      assetAwarded: null,
+    });
   });
 
   it("creates multiple records when multiple cups are added", async () => {
@@ -82,6 +92,15 @@ describe("coffee API", () => {
         where: { userId, teamId, deletedAt: { not: null } },
       }),
     ).toBe(1);
+    await expect(
+      prisma.activityEvent.findFirstOrThrow({
+        where: { userId, teamId, type: ACTIVITY_EVENT_TYPES.COFFEE_REMOVE },
+        orderBy: { createdAt: "desc" },
+      }),
+    ).resolves.toMatchObject({
+      message: "li 撤回 1 杯咖啡，今日累计 1 杯",
+      assetAwarded: null,
+    });
   });
 
   it("returns 409 when there is no cup to remove today", async () => {

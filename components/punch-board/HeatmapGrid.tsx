@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
 import { deleteTodayPunch, submitTodayPunch } from "@/lib/api";
+import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
 
@@ -44,6 +45,7 @@ export function HeatmapGrid() {
         },
       });
       window.dispatchEvent(new Event("activity-events:refresh"));
+      dispatchCalendarRefresh();
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "打卡失败";
@@ -89,6 +91,7 @@ export function HeatmapGrid() {
         },
       });
       window.dispatchEvent(new Event("activity-events:refresh"));
+      dispatchCalendarRefresh();
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "撤销失败";

@@ -23,6 +23,79 @@ function snapshot(cups: number): CoffeeSnapshot {
   };
 }
 
+function createJsonResponse(body: unknown, ok = true, status = 200) {
+  return {
+    ok,
+    status,
+    json: async () => body,
+  };
+}
+
+function mockCoffeeFetch({
+  stateSnapshots = [],
+  addSnapshots = [],
+  removeSnapshots = [],
+  coffeeEvents = [],
+}: {
+  stateSnapshots?: CoffeeSnapshot[];
+  addSnapshots?: CoffeeSnapshot[];
+  removeSnapshots?: CoffeeSnapshot[];
+  coffeeEvents?: Array<{
+    id: string;
+    type: string;
+    text: string;
+    assetAwarded: number | null;
+    createdAt: string;
+    user: {
+      id: string;
+      name: string;
+      avatarKey: string;
+    };
+  }>;
+}) {
+  const stateQueue = [...stateSnapshots];
+  const addQueue = [...addSnapshots];
+  const removeQueue = [...removeSnapshots];
+
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      const method = init?.method ?? "GET";
+
+      if (url === "/api/activity-events?kind=coffee") {
+        return Promise.resolve(createJsonResponse({ events: coffeeEvents }));
+      }
+
+      if (url === "/api/coffee/state" && method === "GET") {
+        const nextSnapshot = stateQueue.shift();
+        if (!nextSnapshot) {
+          throw new Error("Unexpected /api/coffee/state call");
+        }
+        return Promise.resolve(createJsonResponse({ snapshot: nextSnapshot }));
+      }
+
+      if (url === "/api/coffee/cups" && method === "POST") {
+        const nextSnapshot = addQueue.shift();
+        if (!nextSnapshot) {
+          throw new Error("Unexpected /api/coffee/cups call");
+        }
+        return Promise.resolve(createJsonResponse({ snapshot: nextSnapshot }));
+      }
+
+      if (url === "/api/coffee/cups/latest" && method === "DELETE") {
+        const nextSnapshot = removeQueue.shift();
+        if (!nextSnapshot) {
+          throw new Error("Unexpected /api/coffee/cups/latest call");
+        }
+        return Promise.resolve(createJsonResponse({ snapshot: nextSnapshot }));
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${url}`);
+    }),
+  );
+}
+
 describe("CoffeeCheckin", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -42,14 +115,12 @@ describe("CoffeeCheckin", () => {
   });
 
   it("loads coffee state and can add or remove today's cups", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(0) }) })
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(1) }) })
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(0) }) }),
-    );
+    const dispatchEventSpy = vi.spyOn(window, "dispatchEvent");
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(0)],
+      addSnapshots: [snapshot(1)],
+      removeSnapshots: [snapshot(0)],
+    });
 
     await act(async () => {
       root.render(<CoffeeCheckin />);
@@ -78,6 +149,8 @@ describe("CoffeeCheckin", () => {
       "/api/coffee/cups",
       expect.objectContaining({ method: "POST" }),
     );
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "calendar:refresh" }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "activity-events:refresh" }));
     expect(container.textContent).toContain("我的今日杯数");
     expect(container.textContent).toContain("☕ 1");
 
@@ -96,6 +169,8 @@ describe("CoffeeCheckin", () => {
       "/api/coffee/cups/latest",
       expect.objectContaining({ method: "DELETE" }),
     );
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "calendar:refresh" }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "activity-events:refresh" }));
   });
 
   it("shows an actionable error when the initial coffee state is unauthorized", async () => {
@@ -120,13 +195,10 @@ describe("CoffeeCheckin", () => {
   });
 
   it("asks for confirmation before adding the first cup from the calendar", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(0) }) })
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(1) }) }),
-    );
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(0)],
+      addSnapshots: [snapshot(1)],
+    });
 
     await act(async () => {
       root.render(<CoffeeCheckin />);
@@ -144,7 +216,7 @@ describe("CoffeeCheckin", () => {
     });
 
     expect(container.textContent).toContain("确认今天喝咖啡？");
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
 
     const dialog = container.querySelector('[role="dialog"]');
     const confirmButton = Array.from(dialog!.querySelectorAll("button")).find((button) =>
@@ -165,14 +237,11 @@ describe("CoffeeCheckin", () => {
   });
 
   it("lets the calendar dialog add or remove cups after coffee is already checked in", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(2) }) })
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(3) }) })
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ snapshot: snapshot(2) }) }),
-    );
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(2)],
+      addSnapshots: [snapshot(3)],
+      removeSnapshots: [snapshot(2)],
+    });
 
     await act(async () => {
       root.render(<CoffeeCheckin />);
@@ -232,5 +301,56 @@ describe("CoffeeCheckin", () => {
       expect.objectContaining({ method: "DELETE" }),
     );
     expect(container.textContent).toContain("今天已续命 2 杯");
+  });
+
+  it("renders coffee activity events with the same realtime feed shape", async () => {
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(1)],
+      coffeeEvents: [
+        {
+          id: "coffee-1",
+          type: "COFFEE_ADD",
+          text: "li 续命 1 杯，今日累计 1 杯",
+          assetAwarded: null,
+          createdAt: "2026-04-23T01:18:00.000Z",
+          user: {
+            id: "u1",
+            name: "li",
+            avatarKey: "male1",
+          },
+        },
+      ],
+    });
+
+    await act(async () => {
+      root.render(<CoffeeCheckin />);
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("实时动态");
+
+    const feed = container.querySelector('[aria-label="咖啡实时动态"]');
+    expect(feed).not.toBeNull();
+
+    expect(feed!.textContent).toContain("已同步");
+    expect(feed!.textContent).toContain("li 续命 1 杯，今日累计 1 杯");
+    expect(feed!.querySelectorAll("img")).toHaveLength(1);
+  });
+
+  it("shows an empty live feed when there is no coffee check-in today", async () => {
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(0)],
+      coffeeEvents: [],
+    });
+
+    await act(async () => {
+      root.render(<CoffeeCheckin />);
+      await Promise.resolve();
+    });
+
+    const feed = container.querySelector('[aria-label="咖啡实时动态"]');
+    expect(feed).not.toBeNull();
+    expect(feed!.querySelectorAll("img")).toHaveLength(0);
+    expect(feed!.textContent).toContain("今天还没有咖啡打卡");
   });
 });

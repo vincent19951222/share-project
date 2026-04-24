@@ -72,7 +72,7 @@ export function ActivityStream() {
     setSyncState("syncing");
 
     try {
-      const response = await fetch("/api/activity-events", { cache: "no-store" });
+      const response = await fetch("/api/activity-events?kind=punch", { cache: "no-store" });
 
       if (!response.ok) {
         throw new Error("Failed to fetch activity events");

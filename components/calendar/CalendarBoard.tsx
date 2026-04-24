@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchCalendarState } from "@/lib/api";
+import { CALENDAR_REFRESH_EVENT } from "@/lib/calendar-refresh";
 import type { CalendarMonthSnapshot } from "@/lib/types";
 import { CalendarGrid } from "./CalendarGrid";
 import { CalendarHeader } from "./CalendarHeader";
@@ -26,6 +27,39 @@ export function CalendarBoard() {
   useEffect(() => {
     void loadMonth();
   }, []);
+
+  useEffect(() => {
+    async function handleRefresh() {
+      const currentMonthKey = snapshot?.currentMonthKey;
+
+      if (!currentMonthKey) {
+        return;
+      }
+
+      try {
+        const refreshedSnapshot = validateMonthSnapshot(
+          await fetchCalendarState(currentMonthKey),
+        );
+        setSnapshotCache((current) => ({
+          ...current,
+          [refreshedSnapshot.monthKey]: refreshedSnapshot,
+        }));
+
+        if (viewedMonthKey === null || viewedMonthKey === refreshedSnapshot.currentMonthKey) {
+          setViewedMonthKey(refreshedSnapshot.monthKey);
+        }
+      } catch (caught) {
+        if (viewedMonthKey === currentMonthKey) {
+          setError(caught instanceof Error ? caught.message : "牛马日历加载失败");
+        }
+      }
+    }
+
+    window.addEventListener(CALENDAR_REFRESH_EVENT, handleRefresh);
+    return () => {
+      window.removeEventListener(CALENDAR_REFRESH_EVENT, handleRefresh);
+    };
+  }, [snapshot, viewedMonthKey]);
 
   async function loadMonth(monthKey?: string) {
     setBusy(true);

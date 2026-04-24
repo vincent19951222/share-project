@@ -222,4 +222,70 @@ describe("CalendarBoard", () => {
       expect(container.textContent).not.toContain("查看明细");
     });
   });
+
+  it("refreshes the current month snapshot when coffee data changes", async () => {
+    const initialRequest = deferred<{
+      ok: boolean;
+      json: () => Promise<{ snapshot: CalendarMonthSnapshot }>;
+    }>();
+    const refreshRequest = deferred<{
+      ok: boolean;
+      json: () => Promise<{ snapshot: CalendarMonthSnapshot }>;
+    }>();
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockReturnValueOnce(initialRequest.promise).mockReturnValueOnce(refreshRequest.promise),
+    );
+
+    await act(async () => {
+      root.render(<CalendarBoard />);
+    });
+
+    await act(async () => {
+      initialRequest.resolve({
+        ok: true,
+        json: async () => ({
+          snapshot: buildSnapshot("2026-04", "2026-04", [
+            { day: 1, workedOut: false, coffeeCups: 1 },
+          ]),
+        }),
+      });
+      await initialRequest.promise;
+    });
+
+    await waitFor(() => {
+      expect(container.textContent).toContain("本月喝了 1 杯");
+      expect(getDayCell(container, 1).querySelectorAll("img[alt='']").length).toBe(1);
+    });
+
+    await act(async () => {
+      window.dispatchEvent(new Event("calendar:refresh"));
+    });
+
+    expect(fetch).toHaveBeenLastCalledWith(
+      "/api/calendar/state?month=2026-04",
+      expect.objectContaining({
+        cache: "no-store",
+        credentials: "same-origin",
+      }),
+    );
+
+    await act(async () => {
+      refreshRequest.resolve({
+        ok: true,
+        json: async () => ({
+          snapshot: buildSnapshot("2026-04", "2026-04", [
+            { day: 1, workedOut: false, coffeeCups: 2 },
+          ]),
+        }),
+      });
+      await refreshRequest.promise;
+    });
+
+    await waitFor(() => {
+      expect(container.textContent).toContain("本月喝了 2 杯");
+      expect(getDayCell(container, 1).querySelectorAll("img[alt='']").length).toBe(2);
+    });
+  });
 });

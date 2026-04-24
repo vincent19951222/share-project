@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mapActivityEventToDto } from "@/lib/activity-events";
+import { getShanghaiDayKey } from "@/lib/economy";
+import {
+  getActivityEventTypesByKind,
+  mapActivityEventToDto,
+} from "@/lib/activity-events";
 import { prisma } from "@/lib/prisma";
 import { loadCurrentUser } from "@/lib/session";
 
@@ -14,13 +18,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const since = new Date(Date.now() - RECENT_ACTIVITY_WINDOW_MS);
+    const kind = request.nextUrl.searchParams.get("kind");
+    const typeFilter = getActivityEventTypesByKind(kind);
+    const since =
+      kind === "coffee"
+        ? new Date(`${getShanghaiDayKey()}T00:00:00+08:00`)
+        : new Date(Date.now() - RECENT_ACTIVITY_WINDOW_MS);
     const events = await prisma.activityEvent.findMany({
       where: {
         teamId: user.teamId,
         createdAt: {
           gte: since,
         },
+        ...(typeFilter ? { type: { in: typeFilter } } : {}),
       },
       include: {
         user: {

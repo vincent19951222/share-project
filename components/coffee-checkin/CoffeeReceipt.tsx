@@ -1,5 +1,6 @@
 "use client";
 
+import { CoffeeActivityFeed } from "./CoffeeActivityFeed";
 import type { CoffeeSnapshot } from "@/lib/types";
 
 interface CoffeeReceiptProps {
@@ -121,12 +122,7 @@ export function CoffeeReceipt({
           </div>
           {error ? <p className="mt-3 text-sm font-black text-orange-600">{error}</p> : null}
         </div>
-
-        <div className="grid gap-2 text-sm font-bold text-amber-900">
-          <p>09:18 li 续命 1 杯，早会前的防御姿态。</p>
-          <p>10:42 luo 今日已 3 杯，咖啡王暂时上岗。</p>
-          <p>13:06 wu 撤回一杯，理智回归。</p>
-        </div>
+        <CoffeeActivityFeed />
       </div>
     </section>
   );
