@@ -39,7 +39,7 @@
 - Modify: `__tests__/season-admin-panel.test.tsx`
 - Modify: `components/admin/SeasonAdminPanel.tsx`
 
-- [ ] **Step 1: Add failing tests for active season details and disabled create form**
+- [x] **Step 1: Add failing tests for active season details and disabled create form**
 
 Add these assertions to `renders the create form, active season, and history` after the existing active season expectations:
 
@@ -57,7 +57,7 @@ expect(submitButton).not.toBeUndefined();
 expect(submitButton).toHaveProperty("disabled", true);
 ```
 
-- [ ] **Step 2: Add failing tests for no active season empty state**
+- [x] **Step 2: Add failing tests for no active season empty state**
 
 Append this test to `__tests__/season-admin-panel.test.tsx`:
 
@@ -89,7 +89,7 @@ it("shows a create-ready empty state when there is no active season", async () =
 });
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run:
 
@@ -99,7 +99,7 @@ npm test -- __tests__/season-admin-panel.test.tsx
 
 Expected: FAIL because the new polish copy and disabled active-season form state do not exist yet.
 
-- [ ] **Step 4: Implement admin formatting helpers and disabled state**
+- [x] **Step 4: Implement admin formatting helpers and disabled state**
 
 In `components/admin/SeasonAdminPanel.tsx`, add these helpers near `readErrorMessage`:
 
@@ -175,7 +175,7 @@ Use this button label:
 {isSubmitting ? "正在开赛季..." : canCreateSeason ? "开启新赛季" : "已有赛季进行中"}
 ```
 
-- [ ] **Step 5: Implement current and history season details**
+- [x] **Step 5: Implement current and history season details**
 
 Replace the active season detail block with:
 
@@ -240,7 +240,7 @@ Update each history item to include progress, dates, and status:
 })}
 ```
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [x] **Step 6: Run tests to verify they pass**
 
 Run:
 
@@ -250,7 +250,7 @@ npm test -- __tests__/season-admin-panel.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add __tests__/season-admin-panel.test.tsx components/admin/SeasonAdminPanel.tsx
@@ -265,7 +265,7 @@ git commit -m "polish admin season panel states"
 - Modify: `__tests__/season-admin-panel.test.tsx`
 - Modify: `components/admin/SeasonAdminPanel.tsx`
 
-- [ ] **Step 1: Add failing tests for common API errors**
+- [x] **Step 1: Add failing tests for common API errors**
 
 Append this test:
 
@@ -326,7 +326,7 @@ it("keeps season conflict errors understandable", async () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -336,7 +336,7 @@ npm test -- __tests__/season-admin-panel.test.tsx
 
 Expected: FAIL because `Forbidden` is currently displayed directly.
 
-- [ ] **Step 3: Implement friendly error mapping**
+- [x] **Step 3: Implement friendly error mapping**
 
 Replace `readErrorMessage` with:
 
@@ -386,7 +386,7 @@ async function readErrorMessage(response: Response): Promise<string> {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run:
 
@@ -396,7 +396,7 @@ npm test -- __tests__/season-admin-panel.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add __tests__/season-admin-panel.test.tsx components/admin/SeasonAdminPanel.tsx
@@ -411,7 +411,7 @@ git commit -m "polish admin season error messages"
 - Modify: `__tests__/season-progress-bar.test.tsx`
 - Modify: `components/punch-board/SeasonProgressBar.tsx`
 
-- [ ] **Step 1: Inspect existing test exports**
+- [x] **Step 1: Inspect existing test exports**
 
 Run:
 
@@ -421,7 +421,7 @@ sed -n '1,260p' __tests__/season-progress-bar.test.tsx
 
 Expected: identify the local helper used to render `SeasonProgressBar`.
 
-- [ ] **Step 2: Add failing tests for no-season and completed-season copy**
+- [x] **Step 2: Add failing tests for no-season and completed-season copy**
 
 Add these tests to the existing `SeasonProgressBar` describe block:
 
@@ -467,7 +467,7 @@ it("explains completed seasons without hiding continued rewards", () => {
 });
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run:
 
@@ -477,7 +477,7 @@ npm test -- __tests__/season-progress-bar.test.tsx
 
 Expected: FAIL because the new explanatory copy does not exist.
 
-- [ ] **Step 4: Implement progress bar copy states**
+- [x] **Step 4: Implement progress bar copy states**
 
 In `components/punch-board/SeasonProgressBar.tsx`, replace the no-season return with:
 
@@ -514,7 +514,7 @@ Replace the title row with:
 )}
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run:
 
@@ -524,7 +524,7 @@ npm test -- __tests__/season-progress-bar.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add __tests__/season-progress-bar.test.tsx components/punch-board/SeasonProgressBar.tsx
@@ -540,7 +540,7 @@ git commit -m "polish season progress copy"
 - Modify: `components/punch-board/TeamHeader.tsx`
 - Modify: `components/navbar/ProfileDropdown.tsx`
 
-- [ ] **Step 1: Add failing profile dropdown copy test**
+- [x] **Step 1: Add failing profile dropdown copy test**
 
 In `__tests__/profile-dropdown.test.tsx`, add expectations to the existing render test for an admin user:
 
@@ -551,7 +551,7 @@ expect(container.textContent).toContain("下一次有效打卡可得");
 expect(container.textContent).toContain("赛季设置");
 ```
 
-- [ ] **Step 2: Run the profile dropdown test to verify it fails**
+- [x] **Step 2: Run the profile dropdown test to verify it fails**
 
 Run:
 
@@ -561,7 +561,7 @@ npm test -- __tests__/profile-dropdown.test.tsx
 
 Expected: FAIL because the explanatory copy does not exist yet.
 
-- [ ] **Step 3: Update TeamHeader copy**
+- [x] **Step 3: Update TeamHeader copy**
 
 In `components/punch-board/TeamHeader.tsx`, change the vault block to:
 
@@ -586,7 +586,7 @@ Change KPI labels to:
 
 The existing labels can remain short; the main semantic explanation lives in subtitles and Profile.
 
-- [ ] **Step 4: Update ProfileDropdown copy**
+- [x] **Step 4: Update ProfileDropdown copy**
 
 Replace the top content block in `components/navbar/ProfileDropdown.tsx` with:
 
@@ -622,7 +622,7 @@ Replace the two KPI rows with:
 </div>
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run:
 
@@ -632,7 +632,7 @@ npm test -- __tests__/profile-dropdown.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add __tests__/profile-dropdown.test.tsx components/punch-board/TeamHeader.tsx components/navbar/ProfileDropdown.tsx
@@ -647,7 +647,7 @@ git commit -m "polish economy copy"
 - Modify: `app/globals.css`
 - Modify: `__tests__/shared-board-css.test.ts` or create `__tests__/p3-responsive-css.test.ts`
 
-- [ ] **Step 1: Add failing CSS regression test**
+- [x] **Step 1: Add failing CSS regression test**
 
 Create `__tests__/p3-responsive-css.test.ts`:
 
@@ -674,7 +674,7 @@ describe("P3 responsive CSS", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -684,7 +684,7 @@ npm test -- __tests__/p3-responsive-css.test.ts
 
 Expected: FAIL because the new mobile rules do not exist yet.
 
-- [ ] **Step 3: Add responsive CSS**
+- [x] **Step 3: Add responsive CSS**
 
 In `app/globals.css`, update `.dropdown-menu`:
 
@@ -746,7 +746,7 @@ Add this media block after the existing `@media (max-width: 1180px)` block:
 }
 ```
 
-- [ ] **Step 4: Run CSS test to verify it passes**
+- [x] **Step 4: Run CSS test to verify it passes**
 
 Run:
 
@@ -756,7 +756,7 @@ npm test -- __tests__/p3-responsive-css.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/globals.css __tests__/p3-responsive-css.test.ts
@@ -770,7 +770,7 @@ git commit -m "polish p3 mobile layout"
 **Files:**
 - No expected source changes unless verification finds a defect.
 
-- [ ] **Step 1: Run targeted P3 tests**
+- [x] **Step 1: Run targeted P3 tests**
 
 Run:
 
@@ -780,7 +780,7 @@ npm test -- __tests__/season-admin-panel.test.tsx __tests__/season-progress-bar.
 
 Expected: PASS.
 
-- [ ] **Step 2: Run full test suite**
+- [x] **Step 2: Run full test suite**
 
 Run:
 
@@ -790,7 +790,7 @@ npm test
 
 Expected: PASS.
 
-- [ ] **Step 3: Run typecheck**
+- [x] **Step 3: Run typecheck**
 
 Run:
 
@@ -800,7 +800,7 @@ npm run lint
 
 Expected: PASS with `tsc --noEmit`.
 
-- [ ] **Step 4: Start the development server**
+- [x] **Step 4: Start the development server**
 
 Run:
 
@@ -812,6 +812,8 @@ Expected: server starts on `http://localhost:3000`.
 
 - [ ] **Step 5: Browser-check P3 surfaces**
 
+2026-04-25 verification note: automated dev-server reachability passed (`/login` 200, `/admin` 307 to `/login`), but manual visual browser inspection was not completed in this session because no Playwright/browser runner was available.
+
 Open `http://localhost:3000` and inspect:
 
 - desktop board header: economy labels are readable and no text overlaps.
@@ -819,11 +821,11 @@ Open `http://localhost:3000` and inspect:
 - Profile dropdown on mobile: menu stays inside viewport and buttons remain clickable.
 - `/admin` desktop and mobile: form, current season, history, and feedback blocks remain readable.
 
-- [ ] **Step 6: Stop the development server**
+- [x] **Step 6: Stop the development server**
 
 Stop the `npm run dev` session with `Ctrl-C`.
 
-- [ ] **Step 7: Commit any verification fixes**
+- [x] **Step 7: Commit any verification fixes**
 
 If verification required fixes, commit them:
 
