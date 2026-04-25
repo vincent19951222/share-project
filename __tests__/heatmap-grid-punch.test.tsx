@@ -119,6 +119,35 @@ describe("HeatmapGrid punch flow", () => {
     expect(container.querySelectorAll(".heatmap-mobile-member")).toHaveLength(5);
   });
 
+  it("centers today's mobile column using the rendered date column", async () => {
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      get() {
+        if (this.classList.contains("heatmap-mobile-scroll")) return 399;
+        return 0;
+      },
+    });
+    const monthState: BoardState = {
+      ...initialState,
+      today: 25,
+      totalDays: 30,
+      gridData: initialState.members.map(() => Array.from({ length: 30 }, () => false)),
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={monthState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    expect(container.querySelector('.heatmap-mobile-day[data-day="25"]')).not.toBeNull();
+    expect(container.querySelector<HTMLDivElement>(".heatmap-mobile-scroll")?.scrollLeft).toBeCloseTo(
+      838.9,
+    );
+  });
+
   it("waits for the server snapshot before marking the punch and adds a success log", async () => {
     const request = deferred<{
       ok: boolean;

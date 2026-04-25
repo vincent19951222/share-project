@@ -100,6 +100,8 @@ describe("p3 responsive CSS", () => {
     expect(teamHeaderAccountRule).toMatch(/width:\s*100%/);
     expect(teamHeaderAccountRule).toMatch(/border-top:\s*2px solid #f1f5f9/);
     expect(css).toMatch(/\.dropdown-menu[\s\S]*max-width:\s*calc\(100vw - 2rem\)/);
+    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.report-board\s*\{[\s\S]*position:\s*relative/);
+    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.report-board\s*\{[\s\S]*overflow:\s*visible/);
   });
 
   describe("responsive surfaces", () => {

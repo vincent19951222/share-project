@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
 import { deleteTodayPunch, submitTodayPunch } from "@/lib/api";
 import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
@@ -15,13 +15,56 @@ export function HeatmapGrid() {
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const currentUserIndex = state.members.findIndex((member) => member.id === state.currentUserId);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const scrollLeft = (state.today - 2) * 60;
     if (desktopScrollRef.current) {
       desktopScrollRef.current.scrollLeft = scrollLeft;
     }
     if (mobileScrollRef.current) {
-      mobileScrollRef.current.scrollLeft = scrollLeft;
+      const scrollPane = mobileScrollRef.current;
+
+      const alignWithMobileFormula = () => {
+        const rootFontSize = Number.parseFloat(
+          window.getComputedStyle(document.documentElement).fontSize,
+        ) || 16;
+        const memberWidth = 5.3 * rootFontSize;
+        const cellWidth = 2.1 * rootFontSize;
+        const columnGap = 0.45 * rootFontSize;
+        const visibleGridWidth = (scrollPane.clientWidth || window.innerWidth) - memberWidth;
+
+        scrollPane.scrollLeft = Math.max(
+          0,
+          (state.today - 1) * (cellWidth + columnGap) -
+            visibleGridWidth / 2 +
+            cellWidth / 2,
+        );
+      };
+
+      const alignWithMeasuredColumn = () => {
+        const todayColumn = scrollPane.querySelector<HTMLElement>(
+          `.heatmap-mobile-day[data-day="${state.today}"]`,
+        );
+        const stickyWidth =
+          scrollPane.querySelector<HTMLElement>(".heatmap-mobile-member-head")?.offsetWidth ?? 0;
+
+        if (!todayColumn || todayColumn.offsetWidth <= 0 || stickyWidth <= 0) {
+          alignWithMobileFormula();
+          return;
+        }
+
+        const visibleGridWidth = scrollPane.clientWidth - stickyWidth;
+        scrollPane.scrollLeft = Math.max(
+          0,
+          todayColumn.offsetLeft -
+            stickyWidth -
+            visibleGridWidth / 2 +
+            todayColumn.offsetWidth / 2,
+        );
+      };
+
+      alignWithMobileFormula();
+      const frameId = window.requestAnimationFrame(alignWithMeasuredColumn);
+      return () => window.cancelAnimationFrame(frameId);
     }
   }, [state.today]);
 
@@ -235,6 +278,7 @@ export function HeatmapGrid() {
                 return (
                   <div
                     key={day}
+                    data-day={day}
                     className={`heatmap-mobile-day flex items-center justify-center text-xs font-bold rounded-full ${
                       isToday
                         ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]"
@@ -248,7 +292,7 @@ export function HeatmapGrid() {
             </div>
             {state.members.map((member, rowIndex) => (
               <div key={member.id} className="heatmap-mobile-row flex items-center">
-                <div className="heatmap-mobile-member sticky left-0 z-10 flex flex-col items-center justify-center bg-white border-r-2 border-slate-100">
+                <div className="heatmap-mobile-member sticky left-0 z-10 flex items-center gap-2 bg-white border-r-2 border-slate-100">
                   <div
                     className={`heatmap-mobile-avatar flex items-center justify-center rounded-full shadow-sm border overflow-hidden bg-slate-50 ${
                       rowIndex === currentUserIndex ? "border-2 border-slate-800 ring-2 ring-yellow-300" : "border-slate-200"
@@ -256,7 +300,7 @@ export function HeatmapGrid() {
                   >
                     <img src={getAvatarUrl(member.avatarKey)} alt={member.name} className="w-full h-full object-cover" />
                   </div>
-                  <span className="heatmap-mobile-name font-bold text-sub truncate text-center">{member.name}</span>
+                  <span className="heatmap-mobile-name min-w-0 truncate font-bold text-sub">{member.name}</span>
                 </div>
                 {Array.from({ length: state.totalDays }, (_, index) => renderPunchCell(rowIndex, index))}
               </div>
