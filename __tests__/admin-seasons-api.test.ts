@@ -42,6 +42,9 @@ async function getSeedUsers() {
 }
 
 async function cleanupAdminSeasonArtifacts() {
+  await prisma.teamDynamicReadState.deleteMany();
+  await prisma.teamDynamic.deleteMany();
+
   const tempTeams = await prisma.team.findMany({
     where: { code: { startsWith: TEMP_TEAM_CODE_PREFIX } },
     select: { id: true },
@@ -301,6 +304,49 @@ describe("admin seasons api", () => {
     });
     expect(season.status).toBe("ENDED");
     expect(season.endedAt).not.toBeNull();
+  });
+
+  it("writes a team dynamic when a season starts", async () => {
+    const { admin } = await getSeedUsers();
+
+    const response = await POST(
+      makeRequest("POST", "/api/admin/seasons", admin.id, {
+        goalName: "五月脱脂挑战",
+        targetSlots: 80,
+      }),
+    );
+
+    expect(response.status).toBe(201);
+
+    const entry = await prisma.teamDynamic.findFirstOrThrow({
+      where: { teamId: admin.teamId, type: "SEASON_STARTED" },
+      orderBy: { occurredAt: "desc" },
+    });
+
+    expect(entry.title).toContain("新赛季");
+    expect(entry.summary).toContain("五月脱脂挑战");
+  });
+
+  it("writes a team dynamic when the active season ends", async () => {
+    const { admin } = await getSeedUsers();
+
+    const createResponse = await POST(
+      makeRequest("POST", "/api/admin/seasons", admin.id, {
+        goalName: "五月脱脂挑战",
+        targetSlots: 120,
+      }),
+    );
+    expect(createResponse.status).toBe(201);
+
+    const endResponse = await PATCH(makeRequest("PATCH", "/api/admin/seasons/current", admin.id));
+    expect(endResponse.status).toBe(200);
+
+    const entry = await prisma.teamDynamic.findFirstOrThrow({
+      where: { teamId: admin.teamId, type: "SEASON_ENDED" },
+      orderBy: { occurredAt: "desc" },
+    });
+
+    expect(entry.title).toContain("赛季已经结束");
   });
 
   it("returns 404 when there is no active season to end", async () => {
