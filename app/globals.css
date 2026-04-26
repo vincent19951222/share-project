@@ -1159,6 +1159,25 @@ body {
   color: #334155;
 }
 
+.team-dynamics-page {
+  border-color: #f1f5f9;
+}
+
+.team-dynamic-filter,
+.team-dynamic-stat {
+  border: 2px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.team-dynamic-filter-active {
+  background: #1f2937;
+  color: #fff7cc;
+  border-color: #1f2937;
+}
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
