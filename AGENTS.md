@@ -16,6 +16,9 @@ npm run dev          # 启动开发服务器 (http://localhost:3000)
 npm run build        # 构建生产版本
 npm start            # 启动生产服务器
 
+# Windows + PM2 生产启动（推荐）
+cmd /c "set DATABASE_URL=file:/E:/data/share-project/prod.db && pm2 start node_modules\next\dist\bin\next --name share-project -- start -p 3000"
+
 # 测试
 npm test             # 运行所有测试
 npm run test:watch   # 监听模式运行测试
@@ -73,9 +76,25 @@ lib/
 
 prisma/
   schema.prisma     # 数据库模型定义
-  dev.db            # SQLite 数据库文件
+  dev.db            # 本地开发 SQLite 数据库文件（不作为生产库）
   seed.ts           # 数据库种子脚本
 ```
+
+## 环境与数据库约定
+
+- **生产代码目录**: `E:\Projects\share-project`
+- **生产数据库**: `E:\data\share-project\prod.db`
+- **开发数据库**: `prisma/dev.db`
+- **生产环境变量**: `DATABASE_URL="file:/E:/data/share-project/prod.db"`
+- **开发环境变量**: `DATABASE_URL="file:./prisma/dev.db"`
+
+**重要**:
+- 生产数据库不进 git
+- `prisma/dev.db` 仅用于本地开发，不作为生产数据库
+- 新拉取项目后默认没有 `prisma/dev.db`，这是预期行为
+- 本地开发前需要执行 `npx prisma db push` 和 `npx tsx prisma/seed.ts` 来初始化开发库
+- 推荐将生产目录和开发目录分开，例如 `share-project` / `share-project-dev`
+- Windows 下用 PM2 时，直接托管 `next`，不要用 `pm2 start npm --name ... -- start`
 
 ## 路由架构
 
@@ -175,3 +194,5 @@ const { state, dispatch } = useBoard();
 3. **时区**: 所有时间戳统一使用 Asia/Shanghai
 4. **ID 生成**: 统一使用 CUID (Prisma `@default(cuid())`)
 5. **认证状态**: 在 `(board)/layout.tsx` 中验证，不要在单独组件中重复检查
+6. **生产目录限制**: 不要在生产目录运行 `npm run dev`、`npx prisma db push`、`npx tsx prisma/seed.ts`
+7. **生产发布顺序**: `git pull` -> `npm install` -> `npm run build` -> `pm2 restart share-project --update-env`
