@@ -46,12 +46,7 @@ export function resolveSqliteDatabasePath(env: SqliteConfigEnv = process.env) {
 }
 
 export function resolveSqliteDatabaseUrl(env: SqliteConfigEnv = process.env) {
-  const databaseUrl = env.DATABASE_URL?.trim();
   const overridePath = env.PRISMA_DB_PATH?.trim();
-
-  if (!overridePath && databaseUrl?.startsWith(FILE_PROTOCOL)) {
-    return databaseUrl;
-  }
 
   const dbPath = resolveSqliteDatabasePath(env);
   return `${FILE_PROTOCOL}${normalizePathForUrl(dbPath)}`;

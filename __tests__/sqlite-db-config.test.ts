@@ -19,7 +19,18 @@ describe("sqlite database config", () => {
     };
 
     expect(resolveSqliteDatabasePath(config)).toBe(path.normalize("E:/data/share-project/prod.db"));
-    expect(resolveSqliteDatabaseUrl(config)).toBe("file:/E:/data/share-project/prod.db");
+    expect(resolveSqliteDatabaseUrl(config)).toBe("file:E:/data/share-project/prod.db");
+  });
+
+  it("normalizes relative DATABASE_URL values to an absolute runtime path", () => {
+    const config = {
+      DATABASE_URL: "file:./prisma/dev.db",
+    };
+
+    const expectedPath = path.resolve(process.cwd(), "prisma", "dev.db");
+
+    expect(resolveSqliteDatabasePath(config)).toBe(expectedPath);
+    expect(resolveSqliteDatabaseUrl(config)).toBe(`file:${expectedPath.replace(/\\/g, "/")}`);
   });
 
   it("falls back to prisma/dev.db for local development", () => {
