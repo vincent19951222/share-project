@@ -110,7 +110,9 @@ flowchart TD
   GM10 --> GM14
   GM04 --> GM15["GM-15 Weekly Report / Report Center Integration"]
   GM06 --> GM15
+  GM11 --> GM15
   GM12 --> GM15
+  GM13 --> GM15
 ```
 
 Story package list:
@@ -146,12 +148,12 @@ Recommended spec creation order:
 8. `GM-07` - spec written at `docs/superpowers/specs/2026-04-26-gm-07-backpack-v1-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-07-backpack-v1.md`
 9. `GM-08` - spec written at `docs/superpowers/specs/2026-04-26-gm-08-today-effective-item-use-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-08-today-effective-item-use.md`
 10. `GM-09` - spec written at `docs/superpowers/specs/2026-04-26-gm-09-boost-settlement-integration-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-09-boost-settlement-integration.md`
-11. `GM-10`
-12. `GM-11`
-13. `GM-12`
-14. `GM-13`
-15. `GM-14`
-16. `GM-15`
+11. `GM-10` - spec written at `docs/superpowers/specs/2026-04-26-gm-10-real-world-redemption-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-10-real-world-redemption.md`
+12. `GM-11` - spec written at `docs/superpowers/specs/2026-04-26-gm-11-enterprise-wechat-sender-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-11-enterprise-wechat-sender.md`
+13. `GM-12` - spec written at `docs/superpowers/specs/2026-04-26-gm-12-weak-social-invitations-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-12-weak-social-invitations.md`
+14. `GM-13` - spec written at `docs/superpowers/specs/2026-04-26-gm-13-team-dynamics-integration-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-13-team-dynamics-integration.md`
+15. `GM-14` - spec written at `docs/superpowers/specs/2026-04-26-gm-14-docs-center-rule-pages-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-14-docs-center-rule-pages.md`
+16. `GM-15` - spec written at `docs/superpowers/specs/2026-04-26-gm-15-weekly-report-report-center-integration-design.md`; plan written at `docs/superpowers/plans/2026-04-26-gm-15-weekly-report-report-center-integration.md`
 
 ## Story Map
 
@@ -459,11 +461,12 @@ Recommended spec creation order:
 
 **Feature:** Explain game rules in the docs center.
 
-**Depends on:** Docs Center v1, stable decisions from GM-04 through GM-10.
+**Depends on:** Docs Center v1, stable rule decisions from GM-04 through GM-13, especially GM-10 redemption, GM-12 weak social, and GM-13 team dynamics visibility.
 
 **What ships:**
 
-- Rules for tickets, ten draw, coin purchase, inventory, boosts, leave protection, weak social, and Luckin redemption.
+- Docs Center pages for gameplay rules, reward economy, item usage, boost settlement, leave protection, weak social, Luckin redemption, FAQ, and changelog.
+- `牛马补给站` rule/help entry that links users into the Docs Center.
 - Changelog entry for 牛马补给站.
 
 **Acceptance criteria:**
@@ -471,26 +474,29 @@ Recommended spec creation order:
 - New users can understand why they got one or two tickets.
 - Boost and leave protection rules are explicit.
 - Real-world redemption is described as admin-confirmed offline fulfillment.
+- Weak social and team dynamics visibility are explained without implying extra coin rewards.
+- In-app rule links resolve to the relevant Docs Center section.
 
 ### Story GM-15: Weekly Report and Report Center Integration
 
 **Feature:** Use game data in team recap surfaces after data has accumulated.
 
-**Depends on:** GM-04, GM-06, GM-12, manual weekly report or report center season recap.
+**Depends on:** GM-04, GM-06, GM-11, GM-12, GM-13, and the mainline Report Center / Team Dynamics surfaces.
 
 **What ships:**
 
-- Four-dimension completion stats.
-- Ticket earned and lottery participation summary.
-- Rare prize highlights.
-- Weak social response highlights.
-- Optional weekly report block.
+- Weekly game summary aggregation from completed task, ticket, lottery, item-use, and weak-social records.
+- Report Center `牛马补给站` weekly recap block.
+- Admin publish action that can write a weekly recap into Team Dynamics.
+- Optional Enterprise WeChat weekly recap send path when webhook config exists.
 
 **Acceptance criteria:**
 
 - Report center can render without game data.
 - Weekly report uses aggregated records, not live random recalculation.
 - Report copy remains readable and does not expose every low-value action.
+- Publishing the same weekly recap twice does not create duplicate Team Dynamics events.
+- Enterprise WeChat send failure does not corrupt the saved weekly recap state.
 
 ## Recommended Release Slices
 
