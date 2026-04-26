@@ -17,25 +17,61 @@ model Team {
   seasons        Season[]
   activityEvents ActivityEvent[]
   coffeeRecords  CoffeeRecord[]
+  teamDynamics   TeamDynamic[]
 }
 
 model User {
-  id              String             @id @default(cuid())
-  username        String             @unique
-  password        String
-  avatarKey       String
-  role            String             @default("MEMBER")
-  currentStreak   Int                @default(0)
-  lastPunchDayKey String?
-  coins           Int                @default(0)
-  teamId          String
-  team            Team               @relation(fields: [teamId], references: [id])
-  punchRecords    PunchRecord[]
-  boardNotes      BoardNote[]
-  seasonStats     SeasonMemberStat[]
-  activityEvents  ActivityEvent[]
-  coffeeRecords   CoffeeRecord[]
-  createdAt       DateTime           @default(now())
+  id                    String                 @id @default(cuid())
+  username              String                 @unique
+  password              String
+  avatarKey             String
+  role                  String                 @default("MEMBER")
+  currentStreak         Int                    @default(0)
+  lastPunchDayKey       String?
+  coins                 Int                    @default(0)
+  teamId                String
+  team                  Team                   @relation(fields: [teamId], references: [id])
+  punchRecords          PunchRecord[]
+  boardNotes            BoardNote[]
+  seasonStats           SeasonMemberStat[]
+  activityEvents        ActivityEvent[]
+  coffeeRecords         CoffeeRecord[]
+  teamDynamicReadStates TeamDynamicReadState[]
+  createdAt             DateTime               @default(now())
+}
+
+model TeamDynamic {
+  id          String                 @id @default(cuid())
+  teamId      String
+  team        Team                   @relation(fields: [teamId], references: [id])
+  type        String
+  title       String
+  summary     String
+  payloadJson String
+  actorUserId String?
+  sourceType  String?
+  sourceId    String?
+  importance  String                 @default("normal")
+  occurredAt  DateTime
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  readStates  TeamDynamicReadState[]
+
+  @@index([teamId, occurredAt])
+  @@index([teamId, type, occurredAt])
+  @@unique([teamId, sourceType, sourceId])
+}
+
+model TeamDynamicReadState {
+  id            String      @id @default(cuid())
+  teamDynamicId String
+  teamDynamic   TeamDynamic @relation(fields: [teamDynamicId], references: [id])
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  readAt        DateTime    @default(now())
+
+  @@unique([teamDynamicId, userId])
+  @@index([userId, readAt])
 }
 
 model Season {
