@@ -8,6 +8,7 @@
 # Codex local config and logs
 .codex/
 .codex-dev-*.log
+.worktrees/
 
 # Superpowers local config
 .superpowers/
@@ -30,8 +31,8 @@ dist/
 
 # Database
 *.db
-!prisma/dev.db
 prisma/dev.db.bak-*
+.local/
 
 # Prisma generated client
 /lib/generated/prisma

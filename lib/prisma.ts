@@ -1,26 +1,13 @@
 import { PrismaClient } from "@/lib/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import path from "path";
+import { resolveSqliteDatabaseUrl } from "@/lib/sqlite-db-config";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function resolveDbPath() {
-  const overridePath = process.env.PRISMA_DB_PATH?.trim();
-
-  if (!overridePath) {
-    return path.resolve(process.cwd(), "prisma", "dev.db");
-  }
-
-  return path.isAbsolute(overridePath)
-    ? overridePath
-    : path.resolve(process.cwd(), overridePath);
-}
-
 function createPrismaClient() {
-  const dbPath = resolveDbPath();
-  const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
+  const adapter = new PrismaBetterSqlite3({ url: resolveSqliteDatabaseUrl() });
   return new PrismaClient({ adapter });
 }
 

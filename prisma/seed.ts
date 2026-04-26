@@ -1,10 +1,9 @@
 import { PrismaClient } from "@/lib/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import path from "path";
+import { resolveSqliteDatabaseUrl } from "@/lib/sqlite-db-config";
 import { seedDatabase } from "../lib/db-seed";
 
-const dbPath = path.resolve(process.cwd(), "prisma", "dev.db");
-const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
+const adapter = new PrismaBetterSqlite3({ url: resolveSqliteDatabaseUrl() });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
