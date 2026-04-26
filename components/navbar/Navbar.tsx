@@ -8,6 +8,7 @@ import { ProfileDropdown } from "./ProfileDropdown";
 import { AssetIcon } from "@/components/ui/AssetIcon";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
+import { TeamDynamicsBell } from "./TeamDynamicsBell";
 
 export function Navbar() {
   const { state, dispatch } = useBoard();
@@ -108,6 +109,7 @@ export function Navbar() {
             >
               <span aria-hidden="true">{mobileTabsOpen ? "×" : "≡"}</span>
             </button>
+            <TeamDynamicsBell />
             <button
               onClick={handleProfileClick}
               disabled={!currentMember}
