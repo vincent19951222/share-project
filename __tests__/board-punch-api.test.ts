@@ -61,6 +61,12 @@ describe("/api/board/punch", () => {
         userId: { in: teamUsers.map((member) => member.id) },
       },
     });
+    await prisma.teamDynamicReadState.deleteMany();
+    await prisma.teamDynamic.deleteMany({
+      where: {
+        teamId: user.teamId,
+      },
+    });
     await prisma.seasonMemberStat.deleteMany({
       where: {
         seasonId: { in: seasonIds },
@@ -388,6 +394,72 @@ describe("/api/board/punch", () => {
     expect(afterSeason.filledSlots).toBe(1);
     expect(records.filter((record) => record.countedForSeasonSlot)).toHaveLength(1);
     expect(stats.reduce((sum, stat) => sum + stat.slotContribution, 0)).toBe(1);
+  });
+
+  it("writes a season target reached dynamic exactly once when the last slot fills", async () => {
+    await resetState();
+    await createActiveSeason({ filledSlots: 0, targetSlots: 1 });
+
+    const currentUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const otherUser = await prisma.user.findFirstOrThrow({
+      where: { teamId: currentUser.teamId, id: { not: userId } },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      POST(request("POST", userId)),
+      POST(request("POST", otherUser.id)),
+    ]);
+
+    expect([firstResponse.status, secondResponse.status].sort((a, b) => a - b)).toEqual([200, 200]);
+
+    const entries = await prisma.teamDynamic.findMany({
+      where: { teamId: currentUser.teamId, type: "SEASON_TARGET_REACHED" },
+    });
+
+    expect(entries).toHaveLength(1);
+  });
+
+  it("writes a full attendance dynamic when every member punches on the same day", async () => {
+    await resetState();
+    const currentUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const teammates = await prisma.user.findMany({
+      where: { teamId: currentUser.teamId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    for (const teammate of teammates) {
+      const response = await POST(request("POST", teammate.id));
+      expect(response.status).toBe(200);
+    }
+
+    const entry = await prisma.teamDynamic.findFirstOrThrow({
+      where: { teamId: currentUser.teamId, type: "TEAM_FULL_ATTENDANCE" },
+      orderBy: { occurredAt: "desc" },
+    });
+
+    expect(entry.summary).toContain("全勤");
+  });
+
+  it("writes a streak milestone dynamic when the current user reaches seven days", async () => {
+    await resetState();
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        currentStreak: 6,
+        lastPunchDayKey: "2026-04-23",
+      },
+    });
+
+    const response = await POST(request("POST", userId));
+    expect(response.status).toBe(200);
+
+    const entry = await prisma.teamDynamic.findFirstOrThrow({
+      where: { type: "STREAK_MILESTONE" },
+      orderBy: { occurredAt: "desc" },
+    });
+
+    expect(entry.title).toContain("7 天");
   });
 
   it("undoes today's punch and restores the previous streak and coins", async () => {

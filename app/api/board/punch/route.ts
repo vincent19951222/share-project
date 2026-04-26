@@ -13,6 +13,10 @@ import {
   getNextPunchStreak,
   getShanghaiDayKey,
 } from "@/lib/economy";
+import { TEAM_DYNAMIC_TYPES } from "@/lib/team-dynamics";
+import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
+
+const STREAK_MILESTONES = new Set([7, 14, 30]);
 
 class TodayPunchNotFoundError extends Error {
   constructor() {
@@ -91,6 +95,10 @@ export async function POST(request: NextRequest) {
       user.team.users.findIndex((member) => member.id === user.id),
       0,
     );
+    const teamMemberIds = user.team.users.map((member) => member.id);
+    const teamMemberCount = teamMemberIds.length;
+    let recordCountedForSeasonSlot = false;
+    let nextFilledSlots = activeSeason?.filledSlots ?? 0;
 
     try {
       await prisma.$transaction(async (tx) => {
@@ -113,6 +121,10 @@ export async function POST(request: NextRequest) {
           });
 
           countsForSeasonSlot = seasonUpdate.count === 1;
+          recordCountedForSeasonSlot = countsForSeasonSlot;
+          nextFilledSlots = countsForSeasonSlot
+            ? Math.min(activeSeason.filledSlots + 1, activeSeason.targetSlots)
+            : activeSeason.filledSlots;
         }
 
         await tx.punchRecord.create({
@@ -208,6 +220,82 @@ export async function POST(request: NextRequest) {
       }
 
       throw error;
+    }
+
+    const dynamicsToCreate: Promise<unknown>[] = [];
+
+    if (STREAK_MILESTONES.has(nextStreak)) {
+      dynamicsToCreate.push(
+        createOrReuseTeamDynamic({
+          teamId: user.teamId,
+          actorUserId: user.id,
+          type: TEAM_DYNAMIC_TYPES.STREAK_MILESTONE,
+          title: `${user.username} 连续打卡 ${nextStreak} 天`,
+          summary: `${user.username} 把连签推进到了第 ${nextStreak} 天`,
+          payload: {
+            userId: user.id,
+            username: user.username,
+            streak: nextStreak,
+          },
+          sourceType: "streak",
+          sourceId: `${user.id}:${nextStreak}:${todayDayKey}`,
+          occurredAt: now,
+        }),
+      );
+    }
+
+    const todayPunchCount = await prisma.punchRecord.count({
+      where: {
+        userId: { in: teamMemberIds },
+        dayKey: todayDayKey,
+        punched: true,
+      },
+    });
+
+    if (todayPunchCount === teamMemberCount) {
+      dynamicsToCreate.push(
+        createOrReuseTeamDynamic({
+          teamId: user.teamId,
+          type: TEAM_DYNAMIC_TYPES.TEAM_FULL_ATTENDANCE,
+          title: "今天全员完成打卡",
+          summary: `${todayDayKey} 团队全勤，今天没有人掉队`,
+          payload: {
+            dayKey: todayDayKey,
+            memberCount: teamMemberCount,
+          },
+          sourceType: "attendance",
+          sourceId: todayDayKey,
+          occurredAt: now,
+        }),
+      );
+    }
+
+    if (
+      activeSeason &&
+      recordCountedForSeasonSlot &&
+      nextFilledSlots === activeSeason.targetSlots
+    ) {
+      dynamicsToCreate.push(
+        createOrReuseTeamDynamic({
+          teamId: user.teamId,
+          type: TEAM_DYNAMIC_TYPES.SEASON_TARGET_REACHED,
+          title: `赛季目标已达成：${activeSeason.goalName}`,
+          summary: `${activeSeason.goalName} 冲到 ${activeSeason.targetSlots}/${activeSeason.targetSlots}`,
+          payload: {
+            seasonId: activeSeason.id,
+            goalName: activeSeason.goalName,
+            filledSlots: activeSeason.targetSlots,
+            targetSlots: activeSeason.targetSlots,
+          },
+          sourceType: "season-target",
+          sourceId: activeSeason.id,
+          occurredAt: now,
+        }),
+      );
+    }
+
+    if (dynamicsToCreate.length > 0) {
+      await Promise.all(dynamicsToCreate);
     }
 
     return buildSnapshotResponse(user.id, now);
