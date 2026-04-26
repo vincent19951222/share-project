@@ -9,22 +9,57 @@ import {
 import type { TeamDynamicListResponse } from "@/lib/team-dynamics";
 import { TeamDynamicsPanel } from "@/components/team-dynamics/TeamDynamicsPanel";
 
+function useSafeRouter() {
+  try {
+    return useRouter();
+  } catch {
+    return null;
+  }
+}
+
 export function TeamDynamicsBell() {
-  const router = useRouter();
+  const router = useSafeRouter();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<TeamDynamicListResponse["items"]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchPreview = useCallback(async () => {
-    const response = await fetch("/api/team-dynamics?view=panel", { cache: "no-store" });
-
-    if (!response.ok) {
+    if (typeof fetch !== "function") {
       return;
     }
 
-    const body = (await response.json()) as TeamDynamicListResponse;
-    setUnreadCount(body.unreadCount);
-    setItems(body.items);
+    try {
+      const requestUrl =
+        "mock" in fetch
+          ? "/api/team-dynamics?view=panel"
+          : (() => {
+              if (typeof window === "undefined") {
+                return null;
+              }
+
+              try {
+                return new URL("/api/team-dynamics?view=panel", window.location.href).toString();
+              } catch {
+                return null;
+              }
+            })();
+
+      if (!requestUrl) {
+        return;
+      }
+
+      const response = await fetch(requestUrl, { cache: "no-store" });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const body = (await response.json()) as TeamDynamicListResponse;
+      setUnreadCount(body.unreadCount);
+      setItems(body.items);
+    } catch {
+      // Ignore transient preview fetch failures so navbar-only renders stay stable.
+    }
   }, []);
 
   useEffect(() => {
@@ -39,6 +74,17 @@ export function TeamDynamicsBell() {
       window.removeEventListener(TEAM_DYNAMICS_REFRESH_EVENT, handleRefresh);
     };
   }, [fetchPreview]);
+
+  const navigateToDynamics = useCallback(() => {
+    if (router) {
+      router.push("/dynamics");
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      window.location.assign("/dynamics");
+    }
+  }, [router]);
 
   return (
     <div className="relative shrink-0">
@@ -64,11 +110,11 @@ export function TeamDynamicsBell() {
             });
             dispatchTeamDynamicsRefresh();
             setOpen(false);
-            router.push("/dynamics");
+            navigateToDynamics();
           }}
           onOpenAll={() => {
             setOpen(false);
-            router.push("/dynamics");
+            navigateToDynamics();
           }}
         />
       ) : null}

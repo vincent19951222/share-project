@@ -105,4 +105,15 @@ describe("TeamDynamicsBell", () => {
     expect(container.textContent).toContain("查看全部动态");
     expect(container.textContent).toContain("新赛季已经开启：五月脱脂挑战");
   });
+
+  it("ignores preview fetch failures in environments without a live api", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+
+    await act(async () => {
+      root.render(<Navbar />);
+      await Promise.resolve();
+    });
+
+    expect(container.querySelector(".team-dynamics-bell-badge")).toBeNull();
+  });
 });
