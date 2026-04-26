@@ -6,16 +6,51 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function resolveDbPath() {
-  const overridePath = process.env.PRISMA_DB_PATH?.trim();
+type ResolveDbPathOptions = {
+  cwd?: string;
+  prismaDbPath?: string;
+  databaseUrl?: string;
+};
 
-  if (!overridePath) {
-    return path.resolve(process.cwd(), "prisma", "dev.db");
+function resolveFileUrlPath(databaseUrl: string | undefined) {
+  const normalized = databaseUrl?.trim();
+
+  if (!normalized?.startsWith("file:")) {
+    return null;
   }
 
-  return path.isAbsolute(overridePath)
-    ? overridePath
-    : path.resolve(process.cwd(), overridePath);
+  const withoutScheme = normalized.slice("file:".length);
+
+  if (!withoutScheme) {
+    return null;
+  }
+
+  const [pathname] = withoutScheme.split(/[?#]/, 1);
+  return pathname || null;
+}
+
+export function resolveDbPath({
+  cwd = process.cwd(),
+  prismaDbPath = process.env.PRISMA_DB_PATH,
+  databaseUrl = process.env.DATABASE_URL,
+}: ResolveDbPathOptions = {}) {
+  const overridePath = prismaDbPath?.trim();
+
+  if (overridePath) {
+    return path.isAbsolute(overridePath)
+      ? overridePath
+      : path.resolve(cwd, overridePath);
+  }
+
+  const databasePath = resolveFileUrlPath(databaseUrl);
+
+  if (databasePath) {
+    return path.isAbsolute(databasePath)
+      ? databasePath
+      : path.resolve(cwd, databasePath);
+  }
+
+  return path.resolve(cwd, "prisma", "dev.db");
 }
 
 function createPrismaClient() {
