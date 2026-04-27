@@ -96,6 +96,8 @@ describe("TeamDynamicsBell", () => {
       button.getAttribute("aria-label")?.includes("团队动态"),
     );
     expect(bellButton).toBeDefined();
+    expect(bellButton?.querySelector("svg")).not.toBeNull();
+    expect(bellButton?.textContent).not.toContain("铃");
 
     await act(async () => {
       bellButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));

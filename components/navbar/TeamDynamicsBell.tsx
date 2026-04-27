@@ -8,6 +8,7 @@ import {
 } from "@/lib/team-dynamics-refresh";
 import type { TeamDynamicListResponse } from "@/lib/team-dynamics";
 import { TeamDynamicsPanel } from "@/components/team-dynamics/TeamDynamicsPanel";
+import { SvgIcons } from "@/components/ui/SvgIcons";
 
 function useSafeRouter() {
   try {
@@ -94,7 +95,11 @@ export function TeamDynamicsBell() {
         onClick={() => setOpen((value) => !value)}
         className="team-dynamics-bell-btn"
       >
-        <span aria-hidden="true">铃</span>
+        <span
+          aria-hidden="true"
+          className="team-dynamics-bell-icon"
+          dangerouslySetInnerHTML={{ __html: SvgIcons.bell }}
+        />
         {unreadCount > 0 ? <span className="team-dynamics-bell-badge">{unreadCount}</span> : null}
       </button>
 

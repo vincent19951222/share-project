@@ -42,7 +42,10 @@ describe("DocsCenter", () => {
     });
 
     expect(container.textContent).toContain("文档中心");
+    expect(container.textContent).toContain("最近更新");
     expect(container.textContent).toContain("赛季规则");
+    expect(container.textContent).not.toContain("EDITORIAL MANUAL");
+    expect(container.textContent).not.toContain("SECTION");
     expect(container.querySelector('[role="tablist"]')).toBeNull();
     expect(container.querySelector('[role="tab"]')).toBeNull();
     expect(container.querySelector('a[href="/docs?tab=rules#vault"]')).not.toBeNull();

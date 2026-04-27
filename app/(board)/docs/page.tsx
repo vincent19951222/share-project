@@ -27,8 +27,10 @@ export default async function DocsPage({ searchParams }: DocsPageProps) {
   const initialTab = resolveDocsTab(params.tab);
 
   return (
-    <div className="p-4 sm:p-6">
-      <DocsCenter initialTab={initialTab} />
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <DocsCenter initialTab={initialTab} />
+      </div>
     </div>
   );
 }

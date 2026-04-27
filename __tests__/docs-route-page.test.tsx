@@ -52,5 +52,7 @@ describe("DocsPage route", () => {
   it("stays standalone by avoiding Navbar imports and deriving tabs from docs content", () => {
     expect(routeSource).not.toContain('from "@/components/navbar/Navbar"');
     expect(routeSource).toContain('from "@/content/docs-center/tabs"');
+    expect(routeSource).toContain("flex h-full min-h-0 flex-col");
+    expect(routeSource).toContain("flex-1 overflow-y-auto");
   });
 });

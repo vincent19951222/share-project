@@ -7,7 +7,6 @@ interface DocsSectionProps {
 export function DocsSection({ section }: DocsSectionProps) {
   return (
     <article id={section.id} className="docs-section">
-      <div className="docs-section-kicker">SECTION</div>
       <h2 className="docs-section-title">{section.title}</h2>
       <p className="docs-section-summary">{section.summary}</p>
       <ul className="docs-section-list">

@@ -67,15 +67,15 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
         <a className="docs-back-link" href="/">
           返回主面板
         </a>
-        <p className="docs-center-kicker">EDITORIAL MANUAL</p>
         <div className="docs-center-title-row">
-          <div>
+          <div className="docs-center-heading">
             <h1 className="docs-center-title">文档中心</h1>
-            <p className="docs-center-intro">承接规则、说明、更新记录，减少口径分散和重复解释。</p>
-          </div>
-          <div className="docs-center-stamp">
-            <span className="docs-center-stamp-label">最近更新</span>
-            <strong>{updatedAt}</strong>
+            <p className="docs-center-intro">
+              集中查看更新日志、赛季规则、使用说明和常见问题，减少重复解释和口径分散。
+            </p>
+            <p className="docs-center-meta">
+              最近更新：<time dateTime={updatedAt}>{updatedAt}</time>
+            </p>
           </div>
         </div>
       </div>
@@ -84,8 +84,11 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
 
       <div className="docs-center-body">
         <aside className="docs-center-sidebar">
-          <p className="docs-current-tab">{activeTabMeta.label}</p>
-          <p className="docs-current-description">{activeTabMeta.description}</p>
+          <div className="docs-current-tab">
+            <p className="docs-current-label">当前栏目</p>
+            <p className="docs-current-title">{activeTabMeta.label}</p>
+            <p className="docs-current-description">{activeTabMeta.description}</p>
+          </div>
           <DocsTableOfContents
             hrefBase={buildTocHrefBase(safePathname, activeTabMeta.id)}
             items={sections.map((section) => ({ id: section.id, label: section.title }))}

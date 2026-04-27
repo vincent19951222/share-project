@@ -15,7 +15,7 @@ interface DocsTableOfContentsProps {
 export function DocsTableOfContents({ hrefBase, items }: DocsTableOfContentsProps) {
   return (
     <nav className="docs-toc" aria-label="当前栏目目录">
-      <p className="docs-toc-eyebrow">本页索引</p>
+      <p className="docs-toc-eyebrow">本页目录</p>
       <ul className="docs-toc-list">
         {items.map((item) => (
           <li key={item.id}>

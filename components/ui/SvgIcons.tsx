@@ -11,6 +11,7 @@ export const SvgIcons = {
   msgHighlight: `<svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-yellow-500" fill="#fde047" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
   poke: `<svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0 text-slate-800" fill="#fde047" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
   signal: `<svg viewBox="0 0 24 24" class="w-3 h-3 shrink-0 inline-block align-middle" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4a16 16 0 0 1 16 16M4 10a10 10 0 0 1 10 10M4 16a4 4 0 0 1 4 4M4 22h.01"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="#fde047" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M10.5 20a1.75 1.75 0 0 0 3 0"/></svg>`,
 
   // Misc icons
   trophy: `<svg viewBox="0 0 24 24" class="w-full h-full" fill="#fef08a" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
