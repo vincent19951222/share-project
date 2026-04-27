@@ -16,6 +16,7 @@ export function DocsTabs({ tabs, activeTab, onTabChange }: DocsTabsProps) {
           <button
             key={tab.id}
             type="button"
+            aria-pressed={isActive}
             className={isActive ? "docs-tab docs-tab-active" : "docs-tab"}
             onClick={() => onTabChange(tab.id)}
           >

@@ -50,8 +50,14 @@ describe("DocsCenter", () => {
     const faqButton = Array.from(container.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("常见问题"),
     );
+    const rulesButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("赛季规则"),
+    );
 
     expect(faqButton).toBeDefined();
+    expect(rulesButton).toBeDefined();
+    expect(rulesButton?.getAttribute("aria-pressed")).toBe("true");
+    expect(faqButton?.getAttribute("aria-pressed")).toBe("false");
 
     await act(async () => {
       faqButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -61,6 +67,8 @@ describe("DocsCenter", () => {
     expect(container.textContent).not.toContain("赛季开始 / 结束逻辑");
     expect(container.querySelector('a[href="/docs?tab=faq#docs-dropdown"]')).not.toBeNull();
     expect(container.querySelector('a[href="/docs?tab=rules#vault"]')).toBeNull();
+    expect(rulesButton?.getAttribute("aria-pressed")).toBe("false");
+    expect(faqButton?.getAttribute("aria-pressed")).toBe("true");
     expect(replaceMock).toHaveBeenCalledWith("/docs?tab=faq", { scroll: false });
   });
 
