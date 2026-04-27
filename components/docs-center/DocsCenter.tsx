@@ -9,7 +9,7 @@ import { docsRules } from "@/content/docs-center/rules";
 import { docsTabs } from "@/content/docs-center/tabs";
 import type { DocsSection as DocsSectionContent, DocsTabId } from "@/content/docs-center/types";
 import { DocsSection } from "./DocsSection";
-import { DocsTableOfContents } from "./DocsTableOfContents";
+import { DocsTableOfContents, type DocsTocHrefBase } from "./DocsTableOfContents";
 import { DocsTabs } from "./DocsTabs";
 
 function getSectionsForTab(tab: DocsTabId): DocsSectionContent[] {
@@ -36,6 +36,10 @@ function getSectionsForTab(tab: DocsTabId): DocsSectionContent[] {
 
 interface DocsCenterProps {
   initialTab: DocsTabId;
+}
+
+function buildTocHrefBase(pathname: string, tab: DocsTabId): DocsTocHrefBase {
+  return `${pathname}?tab=${tab}`;
 }
 
 export function DocsCenter({ initialTab }: DocsCenterProps) {
@@ -82,7 +86,7 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
           <p className="docs-current-tab">{activeTabMeta.label}</p>
           <p className="docs-current-description">{activeTabMeta.description}</p>
           <DocsTableOfContents
-            tab={activeTabMeta.id}
+            hrefBase={buildTocHrefBase(pathname, activeTabMeta.id)}
             items={sections.map((section) => ({ id: section.id, label: section.title }))}
           />
         </aside>
