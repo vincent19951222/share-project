@@ -41,6 +41,8 @@ describe("DocsCenter", () => {
 
     expect(container.textContent).toContain("文档中心");
     expect(container.textContent).toContain("赛季规则");
+    expect(container.querySelector('[role="tablist"]')).toBeNull();
+    expect(container.querySelector('[role="tab"]')).toBeNull();
     expect(container.querySelector('a[href="/docs?tab=rules#vault"]')).not.toBeNull();
     expect(container.textContent).toContain("牛马金库");
     expect(container.textContent).not.toContain("为什么文档中心放在下拉里？");

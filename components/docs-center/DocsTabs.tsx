@@ -8,7 +8,7 @@ interface DocsTabsProps {
 
 export function DocsTabs({ tabs, activeTab, onTabChange }: DocsTabsProps) {
   return (
-    <div className="docs-tabs" role="tablist" aria-label="文档中心栏目">
+    <div className="docs-tabs" aria-label="文档中心栏目">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 
@@ -16,8 +16,6 @@ export function DocsTabs({ tabs, activeTab, onTabChange }: DocsTabsProps) {
           <button
             key={tab.id}
             type="button"
-            role="tab"
-            aria-selected={isActive}
             className={isActive ? "docs-tab docs-tab-active" : "docs-tab"}
             onClick={() => onTabChange(tab.id)}
           >
