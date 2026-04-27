@@ -8,7 +8,7 @@ interface DocsTabsProps {
 
 export function DocsTabs({ tabs, activeTab, onTabChange }: DocsTabsProps) {
   return (
-    <div className="docs-tabs" aria-label="文档中心栏目">
+    <nav className="docs-tabs" aria-label="文档中心栏目">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 
@@ -25,6 +25,6 @@ export function DocsTabs({ tabs, activeTab, onTabChange }: DocsTabsProps) {
           </button>
         );
       })}
-    </div>
+    </nav>
   );
 }
