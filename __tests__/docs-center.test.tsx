@@ -5,9 +5,10 @@ import { DocsCenter } from "@/components/docs-center/DocsCenter";
 import { DocsTableOfContents } from "@/components/docs-center/DocsTableOfContents";
 
 const replaceMock = vi.fn();
+let pathnameMock: string | null = "/docs";
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/docs",
+  usePathname: () => pathnameMock,
   useRouter: () => ({
     replace: replaceMock,
   }),
@@ -24,6 +25,7 @@ describe("DocsCenter", () => {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
+    pathnameMock = "/docs";
     replaceMock.mockReset();
   });
 
@@ -87,5 +89,27 @@ describe("DocsCenter", () => {
 
     expect(container.querySelector('a[href="/manual?tab=help#punch-workflow"]')).not.toBeNull();
     expect(container.querySelector('a[href="/manual?tab=help#asset-check"]')).not.toBeNull();
+  });
+
+  it("falls back to /docs when pathname is unavailable", async () => {
+    pathnameMock = null;
+
+    await act(async () => {
+      root.render(<DocsCenter initialTab="rules" />);
+    });
+
+    expect(container.querySelector('a[href="/docs?tab=rules#vault"]')).not.toBeNull();
+
+    const faqButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("常见问题"),
+    );
+
+    expect(faqButton).toBeDefined();
+
+    await act(async () => {
+      faqButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(replaceMock).toHaveBeenCalledWith("/docs?tab=faq", { scroll: false });
   });
 });

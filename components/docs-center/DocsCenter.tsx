@@ -45,6 +45,7 @@ function buildTocHrefBase(pathname: string, tab: DocsTabId): DocsTocHrefBase {
 export function DocsCenter({ initialTab }: DocsCenterProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const safePathname = pathname ?? "/docs";
   const [activeTab, setActiveTab] = useState<DocsTabId>(initialTab);
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
 
   function handleTabChange(tab: DocsTabId) {
     setActiveTab(tab);
-    router.replace(`${pathname}?tab=${tab}`, { scroll: false });
+    router.replace(`${safePathname}?tab=${tab}`, { scroll: false });
   }
 
   return (
@@ -86,7 +87,7 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
           <p className="docs-current-tab">{activeTabMeta.label}</p>
           <p className="docs-current-description">{activeTabMeta.description}</p>
           <DocsTableOfContents
-            hrefBase={buildTocHrefBase(pathname, activeTabMeta.id)}
+            hrefBase={buildTocHrefBase(safePathname, activeTabMeta.id)}
             items={sections.map((section) => ({ id: section.id, label: section.title }))}
           />
         </aside>
