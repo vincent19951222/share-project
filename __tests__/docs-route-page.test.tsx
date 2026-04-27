@@ -1,11 +1,9 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DocsPage from "@/app/(board)/docs/page";
-
-vi.mock("@/components/navbar/Navbar", () => ({
-  Navbar: () => <div data-testid="navbar-shell">shared navbar</div>,
-}));
 
 vi.mock("@/components/docs-center/DocsCenter", () => ({
   DocsCenter: ({ initialTab }: { initialTab: string }) => (
@@ -19,6 +17,10 @@ vi.mock("@/components/docs-center/DocsCenter", () => ({
 describe("DocsPage route", () => {
   let container: HTMLDivElement;
   let root: Root;
+  const routeSource = readFileSync(
+    path.join(process.cwd(), "app", "(board)", "docs", "page.tsx"),
+    "utf8",
+  );
 
   beforeEach(() => {
     container = document.createElement("div");
@@ -45,6 +47,10 @@ describe("DocsPage route", () => {
     expect(container.querySelector('[data-testid="docs-center"]')?.textContent).toContain(
       "changelog",
     );
-    expect(container.querySelector('[data-testid="navbar-shell"]')).toBeNull();
+  });
+
+  it("stays standalone by avoiding Navbar imports and deriving tabs from docs content", () => {
+    expect(routeSource).not.toContain('from "@/components/navbar/Navbar"');
+    expect(routeSource).toContain('from "@/content/docs-center/tabs"');
   });
 });

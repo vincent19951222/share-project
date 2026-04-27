@@ -1,13 +1,16 @@
 import { DocsCenter } from "@/components/docs-center/DocsCenter";
+import { docsTabs } from "@/content/docs-center/tabs";
 import type { DocsTabId } from "@/content/docs-center/types";
 
-const validTabs: readonly DocsTabId[] = ["changelog", "rules", "help", "faq"];
+function isDocsTabId(value: string): value is DocsTabId {
+  return docsTabs.some((tab) => tab.id === value);
+}
 
 function resolveDocsTab(value: string | string[] | undefined): DocsTabId {
   const candidate = Array.isArray(value) ? value[0] : value;
 
-  if (candidate && validTabs.includes(candidate as DocsTabId)) {
-    return candidate as DocsTabId;
+  if (candidate && isDocsTabId(candidate)) {
+    return candidate;
   }
 
   return "changelog";
