@@ -39,6 +39,11 @@ describe("docs center CSS", () => {
 
     expect(css).toMatch(/\.docs-toc-link\s*\{[\s\S]*text-transform:\s*uppercase/);
     expect(css).toMatch(/\.docs-toc-link\s*\{[\s\S]*letter-spacing:\s*0\.12em/);
+    expect(css).toMatch(/\.docs-toc-list\s*\{[\s\S]*counter-reset:\s*docs-toc/);
+    expect(css).toMatch(/\.docs-toc-list li\s*\{[\s\S]*counter-increment:\s*docs-toc/);
+    expect(css).toMatch(
+      /\.docs-toc-link::before\s*\{[\s\S]*content:\s*counter\(docs-toc,\s*decimal-leading-zero\)\s*"\."/,
+    );
 
     expect(tabletBlock).toMatch(/\.docs-center-body\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.docs-tabs\s*\{[\s\S]*overflow-x:\s*auto/);

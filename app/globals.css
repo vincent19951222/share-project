@@ -828,6 +828,11 @@ body {
 .docs-toc-list {
   display: grid;
   gap: 0.65rem;
+  counter-reset: docs-toc;
+}
+
+.docs-toc-list li {
+  counter-increment: docs-toc;
 }
 
 .docs-toc-link {
@@ -840,6 +845,15 @@ body {
   letter-spacing: 0.12em;
   line-height: 1.5;
   text-transform: uppercase;
+}
+
+.docs-toc-link::before {
+  content: counter(docs-toc, decimal-leading-zero) ".";
+  display: inline-block;
+  min-width: 2.8rem;
+  margin-right: 0.45rem;
+  color: #a16207;
+  font-weight: 900;
 }
 
 .docs-center-content {
