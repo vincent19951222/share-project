@@ -8,7 +8,7 @@
     "prebuild": "npm run prepare:prisma",
     "prelint": "npm run prepare:prisma",
     "pretest": "npm run prepare:prisma",
-    "dev": "next dev",
+    "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
