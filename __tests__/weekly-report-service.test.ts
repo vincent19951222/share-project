@@ -6,6 +6,7 @@ import {
   buildWeeklyReportSnapshot,
   getCurrentWeeklyReportDraft,
   publishWeeklyReportDraft,
+  publishWeeklyReportDraftWithStatus,
   upsertWeeklyReportDraft,
 } from "@/lib/weekly-report-service";
 
@@ -381,6 +382,26 @@ describe("weekly-report service", () => {
         },
       }),
     ).toBe(1);
+  });
+
+  it("reports whether a weekly team dynamic was newly published", async () => {
+    await upsertWeeklyReportDraft({
+      userId: ADMIN_ID,
+      now: REPORT_NOW,
+    });
+
+    const first = await publishWeeklyReportDraftWithStatus({
+      userId: ADMIN_ID,
+      now: PUBLISH_NOW,
+    });
+    const second = await publishWeeklyReportDraftWithStatus({
+      userId: ADMIN_ID,
+      now: new Date("2026-04-30T12:05:00+08:00"),
+    });
+
+    expect(first.created).toBe(true);
+    expect(second.created).toBe(false);
+    expect(second.dynamic.id).toBe(first.dynamic.id);
   });
 
   it("publishes the stored draft snapshot instead of recomputing current data", async () => {

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { publishWeeklyReportDraft, WeeklyReportServiceError } from "@/lib/weekly-report-service";
+import {
+  publishWeeklyReportDraftWithStatus,
+  WeeklyReportServiceError,
+} from "@/lib/weekly-report-service";
+import { pushWeeklyReportDynamicToWeWork, type WeWorkPushResult } from "@/lib/wework-webhook";
 import { isAdminUser, loadCurrentUser } from "@/lib/session";
 
 function handleWeeklyReportServiceError(error: unknown) {
@@ -22,8 +26,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const dynamic = await publishWeeklyReportDraft({ userId: user.id });
-    return NextResponse.json({ dynamic });
+    const { dynamic, created } = await publishWeeklyReportDraftWithStatus({ userId: user.id });
+    const weworkPush: WeWorkPushResult = created
+      ? await pushWeeklyReportDynamicToWeWork({ dynamic })
+      : { status: "skipped", reason: "already-published" };
+
+    return NextResponse.json({ dynamic, weworkPush });
   } catch (error) {
     return handleWeeklyReportServiceError(error);
   }

@@ -66,7 +66,10 @@ npm run build
 
 ```env
 DATABASE_URL="file:/E:/data/share-project/prod.db"
+WEWORK_WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..."
 ```
+
+`WEWORK_WEBHOOK_URL` 为可选配置。配置后，管理员发布本周战报时会自动向对应企业微信群机器人推送 markdown 周报；未配置时发布流程正常完成，只跳过企业微信推送。
 
 标准生产启动流程：
 

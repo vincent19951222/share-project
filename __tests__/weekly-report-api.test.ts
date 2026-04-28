@@ -45,6 +45,8 @@ describe("weekly report admin api", () => {
   });
 
   afterEach(async () => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     await cleanupWeeklyReportArtifacts();
   });
 
@@ -94,6 +96,42 @@ describe("weekly report admin api", () => {
       sourceId: `${admin.teamId}:2026-04-27`,
       summary: createBody.draft.summary,
     });
+  });
+
+  it("automatically pushes to enterprise wechat after publishing without blocking success", async () => {
+    vi.stubEnv("WEWORK_WEBHOOK_URL", "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key");
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+    const { admin } = await getSeedUsers();
+
+    await postDraft(makeRequest("POST", "/api/reports/weekly/draft", admin.id));
+    const response = await postPublish(makeRequest("POST", "/api/reports/weekly/publish", admin.id));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+
+    expect(body.dynamic).toMatchObject({
+      teamId: admin.teamId,
+      type: "WEEKLY_REPORT_CREATED",
+      sourceType: "weekly-report",
+    });
+    expect(body.weworkPush).toEqual({
+      status: "failed",
+      reason: "network down",
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    const secondResponse = await postPublish(makeRequest("POST", "/api/reports/weekly/publish", admin.id));
+    expect(secondResponse.status).toBe(200);
+    await expect(secondResponse.json()).resolves.toMatchObject({
+      weworkPush: { status: "skipped", reason: "already-published" },
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("returns 403 for non-admin users", async () => {

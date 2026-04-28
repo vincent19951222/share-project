@@ -1,7 +1,6 @@
 import type { Prisma, TeamDynamic, WeeklyReportDraft } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { TEAM_DYNAMIC_TYPES } from "@/lib/team-dynamics";
-import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
 import {
   buildWeeklyReportSummary,
   getCurrentWeeklyReportWindow,
@@ -399,6 +398,13 @@ export async function getCurrentWeeklyReportDraft(
 export async function publishWeeklyReportDraft(
   input: AdminWeeklyReportInput,
 ): Promise<TeamDynamic> {
+  const result = await publishWeeklyReportDraftWithStatus(input);
+  return result.dynamic;
+}
+
+export async function publishWeeklyReportDraftWithStatus(
+  input: AdminWeeklyReportInput,
+): Promise<{ dynamic: TeamDynamic; created: boolean }> {
   const client = input.client ?? prisma;
   const now = input.now ?? new Date();
   const admin = await requireAdmin({ ...input, client });
@@ -411,19 +417,36 @@ export async function publishWeeklyReportDraft(
   const sourceType = "weekly-report";
   const sourceId = `${admin.teamId}:${draft.weekStartDayKey}`;
 
+  const existing = await client.teamDynamic.findUnique({
+    where: {
+      teamId_sourceType_sourceId: {
+        teamId: admin.teamId,
+        sourceType,
+        sourceId,
+      },
+    },
+  });
+
+  if (existing) {
+    return { dynamic: existing, created: false };
+  }
+
   try {
-    return await createOrReuseTeamDynamic({
-      teamId: admin.teamId,
-      type: TEAM_DYNAMIC_TYPES.WEEKLY_REPORT_CREATED,
-      title: "本周战报已经生成",
-      summary: draft.summary,
-      payload: draft.snapshot,
-      actorUserId: admin.id,
-      sourceType,
-      sourceId,
-      occurredAt: now,
-      client,
+    const dynamic = await client.teamDynamic.create({
+      data: {
+        teamId: admin.teamId,
+        type: TEAM_DYNAMIC_TYPES.WEEKLY_REPORT_CREATED,
+        title: "本周战报已经生成",
+        summary: draft.summary,
+        payloadJson: JSON.stringify(draft.snapshot),
+        actorUserId: admin.id,
+        sourceType,
+        sourceId,
+        occurredAt: now,
+      },
     });
+
+    return { dynamic, created: true };
   } catch (error) {
     if (!isUniqueConstraintError(error)) {
       throw error;
@@ -440,7 +463,7 @@ export async function publishWeeklyReportDraft(
     });
 
     if (existing) {
-      return existing;
+      return { dynamic: existing, created: false };
     }
 
     throw error;
