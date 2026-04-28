@@ -7,6 +7,7 @@ import { ReportHeader } from "./ReportHeader";
 import { Milestones } from "./Milestones";
 import { CoffeeReportPanel } from "./CoffeeReportPanel";
 import { TrendChart } from "./TrendChart";
+import { WeeklyReportAdminPanel } from "./WeeklyReportAdminPanel";
 import { buildReportData } from "./report-data";
 
 export function ReportCenter() {
@@ -34,6 +35,7 @@ export function ReportCenter() {
           error={coffeeState.error}
         />
       </div>
+      {state.currentUser?.isAdmin ? <WeeklyReportAdminPanel /> : null}
     </div>
   );
 }
