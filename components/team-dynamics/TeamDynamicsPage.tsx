@@ -12,39 +12,60 @@ import type {
 import { TeamDynamicsFilters } from "./TeamDynamicsFilters";
 import { TeamDynamicsTimeline } from "./TeamDynamicsTimeline";
 
+async function readErrorMessage(response: Response, fallback: string) {
+  try {
+    const body = (await response.json()) as { error?: unknown };
+
+    if (typeof body.error === "string" && body.error.trim() !== "") {
+      return body.error;
+    }
+  } catch {
+    // Keep the fallback when the server did not send a JSON error payload.
+  }
+
+  return fallback;
+}
+
 export function TeamDynamicsPage({
   initialItems,
   initialUnreadCount,
-  initialNextCursor,
 }: {
   initialItems: TeamDynamicListItem[];
   initialUnreadCount: number;
-  initialNextCursor: string | null;
 }) {
   const [items, setItems] = useState(initialItems);
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [activeType, setActiveType] = useState<TeamDynamicFilterType>("ALL");
-  const [_nextCursor] = useState(initialNextCursor);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function reload(nextUnreadOnly: boolean, nextType: TeamDynamicFilterType) {
-    const query = new URLSearchParams({
-      view: "page",
-      ...(nextUnreadOnly ? { filter: "unread" } : {}),
-      ...(nextType !== "ALL" ? { type: nextType } : {}),
-    });
+    try {
+      setErrorMessage(null);
 
-    const response = await fetch(`/api/team-dynamics?${query.toString()}`, {
-      cache: "no-store",
-    });
+      const query = new URLSearchParams({
+        view: "page",
+        ...(nextUnreadOnly ? { filter: "unread" } : {}),
+        ...(nextType !== "ALL" ? { type: nextType } : {}),
+      });
 
-    if (!response.ok) {
-      return;
+      const response = await fetch(`/api/team-dynamics?${query.toString()}`, {
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setErrorMessage(await readErrorMessage(response, "团队动态加载失败"));
+        return false;
+      }
+
+      const body = (await response.json()) as TeamDynamicListResponse;
+      setItems(body.items);
+      setUnreadCount(body.unreadCount);
+      return true;
+    } catch {
+      setErrorMessage("团队动态加载失败");
+      return false;
     }
-
-    const body = (await response.json()) as TeamDynamicListResponse;
-    setItems(body.items);
-    setUnreadCount(body.unreadCount);
   }
 
   return (
@@ -62,18 +83,28 @@ export function TeamDynamicsPage({
             type="button"
             className="quest-btn px-4 py-2 text-sm"
             onClick={async () => {
-              const response = await fetch("/api/team-dynamics/read", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mode: "all" }),
-              });
+              try {
+                setErrorMessage(null);
 
-              if (!response.ok) {
-                return;
+                const response = await fetch("/api/team-dynamics/read", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ mode: "all" }),
+                });
+
+                if (!response.ok) {
+                  setErrorMessage(await readErrorMessage(response, "全部标为已读失败"));
+                  return;
+                }
+
+                const reloaded = await reload(unreadOnly, activeType);
+
+                if (reloaded) {
+                  dispatchTeamDynamicsRefresh();
+                }
+              } catch {
+                setErrorMessage("全部标为已读失败");
               }
-
-              await reload(unreadOnly, activeType);
-              dispatchTeamDynamicsRefresh();
             }}
           >
             全部标为已读
@@ -87,15 +118,27 @@ export function TeamDynamicsPage({
             activeType={activeType}
             onToggleUnread={async () => {
               const nextUnreadOnly = !unreadOnly;
-              setUnreadOnly(nextUnreadOnly);
-              await reload(nextUnreadOnly, activeType);
+              const reloaded = await reload(nextUnreadOnly, activeType);
+
+              if (reloaded) {
+                setUnreadOnly(nextUnreadOnly);
+              }
             }}
             onTypeChange={async (nextType) => {
-              setActiveType(nextType);
-              await reload(unreadOnly, nextType);
+              const reloaded = await reload(unreadOnly, nextType);
+
+              if (reloaded) {
+                setActiveType(nextType);
+              }
             }}
           />
         </div>
+
+        {errorMessage ? (
+          <div className="rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+            {errorMessage}
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-5">

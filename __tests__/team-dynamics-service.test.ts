@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
-import { TEAM_DYNAMIC_TYPES } from "@/lib/team-dynamics";
+import {
+  TEAM_DYNAMICS_PAGE_LIMIT,
+  TEAM_DYNAMICS_PANEL_LIMIT,
+  TEAM_DYNAMIC_TYPES,
+} from "@/lib/team-dynamics";
 import {
   createOrReuseTeamDynamic,
   listTeamDynamicsForUser,
@@ -86,7 +90,7 @@ describe("team-dynamics service", () => {
       view: "page",
       unreadOnly: true,
       type: "ALL",
-      limit: 50,
+      limit: TEAM_DYNAMICS_PAGE_LIMIT,
       cursor: null,
     });
 
@@ -114,7 +118,7 @@ describe("team-dynamics service", () => {
       view: "panel",
       unreadOnly: true,
       type: "ALL",
-      limit: 8,
+      limit: TEAM_DYNAMICS_PANEL_LIMIT,
       cursor: null,
     });
 

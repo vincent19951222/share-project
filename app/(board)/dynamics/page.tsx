@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TeamDynamicsPage } from "@/components/team-dynamics/TeamDynamicsPage";
+import { TEAM_DYNAMICS_PAGE_LIMIT } from "@/lib/team-dynamics";
 import { listTeamDynamicsForUser } from "@/lib/team-dynamics-service";
 import { loadCurrentUser } from "@/lib/session";
 
@@ -18,7 +19,7 @@ export default async function DynamicsPage() {
     view: "page",
     unreadOnly: false,
     type: "ALL",
-    limit: 50,
+    limit: TEAM_DYNAMICS_PAGE_LIMIT,
     cursor: null,
   });
 
@@ -52,7 +53,6 @@ export default async function DynamicsPage() {
         <TeamDynamicsPage
           initialItems={initial.items}
           initialUnreadCount={initial.unreadCount}
-          initialNextCursor={initial.nextCursor}
         />
       </div>
     </div>

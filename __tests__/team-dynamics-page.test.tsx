@@ -13,6 +13,13 @@ function createJsonResponse(body: unknown) {
   } as Response;
 }
 
+function createErrorResponse(message: string) {
+  return {
+    ok: false,
+    json: async () => ({ error: message }),
+  } as Response;
+}
+
 function createWeeklyReportPayload() {
   return {
     version: 1,
@@ -100,7 +107,6 @@ describe("TeamDynamicsPage", () => {
             },
           ]}
           initialUnreadCount={1}
-          initialNextCursor={null}
         />,
       );
     });
@@ -133,5 +139,53 @@ describe("TeamDynamicsPage", () => {
     });
 
     expect(container.textContent).toContain("未读动态已经清空");
+  });
+
+  it("shows a visible error and keeps the current filter when reload fails", async () => {
+    vi.mocked(fetch).mockReset();
+    vi.mocked(fetch).mockResolvedValueOnce(createErrorResponse("Reload failed"));
+
+    await act(async () => {
+      root.render(
+        <TeamDynamicsPage
+          initialItems={[]}
+          initialUnreadCount={0}
+        />,
+      );
+    });
+
+    const unreadButton = container.querySelectorAll("button")[1];
+    const labelBeforeFailure = unreadButton.textContent;
+
+    await act(async () => {
+      unreadButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("Reload failed");
+    expect(unreadButton.textContent).toBe(labelBeforeFailure);
+  });
+
+  it("shows a visible error when mark-all fails", async () => {
+    vi.mocked(fetch).mockReset();
+    vi.mocked(fetch).mockResolvedValueOnce(createErrorResponse("Mark all failed"));
+
+    await act(async () => {
+      root.render(
+        <TeamDynamicsPage
+          initialItems={[]}
+          initialUnreadCount={1}
+        />,
+      );
+    });
+
+    const markAllButton = container.querySelectorAll("button")[0];
+
+    await act(async () => {
+      markAllButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("Mark all failed");
   });
 });

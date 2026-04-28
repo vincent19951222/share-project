@@ -16,6 +16,9 @@ export type TeamDynamicListView = "panel" | "page";
 export type TeamDynamicFilterType = TeamDynamicType | "ALL";
 export type TeamDynamicTone = "default" | "highlight" | "success";
 
+export const TEAM_DYNAMICS_PANEL_LIMIT = 8;
+export const TEAM_DYNAMICS_PAGE_LIMIT = 50;
+
 export interface TeamDynamicMeta {
   label: string;
   tone: TeamDynamicTone;
@@ -103,7 +106,7 @@ export function normalizeTeamDynamicsQuery(
     view,
     unreadOnly: searchParams.get("filter") === "unread",
     type: isTeamDynamicType(typeParam) ? typeParam : "ALL",
-    limit: view === "page" ? 50 : 8,
+    limit: view === "page" ? TEAM_DYNAMICS_PAGE_LIMIT : TEAM_DYNAMICS_PANEL_LIMIT,
     cursor: searchParams.get("cursor"),
   };
 }
