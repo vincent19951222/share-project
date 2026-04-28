@@ -78,6 +78,43 @@ function createJsonResponse(body: unknown) {
   };
 }
 
+function createErrorResponse(status: number, body: unknown) {
+  return {
+    ok: false,
+    status,
+    json: async () => body,
+  };
+}
+
+function buildAdminState(): BoardState {
+  return {
+    ...initialState,
+    currentUser: {
+      ...initialState.currentUser!,
+      isAdmin: true,
+    },
+  };
+}
+
+async function renderReportCenter(root: Root, state: BoardState) {
+  await act(async () => {
+    root.render(
+      <BoardProvider initialState={state}>
+        <CoffeeProvider>
+          <ReportCenter />
+        </CoffeeProvider>
+      </BoardProvider>,
+    );
+    await Promise.resolve();
+  });
+}
+
+function findButton(container: HTMLDivElement, label: string) {
+  return Array.from(container.querySelectorAll("button")).find((button) =>
+    button.textContent?.includes(label),
+  );
+}
+
 describe("ReportCenter", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -90,6 +127,12 @@ describe("ReportCenter", () => {
       vi.fn((input: RequestInfo | URL) => {
         if (String(input) === "/api/coffee/state") {
           return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        }
+        if (String(input) === "/api/reports/weekly/draft") {
+          return Promise.resolve(createJsonResponse({ draft: null }));
+        }
+        if (String(input) === "/api/reports/weekly/publish") {
+          return Promise.resolve(createJsonResponse({ dynamic: { id: "weekly-dynamic-1" } }));
         }
 
         throw new Error(`Unexpected fetch call: ${String(input)}`);
@@ -110,16 +153,7 @@ describe("ReportCenter", () => {
   });
 
   it("renders the lightweight dashboard with a playful coffee report", async () => {
-    await act(async () => {
-      root.render(
-        <BoardProvider initialState={initialState}>
-          <CoffeeProvider>
-            <ReportCenter />
-          </CoffeeProvider>
-        </BoardProvider>,
-      );
-      await Promise.resolve();
-    });
+    await renderReportCenter(root, initialState);
 
     expect(container.textContent).toContain("4月牛马战报");
     expect(container.textContent).toContain("本月打卡 4 次，全勤 1 天，团队节奏还有上升空间。");
@@ -147,5 +181,91 @@ describe("ReportCenter", () => {
     expect(container.textContent).not.toContain("Bob");
     expect(container.textContent).not.toContain("10.01");
     expect(container.querySelector("svg[aria-label='团队每日打卡人数趋势']")).not.toBeNull();
+  });
+
+  it("shows weekly report admin actions only for admins", async () => {
+    await renderReportCenter(root, buildAdminState());
+
+    expect(container.textContent).toContain("本周周报");
+    expect(container.textContent).toContain("还没生成本周草稿");
+    expect(findButton(container, "生成本周周报")).toBeTruthy();
+    expect(findButton(container, "发布到团队动态")).toBeTruthy();
+  });
+
+  it("hides the weekly report admin panel from regular members", async () => {
+    await renderReportCenter(root, initialState);
+
+    expect(container.textContent).not.toContain("本周周报");
+    expect(findButton(container, "生成本周周报")).toBeUndefined();
+    expect(findButton(container, "发布到团队动态")).toBeUndefined();
+  });
+
+  it("renders generated weekly draft summary and week range for admins", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        if (String(input) === "/api/coffee/state") {
+          return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        }
+        if (String(input) === "/api/reports/weekly/draft" && (!init?.method || init.method === "GET")) {
+          return Promise.resolve(createJsonResponse({ draft: null }));
+        }
+        if (String(input) === "/api/reports/weekly/draft" && init?.method === "POST") {
+          return Promise.resolve(
+            createJsonResponse({
+              draft: {
+                id: "draft-1",
+                teamId: "team-1",
+                createdByUserId: "u1",
+                weekStartDayKey: "2026-04-27",
+                summary: "本周打卡 9 次，全勤 2 天，赛季进度 3/5。",
+                createdAt: "2026-04-30T10:00:00.000+08:00",
+                updatedAt: "2026-04-30T10:00:00.000+08:00",
+                snapshot: {
+                  version: 1,
+                  weekStartDayKey: "2026-04-27",
+                  weekEndDayKey: "2026-04-30",
+                  generatedAt: "2026-04-30T10:00:00.000+08:00",
+                  generatedByUserId: "u1",
+                  summary: "本周打卡 9 次，全勤 2 天，赛季进度 3/5。",
+                  metrics: {
+                    totalPunches: 9,
+                    fullAttendanceDays: 2,
+                    seasonProgress: {
+                      filledSlots: 3,
+                      targetSlots: 5,
+                      status: "ACTIVE",
+                    },
+                  },
+                  highlights: {
+                    topMembers: [],
+                  },
+                  sections: [],
+                },
+              },
+            }),
+          );
+        }
+        if (String(input) === "/api/reports/weekly/publish") {
+          return Promise.resolve(createJsonResponse({ dynamic: { id: "weekly-dynamic-1" } }));
+        }
+
+        throw new Error(`Unexpected fetch call: ${String(input)} ${init?.method ?? "GET"}`);
+      }),
+    );
+
+    await renderReportCenter(root, buildAdminState());
+
+    const generateButton = findButton(container, "生成本周周报");
+    expect(generateButton).toBeTruthy();
+
+    await act(async () => {
+      generateButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("已生成草稿");
+    expect(container.textContent).toContain("本周打卡 9 次，全勤 2 天，赛季进度 3/5。");
+    expect(container.textContent).toContain("2026.04.27 - 2026.04.30");
   });
 });

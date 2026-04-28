@@ -53,6 +53,21 @@ export async function seedDatabase(): Promise<void> {
     where: { teamId: team.id },
   });
 
+  const existingTeamDynamics = await prisma.teamDynamic.findMany({
+    where: { teamId: team.id },
+    select: { id: true },
+  });
+  const existingTeamDynamicIds = existingTeamDynamics.map((item) => item.id);
+
+  if (existingTeamDynamicIds.length > 0) {
+    await prisma.teamDynamicReadState.deleteMany({
+      where: { teamDynamicId: { in: existingTeamDynamicIds } },
+    });
+    await prisma.teamDynamic.deleteMany({
+      where: { id: { in: existingTeamDynamicIds } },
+    });
+  }
+
   const seededUsernames = new Set(SEED_USERS.map((user) => user.username));
   const seededUserIds: string[] = [];
 
@@ -126,6 +141,7 @@ export async function seedDatabase(): Promise<void> {
     await prisma.coffeeRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.punchRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.seasonMemberStat.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.teamDynamicReadState.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.user.deleteMany({ where: { id: { in: extraUserIds } } });
   }
 }

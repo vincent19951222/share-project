@@ -102,6 +102,18 @@ describe("p3 responsive CSS", () => {
     expect(css).toMatch(/\.dropdown-menu[\s\S]*max-width:\s*calc\(100vw - 2rem\)/);
     expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.report-board\s*\{[\s\S]*position:\s*relative/);
     expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.report-board\s*\{[\s\S]*overflow:\s*visible/);
+    expect(css).toMatch(
+      /@media \(max-width:\s*760px\)[\s\S]*\.team-dynamics-panel\.dropdown-menu\s*\{[\s\S]*position:\s*fixed/,
+    );
+    expect(css).toMatch(
+      /@media \(max-width:\s*760px\)[\s\S]*\.team-dynamics-panel\.dropdown-menu\s*\{[\s\S]*left:\s*1rem/,
+    );
+    expect(css).toMatch(
+      /@media \(max-width:\s*760px\)[\s\S]*\.team-dynamics-panel\.dropdown-menu\s*\{[\s\S]*right:\s*1rem/,
+    );
+    expect(css).toMatch(
+      /@media \(max-width:\s*760px\)[\s\S]*\.team-dynamics-panel\.dropdown-menu\s*\{[\s\S]*width:\s*auto/,
+    );
   });
 
   describe("responsive surfaces", () => {
