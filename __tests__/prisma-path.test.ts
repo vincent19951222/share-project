@@ -1,3 +1,4 @@
+import os from "os";
 import path from "path";
 import { describe, expect, it } from "vitest";
 import { resolveSqliteDatabasePath } from "@/lib/sqlite-db-config";
@@ -23,12 +24,23 @@ describe("resolveSqliteDatabasePath", () => {
     ).toBe(path.resolve(cwd, ".local/dev.db"));
   });
 
-  it("falls back to prisma/dev.db when no env override exists", () => {
+  it("falls back to the default home data path when no env override exists", () => {
+    const expectedPath = path.join(os.homedir(), "data", "share-project", "dev.db");
+
     expect(
       resolveSqliteDatabasePath({
         PRISMA_DB_PATH: "",
         DATABASE_URL: "",
       }),
-    ).toBe(path.resolve(cwd, "prisma/dev.db"));
+    ).toBe(expectedPath);
+  });
+
+  it("expands ~ for PRISMA_DB_PATH overrides", () => {
+    expect(
+      resolveSqliteDatabasePath({
+        PRISMA_DB_PATH: "~/data/share-project/override.db",
+        DATABASE_URL: "",
+      }),
+    ).toBe(path.join(os.homedir(), "data", "share-project", "override.db"));
   });
 });

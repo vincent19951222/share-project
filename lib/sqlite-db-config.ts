@@ -1,3 +1,5 @@
+import fs from "fs";
+import os from "os";
 import path from "path";
 
 type SqliteConfigEnv = {
@@ -7,16 +9,34 @@ type SqliteConfigEnv = {
 };
 
 const FILE_PROTOCOL = "file:";
-const DEFAULT_DEV_DB_PATH = path.join("prisma", "dev.db");
+const DEFAULT_DEV_DB_PATH = path.join(os.homedir(), "data", "share-project", "dev.db");
 
 function normalizePathForUrl(dbPath: string) {
   return dbPath.replace(/\\/g, "/");
 }
 
+function isWindowsAbsolutePath(inputPath: string) {
+  return /^[A-Za-z]:[\\/]/.test(inputPath);
+}
+
+function expandHomeDirectory(inputPath: string) {
+  if (inputPath === "~") {
+    return os.homedir();
+  }
+
+  if (inputPath.startsWith("~/") || inputPath.startsWith("~\\")) {
+    return path.join(os.homedir(), inputPath.slice(2));
+  }
+
+  return inputPath;
+}
+
 function resolvePathInput(inputPath: string) {
-  return path.isAbsolute(inputPath)
-    ? path.normalize(inputPath)
-    : path.resolve(process.cwd(), inputPath);
+  const expandedPath = expandHomeDirectory(inputPath);
+
+  return path.isAbsolute(expandedPath) || isWindowsAbsolutePath(expandedPath)
+    ? path.normalize(expandedPath)
+    : path.resolve(process.cwd(), expandedPath);
 }
 
 function extractPathFromDatabaseUrl(databaseUrl: string) {
@@ -42,12 +62,16 @@ export function resolveSqliteDatabasePath(env: SqliteConfigEnv = process.env) {
     return resolvePathInput(extractPathFromDatabaseUrl(databaseUrl));
   }
 
-  return path.resolve(process.cwd(), DEFAULT_DEV_DB_PATH);
+  return DEFAULT_DEV_DB_PATH;
 }
 
 export function resolveSqliteDatabaseUrl(env: SqliteConfigEnv = process.env) {
-  const overridePath = env.PRISMA_DB_PATH?.trim();
-
   const dbPath = resolveSqliteDatabasePath(env);
   return `${FILE_PROTOCOL}${normalizePathForUrl(dbPath)}`;
+}
+
+export function ensureSqliteDatabaseDirectory(env: SqliteConfigEnv = process.env) {
+  const dbPath = resolveSqliteDatabasePath(env);
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  return dbPath;
 }
