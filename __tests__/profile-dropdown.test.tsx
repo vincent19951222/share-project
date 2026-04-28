@@ -68,4 +68,19 @@ describe("ProfileDropdown", () => {
     expect(container.textContent).toContain("下一次有效打卡可得");
     expect(container.textContent).toContain("赛季设置");
   });
+
+  it("shows a docs center link beside the existing account actions", () => {
+    act(() => {
+      root.render(
+        <BoardProvider initialState={initialState}>
+          <ProfileDropdown onDismiss={() => {}} onEditProfile={() => {}} />
+        </BoardProvider>,
+      );
+    });
+
+    const docsLink = container.querySelector('a[href="/docs"]');
+
+    expect(docsLink).not.toBeNull();
+    expect(docsLink?.textContent).toContain("文档中心");
+  });
 });

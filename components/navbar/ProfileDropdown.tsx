@@ -76,6 +76,12 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
               赛季设置
             </Link>
           ) : null}
+          <Link
+            href="/docs"
+            className="mt-2 w-full py-2 text-center text-sm font-bold text-slate-800 bg-slate-100 border-2 border-slate-200 rounded-xl hover:bg-slate-200 transition-colors"
+          >
+            文档中心
+          </Link>
           <button
             onClick={onEditProfile}
             className="mt-2 w-full py-2 text-sm font-bold text-slate-800 bg-slate-100 border-2 border-slate-200 rounded-xl hover:bg-slate-200 transition-colors"

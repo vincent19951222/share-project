@@ -3,6 +3,7 @@ import type {
   CalendarMonthSnapshot,
   CoffeeSnapshot,
 } from "@/lib/types";
+import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -14,6 +15,29 @@ export class ApiError extends Error {
   }
 }
 
+export interface WeeklyReportDraftRecord {
+  id: string;
+  teamId: string;
+  createdByUserId: string;
+  weekStartDayKey: string;
+  summary: string;
+  createdAt: string;
+  updatedAt: string;
+  snapshot: WeeklyReportSnapshot;
+}
+
+export interface WeeklyReportPublishResult {
+  id: string;
+}
+
+interface WeeklyReportDraftEnvelope {
+  draft: WeeklyReportDraftRecord | null;
+}
+
+interface WeeklyReportPublishEnvelope {
+  dynamic: WeeklyReportPublishResult;
+}
+
 async function readJsonPayload(
   response: Response,
   fallbackMessage: string,
@@ -23,6 +47,22 @@ async function readJsonPayload(
   } catch {
     throw new ApiError(fallbackMessage, response.status);
   }
+}
+
+async function readApiResult<T>(
+  response: Response,
+  fallbackMessage: string,
+): Promise<T> {
+  const payload = await readJsonPayload(response, fallbackMessage);
+
+  if (!response.ok) {
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
+  }
+
+  return payload as T;
 }
 
 async function readSnapshot(response: Response): Promise<BoardSnapshot> {
@@ -145,4 +185,47 @@ export async function removeLatestTodayCoffeeCup(): Promise<CoffeeSnapshot> {
   });
 
   return readCoffeeSnapshot(response);
+}
+
+export async function fetchCurrentWeeklyReportDraft(): Promise<WeeklyReportDraftRecord | null> {
+  const response = await fetch("/api/reports/weekly/draft", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  const payload = await readApiResult<WeeklyReportDraftEnvelope>(response, "获取本周周报草稿失败");
+  return payload.draft ?? null;
+}
+
+export async function generateCurrentWeeklyReportDraft(): Promise<WeeklyReportDraftRecord> {
+  const response = await fetch("/api/reports/weekly/draft", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  const payload = await readApiResult<WeeklyReportDraftEnvelope>(response, "生成本周周报失败");
+
+  if (!payload.draft) {
+    throw new ApiError("生成本周周报失败", response.status);
+  }
+
+  return payload.draft;
+}
+
+export async function publishCurrentWeeklyReportDraft(): Promise<WeeklyReportPublishResult> {
+  const response = await fetch("/api/reports/weekly/publish", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  const payload = await readApiResult<WeeklyReportPublishEnvelope>(response, "发布本周周报失败");
+  return payload.dynamic;
 }

@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { ALLOWED_TARGET_SLOTS, getShanghaiDayKey, isValidTargetSlots } from "@/lib/economy";
+import { TEAM_DYNAMIC_TYPES } from "@/lib/team-dynamics";
+import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
 
 export type SeasonStatus = "ACTIVE" | "ENDED";
 
@@ -141,6 +143,22 @@ export async function createSeasonForTeam(
     where: { id: seasonId },
   });
 
+  await createOrReuseTeamDynamic({
+    teamId,
+    type: TEAM_DYNAMIC_TYPES.SEASON_STARTED,
+    title: `新赛季已经开启：${goalName}`,
+    summary: `${goalName} 的 ${targetSlots} 格冲刺已经开始`,
+    payload: {
+      seasonId: season.id,
+      goalName: season.goalName,
+      targetSlots: season.targetSlots,
+      monthKey: season.monthKey,
+    },
+    sourceType: "season",
+    sourceId: `${season.id}:started`,
+    occurredAt: now,
+  });
+
   return serializeSeason(season);
 }
 
@@ -163,6 +181,22 @@ export async function endActiveSeasonForTeam(
       status: "ENDED",
       endedAt: now,
     },
+  });
+
+  await createOrReuseTeamDynamic({
+    teamId,
+    type: TEAM_DYNAMIC_TYPES.SEASON_ENDED,
+    title: `赛季已经结束：${season.goalName}`,
+    summary: `${season.goalName} 本期定格在 ${season.filledSlots}/${season.targetSlots}`,
+    payload: {
+      seasonId: season.id,
+      goalName: season.goalName,
+      filledSlots: season.filledSlots,
+      targetSlots: season.targetSlots,
+    },
+    sourceType: "season",
+    sourceId: `${season.id}:ended`,
+    occurredAt: now,
   });
 
   return serializeSeason(season);

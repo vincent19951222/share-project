@@ -29,6 +29,11 @@ describe("seedDatabase", () => {
       select: { id: true },
     });
     const fixtureSeasonIds = fixtureSeasons.map((season) => season.id);
+    const fixtureTeamDynamics = await prisma.teamDynamic.findMany({
+      where: { teamId: { in: fixtureTeamIds } },
+      select: { id: true },
+    });
+    const fixtureTeamDynamicIds = fixtureTeamDynamics.map((item) => item.id);
 
     await prisma.seasonMemberStat.deleteMany({
       where: {
@@ -54,6 +59,17 @@ describe("seedDatabase", () => {
       where: {
         OR: [{ userId: { in: fixtureUserIds } }, { seasonId: { in: fixtureSeasonIds } }],
       },
+    });
+    await prisma.teamDynamicReadState.deleteMany({
+      where: {
+        OR: [
+          { userId: { in: fixtureUserIds } },
+          { teamDynamicId: { in: fixtureTeamDynamicIds } },
+        ],
+      },
+    });
+    await prisma.teamDynamic.deleteMany({
+      where: { id: { in: fixtureTeamDynamicIds } },
     });
     await prisma.user.deleteMany({ where: { id: { in: fixtureUserIds } } });
     await prisma.season.deleteMany({ where: { id: { in: fixtureSeasonIds } } });
@@ -162,6 +178,41 @@ describe("seedDatabase", () => {
     await seedDatabase();
 
     expect(await prisma.coffeeRecord.count({ where: { teamId: user.teamId } })).toBe(0);
+  });
+
+  it("should clear team dynamics and read states for the seeded team", async () => {
+    await seedDatabase();
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { username: SEED_USERS[0].username },
+    });
+    const dynamic = await prisma.teamDynamic.create({
+      data: {
+        teamId: user.teamId,
+        type: "SEASON_STARTED",
+        title: "Seed cleanup dynamic",
+        summary: "Should be removed by reseeding",
+        payloadJson: JSON.stringify({ source: "seed-test" }),
+        sourceType: "seed-test",
+        sourceId: "seed-test-dynamic",
+        occurredAt: new Date("2026-04-25T08:00:00+08:00"),
+      },
+    });
+    await prisma.teamDynamicReadState.create({
+      data: {
+        teamDynamicId: dynamic.id,
+        userId: user.id,
+      },
+    });
+
+    await seedDatabase();
+
+    expect(await prisma.teamDynamic.findUnique({ where: { id: dynamic.id } })).toBeNull();
+    expect(
+      await prisma.teamDynamicReadState.count({
+        where: { teamDynamicId: dynamic.id },
+      }),
+    ).toBe(0);
   });
 
   it("should not delete seasons that belong to another team", async () => {
