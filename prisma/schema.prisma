@@ -18,6 +18,7 @@ model Team {
   activityEvents ActivityEvent[]
   coffeeRecords  CoffeeRecord[]
   teamDynamics   TeamDynamic[]
+  weeklyReportDrafts WeeklyReportDraft[]
 }
 
 model User {
@@ -37,7 +38,24 @@ model User {
   activityEvents        ActivityEvent[]
   coffeeRecords         CoffeeRecord[]
   teamDynamicReadStates TeamDynamicReadState[]
+  weeklyReportDrafts    WeeklyReportDraft[]
   createdAt             DateTime               @default(now())
+}
+
+model WeeklyReportDraft {
+  id              String   @id @default(cuid())
+  teamId          String
+  team            Team     @relation(fields: [teamId], references: [id])
+  createdByUserId String
+  createdByUser   User     @relation(fields: [createdByUserId], references: [id])
+  weekStartDayKey String
+  summary         String
+  payloadJson     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([teamId, createdByUserId, weekStartDayKey])
+  @@index([teamId, weekStartDayKey, updatedAt])
 }
 
 model TeamDynamic {
