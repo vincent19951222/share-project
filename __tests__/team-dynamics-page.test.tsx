@@ -13,6 +13,29 @@ function createJsonResponse(body: unknown) {
   } as Response;
 }
 
+function createWeeklyReportPayload() {
+  return {
+    version: 1,
+    weekStartDayKey: "2026-04-21",
+    weekEndDayKey: "2026-04-25",
+    generatedAt: "2026-04-25T08:00:00.000Z",
+    generatedByUserId: "admin-1",
+    summary: "本周打卡 18 次，全勤 2 天，赛季进度 12/50。",
+    metrics: {
+      totalPunches: 18,
+      fullAttendanceDays: 2,
+      peakDay: { dayKey: "2026-04-23", value: 5 },
+      lowDay: { dayKey: "2026-04-24", value: 2 },
+      seasonProgress: { filledSlots: 12, targetSlots: 50, status: "ACTIVE" },
+    },
+    highlights: {
+      topMembers: [{ userId: "u1", label: "本周高光", value: "li · 5 次有效打卡" }],
+      coffee: { userId: "u2", label: "续命担当", value: "luo · 4 杯咖啡" },
+    },
+    sections: [],
+  };
+}
+
 describe("TeamDynamicsPage", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -32,7 +55,7 @@ describe("TeamDynamicsPage", () => {
                 title: "本周战报已经生成",
                 summary: "本周打卡 18 次，全勤 2 天",
                 occurredAt: "2026-04-25T08:00:00.000Z",
-                payload: { headline: "本周打卡 18 次" },
+                payload: createWeeklyReportPayload(),
                 isRead: false,
                 importance: "normal",
               },
@@ -71,7 +94,7 @@ describe("TeamDynamicsPage", () => {
               title: "本周战报已经生成",
               summary: "本周打卡 18 次，全勤 2 天",
               occurredAt: "2026-04-25T08:00:00.000Z",
-              payload: { headline: "本周打卡 18 次" },
+              payload: createWeeklyReportPayload(),
               isRead: false,
               importance: "normal",
             },
@@ -84,6 +107,10 @@ describe("TeamDynamicsPage", () => {
 
     expect(container.textContent).toContain("本周战报已经生成");
     expect(container.textContent).toContain("周报");
+    expect(container.textContent).toContain("04.21 - 04.25");
+    expect(container.textContent).toContain("18 次打卡");
+    expect(container.textContent).toContain("2 天全勤");
+    expect(container.textContent).toContain("12/50");
 
     const unreadButton = Array.from(container.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("只看未读"),

@@ -21,7 +21,7 @@ export function TeamDynamicsTimeline({
   return (
     <div className="flex flex-col gap-3">
       {items.map((item) => (
-        <TeamDynamicCard key={item.id} item={item} onOpen={onOpenItem} />
+        <TeamDynamicCard key={item.id} item={item} mode={mode} onOpen={onOpenItem} />
       ))}
     </div>
   );

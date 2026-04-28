@@ -1,4 +1,5 @@
 import { getTeamDynamicMeta, type TeamDynamicListItem } from "@/lib/team-dynamics";
+import { WeeklyReportDynamicCard } from "./WeeklyReportDynamicCard";
 
 function formatOccurredAt(value: string) {
   return new Date(value).toLocaleString("zh-CN", {
@@ -12,11 +13,17 @@ function formatOccurredAt(value: string) {
 
 export function TeamDynamicCard({
   item,
+  mode,
   onOpen,
 }: {
   item: TeamDynamicListItem;
+  mode: "panel" | "page";
   onOpen?: (id: string) => void | Promise<void>;
 }) {
+  if (item.type === "WEEKLY_REPORT_CREATED") {
+    return <WeeklyReportDynamicCard item={item} mode={mode} onOpen={onOpen} />;
+  }
+
   const meta = getTeamDynamicMeta(item.type);
 
   return (
