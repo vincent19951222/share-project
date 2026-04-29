@@ -65,6 +65,41 @@ export async function seedDatabase(): Promise<void> {
     where: { teamId: team.id },
   });
 
+  await prisma.realWorldRedemption.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.itemUseRecord.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  const existingLotteryDraws = await prisma.lotteryDraw.findMany({
+    where: { teamId: team.id },
+    select: { id: true },
+  });
+  const existingLotteryDrawIds = existingLotteryDraws.map((draw) => draw.id);
+
+  if (existingLotteryDrawIds.length > 0) {
+    await prisma.lotteryDrawResult.deleteMany({
+      where: { drawId: { in: existingLotteryDrawIds } },
+    });
+    await prisma.lotteryDraw.deleteMany({
+      where: { id: { in: existingLotteryDrawIds } },
+    });
+  }
+
+  await prisma.inventoryItem.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.lotteryTicketLedger.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.dailyTaskAssignment.deleteMany({
+    where: { teamId: team.id },
+  });
+
   await prisma.enterpriseWechatPushEvent.deleteMany({
     where: { teamId: team.id },
   });
@@ -100,6 +135,7 @@ export async function seedDatabase(): Promise<void> {
         currentStreak: 0,
         lastPunchDayKey: null,
         coins: seedUser.coins,
+        ticketBalance: 0,
         password: passwordHash,
         teamId: team.id,
       },
@@ -111,6 +147,7 @@ export async function seedDatabase(): Promise<void> {
         currentStreak: 0,
         lastPunchDayKey: null,
         coins: seedUser.coins,
+        ticketBalance: 0,
         teamId: team.id,
       },
     });
@@ -141,6 +178,7 @@ export async function seedDatabase(): Promise<void> {
     where: { id: { in: seededUserIds } },
     data: {
       coins: 10,
+      ticketBalance: 0,
       currentStreak: 0,
       lastPunchDayKey: null,
     },
@@ -173,6 +211,32 @@ export async function seedDatabase(): Promise<void> {
         ],
       },
     });
+    await prisma.realWorldRedemption.deleteMany({
+      where: {
+        OR: [
+          { userId: { in: extraUserIds } },
+          { confirmedByUserId: { in: extraUserIds } },
+        ],
+      },
+    });
+    await prisma.itemUseRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
+    const extraLotteryDraws = await prisma.lotteryDraw.findMany({
+      where: { userId: { in: extraUserIds } },
+      select: { id: true },
+    });
+    const extraLotteryDrawIds = extraLotteryDraws.map((draw) => draw.id);
+
+    if (extraLotteryDrawIds.length > 0) {
+      await prisma.lotteryDrawResult.deleteMany({
+        where: { drawId: { in: extraLotteryDrawIds } },
+      });
+      await prisma.lotteryDraw.deleteMany({
+        where: { id: { in: extraLotteryDrawIds } },
+      });
+    }
+    await prisma.inventoryItem.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.lotteryTicketLedger.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.dailyTaskAssignment.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.punchRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.seasonMemberStat.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.teamDynamicReadState.deleteMany({ where: { userId: { in: extraUserIds } } });

@@ -1,4 +1,5 @@
 import { PrismaClient } from "@/lib/generated/prisma/client";
+import type { Prisma } from "@/lib/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { resolveSqliteDatabaseUrl } from "@/lib/sqlite-db-config";
 
@@ -20,3 +21,5 @@ export const prisma = hasRequiredDelegates(globalForPrisma.prisma)
   : createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+export type PrismaClientOrTransaction = PrismaClient | Prisma.TransactionClient;

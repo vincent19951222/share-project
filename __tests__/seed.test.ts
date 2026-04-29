@@ -60,6 +60,49 @@ describe("seedDatabase", () => {
         ],
       },
     });
+    await prisma.realWorldRedemption.deleteMany({
+      where: {
+        OR: [
+          { userId: { in: fixtureUserIds } },
+          { confirmedByUserId: { in: fixtureUserIds } },
+          { teamId: { in: fixtureTeamIds } },
+        ],
+      },
+    });
+    await prisma.itemUseRecord.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
+    const fixtureLotteryDraws = await prisma.lotteryDraw.findMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+      select: { id: true },
+    });
+    const fixtureLotteryDrawIds = fixtureLotteryDraws.map((draw) => draw.id);
+
+    await prisma.lotteryDrawResult.deleteMany({
+      where: { drawId: { in: fixtureLotteryDrawIds } },
+    });
+    await prisma.lotteryDraw.deleteMany({
+      where: { id: { in: fixtureLotteryDrawIds } },
+    });
+    await prisma.inventoryItem.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
+    await prisma.lotteryTicketLedger.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
+    await prisma.dailyTaskAssignment.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
     await prisma.enterpriseWechatPushEvent.deleteMany({
       where: { teamId: { in: fixtureTeamIds } },
     });
