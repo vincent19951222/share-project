@@ -14,7 +14,7 @@
 | GM-04 | Daily Tasks and Life Ticket | 已完成 | 是 |
 | GM-05 | Fitness Ticket Hook | 已完成 | 少量提示 |
 | GM-06 | Lottery V1 | 已完成 | 是 |
-| GM-07 | Backpack V1 | 待开始 | 是 |
+| GM-07 | Backpack V1 | 已完成 | 是 |
 | GM-08 | Today-Effective Item Use | 待开始 | 是 |
 | GM-09 | Boost Settlement Integration | 待开始 | 少量提示 |
 | GM-10 | Real-World Redemption | 待开始 | 是 |
@@ -669,18 +669,85 @@ POST /api/gamification/lottery/draw
 
 GM-06 完成了抽奖券的第一段消费闭环：GM-04 / GM-05 产出的券现在可以被真实消耗，并产出银子或背包库存。后续 GM-07 可以在此基础上把背包详情与库存管理补齐。
 
+## GM-07: Backpack V1
+
+GM-07 做的是“把抽奖产出的库存真正展示出来”：用户现在可以在补给站里看到自己持有的道具、分类、数量、效果说明、使用时机、使用限制和是否需要管理员确认。
+
+### 已完成内容
+
+1. 扩展背包快照
+
+`GET /api/gamification/state` 里的 `snapshot.backpack` 已从旧的 preview 摘要升级为 active 结构，包含：
+
+- `totalQuantity`
+- `ownedItemCount`
+- `previewItems`
+- `groups`
+- `todayEffects`
+- `emptyMessage`
+
+`previewItems` 继续保留，兼容 GM-03 / GM-06 的摘要展示习惯。
+
+2. 新增道具展示 helper
+
+新增 `lib/gamification/item-display.ts`，统一处理：
+
+- 背包分类顺序和分类文案
+- 使用时机文案
+- 道具效果摘要
+- 使用限制摘要
+- 今日道具效果状态文案
+
+3. 背包库存分组展示
+
+`buildGamificationStateForUser()` 现在读取 `InventoryItem`，只把 `quantity > 0` 的库存放进可见背包，并按 `boost`、`protection`、`social`、`lottery`、`task`、`cosmetic`、`real_world`、`unknown` 分组。
+
+未知 `itemId` 不会被隐藏，会进入 `unknown` 分组，并显示配置缺失提示。
+
+4. 今日效果与永久库存分离
+
+`ItemUseRecord` 中当天 `PENDING` 和 `SETTLED` 的记录会进入 `todayEffects`，用于展示“今日待生效 / 今日已结算”的道具效果。
+
+`EXPIRED` 和 `CANCELLED` 不进入补给站主界面，避免噪音。
+
+5. 升级补给站背包 UI
+
+`SupplyStation` 的背包区现在支持：
+
+- 按分类展示库存
+- 点击道具切换详情
+- 展示描述、效果、使用时机、限制和管理员确认要求
+- 展示未知配置 / 已下架提醒
+- 展示 GM-08 才会开放的使用入口提示
+- 单独展示今日效果区
+
+### GM-07 没有做的事
+
+- 没有新增 `/bag` 路由
+- 没有新增 `POST /api/gamification/items/use`
+- 没有扣减 `InventoryItem.quantity`
+- 没有创建新的 `ItemUseRecord`
+- 没有创建 `SocialInvitation`
+- 没有创建 `RealWorldRedemption`
+- 没有发送企业微信消息
+
+### GM-07 总结
+
+GM-07 把 GM-06 产出的背包库存补成了可理解的资产视图。用户能看清“我抽到了什么、有什么用、还有几张”，但仍然不能使用道具；真正的使用、扣库存和结算留给 GM-08 / GM-09 / GM-10 / GM-12。
+
 ## 后续推荐顺序
 
-### 下一步：GM-07 Backpack V1
+### 下一步：GM-08 Today-Effective Item Use
 
-目标：让抽奖产出的道具和福利可以在背包里查看，并为后续道具使用和福利兑换铺路。
+目标：让今日生效型道具可以被用户主动使用，写入 `ItemUseRecord`，并为 GM-09 的健身结算接入铺路。
 
-GM-07 应该交付：
+GM-08 应该交付：
 
-- 背包详情页或补给站背包详情区
-- 按道具分类、数量和可用状态展示库存
-- 保留 GM-08 的使用入口，但不提前结算道具效果
-- 把真实福利兑换入口留给 GM-10
+- 道具使用 API
+- 今日生效道具的库存扣减与使用记录创建
+- 使用限制校验
+- 补给站里的可用道具使用入口
+- 不提前实现真实福利兑换、弱社交邀请或企业微信发送
 
 ## 相关文档
 
@@ -697,9 +764,12 @@ GM-07 应该交付：
 - `docs/superpowers/plans/2026-04-25-gm-05-fitness-ticket-hook.md`
 - `docs/superpowers/specs/2026-04-25-gm-06-lottery-v1-design.md`
 - `docs/superpowers/plans/2026-04-25-gm-06-lottery-v1.md`
+- `docs/superpowers/specs/2026-04-26-gm-07-backpack-v1-design.md`
+- `docs/superpowers/plans/2026-04-26-gm-07-backpack-v1.md`
 
 ## 更新记录
 
+- 2026-04-29: GM-07 完成，新增 active 背包快照、库存分组、道具详情、今日效果区、未知配置展示和补给站背包交互。
 - 2026-04-29: GM-06 完成，新增单抽、十连、十连补券、保底、抽奖记录、奖励结算、抽奖 API 和补给站抽奖交互。
 - 2026-04-29: GM-05 完成，新增健身打卡自动发券、撤销安全扣券、券已消费时阻止撤销、前端轻量提示和测试覆盖。
 - 2026-04-29: GM-04 完成，新增每日四维任务生成、完成、免费换任务、生活券领取、任务 API、补给站交互和测试覆盖。

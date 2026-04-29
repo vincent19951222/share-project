@@ -59,8 +59,12 @@ describe("GET /api/gamification/state", () => {
         ticketPrice: 40,
       },
       backpack: {
+        status: "active",
         totalQuantity: 0,
+        ownedItemCount: 0,
         previewItems: [],
+        groups: [],
+        todayEffects: [],
       },
       social: {
         status: "placeholder",
@@ -128,13 +132,21 @@ describe("GET /api/gamification/state", () => {
       ],
     });
 
-    await prisma.inventoryItem.create({
-      data: {
-        userId,
-        teamId,
-        itemId: "task_reroll_coupon",
-        quantity: 2,
-      },
+    await prisma.inventoryItem.createMany({
+      data: [
+        {
+          userId,
+          teamId,
+          itemId: "small_boost_coupon",
+          quantity: 1,
+        },
+        {
+          userId,
+          teamId,
+          itemId: "luckin_coffee_coupon",
+          quantity: 2,
+        },
+      ],
     });
 
     await prisma.lotteryDraw.create({
@@ -224,15 +236,38 @@ describe("GET /api/gamification/state", () => {
       lifeTicketEarned: true,
     });
     expect(body.snapshot.backpack).toMatchObject({
-      totalQuantity: 2,
-      previewItems: [
-        expect.objectContaining({
-          itemId: "task_reroll_coupon",
-          name: "任务换班券",
-          quantity: 2,
-        }),
-      ],
+      status: "active",
+      totalQuantity: 3,
+      ownedItemCount: 2,
     });
+    expect(body.snapshot.backpack.groups).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          category: "boost",
+          totalQuantity: 1,
+        }),
+        expect.objectContaining({
+          category: "real_world",
+          totalQuantity: 2,
+        }),
+      ]),
+    );
+    expect(body.snapshot.backpack.groups[0].items[0]).toEqual(
+      expect.objectContaining({
+        itemId: "small_boost_coupon",
+        quantity: 1,
+        effectSummary: expect.any(String),
+        usageLimitSummary: expect.any(String),
+      }),
+    );
+    expect(body.snapshot.backpack.todayEffects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          itemId: "drink_water_ping",
+          status: "PENDING",
+        }),
+      ]),
+    );
     expect(body.snapshot.lottery.recentDraws).toHaveLength(1);
     expect(body.snapshot.social).toMatchObject({
       pendingSentCount: 1,

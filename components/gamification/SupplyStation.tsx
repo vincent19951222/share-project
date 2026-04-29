@@ -10,6 +10,7 @@ import {
   rerollGamificationTask,
 } from "@/lib/api";
 import type {
+  GamificationBackpackItemSnapshot,
   GamificationDimensionSnapshot,
   GamificationLotteryDrawSnapshot,
   GamificationStateSnapshot,
@@ -108,11 +109,96 @@ function PlaceholderButton({ children }: { children: string }) {
   );
 }
 
+function BackpackItemDetail({ item }: { item: GamificationBackpackItemSnapshot | null }) {
+  if (!item) {
+    return (
+      <div className="rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
+        选择一个补给查看说明。
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-[1rem] border-[3px] border-slate-900 bg-yellow-50 p-4 shadow-[0_4px_0_0_#1f2937]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-black text-amber-700">{item.categoryLabel}</div>
+          <h3 className="mt-1 text-xl font-black text-slate-950">{item.name}</h3>
+        </div>
+        <span className="rounded-full border-2 border-slate-900 bg-white px-3 py-1 text-sm font-black text-slate-900">
+          x{item.quantity}
+        </span>
+      </div>
+      <p className="mt-3 text-sm font-bold text-slate-600">{item.description}</p>
+      <div className="mt-3 grid gap-2 text-xs font-black text-slate-700">
+        <div className="rounded-lg bg-white px-3 py-2">使用时机：{item.useTimingLabel}</div>
+        <div className="rounded-lg bg-white px-3 py-2">效果：{item.effectSummary}</div>
+        <div className="rounded-lg bg-white px-3 py-2">限制：{item.usageLimitSummary}</div>
+        <div className="rounded-lg bg-white px-3 py-2">
+          管理员确认：{item.requiresAdminConfirmation ? "需要" : "不需要"}
+        </div>
+      </div>
+      {!item.knownDefinition ? (
+        <div className="mt-3 rounded-lg border-2 border-rose-300 bg-rose-50 px-3 py-2 text-xs font-black text-rose-700">
+          这个补给配置已经不存在，请联系管理员确认。
+        </div>
+      ) : null}
+      {item.knownDefinition && !item.enabled ? (
+        <div className="mt-3 rounded-lg border-2 border-amber-300 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800">
+          这个补给已下架，当前只展示库存。
+        </div>
+      ) : null}
+      <div className="mt-3 rounded-lg border-2 border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-500">
+        使用入口将在 GM-08 接入真实结算后开放。
+      </div>
+    </div>
+  );
+}
+
+function TodayEffectsPanel({
+  effects,
+}: {
+  effects: {
+    id: string;
+    name: string;
+    statusLabel: string;
+    effectSummary: string;
+  }[];
+}) {
+  if (effects.length === 0) {
+    return (
+      <div className="rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-xs font-black text-slate-500">
+        今天还没有待生效道具。GM-08 后可以先用道具，再去健身触发结算。
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-2">
+      {effects.map((effect) => (
+        <div
+          key={effect.id}
+          className="rounded-[1rem] border-2 border-lime-300 bg-lime-50 px-3 py-2 text-xs font-black text-slate-700"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span>{effect.name}</span>
+            <span className="rounded-full bg-lime-200 px-2 py-0.5 text-lime-900">
+              {effect.statusLabel}
+            </span>
+          </div>
+          <div className="mt-1 text-slate-500">{effect.effectSummary}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function SupplyStation() {
   const [snapshot, setSnapshot] = useState<GamificationStateSnapshot | null>(null);
   const [busy, setBusy] = useState(true);
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [latestDraw, setLatestDraw] = useState<GamificationLotteryDrawSnapshot | null>(null);
+  const [selectedBackpackItemId, setSelectedBackpackItemId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadState() {
@@ -198,6 +284,11 @@ export function SupplyStation() {
   }
 
   const hasTopUp = snapshot.lottery.tenDrawTopUpRequired > 0;
+  const backpackItems = snapshot.backpack.groups.flatMap((group) => group.items);
+  const selectedBackpackItem =
+    backpackItems.find((item) => item.itemId === selectedBackpackItemId) ??
+    backpackItems[0] ??
+    null;
 
   return (
     <section className="supply-station-viewport absolute inset-0 overflow-y-auto p-4 sm:p-6">
@@ -348,24 +439,67 @@ export function SupplyStation() {
             </section>
 
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
-              <h2 className="text-2xl font-black text-slate-950">背包</h2>
-              {snapshot.backpack.previewItems.length > 0 ? (
-                <div className="mt-3 grid gap-2">
-                  {snapshot.backpack.previewItems.map((item) => (
-                    <div key={item.itemId} className="flex items-center justify-between rounded-[1rem] border-2 border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black">
-                      <span>{item.name}</span>
-                      <span>x{item.quantity}</span>
-                    </div>
-                  ))}
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-950">背包</h2>
+                  <p className="mt-1 text-sm font-bold text-slate-500">
+                    {snapshot.backpack.emptyMessage}
+                  </p>
+                </div>
+                <span className="rounded-full border-2 border-slate-900 bg-sky-100 px-3 py-1 text-sm font-black text-slate-900">
+                  {snapshot.backpack.ownedItemCount} 种
+                </span>
+              </div>
+
+              {snapshot.backpack.groups.length > 0 ? (
+                <div className="mt-4 grid gap-4">
+                  <div className="grid gap-3">
+                    {snapshot.backpack.groups.map((group) => (
+                      <div
+                        key={group.category}
+                        className="rounded-[1rem] border-2 border-slate-200 bg-slate-50 p-3"
+                      >
+                        <div className="mb-2 flex items-center justify-between text-xs font-black text-slate-500">
+                          <span>{group.label}</span>
+                          <span>合计 x{group.totalQuantity}</span>
+                        </div>
+                        <div className="grid gap-2">
+                          {group.items.map((item) => {
+                            const isSelected = selectedBackpackItem?.itemId === item.itemId;
+
+                            return (
+                              <button
+                                key={item.itemId}
+                                type="button"
+                                onClick={() => setSelectedBackpackItemId(item.itemId)}
+                                className={`flex items-center justify-between rounded-[0.85rem] border-2 px-3 py-2 text-left text-sm font-black transition ${
+                                  isSelected
+                                    ? "border-slate-900 bg-yellow-200 shadow-[0_3px_0_0_#1f2937]"
+                                    : "border-slate-200 bg-white text-slate-700"
+                                }`}
+                              >
+                                <span>{item.name}</span>
+                                <span>x{item.quantity}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <BackpackItemDetail item={selectedBackpackItem} />
+
+                  <div>
+                    <h3 className="mb-2 text-sm font-black text-slate-950">今日效果</h3>
+                    <TodayEffectsPanel effects={snapshot.backpack.todayEffects} />
+                  </div>
                 </div>
               ) : (
                 <p className="mt-3 rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
                   {snapshot.backpack.emptyMessage}
                 </p>
               )}
-              <div className="mt-4">
-                <PlaceholderButton>背包详情 GM-07</PlaceholderButton>
-              </div>
             </section>
 
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">

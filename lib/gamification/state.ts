@@ -2,15 +2,29 @@ import { getShanghaiDayKey } from "@/lib/economy";
 import {
   getGamificationDimensions,
   getItemDefinition,
+  getItemDefinitions,
   getTaskCards,
 } from "@/lib/gamification/content";
+import {
+  BACKPACK_CATEGORY_ORDER,
+  getBackpackCategoryLabel,
+  getItemUseStatusLabel,
+  getUseTimingLabel,
+  normalizeBackpackCategory,
+  normalizeUseTiming,
+  summarizeItemEffect,
+  summarizeUsageLimit,
+} from "@/lib/gamification/item-display";
 import { prisma } from "@/lib/prisma";
 import type {
-  GamificationBackpackItemSummary,
+  GamificationBackpackGroupSnapshot,
+  GamificationBackpackItemSnapshot,
+  GamificationBackpackSummary,
   GamificationDimensionSnapshot,
   GamificationLotteryDrawSnapshot,
   GamificationLotteryRewardSnapshot,
   GamificationStateSnapshot,
+  GamificationTodayEffectSnapshot,
 } from "@/lib/types";
 
 const LOTTERY_TICKET_PRICE = 40;
@@ -49,6 +63,142 @@ function parseLotteryRewardSnapshot(raw: string): GamificationLotteryRewardSnaps
   }
 }
 
+function buildBackpackItemSnapshot(input: {
+  itemId: string;
+  quantity: number;
+}): GamificationBackpackItemSnapshot {
+  const definition = getItemDefinition(input.itemId);
+  const category = normalizeBackpackCategory(definition?.category);
+  const useTiming = normalizeUseTiming(definition?.useTiming);
+
+  return {
+    itemId: input.itemId,
+    category,
+    categoryLabel: getBackpackCategoryLabel(category),
+    name: definition?.name ?? "未知补给",
+    description:
+      definition?.description ?? "这个道具配置已经不存在，请联系管理员确认。",
+    quantity: input.quantity,
+    useTiming,
+    useTimingLabel: getUseTimingLabel(useTiming),
+    effectSummary: summarizeItemEffect(definition?.effect),
+    usageLimitSummary: summarizeUsageLimit(definition),
+    stackable: definition?.stackable ?? false,
+    requiresAdminConfirmation: definition?.requiresAdminConfirmation ?? false,
+    enabled: definition?.enabled ?? false,
+    knownDefinition: Boolean(definition),
+  };
+}
+
+function buildBackpackGroups(
+  items: GamificationBackpackItemSnapshot[],
+): GamificationBackpackGroupSnapshot[] {
+  return BACKPACK_CATEGORY_ORDER.map((category) => {
+    const categoryItems = items.filter((item) => item.category === category);
+
+    return {
+      category,
+      label: getBackpackCategoryLabel(category),
+      totalQuantity: categoryItems.reduce((sum, item) => sum + item.quantity, 0),
+      items: categoryItems,
+    };
+  }).filter((group) => group.items.length > 0);
+}
+
+function parseEffectSnapshot(raw: string) {
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return undefined;
+  }
+}
+
+function buildTodayEffectSnapshot(record: {
+  id: string;
+  itemId: string;
+  status: string;
+  effectSnapshotJson: string;
+  createdAt: Date;
+  settledAt: Date | null;
+}): GamificationTodayEffectSnapshot {
+  const definition = getItemDefinition(record.itemId);
+  const parsedEffect = parseEffectSnapshot(record.effectSnapshotJson);
+
+  return {
+    id: record.id,
+    itemId: record.itemId,
+    name: definition?.name ?? "未知补给",
+    status: record.status as GamificationTodayEffectSnapshot["status"],
+    statusLabel: getItemUseStatusLabel(record.status),
+    effectSummary: summarizeItemEffect(parsedEffect ?? definition?.effect),
+    createdAt: record.createdAt.toISOString(),
+    settledAt: record.settledAt?.toISOString() ?? null,
+  };
+}
+
+function buildBackpackSummary(user: {
+  inventoryItems: { itemId: string; quantity: number }[];
+  itemUseRecords: {
+    id: string;
+    itemId: string;
+    status: string;
+    effectSnapshotJson: string;
+    createdAt: Date;
+    settledAt: Date | null;
+  }[];
+}): GamificationBackpackSummary {
+  const knownItemIds = new Set(getItemDefinitions().map((item) => item.id));
+  const items = user.inventoryItems
+    .filter((item) => item.quantity > 0)
+    .map((item) => buildBackpackItemSnapshot(item))
+    .sort((a, b) => {
+      const categoryDiff =
+        BACKPACK_CATEGORY_ORDER.indexOf(a.category) -
+        BACKPACK_CATEGORY_ORDER.indexOf(b.category);
+
+      if (categoryDiff !== 0) {
+        return categoryDiff;
+      }
+
+      if (a.knownDefinition !== b.knownDefinition) {
+        return a.knownDefinition ? -1 : 1;
+      }
+
+      return a.name.localeCompare(b.name, "zh-Hans-CN");
+    });
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  const configuredItemCount = items.filter((item) => knownItemIds.has(item.itemId)).length;
+  const todayEffectStatusOrder = new Map([
+    ["PENDING", 0],
+    ["SETTLED", 1],
+  ]);
+
+  return {
+    status: "active",
+    totalQuantity,
+    ownedItemCount: items.length,
+    previewItems: items.slice(0, 3),
+    groups: buildBackpackGroups(items),
+    todayEffects: user.itemUseRecords
+      .map((record) => buildTodayEffectSnapshot(record))
+      .sort((a, b) => {
+        const statusDiff =
+          (todayEffectStatusOrder.get(a.status) ?? 99) -
+          (todayEffectStatusOrder.get(b.status) ?? 99);
+
+        if (statusDiff !== 0) {
+          return statusDiff;
+        }
+
+        return b.createdAt.localeCompare(a.createdAt);
+      }),
+    emptyMessage:
+      totalQuantity === 0
+        ? "背包空空，先去抽奖机薅点补给。"
+        : `已收纳 ${items.length} 种补给，其中 ${configuredItemCount} 种配置正常。`,
+  };
+}
+
 export async function buildGamificationStateForUser(
   userId: string,
   now: Date = new Date(),
@@ -82,14 +232,25 @@ export async function buildGamificationStateForUser(
         },
       },
       inventoryItems: {
-        where: {
-          quantity: { gt: 0 },
-        },
-        orderBy: { updatedAt: "desc" },
-        take: 4,
+        orderBy: [{ updatedAt: "desc" }, { itemId: "asc" }],
         select: {
           itemId: true,
           quantity: true,
+        },
+      },
+      itemUseRecords: {
+        where: {
+          dayKey,
+          status: { in: ["PENDING", "SETTLED"] },
+        },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          itemId: true,
+          status: true,
+          effectSnapshotJson: true,
+          createdAt: true,
+          settledAt: true,
         },
       },
       lotteryDraws: {
@@ -194,17 +355,6 @@ export async function buildGamificationStateForUser(
     dailyTopUpPurchased + tenDrawTopUpRequired <= DAILY_TOP_UP_LIMIT &&
     user.coins >= tenDrawTopUpCoinCost;
 
-  const previewItems: GamificationBackpackItemSummary[] = user.inventoryItems.map((item) => {
-    const definition = getItemDefinition(item.itemId);
-
-    return {
-      itemId: item.itemId,
-      name: definition?.name ?? item.itemId,
-      quantity: item.quantity,
-      category: definition?.category ?? "unknown",
-    };
-  });
-
   const recentDraws: GamificationLotteryDrawSnapshot[] = user.lotteryDraws.map((draw) => ({
     id: draw.id,
     drawType: draw.drawType as "SINGLE" | "TEN",
@@ -251,11 +401,7 @@ export async function buildGamificationStateForUser(
             : "攒到 7 张券后，可以用银子补齐十连。",
       recentDraws,
     },
-    backpack: {
-      totalQuantity: user.inventoryItems.reduce((sum, item) => sum + item.quantity, 0),
-      previewItems,
-      emptyMessage: "背包空空，等抽奖机上线上后再来进货。",
-    },
+    backpack: buildBackpackSummary(user),
     social: {
       status: "placeholder",
       pendingSentCount: user.sentSocialInvitations.length,

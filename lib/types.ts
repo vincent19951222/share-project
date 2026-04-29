@@ -103,16 +103,60 @@ export interface GamificationLotterySummary {
   recentDraws: GamificationLotteryDrawSnapshot[];
 }
 
-export interface GamificationBackpackItemSummary {
+export type GamificationBackpackCategory =
+  | "boost"
+  | "protection"
+  | "social"
+  | "lottery"
+  | "task"
+  | "cosmetic"
+  | "real_world"
+  | "unknown";
+
+export type GamificationItemUseTiming = "today" | "instant" | "manual_redemption" | "unknown";
+
+export interface GamificationBackpackItemSnapshot {
+  itemId: string;
+  category: GamificationBackpackCategory;
+  categoryLabel: string;
+  name: string;
+  description: string;
+  quantity: number;
+  useTiming: GamificationItemUseTiming;
+  useTimingLabel: string;
+  effectSummary: string;
+  usageLimitSummary: string;
+  stackable: boolean;
+  requiresAdminConfirmation: boolean;
+  enabled: boolean;
+  knownDefinition: boolean;
+}
+
+export interface GamificationBackpackGroupSnapshot {
+  category: GamificationBackpackCategory;
+  label: string;
+  totalQuantity: number;
+  items: GamificationBackpackItemSnapshot[];
+}
+
+export interface GamificationTodayEffectSnapshot {
+  id: string;
   itemId: string;
   name: string;
-  quantity: number;
-  category: string;
+  status: "PENDING" | "SETTLED" | "EXPIRED" | "CANCELLED";
+  statusLabel: string;
+  effectSummary: string;
+  createdAt: string;
+  settledAt: string | null;
 }
 
 export interface GamificationBackpackSummary {
+  status: "active";
   totalQuantity: number;
-  previewItems: GamificationBackpackItemSummary[];
+  ownedItemCount: number;
+  previewItems: GamificationBackpackItemSnapshot[];
+  groups: GamificationBackpackGroupSnapshot[];
+  todayEffects: GamificationTodayEffectSnapshot[];
   emptyMessage: string;
 }
 

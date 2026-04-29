@@ -41,6 +41,76 @@ function buildAssignment(
   };
 }
 
+const smallBoostBackpackItem: GamificationStateSnapshot["backpack"]["previewItems"][number] = {
+  itemId: "small_boost_coupon",
+  category: "boost",
+  categoryLabel: "Boost",
+  name: "Small Boost Coupon",
+  description: "Boost today's personal fitness income.",
+  quantity: 1,
+  useTiming: "today",
+  useTimingLabel: "Today",
+  effectSummary: "Personal fitness income 1.5x today.",
+  usageLimitSummary: "Once per user per day.",
+  stackable: false,
+  requiresAdminConfirmation: false,
+  enabled: true,
+  knownDefinition: true,
+};
+
+const luckinBackpackItem: GamificationStateSnapshot["backpack"]["previewItems"][number] = {
+  itemId: "luckin_coffee_coupon",
+  category: "real_world",
+  categoryLabel: "Real World",
+  name: "Luckin Coffee Coupon",
+  description: "Redeem one coffee with an admin.",
+  quantity: 2,
+  useTiming: "manual_redemption",
+  useTimingLabel: "Manual redemption",
+  effectSummary: "Ask an admin to redeem an offline benefit.",
+  usageLimitSummary: "Can be held in stacks; requires admin confirmation.",
+  stackable: true,
+  requiresAdminConfirmation: true,
+  enabled: true,
+  knownDefinition: true,
+};
+
+function buildBackpackFixture(): GamificationStateSnapshot["backpack"] {
+  return {
+    status: "active",
+    totalQuantity: 3,
+    ownedItemCount: 2,
+    previewItems: [smallBoostBackpackItem, luckinBackpackItem],
+    groups: [
+      {
+        category: "boost",
+        label: "Boost",
+        totalQuantity: 1,
+        items: [smallBoostBackpackItem],
+      },
+      {
+        category: "real_world",
+        label: "Real World",
+        totalQuantity: 2,
+        items: [luckinBackpackItem],
+      },
+    ],
+    todayEffects: [
+      {
+        id: "use_1",
+        itemId: "small_boost_coupon",
+        name: "Small Boost Coupon",
+        status: "PENDING",
+        statusLabel: "Pending today",
+        effectSummary: "Personal fitness income 1.5x today.",
+        createdAt: "2026-04-26T01:00:00.000Z",
+        settledAt: null,
+      },
+    ],
+    emptyMessage: "Holding 2 item types.",
+  };
+}
+
 function buildSnapshot(
   overrides: Partial<GamificationStateSnapshot> = {},
 ): GamificationStateSnapshot {
@@ -101,8 +171,12 @@ function buildSnapshot(
       recentDraws: [],
     },
     backpack: {
+      status: "active",
       totalQuantity: 0,
+      ownedItemCount: 0,
       previewItems: [],
+      groups: [],
+      todayEffects: [],
       emptyMessage: "Backpack empty",
     },
     social: {
@@ -370,5 +444,56 @@ describe("SupplyStation", () => {
     );
     expect(container.textContent).toContain("Fish Touch Subsidy");
     expect(container.textContent).toContain("+5 coins");
+  });
+
+  it("renders grouped backpack inventory and today's effects", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot({ backpack: buildBackpackFixture() }) })),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    expect(container.textContent).toContain("Boost");
+    expect(container.textContent).toContain("Real World");
+    expect(container.textContent).toContain("Small Boost Coupon");
+    expect(container.textContent).toContain("Luckin Coffee Coupon");
+    expect(container.textContent).toContain("今日效果");
+    expect(container.textContent).toContain("Pending today");
+    expect(container.textContent).toContain("GM-08");
+  });
+
+  it("switches backpack detail when an item is selected", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot({ backpack: buildBackpackFixture() }) })),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    expect(container.textContent).toContain("管理员确认：不需要");
+
+    const luckinButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("Luckin Coffee Coupon"),
+    );
+
+    expect(luckinButton).toBeDefined();
+
+    await act(async () => {
+      luckinButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("管理员确认：需要");
+    expect(container.textContent).toContain("Manual redemption");
   });
 });
