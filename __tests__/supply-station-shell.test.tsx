@@ -48,6 +48,10 @@ const smallBoostBackpackItem: GamificationStateSnapshot["backpack"]["previewItem
   name: "Small Boost Coupon",
   description: "Boost today's personal fitness income.",
   quantity: 1,
+  reservedQuantity: 0,
+  availableQuantity: 1,
+  useEnabled: true,
+  useDisabledReason: null,
   useTiming: "today",
   useTimingLabel: "Today",
   effectSummary: "Personal fitness income 1.5x today.",
@@ -65,6 +69,10 @@ const luckinBackpackItem: GamificationStateSnapshot["backpack"]["previewItems"][
   name: "Luckin Coffee Coupon",
   description: "Redeem one coffee with an admin.",
   quantity: 2,
+  reservedQuantity: 0,
+  availableQuantity: 2,
+  useEnabled: false,
+  useDisabledReason: "这个道具的使用入口还没开放",
   useTiming: "manual_redemption",
   useTimingLabel: "Manual redemption",
   effectSummary: "Ask an admin to redeem an offline benefit.",
@@ -465,7 +473,7 @@ describe("SupplyStation", () => {
     expect(container.textContent).toContain("Luckin Coffee Coupon");
     expect(container.textContent).toContain("今日效果");
     expect(container.textContent).toContain("Pending today");
-    expect(container.textContent).toContain("GM-08");
+    expect(container.textContent).toContain("今日使用");
   });
 
   it("switches backpack detail when an item is selected", async () => {
@@ -495,5 +503,69 @@ describe("SupplyStation", () => {
 
     expect(container.textContent).toContain("管理员确认：需要");
     expect(container.textContent).toContain("Manual redemption");
+  });
+
+  it("uses an enabled backpack item and refreshes the snapshot", async () => {
+    const updatedSnapshot = buildSnapshot({ backpack: buildBackpackFixture() });
+    updatedSnapshot.backpack.todayEffects = [
+      {
+        id: "use_2",
+        itemId: "small_boost_coupon",
+        name: "Small Boost Coupon",
+        status: "PENDING",
+        statusLabel: "Pending today",
+        effectSummary: "Personal fitness income 1.5x today.",
+        createdAt: "2026-04-26T01:00:00.000Z",
+        settledAt: null,
+      },
+    ];
+
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot({ backpack: buildBackpackFixture() }) }))
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            snapshot: updatedSnapshot,
+            itemUse: {
+              id: "use_2",
+              itemId: "small_boost_coupon",
+              status: "PENDING",
+              targetType: null,
+              targetId: null,
+              inventoryConsumed: false,
+              message: "Boost is pending for today.",
+            },
+          }),
+        ),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    const useButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("今日使用"),
+    );
+
+    expect(useButton).toBeDefined();
+
+    await act(async () => {
+      useButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/gamification/items/use",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ itemId: "small_boost_coupon" }),
+      }),
+    );
+    expect(container.textContent).toContain("Boost is pending for today.");
   });
 });

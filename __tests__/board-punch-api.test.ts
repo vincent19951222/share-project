@@ -4,7 +4,7 @@ import { DELETE, POST } from "@/app/api/board/punch/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
 import { getCurrentBoardDay } from "@/lib/board-state";
-import { getShanghaiDayKey } from "@/lib/economy";
+import { getPreviousShanghaiDayKey, getShanghaiDayKey } from "@/lib/economy";
 import { createCookieValue } from "@/lib/auth";
 
 function request(method: "POST" | "DELETE", userId?: string) {
@@ -56,6 +56,21 @@ describe("/api/board/punch", () => {
     const seasonIds = seasons.map((season) => season.id);
 
     await prisma.punchRecord.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
+    await prisma.itemUseRecord.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
+    await prisma.inventoryItem.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
+    await prisma.lotteryTicketLedger.deleteMany({
       where: {
         userId: { in: teamUsers.map((member) => member.id) },
       },
@@ -183,6 +198,97 @@ describe("/api/board/punch", () => {
     });
     expect(activity.message).toBe("li 刚刚打卡，拿下 20 银子");
     expect(activity.assetAwarded).toBe(20);
+  });
+
+  it("binds a pending fitness boost to the new real punch without settling it", async () => {
+    await resetState();
+    await prisma.itemUseRecord.create({
+      data: {
+        userId,
+        teamId: (await prisma.user.findUniqueOrThrow({ where: { id: userId } })).teamId,
+        itemId: "small_boost_coupon",
+        dayKey: todayDayKey,
+        status: "PENDING",
+        targetType: null,
+        targetId: null,
+        effectSnapshotJson: JSON.stringify({ type: "fitness_coin_multiplier", multiplier: 1.5 }),
+      },
+    });
+
+    const response = await POST(request("POST", userId));
+    expect(response.status).toBe(200);
+
+    const punch = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    const boost = await prisma.itemUseRecord.findFirstOrThrow({
+      where: { userId, itemId: "small_boost_coupon" },
+    });
+
+    expect(boost).toMatchObject({
+      status: "PENDING",
+      targetType: "FITNESS_PUNCH",
+      targetId: punch.id,
+    });
+    expect(punch.assetAwarded).toBe(10);
+  });
+
+  it("continues streak reward through one leave-protected day", async () => {
+    await resetState();
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const yesterdayDayKey = getPreviousShanghaiDayKey(todayDayKey);
+    const dayBeforeYesterdayKey = getPreviousShanghaiDayKey(yesterdayDayKey);
+
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: today - 2,
+        dayKey: dayBeforeYesterdayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 3,
+        assetAwarded: 30,
+        countedForSeasonSlot: false,
+      },
+    });
+    await prisma.itemUseRecord.create({
+      data: {
+        userId,
+        teamId: user.teamId,
+        itemId: "fitness_leave_coupon",
+        dayKey: yesterdayDayKey,
+        status: "SETTLED",
+        targetType: "LEAVE_PROTECTION",
+        targetId: null,
+        effectSnapshotJson: JSON.stringify({
+          type: "leave_protection",
+          protectsStreak: true,
+          freezesNextFitnessRewardTier: true,
+        }),
+        settledAt: new Date("2026-04-23T09:00:00+08:00"),
+      },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        currentStreak: 3,
+        lastPunchDayKey: dayBeforeYesterdayKey,
+        coins: 100,
+      },
+    });
+
+    const response = await POST(request("POST", userId));
+    expect(response.status).toBe(200);
+
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const punch = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+
+    expect(punch.streakAfterPunch).toBe(4);
+    expect(punch.assetAwarded).toBe(40);
+    expect(after.coins).toBe(140);
   });
 
   it("awards coins from the user's consecutive punch streak globally", async () => {

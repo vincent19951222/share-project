@@ -8,6 +8,7 @@ import {
   drawGamificationLottery,
   ensureTodayGamificationTasks,
   rerollGamificationTask,
+  useGamificationItem,
 } from "@/lib/api";
 import type {
   GamificationBackpackItemSnapshot,
@@ -109,7 +110,19 @@ function PlaceholderButton({ children }: { children: string }) {
   );
 }
 
-function BackpackItemDetail({ item }: { item: GamificationBackpackItemSnapshot | null }) {
+function BackpackItemDetail({
+  item,
+  activeAction,
+  selectedRerollDimension,
+  onRerollDimensionChange,
+  onUse,
+}: {
+  item: GamificationBackpackItemSnapshot | null;
+  activeAction: string | null;
+  selectedRerollDimension: string;
+  onRerollDimensionChange: (dimensionKey: string) => void;
+  onUse: (itemId: string) => void;
+}) {
   if (!item) {
     return (
       <div className="rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
@@ -148,9 +161,39 @@ function BackpackItemDetail({ item }: { item: GamificationBackpackItemSnapshot |
           这个补给已下架，当前只展示库存。
         </div>
       ) : null}
-      <div className="mt-3 rounded-lg border-2 border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-500">
-        使用入口将在 GM-08 接入真实结算后开放。
-      </div>
+      {item.itemId === "task_reroll_coupon" ? (
+        <label className="mt-3 block text-xs font-black text-slate-600">
+          选择要换班的维度
+          <select
+            value={selectedRerollDimension}
+            onChange={(event) => onRerollDimensionChange(event.target.value)}
+            className="mt-1 w-full rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-black text-slate-900"
+          >
+            <option value="movement">把电充绿</option>
+            <option value="hydration">喝白白</option>
+            <option value="social">把事办黄</option>
+            <option value="learning">把股看红</option>
+          </select>
+        </label>
+      ) : null}
+      <button
+        type="button"
+        disabled={activeAction !== null || !item.useEnabled}
+        onClick={() => onUse(item.itemId)}
+        className="mt-3 w-full rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+      >
+        {item.itemId === "fitness_leave_coupon" ? "今天请假，不断联" : "今日使用"}
+      </button>
+      {item.useDisabledReason ? (
+        <div className="mt-2 rounded-lg border-2 border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-500">
+          {item.useDisabledReason}
+        </div>
+      ) : null}
+      {item.reservedQuantity > 0 ? (
+        <div className="mt-2 rounded-lg border-2 border-amber-300 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800">
+          今日已预占 {item.reservedQuantity} 张，可用 {item.availableQuantity} 张。
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -199,6 +242,8 @@ export function SupplyStation() {
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [latestDraw, setLatestDraw] = useState<GamificationLotteryDrawSnapshot | null>(null);
   const [selectedBackpackItemId, setSelectedBackpackItemId] = useState<string | null>(null);
+  const [selectedRerollDimension, setSelectedRerollDimension] = useState("movement");
+  const [itemUseMessage, setItemUseMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadState() {
@@ -224,6 +269,7 @@ export function SupplyStation() {
   ) {
     setActiveAction(actionKey);
     setError(null);
+    setItemUseMessage(null);
 
     try {
       setSnapshot(await action());
@@ -237,11 +283,41 @@ export function SupplyStation() {
   async function runLotteryDraw(drawType: "SINGLE" | "TEN", useCoinTopUp = false) {
     setActiveAction(`lottery:${drawType}`);
     setError(null);
+    setItemUseMessage(null);
 
     try {
       const result = await drawGamificationLottery({ drawType, useCoinTopUp });
       setSnapshot(result.snapshot);
       setLatestDraw(result.draw);
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
+
+  async function runItemUse(itemId: string) {
+    setActiveAction(`item:${itemId}`);
+    setError(null);
+    setItemUseMessage(null);
+
+    try {
+      const result = await useGamificationItem({
+        itemId,
+        target:
+          itemId === "task_reroll_coupon"
+            ? {
+                dimensionKey: selectedRerollDimension as
+                  | "movement"
+                  | "hydration"
+                  | "social"
+                  | "learning",
+              }
+            : undefined,
+      });
+
+      setSnapshot(result.snapshot);
+      setItemUseMessage(result.itemUse.message);
     } catch (caught) {
       setError(getSupplyErrorMessage(caught));
     } finally {
@@ -450,6 +526,11 @@ export function SupplyStation() {
                   {snapshot.backpack.ownedItemCount} 种
                 </span>
               </div>
+              {itemUseMessage ? (
+                <div className="mt-3 rounded-[1rem] border-2 border-lime-300 bg-lime-50 px-3 py-2 text-sm font-black text-lime-800">
+                  {itemUseMessage}
+                </div>
+              ) : null}
 
               {snapshot.backpack.groups.length > 0 ? (
                 <div className="mt-4 grid gap-4">
@@ -488,7 +569,15 @@ export function SupplyStation() {
                     ))}
                   </div>
 
-                  <BackpackItemDetail item={selectedBackpackItem} />
+                  <BackpackItemDetail
+                    item={selectedBackpackItem}
+                    activeAction={activeAction}
+                    selectedRerollDimension={selectedRerollDimension}
+                    onRerollDimensionChange={setSelectedRerollDimension}
+                    onUse={(itemId) => {
+                      void runItemUse(itemId);
+                    }}
+                  />
 
                   <div>
                     <h3 className="mb-2 text-sm font-black text-slate-950">今日效果</h3>

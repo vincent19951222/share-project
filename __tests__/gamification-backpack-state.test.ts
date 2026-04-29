@@ -151,6 +151,35 @@ describe("gamification backpack state", () => {
     });
   });
 
+  it("shows reserved and available quantities for pending boost usage", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "small_boost_coupon", quantity: 1 },
+    });
+    await prisma.itemUseRecord.create({
+      data: {
+        userId,
+        teamId,
+        itemId: "small_boost_coupon",
+        dayKey,
+        status: "PENDING",
+        effectSnapshotJson: JSON.stringify({ type: "fitness_coin_multiplier", multiplier: 1.5 }),
+      },
+    });
+
+    const snapshot = await buildGamificationStateForUser(userId, fixedNow);
+    const boost = snapshot?.backpack.groups
+      .flatMap((group) => group.items)
+      .find((item) => item.itemId === "small_boost_coupon");
+
+    expect(boost).toMatchObject({
+      quantity: 1,
+      reservedQuantity: 1,
+      availableQuantity: 0,
+      useEnabled: false,
+      useDisabledReason: "库存已被今日效果预占",
+    });
+  });
+
   it("returns an empty active backpack when the user owns nothing", async () => {
     const snapshot = await buildGamificationStateForUser(userId, fixedNow);
 

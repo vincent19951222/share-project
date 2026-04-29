@@ -68,6 +68,23 @@ export function getShanghaiDayKey(now: Date = new Date()): string {
   return SHANGHAI_DATE_FORMATTER.format(now);
 }
 
+export function getPreviousShanghaiDayKey(dayKey: string): string {
+  return shiftShanghaiDayKey(dayKey, -1);
+}
+
+export function getNextShanghaiDayKey(dayKey: string): string {
+  return shiftShanghaiDayKey(dayKey, 1);
+}
+
+export function getShanghaiWeekKey(dayKey: string): string {
+  const date = parseShanghaiDayKey(dayKey);
+  const localMidday = new Date(date.getTime() + 8 * 60 * 60 * 1000 + 12 * 60 * 60 * 1000);
+  const weekday = localMidday.getUTCDay() === 0 ? 7 : localMidday.getUTCDay();
+  const monday = new Date(localMidday.getTime() - (weekday - 1) * 24 * 60 * 60 * 1000);
+
+  return getShanghaiDayKey(new Date(monday.getTime() - 12 * 60 * 60 * 1000));
+}
+
 export function getPunchRewardForStreak(streak: number): number {
   assertFiniteNumber(streak, "streak");
 

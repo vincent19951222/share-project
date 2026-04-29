@@ -122,6 +122,10 @@ export interface GamificationBackpackItemSnapshot {
   name: string;
   description: string;
   quantity: number;
+  reservedQuantity: number;
+  availableQuantity: number;
+  useEnabled: boolean;
+  useDisabledReason: string | null;
   useTiming: GamificationItemUseTiming;
   useTimingLabel: string;
   effectSummary: string;

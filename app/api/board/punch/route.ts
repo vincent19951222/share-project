@@ -17,10 +17,13 @@ import {
   shouldGrantFitnessPunchTicket,
 } from "@/lib/gamification/fitness-ticket";
 import {
-  getNextPunchRewardPreview,
-  getNextPunchStreak,
+  getPunchRewardForStreak,
   getShanghaiDayKey,
 } from "@/lib/economy";
+import {
+  bindPendingFitnessBoostsToPunch,
+  getNextPunchStreakWithLeaveProtection,
+} from "@/lib/gamification/item-use";
 import {
   pushFullTeamAttendanceIfNeeded,
   pushSeasonTargetReachedIfNeeded,
@@ -93,16 +96,13 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const today = getCurrentBoardDay(now);
     const todayDayKey = getShanghaiDayKey(now);
-    const nextStreak = getNextPunchStreak(
-      user.currentStreak,
-      user.lastPunchDayKey,
+    const nextStreak = await getNextPunchStreakWithLeaveProtection({
+      userId: user.id,
+      currentStreak: user.currentStreak,
+      lastPunchDayKey: user.lastPunchDayKey,
       todayDayKey,
-    );
-    const reward = getNextPunchRewardPreview(
-      user.currentStreak,
-      user.lastPunchDayKey,
-      todayDayKey,
-    );
+    });
+    const reward = getPunchRewardForStreak(nextStreak);
     const activeSeason = user.team.seasons[0] ?? null;
     const memberOrder = Math.max(
       user.team.users.findIndex((member) => member.id === user.id),
@@ -154,6 +154,13 @@ export async function POST(request: NextRequest) {
           },
         });
         const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
+
+        await bindPendingFitnessBoostsToPunch({
+          tx,
+          userId: user.id,
+          dayKey: todayDayKey,
+          punchRecordId: punch.id,
+        });
 
         const updatedUser = await tx.user.update({
           where: { id: user.id },

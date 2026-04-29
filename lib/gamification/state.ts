@@ -15,6 +15,7 @@ import {
   summarizeItemEffect,
   summarizeUsageLimit,
 } from "@/lib/gamification/item-display";
+import { expirePastPendingItemUses } from "@/lib/gamification/item-use";
 import { prisma } from "@/lib/prisma";
 import type {
   GamificationBackpackGroupSnapshot,
@@ -66,10 +67,18 @@ function parseLotteryRewardSnapshot(raw: string): GamificationLotteryRewardSnaps
 function buildBackpackItemSnapshot(input: {
   itemId: string;
   quantity: number;
+  reservedQuantity: number;
 }): GamificationBackpackItemSnapshot {
   const definition = getItemDefinition(input.itemId);
   const category = normalizeBackpackCategory(definition?.category);
   const useTiming = normalizeUseTiming(definition?.useTiming);
+  const availability = getItemUseAvailability({
+    quantity: input.quantity,
+    reservedQuantity: input.reservedQuantity,
+    knownDefinition: Boolean(definition),
+    enabled: definition?.enabled ?? false,
+    effectType: definition?.effect.type ?? null,
+  });
 
   return {
     itemId: input.itemId,
@@ -79,6 +88,10 @@ function buildBackpackItemSnapshot(input: {
     description:
       definition?.description ?? "这个道具配置已经不存在，请联系管理员确认。",
     quantity: input.quantity,
+    reservedQuantity: input.reservedQuantity,
+    availableQuantity: availability.availableQuantity,
+    useEnabled: availability.useEnabled,
+    useDisabledReason: availability.useDisabledReason,
     useTiming,
     useTimingLabel: getUseTimingLabel(useTiming),
     effectSummary: summarizeItemEffect(definition?.effect),
@@ -87,6 +100,52 @@ function buildBackpackItemSnapshot(input: {
     requiresAdminConfirmation: definition?.requiresAdminConfirmation ?? false,
     enabled: definition?.enabled ?? false,
     knownDefinition: Boolean(definition),
+  };
+}
+
+function getItemUseAvailability(input: {
+  quantity: number;
+  reservedQuantity: number;
+  knownDefinition: boolean;
+  enabled: boolean;
+  effectType: string | null;
+}) {
+  const availableQuantity = Math.max(0, input.quantity - input.reservedQuantity);
+
+  if (!input.knownDefinition || !input.enabled) {
+    return {
+      availableQuantity,
+      useEnabled: false,
+      useDisabledReason: "道具配置不可用",
+    };
+  }
+
+  if (
+    input.effectType !== "fitness_coin_multiplier" &&
+    input.effectType !== "fitness_season_multiplier" &&
+    input.effectType !== "fitness_coin_and_season_multiplier" &&
+    input.effectType !== "task_reroll" &&
+    input.effectType !== "leave_protection"
+  ) {
+    return {
+      availableQuantity,
+      useEnabled: false,
+      useDisabledReason: "这个道具的使用入口还没开放",
+    };
+  }
+
+  if (availableQuantity < 1) {
+    return {
+      availableQuantity,
+      useEnabled: false,
+      useDisabledReason: "库存已被今日效果预占",
+    };
+  }
+
+  return {
+    availableQuantity,
+    useEnabled: true,
+    useDisabledReason: null,
   };
 }
 
@@ -148,9 +207,15 @@ function buildBackpackSummary(user: {
   }[];
 }): GamificationBackpackSummary {
   const knownItemIds = new Set(getItemDefinitions().map((item) => item.id));
+  const todayPendingUses = user.itemUseRecords.filter((record) => record.status === "PENDING");
   const items = user.inventoryItems
     .filter((item) => item.quantity > 0)
-    .map((item) => buildBackpackItemSnapshot(item))
+    .map((item) =>
+      buildBackpackItemSnapshot({
+        ...item,
+        reservedQuantity: todayPendingUses.filter((record) => record.itemId === item.itemId).length,
+      }),
+    )
     .sort((a, b) => {
       const categoryDiff =
         BACKPACK_CATEGORY_ORDER.indexOf(a.category) -
@@ -204,6 +269,8 @@ export async function buildGamificationStateForUser(
   now: Date = new Date(),
 ): Promise<GamificationStateSnapshot | null> {
   const dayKey = getShanghaiDayKey(now);
+
+  await expirePastPendingItemUses({ userId, todayDayKey: dayKey });
 
   const user = await prisma.user.findUnique({
     where: { id: userId },

@@ -236,6 +236,37 @@ export async function claimGamificationLifeTicket(): Promise<GamificationStateSn
   return postGamificationAction("/api/gamification/tasks/claim-ticket");
 }
 
+export interface UseGamificationItemRequest {
+  itemId: string;
+  target?: {
+    dimensionKey?: "movement" | "hydration" | "social" | "learning";
+  };
+}
+
+export async function useGamificationItem(payload: UseGamificationItemRequest): Promise<{
+  snapshot: GamificationStateSnapshot;
+  itemUse: {
+    id: string;
+    itemId: string;
+    status: "PENDING" | "SETTLED";
+    targetType: string | null;
+    targetId: string | null;
+    inventoryConsumed: boolean;
+    message: string;
+  };
+}> {
+  const response = await fetch("/api/gamification/items/use", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return readApiResult(response, "道具使用响应解析失败");
+}
+
 export async function drawGamificationLottery({
   drawType,
   useCoinTopUp = false,

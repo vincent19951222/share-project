@@ -5,7 +5,9 @@ import {
   getNextPunchStreak,
   getUpcomingPunchRewardPreview,
   getPunchRewardForStreak,
+  getPreviousShanghaiDayKey,
   getShanghaiDayKey,
+  getShanghaiWeekKey,
   isValidTargetSlots,
 } from "@/lib/economy";
 
@@ -39,6 +41,12 @@ describe("economy rules", () => {
 
   it("handles UTC crossing into the next Shanghai day", () => {
     expect(getShanghaiDayKey(new Date("2026-04-23T18:10:00Z"))).toBe("2026-04-24");
+  });
+
+  it("builds Shanghai week keys from Monday", () => {
+    expect(getShanghaiWeekKey("2026-04-27")).toBe("2026-04-27");
+    expect(getShanghaiWeekKey("2026-05-03")).toBe("2026-04-27");
+    expect(getPreviousShanghaiDayKey("2026-04-26")).toBe("2026-04-25");
   });
 
   it("rejects invalid Shanghai day keys before they can roll over", () => {
