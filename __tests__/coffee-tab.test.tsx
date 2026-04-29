@@ -78,6 +78,29 @@ describe("coffee tab navigation", () => {
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "coffee" });
   });
 
+  it("dispatches the supply station tab selection from the navbar", async () => {
+    const { Navbar } = await import("@/components/navbar/Navbar");
+
+    await act(async () => {
+      root.render(<Navbar />);
+    });
+
+    const supplyButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("牛马补给站"),
+    );
+
+    expect(supplyButton).toBeDefined();
+    expect(
+      supplyButton!.querySelector('img[src*="/assets/icons/supply-pixel.svg"]'),
+    ).not.toBeNull();
+
+    await act(async () => {
+      supplyButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "supply" });
+  });
+
   it("uses managed pixel SVG assets for the primary navigation tabs", async () => {
     const { Navbar } = await import("@/components/navbar/Navbar");
 
@@ -93,6 +116,7 @@ describe("coffee tab navigation", () => {
       "/assets/icons/workout-pixel.svg",
       "/assets/icons/board-pixel.svg",
       "/assets/icons/coffee-pixel.svg",
+      "/assets/icons/supply-pixel.svg",
       "/assets/icons/calendar-pixel.svg",
       "/assets/icons/report-pixel.svg",
     ]);

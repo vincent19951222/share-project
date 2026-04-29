@@ -2,6 +2,7 @@ import type {
   BoardSnapshot,
   CalendarMonthSnapshot,
   CoffeeSnapshot,
+  GamificationStateSnapshot,
 } from "@/lib/types";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
 
@@ -140,6 +141,21 @@ async function readCalendarSnapshot(
   return payload.snapshot as CalendarMonthSnapshot;
 }
 
+async function readGamificationSnapshot(
+  response: Response,
+): Promise<GamificationStateSnapshot> {
+  const payload = await readJsonPayload(response, "响应解析失败");
+
+  if (!response.ok) {
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
+  }
+
+  return payload.snapshot as GamificationStateSnapshot;
+}
+
 export async function fetchCoffeeState(): Promise<CoffeeSnapshot> {
   const response = await fetch("/api/coffee/state", {
     cache: "no-store",
@@ -161,6 +177,15 @@ export async function fetchCalendarState(
   });
 
   return readCalendarSnapshot(response);
+}
+
+export async function fetchGamificationState(): Promise<GamificationStateSnapshot> {
+  const response = await fetch("/api/gamification/state", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  return readGamificationSnapshot(response);
 }
 
 export async function addTodayCoffeeCup(): Promise<CoffeeSnapshot> {

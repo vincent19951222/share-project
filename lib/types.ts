@@ -33,7 +33,91 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
-export type AppTab = "punch" | "board" | "coffee" | "dash" | "calendar";
+export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";
+
+export type GamificationTaskStatus = "pending" | "completed";
+export type GamificationLotteryStatus = "placeholder";
+export type GamificationSocialStatus = "placeholder";
+
+export interface GamificationTaskAssignmentSnapshot {
+  id: string;
+  taskCardId: string;
+  title: string;
+  description: string;
+  status: GamificationTaskStatus;
+  completedAt: string | null;
+}
+
+export interface GamificationDimensionSnapshot {
+  key: "movement" | "hydration" | "social" | "learning";
+  title: string;
+  subtitle: string;
+  description: string;
+  assignment: GamificationTaskAssignmentSnapshot | null;
+}
+
+export interface GamificationTicketSummary {
+  maxFreeTicketsToday: 2;
+  todayEarned: number;
+  todaySpent: number;
+  lifeTicketEarned: boolean;
+  fitnessTicketEarned: boolean;
+}
+
+export interface GamificationLotteryRewardSnapshot {
+  rewardId: string;
+  rewardTier: string;
+  rewardKind: string;
+}
+
+export interface GamificationLotteryDrawSnapshot {
+  id: string;
+  drawType: string;
+  ticketSpent: number;
+  coinSpent: number;
+  createdAt: string;
+  rewards: GamificationLotteryRewardSnapshot[];
+}
+
+export interface GamificationLotterySummary {
+  status: GamificationLotteryStatus;
+  singleDrawEnabled: false;
+  tenDrawEnabled: false;
+  message: string;
+  recentDraws: GamificationLotteryDrawSnapshot[];
+}
+
+export interface GamificationBackpackItemSummary {
+  itemId: string;
+  name: string;
+  quantity: number;
+  category: string;
+}
+
+export interface GamificationBackpackSummary {
+  totalQuantity: number;
+  previewItems: GamificationBackpackItemSummary[];
+  emptyMessage: string;
+}
+
+export interface GamificationSocialSummary {
+  status: GamificationSocialStatus;
+  pendingSentCount: number;
+  pendingReceivedCount: number;
+  message: string;
+}
+
+export interface GamificationStateSnapshot {
+  currentUserId: string;
+  teamId: string;
+  dayKey: string;
+  ticketBalance: number;
+  dimensions: GamificationDimensionSnapshot[];
+  ticketSummary: GamificationTicketSummary;
+  lottery: GamificationLotterySummary;
+  backpack: GamificationBackpackSummary;
+  social: GamificationSocialSummary;
+}
 
 export interface CoffeeMemberSnapshot {
   id: string;

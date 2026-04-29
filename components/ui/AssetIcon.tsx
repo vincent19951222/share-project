@@ -6,6 +6,7 @@ export const assetIconSources = {
   workout: "/assets/icons/workout-pixel.svg",
   board: "/assets/icons/board-pixel.svg",
   coffee: "/assets/icons/coffee-pixel.svg",
+  supply: "/assets/icons/supply-pixel.svg",
   calendar: "/assets/icons/calendar-pixel.svg",
   report: "/assets/icons/report-pixel.svg",
   vaultTrophy: "/assets/icons/vault-trophy-pixel.svg",
