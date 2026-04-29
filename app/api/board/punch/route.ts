@@ -13,6 +13,11 @@ import {
   getNextPunchStreak,
   getShanghaiDayKey,
 } from "@/lib/economy";
+import {
+  pushFullTeamAttendanceIfNeeded,
+  pushSeasonTargetReachedIfNeeded,
+  pushStreakMilestoneIfNeeded,
+} from "@/lib/high-value-push";
 import { TEAM_DYNAMIC_TYPES } from "@/lib/team-dynamics";
 import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
 
@@ -296,6 +301,45 @@ export async function POST(request: NextRequest) {
 
     if (dynamicsToCreate.length > 0) {
       await Promise.all(dynamicsToCreate);
+    }
+
+    const pushTasks: Promise<unknown>[] = [];
+
+    pushTasks.push(
+      pushStreakMilestoneIfNeeded({
+        teamId: user.teamId,
+        userId: user.id,
+        username: user.username,
+        streak: nextStreak,
+        dayKey: todayDayKey,
+      }),
+    );
+
+    if (todayPunchCount === teamMemberCount) {
+      pushTasks.push(
+        pushFullTeamAttendanceIfNeeded({
+          teamId: user.teamId,
+          dayKey: todayDayKey,
+        }),
+      );
+    }
+
+    if (
+      activeSeason &&
+      recordCountedForSeasonSlot &&
+      nextFilledSlots === activeSeason.targetSlots
+    ) {
+      pushTasks.push(
+        pushSeasonTargetReachedIfNeeded({
+          teamId: user.teamId,
+          seasonId: activeSeason.id,
+          goalName: activeSeason.goalName,
+        }),
+      );
+    }
+
+    if (pushTasks.length > 0) {
+      await Promise.allSettled(pushTasks);
     }
 
     return buildSnapshotResponse(user.id, now);

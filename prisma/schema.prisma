@@ -19,6 +19,10 @@ model Team {
   coffeeRecords  CoffeeRecord[]
   teamDynamics   TeamDynamic[]
   weeklyReportDrafts WeeklyReportDraft[]
+  enterpriseWechatSendLogs EnterpriseWechatSendLog[]
+  enterpriseWechatPushEvents EnterpriseWechatPushEvent[]
+  socialInvitations SocialInvitation[]
+  socialInvitationResponses SocialInvitationResponse[]
 }
 
 model User {
@@ -39,6 +43,9 @@ model User {
   coffeeRecords         CoffeeRecord[]
   teamDynamicReadStates TeamDynamicReadState[]
   weeklyReportDrafts    WeeklyReportDraft[]
+  sentSocialInvitations SocialInvitation[]     @relation("SocialInvitationSender")
+  receivedSocialInvitations SocialInvitation[] @relation("SocialInvitationRecipient")
+  socialInvitationResponses SocialInvitationResponse[] @relation("SocialInvitationResponder")
   createdAt             DateTime               @default(now())
 }
 
@@ -56,6 +63,85 @@ model WeeklyReportDraft {
 
   @@unique([teamId, createdByUserId, weekStartDayKey])
   @@index([teamId, weekStartDayKey, updatedAt])
+}
+
+model EnterpriseWechatSendLog {
+  id                  String   @id @default(cuid())
+  teamId              String?
+  team                Team?    @relation(fields: [teamId], references: [id])
+  purpose             String
+  messageType         String
+  status              String
+  targetType          String?
+  targetId            String?
+  contentPreview      String
+  failureReason       String?
+  errorMessage        String?
+  httpStatus          Int?
+  wechatErrcode       Int?
+  wechatErrmsg        String?
+  responseBodySnippet String?
+  createdAt           DateTime @default(now())
+  socialInvitations   SocialInvitation[]
+
+  @@index([teamId, createdAt])
+  @@index([purpose, createdAt])
+}
+
+model EnterpriseWechatPushEvent {
+  id         String   @id @default(cuid())
+  teamId     String
+  team       Team     @relation(fields: [teamId], references: [id])
+  purpose    String
+  eventKey   String   @unique
+  targetType String?
+  targetId   String?
+  payloadJson String?
+  createdAt  DateTime @default(now())
+
+  @@index([teamId, purpose, createdAt])
+}
+
+model SocialInvitation {
+  id                  String                   @id @default(cuid())
+  teamId              String
+  team                Team                     @relation(fields: [teamId], references: [id])
+  senderUserId        String
+  senderUser          User                     @relation("SocialInvitationSender", fields: [senderUserId], references: [id])
+  recipientUserId     String?
+  recipientUser       User?                    @relation("SocialInvitationRecipient", fields: [recipientUserId], references: [id])
+  invitationType      String
+  status              String
+  dayKey              String
+  message             String
+  wechatSendLogId     String?
+  wechatSendLog       EnterpriseWechatSendLog? @relation(fields: [wechatSendLogId], references: [id])
+  wechatWebhookSentAt DateTime?
+  respondedAt         DateTime?
+  expiredAt           DateTime?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  responses           SocialInvitationResponse[]
+
+  @@index([teamId, dayKey, status])
+  @@index([senderUserId, dayKey])
+  @@index([recipientUserId, dayKey, status])
+}
+
+model SocialInvitationResponse {
+  id              String           @id @default(cuid())
+  invitationId    String
+  invitation      SocialInvitation @relation(fields: [invitationId], references: [id])
+  teamId          String
+  team            Team             @relation(fields: [teamId], references: [id])
+  responderUserId String
+  responderUser   User             @relation("SocialInvitationResponder", fields: [responderUserId], references: [id])
+  dayKey          String
+  responseText    String?
+  createdAt       DateTime         @default(now())
+
+  @@unique([invitationId, responderUserId])
+  @@index([teamId, dayKey, createdAt])
 }
 
 model TeamDynamic {

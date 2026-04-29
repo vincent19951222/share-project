@@ -53,6 +53,22 @@ export async function seedDatabase(): Promise<void> {
     where: { teamId: team.id },
   });
 
+  await prisma.socialInvitationResponse.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.socialInvitation.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.enterpriseWechatPushEvent.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.enterpriseWechatSendLog.deleteMany({
+    where: { teamId: team.id },
+  });
+
   const existingTeamDynamics = await prisma.teamDynamic.findMany({
     where: { teamId: team.id },
     select: { id: true },
@@ -139,6 +155,17 @@ export async function seedDatabase(): Promise<void> {
     await prisma.boardNote.deleteMany({ where: { authorId: { in: extraUserIds } } });
     await prisma.activityEvent.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.coffeeRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.socialInvitationResponse.deleteMany({
+      where: { responderUserId: { in: extraUserIds } },
+    });
+    await prisma.socialInvitation.deleteMany({
+      where: {
+        OR: [
+          { senderUserId: { in: extraUserIds } },
+          { recipientUserId: { in: extraUserIds } },
+        ],
+      },
+    });
     await prisma.punchRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.seasonMemberStat.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.teamDynamicReadState.deleteMany({ where: { userId: { in: extraUserIds } } });

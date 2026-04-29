@@ -98,10 +98,16 @@ describe("weekly report admin api", () => {
     });
   });
 
-  it("automatically pushes to enterprise wechat after publishing without blocking success", async () => {
-    vi.stubEnv("WEWORK_WEBHOOK_URL", "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key");
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+  it("routes weekly report publishing through the unified enterprise wechat sender without blocking success", async () => {
     const { admin } = await getSeedUsers();
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    const sendSpy = vi.spyOn(sender, "sendEnterpriseWechatMessage").mockResolvedValue({
+      ok: false,
+      status: "FAILED",
+      logId: "log-1",
+      reason: "HTTP_ERROR",
+      httpStatus: 502,
+    });
 
     await postDraft(makeRequest("POST", "/api/reports/weekly/draft", admin.id));
     const response = await postPublish(makeRequest("POST", "/api/reports/weekly/publish", admin.id));
@@ -115,23 +121,53 @@ describe("weekly report admin api", () => {
       sourceType: "weekly-report",
     });
     expect(body.weworkPush).toEqual({
-      status: "failed",
-      reason: "network down",
+      ok: false,
+      status: "FAILED",
+      logId: "log-1",
+      reason: "HTTP_ERROR",
+      httpStatus: 502,
     });
-    expect(fetch).toHaveBeenCalledWith(
-      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key",
+    expect(sendSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        teamId: admin.teamId,
+        purpose: "WEEKLY_REPORT",
+        targetType: "TeamDynamic",
+        message: expect.objectContaining({
+          type: "markdown",
+          content: expect.stringContaining("统计区间"),
+        }),
       }),
     );
 
     const secondResponse = await postPublish(makeRequest("POST", "/api/reports/weekly/publish", admin.id));
     expect(secondResponse.status).toBe(200);
     await expect(secondResponse.json()).resolves.toMatchObject({
-      weworkPush: { status: "skipped", reason: "already-published" },
+      weworkPush: { status: "SKIPPED", reason: "ALREADY_PUBLISHED" },
     });
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(sendSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("still returns success if the unified sender throws unexpectedly after publish", async () => {
+    const { admin } = await getSeedUsers();
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    vi.spyOn(sender, "sendEnterpriseWechatMessage").mockRejectedValue(new Error("sender exploded"));
+
+    await postDraft(makeRequest("POST", "/api/reports/weekly/draft", admin.id));
+    const response = await postPublish(makeRequest("POST", "/api/reports/weekly/publish", admin.id));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      dynamic: expect.objectContaining({
+        teamId: admin.teamId,
+        type: "WEEKLY_REPORT_CREATED",
+      }),
+      weworkPush: {
+        ok: false,
+        status: "FAILED",
+        reason: "UNEXPECTED_ERROR",
+        errorMessage: "sender exploded",
+      },
+    });
   });
 
   it("returns 403 for non-admin users", async () => {

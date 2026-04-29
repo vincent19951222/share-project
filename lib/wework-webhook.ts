@@ -1,4 +1,8 @@
 import type { TeamDynamic } from "@/lib/generated/prisma/client";
+import {
+  formatEnterpriseWechatMarkdown,
+  sendEnterpriseWechatMessage,
+} from "@/lib/integrations/enterprise-wechat";
 
 type FetchImpl = (input: string, init: RequestInit) => Promise<Response>;
 
@@ -10,15 +14,6 @@ export type WeWorkPushResult =
   | { status: "failed"; reason: string };
 
 const MAX_MARKDOWN_LENGTH = 3800;
-
-function resolveWebhookUrl(webhookUrl?: string): string {
-  return (
-    webhookUrl?.trim() ||
-    process.env.WEWORK_WEBHOOK_URL?.trim() ||
-    process.env.WEWORK_WEEKLY_REPORT_WEBHOOK_URL?.trim() ||
-    ""
-  );
-}
 
 function parsePayload(payloadJson: string): Record<string, unknown> {
   try {
@@ -88,20 +83,39 @@ export function buildWeeklyReportWeWorkMarkdown(dynamic: WeeklyReportDynamic): s
   return clampMarkdown(lines.join("\n"));
 }
 
-async function readWeWorkError(response: Response): Promise<string> {
-  try {
-    const payload = (await response.json()) as { errcode?: unknown; errmsg?: unknown };
-    const errcode = typeof payload.errcode === "number" ? payload.errcode : null;
-    const errmsg = typeof payload.errmsg === "string" ? payload.errmsg : "unknown error";
-
-    if (errcode === 0) {
-      return "";
-    }
-
-    return `企业微信 webhook 返回错误：${errcode ?? response.status} ${errmsg}`;
-  } catch {
-    return `企业微信 webhook 返回 HTTP ${response.status}`;
+function mapSendResultToLegacyResult(
+  result: Awaited<ReturnType<typeof sendEnterpriseWechatMessage>>,
+): WeWorkPushResult {
+  if (result.status === "SENT") {
+    return { status: "sent" };
   }
+
+  if (result.status === "SKIPPED") {
+    return { status: "skipped", reason: "missing-webhook" };
+  }
+
+  if (result.reason === "NETWORK_ERROR") {
+    return { status: "failed", reason: result.errorMessage ?? "企业微信 webhook 推送失败" };
+  }
+
+  if (result.reason === "WECHAT_ERROR") {
+    return {
+      status: "failed",
+      reason: `企业微信 webhook 返回错误：${result.wechatErrcode ?? result.httpStatus ?? "unknown"} ${result.wechatErrmsg ?? "unknown error"}`,
+    };
+  }
+
+  if (result.reason === "HTTP_ERROR") {
+    return {
+      status: "failed",
+      reason: `企业微信 webhook 返回 HTTP ${result.httpStatus ?? 500}`,
+    };
+  }
+
+  return {
+    status: "failed",
+    reason: result.errorMessage ?? "企业微信 webhook 推送失败",
+  };
 }
 
 export async function pushWeeklyReportDynamicToWeWork(input: {
@@ -109,36 +123,17 @@ export async function pushWeeklyReportDynamicToWeWork(input: {
   webhookUrl?: string;
   fetchImpl?: FetchImpl;
 }): Promise<WeWorkPushResult> {
-  const webhookUrl = resolveWebhookUrl(input.webhookUrl);
+  const result = await sendEnterpriseWechatMessage({
+    purpose: "WEEKLY_REPORT",
+    webhookUrl: input.webhookUrl,
+    fetchImpl: input.fetchImpl,
+    message: formatEnterpriseWechatMarkdown({
+      title: input.dynamic.title,
+      lines: buildWeeklyReportWeWorkMarkdown(input.dynamic)
+        .split("\n")
+        .slice(1),
+    }),
+  });
 
-  if (!webhookUrl) {
-    return { status: "skipped", reason: "missing-webhook" };
-  }
-
-  const fetchImpl = input.fetchImpl ?? fetch;
-
-  try {
-    const response = await fetchImpl(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        msgtype: "markdown",
-        markdown: {
-          content: buildWeeklyReportWeWorkMarkdown(input.dynamic),
-        },
-      }),
-    });
-    const error = await readWeWorkError(response);
-
-    if (!response.ok || error) {
-      return { status: "failed", reason: error || `企业微信 webhook 返回 HTTP ${response.status}` };
-    }
-
-    return { status: "sent" };
-  } catch (error) {
-    return {
-      status: "failed",
-      reason: error instanceof Error ? error.message : "企业微信 webhook 推送失败",
-    };
-  }
+  return mapSendResultToLegacyResult(result);
 }

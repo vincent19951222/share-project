@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { DELETE, POST } from "@/app/api/board/punch/route";
 import { prisma } from "@/lib/prisma";
@@ -39,6 +39,10 @@ describe("/api/board/punch", () => {
     await prisma.$disconnect();
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   async function resetState() {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
     const teamUsers = await prisma.user.findMany({
@@ -63,6 +67,16 @@ describe("/api/board/punch", () => {
     });
     await prisma.teamDynamicReadState.deleteMany();
     await prisma.teamDynamic.deleteMany({
+      where: {
+        teamId: user.teamId,
+      },
+    });
+    await prisma.enterpriseWechatPushEvent.deleteMany({
+      where: {
+        teamId: user.teamId,
+      },
+    });
+    await prisma.enterpriseWechatSendLog.deleteMany({
       where: {
         teamId: user.teamId,
       },
@@ -460,6 +474,156 @@ describe("/api/board/punch", () => {
     });
 
     expect(entry.title).toContain("7 天");
+  });
+
+  it("sends a streak milestone push when the user reaches fourteen days", async () => {
+    await resetState();
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        currentStreak: 13,
+        lastPunchDayKey: "2026-04-23",
+      },
+    });
+
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    const sendSpy = vi.spyOn(sender, "sendEnterpriseWechatMessage").mockResolvedValue({
+      ok: true,
+      status: "SENT",
+      logId: "log-1",
+      httpStatus: 200,
+      wechatErrcode: 0,
+      wechatErrmsg: "ok",
+    });
+
+    const response = await POST(request("POST", userId));
+
+    expect(response.status).toBe(200);
+    expect(sendSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        purpose: "TEAM_MILESTONE",
+        message: expect.objectContaining({ type: "text" }),
+      }),
+    );
+  });
+
+  it("sends full-team attendance to enterprise wechat only once per day", async () => {
+    await resetState();
+    const currentUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const teammates = await prisma.user.findMany({
+      where: { teamId: currentUser.teamId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    const sendSpy = vi.spyOn(sender, "sendEnterpriseWechatMessage").mockResolvedValue({
+      ok: true,
+      status: "SENT",
+      logId: "log-2",
+      httpStatus: 200,
+      wechatErrcode: 0,
+      wechatErrmsg: "ok",
+    });
+
+    for (const teammate of teammates) {
+      await POST(request("POST", teammate.id));
+    }
+
+    expect(sendSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not resend full-team attendance after undo and re-complete on the same day", async () => {
+    await resetState();
+    const currentUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const teammates = await prisma.user.findMany({
+      where: { teamId: currentUser.teamId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    const sendSpy = vi.spyOn(sender, "sendEnterpriseWechatMessage").mockResolvedValue({
+      ok: true,
+      status: "SENT",
+      logId: "log-3",
+      httpStatus: 200,
+      wechatErrcode: 0,
+      wechatErrmsg: "ok",
+    });
+
+    for (const teammate of teammates) {
+      const response = await POST(request("POST", teammate.id));
+      expect(response.status).toBe(200);
+    }
+
+    const lastTeammate = teammates[teammates.length - 1]!;
+    const undoResponse = await DELETE(request("DELETE", lastTeammate.id));
+    expect(undoResponse.status).toBe(200);
+
+    const repunchResponse = await POST(request("POST", lastTeammate.id));
+    expect(repunchResponse.status).toBe(200);
+    expect(sendSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends a season target reached push only once per season", async () => {
+    await resetState();
+    await createActiveSeason({ filledSlots: 0, targetSlots: 1 });
+
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    const sendSpy = vi.spyOn(sender, "sendEnterpriseWechatMessage").mockResolvedValue({
+      ok: true,
+      status: "SENT",
+      logId: "log-4",
+      httpStatus: 200,
+      wechatErrcode: 0,
+      wechatErrmsg: "ok",
+    });
+
+    const firstResponse = await POST(request("POST", userId));
+    expect(firstResponse.status).toBe(200);
+
+    const undoResponse = await DELETE(request("DELETE", userId));
+    expect(undoResponse.status).toBe(200);
+
+    const secondResponse = await POST(request("POST", userId));
+    expect(secondResponse.status).toBe(200);
+
+    const seasonGoalCalls = sendSpy.mock.calls.filter(
+      ([arg]) => arg?.targetType === "SeasonGoal",
+    );
+    expect(seasonGoalCalls).toHaveLength(1);
+  });
+
+  it("sends a streak milestone push when the user reaches one hundred days", async () => {
+    await resetState();
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        currentStreak: 99,
+        lastPunchDayKey: "2026-04-23",
+      },
+    });
+
+    const sender = await import("@/lib/integrations/enterprise-wechat");
+    const sendSpy = vi.spyOn(sender, "sendEnterpriseWechatMessage").mockResolvedValue({
+      ok: true,
+      status: "SENT",
+      logId: "log-5",
+      httpStatus: 200,
+      wechatErrcode: 0,
+      wechatErrmsg: "ok",
+    });
+
+    const response = await POST(request("POST", userId));
+
+    expect(response.status).toBe(200);
+    expect(sendSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        targetType: "StreakMilestone",
+        message: expect.objectContaining({
+          content: expect.stringContaining("100"),
+        }),
+      }),
+    );
   });
 
   it("undoes today's punch and restores the previous streak and coins", async () => {

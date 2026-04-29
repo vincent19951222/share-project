@@ -3,8 +3,12 @@ import {
   publishWeeklyReportDraftWithStatus,
   WeeklyReportServiceError,
 } from "@/lib/weekly-report-service";
-import { pushWeeklyReportDynamicToWeWork, type WeWorkPushResult } from "@/lib/wework-webhook";
+import {
+  sendEnterpriseWechatMessage,
+  type EnterpriseWechatSendResult,
+} from "@/lib/integrations/enterprise-wechat";
 import { isAdminUser, loadCurrentUser } from "@/lib/session";
+import { buildWeeklyReportWeWorkMarkdown } from "@/lib/wework-webhook";
 
 function handleWeeklyReportServiceError(error: unknown) {
   if (error instanceof WeeklyReportServiceError) {
@@ -27,9 +31,41 @@ export async function POST(request: NextRequest) {
     }
 
     const { dynamic, created } = await publishWeeklyReportDraftWithStatus({ userId: user.id });
-    const weworkPush: WeWorkPushResult = created
-      ? await pushWeeklyReportDynamicToWeWork({ dynamic })
-      : { status: "skipped", reason: "already-published" };
+    const weworkPush:
+      | EnterpriseWechatSendResult
+      | {
+          ok: false;
+          status: "SKIPPED";
+          reason: "ALREADY_PUBLISHED";
+        }
+      | {
+          ok: false;
+          status: "FAILED";
+          reason: "UNEXPECTED_ERROR";
+          errorMessage: string;
+        } = created
+      ? await (async () => {
+          try {
+            return await sendEnterpriseWechatMessage({
+              teamId: dynamic.teamId,
+              purpose: "WEEKLY_REPORT",
+              targetType: "TeamDynamic",
+              targetId: dynamic.id,
+              message: {
+                type: "markdown",
+                content: buildWeeklyReportWeWorkMarkdown(dynamic),
+              },
+            });
+          } catch (error) {
+            return {
+              ok: false as const,
+              status: "FAILED" as const,
+              reason: "UNEXPECTED_ERROR" as const,
+              errorMessage: error instanceof Error ? error.message : "Unexpected sender failure",
+            };
+          }
+        })()
+      : { ok: false, status: "SKIPPED", reason: "ALREADY_PUBLISHED" };
 
     return NextResponse.json({ dynamic, weworkPush });
   } catch (error) {
