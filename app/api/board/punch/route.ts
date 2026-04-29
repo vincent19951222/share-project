@@ -21,9 +21,9 @@ import {
   getShanghaiDayKey,
 } from "@/lib/economy";
 import {
-  bindPendingFitnessBoostsToPunch,
   getNextPunchStreakWithLeaveProtection,
 } from "@/lib/gamification/item-use";
+import { settleBoostForPunch } from "@/lib/gamification/boost-settlement";
 import {
   pushFullTeamAttendanceIfNeeded,
   pushSeasonTargetReachedIfNeeded,
@@ -104,6 +104,8 @@ export async function POST(request: NextRequest) {
     });
     const reward = getPunchRewardForStreak(nextStreak);
     const activeSeason = user.team.seasons[0] ?? null;
+    const baseReward = reward;
+    const baseSeasonContribution = activeSeason ? baseReward : 0;
     const memberOrder = Math.max(
       user.team.users.findIndex((member) => member.id === user.id),
       0,
@@ -149,24 +151,33 @@ export async function POST(request: NextRequest) {
             punched: true,
             punchType: "default",
             streakAfterPunch: nextStreak,
-            assetAwarded: reward,
+            assetAwarded: baseReward,
+            baseAssetAwarded: baseReward,
+            boostAssetBonus: 0,
+            baseSeasonContribution,
+            boostSeasonBonus: 0,
+            seasonContributionAwarded: baseSeasonContribution,
             countedForSeasonSlot: countsForSeasonSlot,
           },
         });
         const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
 
-        await bindPendingFitnessBoostsToPunch({
+        const boostSettlement = await settleBoostForPunch({
           tx,
           userId: user.id,
+          teamId: user.teamId,
           dayKey: todayDayKey,
           punchRecordId: punch.id,
+          baseAssetAwarded: baseReward,
+          baseSeasonContribution,
+          applyBonusDeltas: false,
         });
 
         const updatedUser = await tx.user.update({
           where: { id: user.id },
           data: {
             coins: {
-              increment: reward,
+              increment: boostSettlement.assetAwarded,
             },
             currentStreak: nextStreak,
             lastPunchDayKey: todayDayKey,
@@ -209,8 +220,12 @@ export async function POST(request: NextRequest) {
             teamId: user.teamId,
             userId: user.id,
             type: ACTIVITY_EVENT_TYPES.PUNCH,
-            message: buildPunchActivityMessage(user.username, reward),
-            assetAwarded: reward,
+            message: buildPunchActivityMessage(
+              user.username,
+              boostSettlement.assetAwarded,
+              boostSettlement.boostLabel,
+            ),
+            assetAwarded: boostSettlement.assetAwarded,
             createdAt: now,
           },
         });
@@ -238,7 +253,7 @@ export async function POST(request: NextRequest) {
               },
               data: {
                 seasonIncome: {
-                  increment: reward,
+                  increment: boostSettlement.seasonContributionAwarded,
                 },
                 ...(countsForSeasonSlot
                   ? {
@@ -255,7 +270,7 @@ export async function POST(request: NextRequest) {
               data: {
                 seasonId: activeSeason.id,
                 userId: user.id,
-                seasonIncome: reward,
+                seasonIncome: boostSettlement.seasonContributionAwarded,
                 slotContribution: countsForSeasonSlot ? 1 : 0,
                 colorIndex: memberOrder,
                 memberOrder,
@@ -432,6 +447,9 @@ export async function DELETE(request: NextRequest) {
             id: true,
             seasonId: true,
             assetAwarded: true,
+            seasonContributionAwarded: true,
+            boostItemUseRecordId: true,
+            boostSummaryJson: true,
             countedForSeasonSlot: true,
             punched: true,
             punchType: true,
@@ -525,6 +543,14 @@ export async function DELETE(request: NextRequest) {
           },
         });
 
+        const seasonRollbackAmount =
+          todayPunch.seasonContributionAwarded > 0
+            ? todayPunch.seasonContributionAwarded
+            : todayPunch.assetAwarded;
+        const consumedBoostLabel = todayPunch.boostSummaryJson
+          ? (JSON.parse(todayPunch.boostSummaryJson) as { boostLabel?: string | null }).boostLabel
+          : null;
+
         await tx.punchRecord.delete({
           where: { id: todayPunch.id },
         });
@@ -545,7 +571,7 @@ export async function DELETE(request: NextRequest) {
             teamId: user.teamId,
             userId: user.id,
             type: ACTIVITY_EVENT_TYPES.UNDO_PUNCH,
-            message: buildUndoPunchActivityMessage(user.username),
+            message: buildUndoPunchActivityMessage(user.username, consumedBoostLabel),
             assetAwarded: null,
             createdAt: now,
           },
@@ -574,7 +600,7 @@ export async function DELETE(request: NextRequest) {
               },
               data: {
                 seasonIncome: {
-                  decrement: todayPunch.assetAwarded,
+                  decrement: seasonRollbackAmount,
                 },
                 ...(todayPunch.countedForSeasonSlot
                   ? {

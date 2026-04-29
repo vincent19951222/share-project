@@ -63,9 +63,13 @@ describe("gamification item use", () => {
     expect(record.effectSnapshotJson).toContain("fitness_coin_multiplier");
   });
 
-  it("binds a boost to today's real punch when the user already punched", async () => {
+  it("immediately settles a boost used after today's punch", async () => {
     await prisma.inventoryItem.create({
-      data: { userId, teamId, itemId: "small_boost_coupon", quantity: 1 },
+      data: { userId, teamId, itemId: "coin_rich_coupon", quantity: 1 },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { coins: 140 },
     });
     const punch = await prisma.punchRecord.create({
       data: {
@@ -75,20 +79,33 @@ describe("gamification item use", () => {
         dayKey,
         punched: true,
         punchType: "default",
-        streakAfterPunch: 3,
-        assetAwarded: 30,
+        streakAfterPunch: 4,
+        assetAwarded: 40,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 0,
+        seasonContributionAwarded: 0,
         countedForSeasonSlot: false,
       },
     });
 
-    const result = await useInventoryItem({ userId, itemId: "small_boost_coupon", now: fixedNow });
+    const result = await useInventoryItem({ userId, itemId: "coin_rich_coupon", now: fixedNow });
+    const updatedPunch = await prisma.punchRecord.findUniqueOrThrow({ where: { id: punch.id } });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const inventory = await prisma.inventoryItem.findUniqueOrThrow({
+      where: { userId_itemId: { userId, itemId: "coin_rich_coupon" } },
+    });
 
     expect(result.itemUse).toMatchObject({
-      status: "PENDING",
+      status: "SETTLED",
       targetType: "FITNESS_PUNCH",
       targetId: punch.id,
-      inventoryConsumed: false,
+      inventoryConsumed: true,
     });
+    expect(result.itemUse.message).toContain("补结算");
+    expect(updatedPunch.assetAwarded).toBe(80);
+    expect(updatedPunch.boostAssetBonus).toBe(40);
+    expect(user.coins).toBe(180);
+    expect(inventory.quantity).toBe(0);
   });
 
   it("rejects a second fitness boost for the same day", async () => {

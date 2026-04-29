@@ -7,6 +7,7 @@ import {
   getShanghaiDayKey,
   getShanghaiWeekKey,
 } from "@/lib/economy";
+import { settleBoostForPunch } from "@/lib/gamification/boost-settlement";
 import { prisma } from "@/lib/prisma";
 
 type TransactionClient = Prisma.TransactionClient;
@@ -314,7 +315,14 @@ async function useFitnessBoost(input: {
         dayKey: input.dayKey,
       },
     },
-    select: { id: true },
+    select: {
+      id: true,
+      punchType: true,
+      seasonId: true,
+      assetAwarded: true,
+      baseAssetAwarded: true,
+      baseSeasonContribution: true,
+    },
   });
   const record = await input.tx.itemUseRecord.create({
     data: {
@@ -328,16 +336,34 @@ async function useFitnessBoost(input: {
       effectSnapshotJson: JSON.stringify(input.definition.effect),
     },
   });
+  let immediateSettlement = false;
+
+  if (todayPunch?.punchType === "default") {
+    await settleBoostForPunch({
+      tx: input.tx,
+      userId: input.userId,
+      teamId: input.teamId,
+      dayKey: input.dayKey,
+      punchRecordId: todayPunch.id,
+      baseAssetAwarded: todayPunch.baseAssetAwarded || todayPunch.assetAwarded,
+      baseSeasonContribution:
+        todayPunch.baseSeasonContribution || (todayPunch.seasonId ? todayPunch.assetAwarded : 0),
+      applyBonusDeltas: true,
+    });
+    immediateSettlement = true;
+  }
 
   return {
     itemUse: {
       id: record.id,
       itemId: record.itemId,
-      status: "PENDING" as const,
+      status: immediateSettlement ? ("SETTLED" as const) : ("PENDING" as const),
       targetType: record.targetType,
       targetId: record.targetId,
-      inventoryConsumed: false,
-      message: "暴击已进入今日待生效，真实健身后结算。",
+      inventoryConsumed: immediateSettlement,
+      message: immediateSettlement
+        ? "暴击已补结算到今日打卡。"
+        : "暴击已进入今日待生效，真实健身后结算。",
     },
   };
 }

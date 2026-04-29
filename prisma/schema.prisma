@@ -359,21 +359,29 @@ model SeasonMemberStat {
 }
 
 model PunchRecord {
-  id                    String   @id @default(cuid())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id])
-  seasonId              String?
-  season                Season?  @relation(fields: [seasonId], references: [id])
-  dayIndex              Int
-  dayKey                String
-  punched               Boolean
-  punchType             String?
-  streakAfterPunch      Int      @default(0)
-  assetAwarded          Int      @default(0)
-  countedForSeasonSlot  Boolean  @default(false)
-  createdAt             DateTime @default(now())
+  id                         String   @id @default(cuid())
+  userId                     String
+  user                       User     @relation(fields: [userId], references: [id])
+  seasonId                   String?
+  season                     Season?  @relation(fields: [seasonId], references: [id])
+  dayIndex                   Int
+  dayKey                     String
+  punched                    Boolean
+  punchType                  String?
+  streakAfterPunch           Int      @default(0)
+  assetAwarded               Int      @default(0)
+  baseAssetAwarded           Int      @default(0)
+  boostAssetBonus            Int      @default(0)
+  baseSeasonContribution     Int      @default(0)
+  boostSeasonBonus           Int      @default(0)
+  seasonContributionAwarded  Int      @default(0)
+  boostItemUseRecordId       String?
+  boostSummaryJson           String?
+  countedForSeasonSlot       Boolean  @default(false)
+  createdAt                  DateTime @default(now())
 
   @@unique([userId, dayKey])
+  @@index([boostItemUseRecordId])
 }
 
 model BoardNote {

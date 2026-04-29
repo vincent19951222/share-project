@@ -32,6 +32,7 @@ describe("POST /api/gamification/items/use", () => {
     await prisma.itemUseRecord.deleteMany({ where: { userId } });
     await prisma.inventoryItem.deleteMany({ where: { userId } });
     await prisma.dailyTaskAssignment.deleteMany({ where: { userId } });
+    await prisma.punchRecord.deleteMany({ where: { userId } });
   });
 
   it("returns 401 when unauthenticated", async () => {
@@ -63,6 +64,51 @@ describe("POST /api/gamification/items/use", () => {
     expect(body.snapshot.backpack.todayEffects[0]).toMatchObject({
       itemId: "small_boost_coupon",
       status: "PENDING",
+    });
+  });
+
+  it("immediately settles boost bonus when used after today's punch", async () => {
+    const dayKey = getShanghaiDayKey(fixedNow);
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "coin_rich_coupon", quantity: 1 },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { coins: 140 },
+    });
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: 26,
+        dayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 4,
+        assetAwarded: 40,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 0,
+        seasonContributionAwarded: 0,
+        countedForSeasonSlot: false,
+      },
+    });
+
+    const response = await POST(request(userId, { itemId: "coin_rich_coupon" }));
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.itemUse).toMatchObject({
+      itemId: "coin_rich_coupon",
+      status: "SETTLED",
+      inventoryConsumed: true,
+    });
+    expect(body.itemUse.message).toContain("补结算");
+    expect(body.snapshot.backpack.todayEffects[0]).toMatchObject({
+      itemId: "coin_rich_coupon",
+      status: "SETTLED",
+    });
+    await expect(prisma.user.findUniqueOrThrow({ where: { id: userId } })).resolves.toMatchObject({
+      coins: 180,
     });
   });
 

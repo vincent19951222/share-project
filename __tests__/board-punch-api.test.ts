@@ -200,12 +200,16 @@ describe("/api/board/punch", () => {
     expect(activity.assetAwarded).toBe(20);
   });
 
-  it("binds a pending fitness boost to the new real punch without settling it", async () => {
+  it("settles a pending fitness boost when the real punch is created", async () => {
     await resetState();
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    await prisma.inventoryItem.create({
+      data: { userId, teamId: user.teamId, itemId: "small_boost_coupon", quantity: 1 },
+    });
     await prisma.itemUseRecord.create({
       data: {
         userId,
-        teamId: (await prisma.user.findUniqueOrThrow({ where: { id: userId } })).teamId,
+        teamId: user.teamId,
         itemId: "small_boost_coupon",
         dayKey: todayDayKey,
         status: "PENDING",
@@ -224,13 +228,60 @@ describe("/api/board/punch", () => {
     const boost = await prisma.itemUseRecord.findFirstOrThrow({
       where: { userId, itemId: "small_boost_coupon" },
     });
+    const inventory = await prisma.inventoryItem.findUniqueOrThrow({
+      where: { userId_itemId: { userId, itemId: "small_boost_coupon" } },
+    });
 
     expect(boost).toMatchObject({
-      status: "PENDING",
+      status: "SETTLED",
       targetType: "FITNESS_PUNCH",
       targetId: punch.id,
     });
+    expect(punch).toMatchObject({
+      assetAwarded: 15,
+      baseAssetAwarded: 10,
+      boostAssetBonus: 5,
+      baseSeasonContribution: 0,
+      seasonContributionAwarded: 0,
+    });
+    expect(inventory.quantity).toBe(0);
+  });
+
+  it("settles a season sprint boost without adding extra season slots", async () => {
+    await resetState();
+    const season = await createActiveSeason({ filledSlots: 0, targetSlots: 1 });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    await prisma.inventoryItem.create({
+      data: { userId: user.id, teamId: user.teamId, itemId: "season_sprint_coupon", quantity: 1 },
+    });
+    await prisma.itemUseRecord.create({
+      data: {
+        userId: user.id,
+        teamId: user.teamId,
+        itemId: "season_sprint_coupon",
+        dayKey: todayDayKey,
+        status: "PENDING",
+        effectSnapshotJson: JSON.stringify({ type: "fitness_season_multiplier", multiplier: 2 }),
+      },
+    });
+
+    const response = await POST(request("POST", user.id));
+    expect(response.status).toBe(200);
+
+    const punch = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId: user.id, dayKey: todayDayKey } },
+    });
+    const stat = await prisma.seasonMemberStat.findUniqueOrThrow({
+      where: { seasonId_userId: { seasonId: season.id, userId: user.id } },
+    });
+    const afterSeason = await prisma.season.findUniqueOrThrow({ where: { id: season.id } });
+
     expect(punch.assetAwarded).toBe(10);
+    expect(punch.seasonContributionAwarded).toBe(20);
+    expect(stat.seasonIncome).toBe(20);
+    expect(stat.slotContribution).toBe(1);
+    expect(afterSeason.filledSlots).toBe(1);
   });
 
   it("continues streak reward through one leave-protected day", async () => {
@@ -887,6 +938,80 @@ describe("/api/board/punch", () => {
     });
     expect(activity.message).toBe("li 撤销了今天的打卡");
     expect(activity.assetAwarded).toBeNull();
+  });
+
+  it("undoes a coin-only boosted punch without rolling back extra season income", async () => {
+    await resetState();
+    const season = await createActiveSeason({ filledSlots: 1, targetSlots: 5 });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const itemUse = await prisma.itemUseRecord.create({
+      data: {
+        userId: user.id,
+        teamId: user.teamId,
+        itemId: "coin_rich_coupon",
+        dayKey: todayDayKey,
+        status: "SETTLED",
+        targetType: "FITNESS_PUNCH",
+        effectSnapshotJson: JSON.stringify({ type: "fitness_coin_multiplier", multiplier: 2 }),
+        settledAt: new Date(),
+      },
+    });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { coins: 180, currentStreak: 4, lastPunchDayKey: todayDayKey },
+    });
+    await prisma.seasonMemberStat.create({
+      data: {
+        seasonId: season.id,
+        userId: user.id,
+        seasonIncome: 40,
+        slotContribution: 1,
+        colorIndex: 0,
+        memberOrder: 0,
+        firstContributionAt: new Date(),
+      },
+    });
+    await prisma.punchRecord.create({
+      data: {
+        userId: user.id,
+        seasonId: season.id,
+        dayIndex: today,
+        dayKey: todayDayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 4,
+        assetAwarded: 80,
+        baseAssetAwarded: 40,
+        boostAssetBonus: 40,
+        baseSeasonContribution: 40,
+        boostSeasonBonus: 0,
+        seasonContributionAwarded: 40,
+        boostItemUseRecordId: itemUse.id,
+        boostSummaryJson: JSON.stringify({ boostLabel: "银子暴富券" }),
+        countedForSeasonSlot: true,
+      },
+    });
+
+    const response = await DELETE(request("DELETE", user.id));
+    expect(response.status).toBe(200);
+
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+    const stat = await prisma.seasonMemberStat.findUniqueOrThrow({
+      where: { seasonId_userId: { seasonId: season.id, userId: user.id } },
+    });
+    const inventoryCount = await prisma.inventoryItem.count({
+      where: { userId: user.id, itemId: "coin_rich_coupon" },
+    });
+    const activity = await prisma.activityEvent.findFirstOrThrow({
+      where: { userId: user.id, type: "UNDO_PUNCH" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    expect(after.coins).toBe(100);
+    expect(stat.seasonIncome).toBe(0);
+    expect(inventoryCount).toBe(0);
+    expect(activity.message).toContain("银子暴富券");
   });
 
   it("rejects undo when today's punch does not exist", async () => {
