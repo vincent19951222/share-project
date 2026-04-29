@@ -35,6 +35,37 @@ describe("seedDatabase", () => {
     });
     const fixtureTeamDynamicIds = fixtureTeamDynamics.map((item) => item.id);
 
+    await prisma.weeklyReportDraft.deleteMany({
+      where: {
+        OR: [
+          { createdByUserId: { in: fixtureUserIds } },
+          { teamId: { in: fixtureTeamIds } },
+        ],
+      },
+    });
+    await prisma.socialInvitationResponse.deleteMany({
+      where: {
+        OR: [
+          { responderUserId: { in: fixtureUserIds } },
+          { teamId: { in: fixtureTeamIds } },
+        ],
+      },
+    });
+    await prisma.socialInvitation.deleteMany({
+      where: {
+        OR: [
+          { senderUserId: { in: fixtureUserIds } },
+          { recipientUserId: { in: fixtureUserIds } },
+          { teamId: { in: fixtureTeamIds } },
+        ],
+      },
+    });
+    await prisma.enterpriseWechatPushEvent.deleteMany({
+      where: { teamId: { in: fixtureTeamIds } },
+    });
+    await prisma.enterpriseWechatSendLog.deleteMany({
+      where: { teamId: { in: fixtureTeamIds } },
+    });
     await prisma.seasonMemberStat.deleteMany({
       where: {
         OR: [{ userId: { in: fixtureUserIds } }, { seasonId: { in: fixtureSeasonIds } }],
