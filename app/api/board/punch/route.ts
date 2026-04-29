@@ -9,6 +9,14 @@ import {
 } from "@/lib/activity-events";
 import { buildBoardSnapshotForUser, getCurrentBoardDay } from "@/lib/board-state";
 import {
+  FITNESS_PUNCH_REVERSAL_SOURCE_TYPE,
+  FITNESS_PUNCH_SOURCE_TYPE,
+  FITNESS_PUNCH_TICKET_GRANT_REASON,
+  FITNESS_PUNCH_TICKET_REVOKE_REASON,
+  FitnessTicketAlreadySpentError,
+  shouldGrantFitnessPunchTicket,
+} from "@/lib/gamification/fitness-ticket";
+import {
   getNextPunchRewardPreview,
   getNextPunchStreak,
   getShanghaiDayKey,
@@ -132,7 +140,7 @@ export async function POST(request: NextRequest) {
             : activeSeason.filledSlots;
         }
 
-        await tx.punchRecord.create({
+        const punch = await tx.punchRecord.create({
           data: {
             userId: user.id,
             seasonId: activeSeason?.id ?? null,
@@ -145,8 +153,9 @@ export async function POST(request: NextRequest) {
             countedForSeasonSlot: countsForSeasonSlot,
           },
         });
+        const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
 
-        await tx.user.update({
+        const updatedUser = await tx.user.update({
           where: { id: user.id },
           data: {
             coins: {
@@ -154,8 +163,39 @@ export async function POST(request: NextRequest) {
             },
             currentStreak: nextStreak,
             lastPunchDayKey: todayDayKey,
+            ...(grantsFitnessTicket
+              ? {
+                  ticketBalance: {
+                    increment: 1,
+                  },
+                }
+              : {}),
+          },
+          select: {
+            ticketBalance: true,
           },
         });
+
+        if (grantsFitnessTicket) {
+          await tx.lotteryTicketLedger.create({
+            data: {
+              userId: user.id,
+              teamId: user.teamId,
+              dayKey: todayDayKey,
+              delta: 1,
+              balanceAfter: updatedUser.ticketBalance,
+              reason: FITNESS_PUNCH_TICKET_GRANT_REASON,
+              sourceType: FITNESS_PUNCH_SOURCE_TYPE,
+              sourceId: punch.id,
+              metadataJson: JSON.stringify({
+                punchRecordId: punch.id,
+                dayKey: todayDayKey,
+                punchType: punch.punchType,
+              }),
+              createdAt: now,
+            },
+          });
+        }
 
         await tx.activityEvent.create({
           data: {
@@ -386,11 +426,82 @@ export async function DELETE(request: NextRequest) {
             seasonId: true,
             assetAwarded: true,
             countedForSeasonSlot: true,
+            punched: true,
+            punchType: true,
           },
         });
 
         if (!todayPunch) {
           throw new TodayPunchNotFoundError();
+        }
+
+        const grantLedger = shouldGrantFitnessPunchTicket(todayPunch)
+          ? await tx.lotteryTicketLedger.findFirst({
+              where: {
+                userId: user.id,
+                dayKey: todayDayKey,
+                reason: FITNESS_PUNCH_TICKET_GRANT_REASON,
+                sourceType: FITNESS_PUNCH_SOURCE_TYPE,
+                sourceId: todayPunch.id,
+              },
+              select: {
+                id: true,
+              },
+            })
+          : null;
+
+        const revokeLedger = grantLedger
+          ? await tx.lotteryTicketLedger.findFirst({
+              where: {
+                userId: user.id,
+                dayKey: todayDayKey,
+                reason: FITNESS_PUNCH_TICKET_REVOKE_REASON,
+                sourceType: FITNESS_PUNCH_REVERSAL_SOURCE_TYPE,
+                sourceId: todayPunch.id,
+              },
+              select: {
+                id: true,
+              },
+            })
+          : null;
+
+        if (grantLedger && !revokeLedger) {
+          const ticketUser = await tx.user.findUniqueOrThrow({
+            where: { id: user.id },
+            select: { ticketBalance: true },
+          });
+
+          if (ticketUser.ticketBalance < 1) {
+            throw new FitnessTicketAlreadySpentError();
+          }
+
+          const balanceAfter = ticketUser.ticketBalance - 1;
+
+          await tx.lotteryTicketLedger.create({
+            data: {
+              userId: user.id,
+              teamId: user.teamId,
+              dayKey: todayDayKey,
+              delta: -1,
+              balanceAfter,
+              reason: FITNESS_PUNCH_TICKET_REVOKE_REASON,
+              sourceType: FITNESS_PUNCH_REVERSAL_SOURCE_TYPE,
+              sourceId: todayPunch.id,
+              metadataJson: JSON.stringify({
+                punchRecordId: todayPunch.id,
+                grantLedgerId: grantLedger.id,
+                dayKey: todayDayKey,
+              }),
+              createdAt: now,
+            },
+          });
+
+          await tx.user.update({
+            where: { id: user.id },
+            data: {
+              ticketBalance: balanceAfter,
+            },
+          });
         }
 
         const previousPunch = await tx.punchRecord.findFirst({
@@ -488,7 +599,10 @@ export async function DELETE(request: NextRequest) {
         }
       });
     } catch (error) {
-      if (error instanceof TodayPunchNotFoundError) {
+      if (
+        error instanceof TodayPunchNotFoundError ||
+        error instanceof FitnessTicketAlreadySpentError
+      ) {
         return NextResponse.json({ error: error.message }, { status: 409 });
       }
 

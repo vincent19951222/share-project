@@ -87,7 +87,7 @@ export function HeatmapGrid() {
         type: "ADD_LOG",
         log: {
           id: `punch-${Date.now()}`,
-          text: "<b>你</b> 已完成今日健身打卡，服务器状态已同步。",
+          text: "<b>你</b> 已完成今日健身打卡，健身券 +1，服务器状态已同步。",
           type: "success",
           timestamp: new Date(),
         },
@@ -176,6 +176,7 @@ export function HeatmapGrid() {
           busy={submitting}
           error={error}
           onConfirm={handlePunchConfirm}
+          helperText="确认后会记为今日健身打卡，并获得 1 张健身券。"
         />
       );
     }
@@ -191,7 +192,7 @@ export function HeatmapGrid() {
           triggerClassName="cell cell-punched cursor-pointer disabled:opacity-50"
           title="撤销今天打卡"
           description="确认撤销今天的打卡吗？"
-          helperText="撤销后会回滚今天获得的银子、连签和赛季进度。"
+          helperText="撤销后会回滚今天获得的银子、连签、赛季进度和未使用的健身券。"
           confirmLabel="确认撤销"
           busyLabel="撤销中..."
         />

@@ -29,6 +29,8 @@ export async function buildGamificationStateForUser(
           id: true,
           dimensionKey: true,
           taskCardId: true,
+          completionText: true,
+          rerollCount: true,
           completedAt: true,
         },
       },
@@ -113,6 +115,11 @@ export async function buildGamificationStateForUser(
               description: taskCard?.description ?? "这张任务卡已经不在本地配置中。",
               status: assignment.completedAt ? "completed" : "pending",
               completedAt: assignment.completedAt?.toISOString() ?? null,
+              completionText: assignment.completionText ?? null,
+              rerollCount: assignment.rerollCount,
+              rerollLimit: 1,
+              canComplete: !assignment.completedAt,
+              canReroll: !assignment.completedAt && assignment.rerollCount < 1,
             }
           : null,
       };
@@ -125,6 +132,12 @@ export async function buildGamificationStateForUser(
   const todaySpent = user.lotteryTicketLedgers
     .filter((ledger) => ledger.delta < 0)
     .reduce((sum, ledger) => sum + Math.abs(ledger.delta), 0);
+  const taskCompletedCount = dimensions.filter(
+    (dimension) => dimension.assignment?.status === "completed",
+  ).length;
+  const lifeTicketEarned = user.lotteryTicketLedgers.some(
+    (ledger) => ledger.reason === "DAILY_TASKS_GRANTED",
+  );
 
   const previewItems: GamificationBackpackItemSummary[] = user.inventoryItems.map((item) => {
     const definition = getItemDefinition(item.itemId);
@@ -147,12 +160,12 @@ export async function buildGamificationStateForUser(
       maxFreeTicketsToday: 2,
       todayEarned,
       todaySpent,
-      lifeTicketEarned: user.lotteryTicketLedgers.some(
-        (ledger) => ledger.reason === "DAILY_TASKS_GRANTED",
-      ),
+      lifeTicketEarned,
       fitnessTicketEarned: user.lotteryTicketLedgers.some(
         (ledger) => ledger.reason === "FITNESS_PUNCH_GRANTED",
       ),
+      taskCompletedCount,
+      lifeTicketClaimable: taskCompletedCount === 4 && !lifeTicketEarned,
     },
     lottery: {
       status: "placeholder",

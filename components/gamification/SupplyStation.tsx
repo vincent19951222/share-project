@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ApiError, fetchGamificationState } from "@/lib/api";
+import {
+  ApiError,
+  claimGamificationLifeTicket,
+  completeGamificationTask,
+  ensureTodayGamificationTasks,
+  rerollGamificationTask,
+} from "@/lib/api";
 import type {
   GamificationDimensionSnapshot,
   GamificationStateSnapshot,
@@ -32,7 +38,17 @@ function StatCard({
   );
 }
 
-function DimensionCard({ dimension }: { dimension: GamificationDimensionSnapshot }) {
+function DimensionCard({
+  dimension,
+  busy,
+  onComplete,
+  onReroll,
+}: {
+  dimension: GamificationDimensionSnapshot;
+  busy: boolean;
+  onComplete: () => void;
+  onReroll: () => void;
+}) {
   const assignment = dimension.assignment;
 
   return (
@@ -50,15 +66,30 @@ function DimensionCard({ dimension }: { dimension: GamificationDimensionSnapshot
         {assignment ? assignment.description : dimension.description}
       </p>
       <div className="mt-4 rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
-        {assignment ? assignment.title : "今日任务抽取将在 GM-04 开放。"}
+        {assignment
+          ? assignment.status === "completed"
+            ? assignment.completionText ?? "已自报完成"
+            : assignment.title
+          : "正在生成今日任务..."}
       </div>
-      <button
-        type="button"
-        disabled
-        className="mt-4 w-full cursor-not-allowed rounded-full border-[3px] border-slate-300 bg-slate-100 px-4 py-2 text-sm font-black text-slate-400"
-      >
-        任务打卡 GM-04 开放
-      </button>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          disabled={busy || !assignment?.canComplete}
+          onClick={onComplete}
+          className="rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+        >
+          {assignment?.status === "completed" ? "已完成" : "我完成了"}
+        </button>
+        <button
+          type="button"
+          disabled={busy || !assignment?.canReroll}
+          onClick={onReroll}
+          className="rounded-full border-[3px] border-slate-900 bg-white px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+        >
+          换一个
+        </button>
+      </div>
     </article>
   );
 }
@@ -78,6 +109,7 @@ function PlaceholderButton({ children }: { children: string }) {
 export function SupplyStation() {
   const [snapshot, setSnapshot] = useState<GamificationStateSnapshot | null>(null);
   const [busy, setBusy] = useState(true);
+  const [activeAction, setActiveAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadState() {
@@ -85,7 +117,7 @@ export function SupplyStation() {
     setError(null);
 
     try {
-      setSnapshot(await fetchGamificationState());
+      setSnapshot(await ensureTodayGamificationTasks());
     } catch (caught) {
       setError(getSupplyErrorMessage(caught));
     } finally {
@@ -96,6 +128,22 @@ export function SupplyStation() {
   useEffect(() => {
     void loadState();
   }, []);
+
+  async function runTaskAction(
+    actionKey: string,
+    action: () => Promise<GamificationStateSnapshot>,
+  ) {
+    setActiveAction(actionKey);
+    setError(null);
+
+    try {
+      setSnapshot(await action());
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
 
   if (!snapshot) {
     return (
@@ -164,7 +212,7 @@ export function SupplyStation() {
               <div>
                 <h2 className="text-2xl font-black text-slate-950">今日四维</h2>
                 <p className="text-sm font-bold text-slate-500">
-                  四项都完成后，GM-04 会解锁四维任务券。
+                  四项都完成后，可以领取今日生活券。
                 </p>
               </div>
               <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-black text-white">
@@ -173,7 +221,25 @@ export function SupplyStation() {
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               {snapshot.dimensions.map((dimension) => (
-                <DimensionCard key={dimension.key} dimension={dimension} />
+                <DimensionCard
+                  key={dimension.key}
+                  dimension={dimension}
+                  busy={activeAction !== null}
+                  onComplete={() => {
+                    void runTaskAction(`complete:${dimension.key}`, () =>
+                      completeGamificationTask({
+                        dimensionKey: dimension.key,
+                      }),
+                    );
+                  }}
+                  onReroll={() => {
+                    void runTaskAction(`reroll:${dimension.key}`, () =>
+                      rerollGamificationTask({
+                        dimensionKey: dimension.key,
+                      }),
+                    );
+                  }}
+                />
               ))}
             </div>
           </section>
@@ -186,12 +252,26 @@ export function SupplyStation() {
                   健身打卡券：{snapshot.ticketSummary.fitnessTicketEarned ? "已到账" : "GM-05 开放"}
                 </div>
                 <div className="rounded-[1rem] border-2 border-slate-200 bg-yellow-50 p-3 text-sm font-black text-slate-700">
-                  四维任务券：{snapshot.ticketSummary.lifeTicketEarned ? "已到账" : "GM-04 开放"}
+                  四维任务券：{snapshot.ticketSummary.lifeTicketEarned ? "已到账" : `${snapshot.ticketSummary.taskCompletedCount}/4`}
                 </div>
                 <div className="rounded-[1rem] border-2 border-slate-200 bg-slate-50 p-3 text-sm font-black text-slate-700">
                   今日最多免费 {snapshot.ticketSummary.maxFreeTicketsToday} 张，已花 {snapshot.ticketSummary.todaySpent} 张。
                 </div>
               </div>
+              <button
+                type="button"
+                disabled={activeAction !== null || !snapshot.ticketSummary.lifeTicketClaimable}
+                onClick={() => {
+                  void runTaskAction("claim-ticket", claimGamificationLifeTicket);
+                }}
+                className="mt-3 w-full rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-3 text-sm font-black text-slate-900 shadow-[0_4px_0_0_#1f2937] disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none"
+              >
+                {snapshot.ticketSummary.lifeTicketEarned
+                  ? "今日生活券已到账"
+                  : snapshot.ticketSummary.lifeTicketClaimable
+                    ? "领取生活券"
+                    : `四维进度 ${snapshot.ticketSummary.taskCompletedCount}/4`}
+              </button>
             </section>
 
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">

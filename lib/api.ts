@@ -188,6 +188,53 @@ export async function fetchGamificationState(): Promise<GamificationStateSnapsho
   return readGamificationSnapshot(response);
 }
 
+async function postGamificationAction(
+  path: string,
+  body: Record<string, unknown> = {},
+): Promise<GamificationStateSnapshot> {
+  const response = await fetch(path, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  return readGamificationSnapshot(response);
+}
+
+export async function ensureTodayGamificationTasks(): Promise<GamificationStateSnapshot> {
+  return postGamificationAction("/api/gamification/tasks/ensure-today");
+}
+
+export async function completeGamificationTask({
+  dimensionKey,
+  completionText,
+}: {
+  dimensionKey: string;
+  completionText?: string;
+}): Promise<GamificationStateSnapshot> {
+  return postGamificationAction("/api/gamification/tasks/complete", {
+    dimensionKey,
+    completionText,
+  });
+}
+
+export async function rerollGamificationTask({
+  dimensionKey,
+}: {
+  dimensionKey: string;
+}): Promise<GamificationStateSnapshot> {
+  return postGamificationAction("/api/gamification/tasks/reroll", {
+    dimensionKey,
+  });
+}
+
+export async function claimGamificationLifeTicket(): Promise<GamificationStateSnapshot> {
+  return postGamificationAction("/api/gamification/tasks/claim-ticket");
+}
+
 export async function addTodayCoffeeCup(): Promise<CoffeeSnapshot> {
   const response = await fetch("/api/coffee/cups", {
     method: "POST",

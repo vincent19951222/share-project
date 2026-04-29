@@ -46,6 +46,11 @@ export interface GamificationTaskAssignmentSnapshot {
   description: string;
   status: GamificationTaskStatus;
   completedAt: string | null;
+  completionText: string | null;
+  rerollCount: number;
+  rerollLimit: 1;
+  canComplete: boolean;
+  canReroll: boolean;
 }
 
 export interface GamificationDimensionSnapshot {
@@ -62,6 +67,8 @@ export interface GamificationTicketSummary {
   todaySpent: number;
   lifeTicketEarned: boolean;
   fitnessTicketEarned: boolean;
+  taskCompletedCount: number;
+  lifeTicketClaimable: boolean;
 }
 
 export interface GamificationLotteryRewardSnapshot {
