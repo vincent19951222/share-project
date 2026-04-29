@@ -2,6 +2,7 @@ import type {
   BoardSnapshot,
   CalendarMonthSnapshot,
   CoffeeSnapshot,
+  GamificationLotteryDrawSnapshot,
   GamificationStateSnapshot,
 } from "@/lib/types";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
@@ -233,6 +234,31 @@ export async function rerollGamificationTask({
 
 export async function claimGamificationLifeTicket(): Promise<GamificationStateSnapshot> {
   return postGamificationAction("/api/gamification/tasks/claim-ticket");
+}
+
+export async function drawGamificationLottery({
+  drawType,
+  useCoinTopUp = false,
+}: {
+  drawType: "SINGLE" | "TEN";
+  useCoinTopUp?: boolean;
+}): Promise<{
+  snapshot: GamificationStateSnapshot;
+  draw: GamificationLotteryDrawSnapshot;
+}> {
+  const response = await fetch("/api/gamification/lottery/draw", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ drawType, useCoinTopUp }),
+  });
+
+  return readApiResult<{
+    snapshot: GamificationStateSnapshot;
+    draw: GamificationLotteryDrawSnapshot;
+  }>(response, "抽奖响应解析失败");
 }
 
 export async function addTodayCoffeeCup(): Promise<CoffeeSnapshot> {

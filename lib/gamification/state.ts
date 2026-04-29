@@ -8,8 +8,46 @@ import { prisma } from "@/lib/prisma";
 import type {
   GamificationBackpackItemSummary,
   GamificationDimensionSnapshot,
+  GamificationLotteryDrawSnapshot,
+  GamificationLotteryRewardSnapshot,
   GamificationStateSnapshot,
 } from "@/lib/types";
+
+const LOTTERY_TICKET_PRICE = 40;
+const DAILY_TOP_UP_LIMIT = 3;
+const TEN_DRAW_SIZE = 10;
+const TEN_DRAW_MIN_OWNED_TICKETS = 7;
+
+function parseLotteryRewardSnapshot(raw: string): GamificationLotteryRewardSnapshot {
+  try {
+    const reward = JSON.parse(raw) as {
+      id?: string;
+      tier?: string;
+      kind?: string;
+      name?: string;
+      description?: string;
+      effectSummary?: string;
+    };
+
+    return {
+      rewardId: reward.id ?? "unknown",
+      rewardTier: reward.tier ?? "unknown",
+      rewardKind: reward.kind ?? "unknown",
+      name: reward.name ?? "未知奖励",
+      description: reward.description ?? "历史奖励快照缺少描述。",
+      effectSummary: reward.effectSummary ?? reward.description ?? "未知奖励",
+    };
+  } catch {
+    return {
+      rewardId: "unknown",
+      rewardTier: "unknown",
+      rewardKind: "unknown",
+      name: "未知奖励",
+      description: "历史奖励快照解析失败。",
+      effectSummary: "未知奖励",
+    };
+  }
+}
 
 export async function buildGamificationStateForUser(
   userId: string,
@@ -22,6 +60,7 @@ export async function buildGamificationStateForUser(
     select: {
       id: true,
       teamId: true,
+      coins: true,
       ticketBalance: true,
       dailyTaskAssignments: {
         where: { dayKey },
@@ -39,6 +78,7 @@ export async function buildGamificationStateForUser(
         select: {
           delta: true,
           reason: true,
+          sourceType: true,
         },
       },
       inventoryItems: {
@@ -60,6 +100,7 @@ export async function buildGamificationStateForUser(
           drawType: true,
           ticketSpent: true,
           coinSpent: true,
+          guaranteeApplied: true,
           createdAt: true,
           results: {
             orderBy: { position: "asc" },
@@ -67,6 +108,7 @@ export async function buildGamificationStateForUser(
               rewardId: true,
               rewardTier: true,
               rewardKind: true,
+              rewardSnapshotJson: true,
             },
           },
         },
@@ -138,6 +180,19 @@ export async function buildGamificationStateForUser(
   const lifeTicketEarned = user.lotteryTicketLedgers.some(
     (ledger) => ledger.reason === "DAILY_TASKS_GRANTED",
   );
+  const dailyTopUpPurchased = user.lotteryTicketLedgers
+    .filter(
+      (ledger) =>
+        ledger.reason === "COIN_PURCHASE_GRANTED" && ledger.sourceType === "lottery_topup",
+    )
+    .reduce((sum, ledger) => sum + Math.max(0, ledger.delta), 0);
+  const tenDrawTopUpRequired = Math.max(0, TEN_DRAW_SIZE - user.ticketBalance);
+  const tenDrawTopUpCoinCost = tenDrawTopUpRequired * LOTTERY_TICKET_PRICE;
+  const tenDrawCanTopUp =
+    user.ticketBalance >= TEN_DRAW_MIN_OWNED_TICKETS &&
+    user.ticketBalance < TEN_DRAW_SIZE &&
+    dailyTopUpPurchased + tenDrawTopUpRequired <= DAILY_TOP_UP_LIMIT &&
+    user.coins >= tenDrawTopUpCoinCost;
 
   const previewItems: GamificationBackpackItemSummary[] = user.inventoryItems.map((item) => {
     const definition = getItemDefinition(item.itemId);
@@ -149,6 +204,18 @@ export async function buildGamificationStateForUser(
       category: definition?.category ?? "unknown",
     };
   });
+
+  const recentDraws: GamificationLotteryDrawSnapshot[] = user.lotteryDraws.map((draw) => ({
+    id: draw.id,
+    drawType: draw.drawType as "SINGLE" | "TEN",
+    ticketSpent: draw.ticketSpent,
+    coinSpent: draw.coinSpent,
+    guaranteeApplied: draw.guaranteeApplied,
+    createdAt: draw.createdAt.toISOString(),
+    rewards: draw.results.map((result) =>
+      parseLotteryRewardSnapshot(result.rewardSnapshotJson),
+    ),
+  }));
 
   return {
     currentUserId: user.id,
@@ -168,27 +235,26 @@ export async function buildGamificationStateForUser(
       lifeTicketClaimable: taskCompletedCount === 4 && !lifeTicketEarned,
     },
     lottery: {
-      status: "placeholder",
-      singleDrawEnabled: false,
-      tenDrawEnabled: false,
-      message: "抽奖机正在搬进办公室，GM-06 开放。",
-      recentDraws: user.lotteryDraws.map((draw) => ({
-        id: draw.id,
-        drawType: draw.drawType,
-        ticketSpent: draw.ticketSpent,
-        coinSpent: draw.coinSpent,
-        createdAt: draw.createdAt.toISOString(),
-        rewards: draw.results.map((result) => ({
-          rewardId: result.rewardId,
-          rewardTier: result.rewardTier,
-          rewardKind: result.rewardKind,
-        })),
-      })),
+      status: "active",
+      singleDrawEnabled: user.ticketBalance >= 1,
+      tenDrawEnabled: user.ticketBalance >= TEN_DRAW_SIZE || tenDrawCanTopUp,
+      tenDrawTopUpRequired,
+      tenDrawTopUpCoinCost,
+      dailyTopUpPurchased,
+      dailyTopUpLimit: DAILY_TOP_UP_LIMIT,
+      ticketPrice: LOTTERY_TICKET_PRICE,
+      message:
+        user.ticketBalance >= TEN_DRAW_SIZE
+          ? "十连抽已就绪。"
+          : tenDrawCanTopUp
+            ? `还差 ${tenDrawTopUpRequired} 张券，可用 ${tenDrawTopUpCoinCost} 银子补齐十连。`
+            : "攒到 7 张券后，可以用银子补齐十连。",
+      recentDraws,
     },
     backpack: {
       totalQuantity: user.inventoryItems.reduce((sum, item) => sum + item.quantity, 0),
       previewItems,
-      emptyMessage: "背包空空，等抽奖机上线后再来进货。",
+      emptyMessage: "背包空空，等抽奖机上线上后再来进货。",
     },
     social: {
       status: "placeholder",

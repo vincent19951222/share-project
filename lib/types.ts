@@ -36,7 +36,7 @@ export interface CurrentUserSnapshot {
 export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";
 
 export type GamificationTaskStatus = "pending" | "completed";
-export type GamificationLotteryStatus = "placeholder";
+export type GamificationLotteryStatus = "placeholder" | "active";
 export type GamificationSocialStatus = "placeholder";
 
 export interface GamificationTaskAssignmentSnapshot {
@@ -75,21 +75,30 @@ export interface GamificationLotteryRewardSnapshot {
   rewardId: string;
   rewardTier: string;
   rewardKind: string;
+  name: string;
+  description: string;
+  effectSummary: string;
 }
 
 export interface GamificationLotteryDrawSnapshot {
   id: string;
-  drawType: string;
+  drawType: "SINGLE" | "TEN";
   ticketSpent: number;
   coinSpent: number;
+  guaranteeApplied: boolean;
   createdAt: string;
   rewards: GamificationLotteryRewardSnapshot[];
 }
 
 export interface GamificationLotterySummary {
   status: GamificationLotteryStatus;
-  singleDrawEnabled: false;
-  tenDrawEnabled: false;
+  singleDrawEnabled: boolean;
+  tenDrawEnabled: boolean;
+  tenDrawTopUpRequired: number;
+  tenDrawTopUpCoinCost: number;
+  dailyTopUpPurchased: number;
+  dailyTopUpLimit: 3;
+  ticketPrice: 40;
   message: string;
   recentDraws: GamificationLotteryDrawSnapshot[];
 }

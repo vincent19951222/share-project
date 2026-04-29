@@ -5,17 +5,19 @@ import {
   ApiError,
   claimGamificationLifeTicket,
   completeGamificationTask,
+  drawGamificationLottery,
   ensureTodayGamificationTasks,
   rerollGamificationTask,
 } from "@/lib/api";
 import type {
   GamificationDimensionSnapshot,
+  GamificationLotteryDrawSnapshot,
   GamificationStateSnapshot,
 } from "@/lib/types";
 
 function getSupplyErrorMessage(caught: unknown) {
   if (caught instanceof ApiError && caught.status === 401) {
-    return "登录状态过期，请重新登录。";
+    return "登录状态已过期，请重新登录。";
   }
 
   return caught instanceof Error ? caught.message : "牛马补给站加载失败，稍后再试。";
@@ -110,6 +112,7 @@ export function SupplyStation() {
   const [snapshot, setSnapshot] = useState<GamificationStateSnapshot | null>(null);
   const [busy, setBusy] = useState(true);
   const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [latestDraw, setLatestDraw] = useState<GamificationLotteryDrawSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadState() {
@@ -145,6 +148,21 @@ export function SupplyStation() {
     }
   }
 
+  async function runLotteryDraw(drawType: "SINGLE" | "TEN", useCoinTopUp = false) {
+    setActiveAction(`lottery:${drawType}`);
+    setError(null);
+
+    try {
+      const result = await drawGamificationLottery({ drawType, useCoinTopUp });
+      setSnapshot(result.snapshot);
+      setLatestDraw(result.draw);
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
+
   if (!snapshot) {
     return (
       <section className="supply-station-viewport absolute inset-0 overflow-y-auto p-4 sm:p-6">
@@ -156,7 +174,7 @@ export function SupplyStation() {
             </p>
             {error ? (
               <div className="mt-5 flex flex-wrap justify-center gap-3">
-                {error.includes("登录状态过期") ? (
+                {error.includes("登录状态已过期") ? (
                   <a
                     href="/login"
                     className="rounded-full border-[3px] border-slate-900 bg-yellow-200 px-5 py-3 text-sm font-black shadow-[0_4px_0_0_#1f2937]"
@@ -178,6 +196,8 @@ export function SupplyStation() {
       </section>
     );
   }
+
+  const hasTopUp = snapshot.lottery.tenDrawTopUpRequired > 0;
 
   return (
     <section className="supply-station-viewport absolute inset-0 overflow-y-auto p-4 sm:p-6">
@@ -249,7 +269,7 @@ export function SupplyStation() {
               <h2 className="text-2xl font-black text-slate-950">今日券路</h2>
               <div className="mt-4 grid gap-3">
                 <div className="rounded-[1rem] border-2 border-slate-200 bg-lime-50 p-3 text-sm font-black text-slate-700">
-                  健身打卡券：{snapshot.ticketSummary.fitnessTicketEarned ? "已到账" : "GM-05 开放"}
+                  健身打卡券：{snapshot.ticketSummary.fitnessTicketEarned ? "已到账" : "今日未到账"}
                 </div>
                 <div className="rounded-[1rem] border-2 border-slate-200 bg-yellow-50 p-3 text-sm font-black text-slate-700">
                   四维任务券：{snapshot.ticketSummary.lifeTicketEarned ? "已到账" : `${snapshot.ticketSummary.taskCompletedCount}/4`}
@@ -277,15 +297,54 @@ export function SupplyStation() {
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
               <h2 className="text-2xl font-black text-slate-950">抽奖机</h2>
               <p className="mt-2 text-sm font-bold text-slate-500">{snapshot.lottery.message}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <PlaceholderButton>单抽 GM-06</PlaceholderButton>
-                <PlaceholderButton>十连 GM-06</PlaceholderButton>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  disabled={activeAction !== null || !snapshot.lottery.singleDrawEnabled}
+                  onClick={() => {
+                    void runLotteryDraw("SINGLE");
+                  }}
+                  className="rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+                >
+                  单抽 x1
+                </button>
+                <button
+                  type="button"
+                  disabled={activeAction !== null || !snapshot.lottery.tenDrawEnabled}
+                  onClick={() => {
+                    void runLotteryDraw("TEN", hasTopUp);
+                  }}
+                  className="rounded-full border-[3px] border-slate-900 bg-white px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+                >
+                  {hasTopUp ? "补券十连" : "十连 x10"}
+                </button>
               </div>
-              <div className="mt-4 rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
-                {snapshot.lottery.recentDraws.length > 0
-                  ? `最近 ${snapshot.lottery.recentDraws.length} 次抽奖记录已归档。`
-                  : "暂时没有抽奖记录。"}
-              </div>
+              {hasTopUp ? (
+                <div className="mt-3 rounded-[1rem] border-2 border-amber-300 bg-amber-50 p-3 text-xs font-black text-amber-800">
+                  十连还差 {snapshot.lottery.tenDrawTopUpRequired} 张券，需要 {snapshot.lottery.tenDrawTopUpCoinCost} 银子补齐。
+                </div>
+              ) : null}
+              {latestDraw ? (
+                <div className="mt-4 rounded-[1rem] border-2 border-slate-900 bg-lime-50 p-3">
+                  <div className="text-sm font-black text-slate-950">
+                    本次抽到 {latestDraw.rewards.length} 个奖励
+                    {latestDraw.guaranteeApplied ? "，触发十连保底" : ""}
+                  </div>
+                  <div className="mt-2 grid gap-2">
+                    {latestDraw.rewards.map((reward, index) => (
+                      <div key={`${latestDraw.id}-${index}`} className="rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-700">
+                        {index + 1}. {reward.name} / {reward.effectSummary}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
+                  {snapshot.lottery.recentDraws.length > 0
+                    ? `最近 ${snapshot.lottery.recentDraws.length} 次抽奖记录已归档。`
+                    : "暂时没有抽奖记录。"}
+                </div>
+              )}
             </section>
 
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">

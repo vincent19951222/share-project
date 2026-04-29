@@ -49,9 +49,14 @@ describe("GET /api/gamification/state", () => {
         fitnessTicketEarned: false,
       },
       lottery: {
-        status: "placeholder",
+        status: "active",
         singleDrawEnabled: false,
         tenDrawEnabled: false,
+        tenDrawTopUpRequired: 10,
+        tenDrawTopUpCoinCost: 400,
+        dailyTopUpPurchased: 0,
+        dailyTopUpLimit: 3,
+        ticketPrice: 40,
       },
       backpack: {
         totalQuantity: 0,

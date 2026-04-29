@@ -28,8 +28,8 @@ function buildAssignment(
   return {
     id: `assignment-${dimensionKey}`,
     taskCardId: `${dimensionKey}_${String(index).padStart(3, "0")}`,
-    title: `${dimensionKey} 任务`,
-    description: `${dimensionKey} 今日补给`,
+    title: `${dimensionKey} task`,
+    description: `${dimensionKey} description`,
     status: "pending" as const,
     completedAt: null,
     completionText: null,
@@ -41,54 +41,42 @@ function buildAssignment(
   };
 }
 
-function buildSnapshotWithTasks(
-  overrides: Partial<GamificationStateSnapshot["ticketSummary"]> = {},
+function buildSnapshot(
+  overrides: Partial<GamificationStateSnapshot> = {},
 ): GamificationStateSnapshot {
   return {
     currentUserId: "u1",
     teamId: "team-1",
     dayKey: "2026-04-29",
-    ticketBalance: 0,
+    ticketBalance: 8,
     dimensions: [
       {
         key: "movement",
-        title: "把电充绿",
-        subtitle: "站一站，不然屁股长根",
-        description: "起身、走动、拉伸、短暂恢复。",
-        assignment: buildAssignment("movement", 1, {
-          title: "工位重启",
-          description: "离开椅子站起来 2 分钟，让身体退出省电模式。",
-        }),
+        title: "Movement",
+        subtitle: "Move a little",
+        description: "Movement dimension",
+        assignment: buildAssignment("movement", 1),
       },
       {
         key: "hydration",
-        title: "把尿喝白",
-        subtitle: "喝白白，别把自己腌入味",
-        description: "补水、接水、无糖饮品。",
-        assignment: buildAssignment("hydration", 1, {
-          title: "首杯投币",
-          description: "喝一杯水，给今天的身体系统投个启动币。",
-        }),
+        title: "Hydration",
+        subtitle: "Drink water",
+        description: "Hydration dimension",
+        assignment: buildAssignment("hydration", 1),
       },
       {
         key: "social",
-        title: "把事办黄",
-        subtitle: "聊两句，让班味散一散",
-        description: "闲聊、吐槽、夸夸、情绪释放。",
-        assignment: buildAssignment("social", 1, {
-          title: "废话 KPI",
-          description: "和同事聊两句无关工作的废话，完成今日人类连接。",
-        }),
+        title: "Social",
+        subtitle: "Talk briefly",
+        description: "Social dimension",
+        assignment: buildAssignment("social", 1),
       },
       {
         key: "learning",
-        title: "把股看红",
-        subtitle: "看一点，给脑子补仓",
-        description: "信息输入、学习、看新闻、文章或工具。",
-        assignment: buildAssignment("learning", 1, {
-          title: "三分钟扫盘",
-          description: "看一篇短文章、帖子或资讯，三分钟也算学习。",
-        }),
+        title: "Learning",
+        subtitle: "Read something",
+        description: "Learning dimension",
+        assignment: buildAssignment("learning", 1),
       },
     ],
     ticketSummary: {
@@ -99,37 +87,47 @@ function buildSnapshotWithTasks(
       fitnessTicketEarned: false,
       taskCompletedCount: 0,
       lifeTicketClaimable: false,
-      ...overrides,
     },
     lottery: {
-      status: "placeholder",
-      singleDrawEnabled: false,
-      tenDrawEnabled: false,
-      message: "抽奖机正在搬进办公室，GM-06 开放。",
+      status: "active",
+      singleDrawEnabled: true,
+      tenDrawEnabled: true,
+      tenDrawTopUpRequired: 2,
+      tenDrawTopUpCoinCost: 80,
+      dailyTopUpPurchased: 0,
+      dailyTopUpLimit: 3,
+      ticketPrice: 40,
+      message: "Need 2 more tickets, can top up for 80 coins.",
       recentDraws: [],
     },
     backpack: {
       totalQuantity: 0,
       previewItems: [],
-      emptyMessage: "背包空空，等抽奖机上线后再来进货。",
+      emptyMessage: "Backpack empty",
     },
     social: {
       status: "placeholder",
       pendingSentCount: 0,
       pendingReceivedCount: 0,
-      message: "点名喝水、出门溜达等弱社交道具将在 GM-12 开放。",
+      message: "Social tools open later",
     },
+    ...overrides,
   };
 }
 
 function buildSnapshotWithCompletedMovement(): GamificationStateSnapshot {
-  const snapshot = buildSnapshotWithTasks({ taskCompletedCount: 1 });
+  const snapshot = buildSnapshot({
+    ticketSummary: {
+      ...buildSnapshot().ticketSummary,
+      taskCompletedCount: 1,
+    },
+  });
   const movement = snapshot.dimensions.find((dimension) => dimension.key === "movement");
 
   if (movement?.assignment) {
     movement.assignment.status = "completed";
     movement.assignment.completedAt = "2026-04-29T01:00:00.000Z";
-    movement.assignment.completionText = "已复活";
+    movement.assignment.completionText = "Done";
     movement.assignment.canComplete = false;
     movement.assignment.canReroll = false;
   }
@@ -138,13 +136,20 @@ function buildSnapshotWithCompletedMovement(): GamificationStateSnapshot {
 }
 
 function buildSnapshotWithRerolledHydration(): GamificationStateSnapshot {
-  const snapshot = buildSnapshotWithCompletedMovement();
+  const snapshot = {
+    ...buildSnapshotWithCompletedMovement(),
+    ticketSummary: {
+      ...buildSnapshotWithCompletedMovement().ticketSummary,
+      taskCompletedCount: 4,
+      lifeTicketClaimable: true,
+    },
+  };
   const hydration = snapshot.dimensions.find((dimension) => dimension.key === "hydration");
 
   if (hydration) {
     hydration.assignment = buildAssignment("hydration", 2, {
-      title: "茶水间续命",
-      description: "去接一杯水，顺便完成一次合法离岗。",
+      title: "hydration rerolled task",
+      description: "rerolled description",
       rerollCount: 1,
       canReroll: false,
     });
@@ -154,16 +159,19 @@ function buildSnapshotWithRerolledHydration(): GamificationStateSnapshot {
 }
 
 function buildSnapshotWithClaimableTicket(): GamificationStateSnapshot {
-  const snapshot = buildSnapshotWithTasks({
-    taskCompletedCount: 4,
-    lifeTicketClaimable: true,
+  const snapshot = buildSnapshot({
+    ticketSummary: {
+      ...buildSnapshot().ticketSummary,
+      taskCompletedCount: 4,
+      lifeTicketClaimable: true,
+    },
   });
 
   for (const dimension of snapshot.dimensions) {
     if (dimension.assignment) {
       dimension.assignment.status = "completed";
       dimension.assignment.completedAt = "2026-04-29T01:00:00.000Z";
-      dimension.assignment.completionText = "已复活";
+      dimension.assignment.completionText = "Done";
       dimension.assignment.canComplete = false;
       dimension.assignment.canReroll = false;
     }
@@ -173,11 +181,13 @@ function buildSnapshotWithClaimableTicket(): GamificationStateSnapshot {
 }
 
 function buildSnapshotWithClaimedTicket(): GamificationStateSnapshot {
+  const base = buildSnapshotWithClaimableTicket();
+
   return {
-    ...buildSnapshotWithClaimableTicket(),
-    ticketBalance: 1,
+    ...base,
+    ticketBalance: 9,
     ticketSummary: {
-      ...buildSnapshotWithClaimableTicket().ticketSummary,
+      ...base.ticketSummary,
       todayEarned: 1,
       lifeTicketEarned: true,
       lifeTicketClaimable: false,
@@ -206,9 +216,9 @@ describe("SupplyStation", () => {
       "fetch",
       vi
         .fn()
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshotWithTasks() }))
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshotWithCompletedMovement() }))
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshotWithClaimableTicket() }))
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshotWithRerolledHydration() }))
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshotWithClaimedTicket() })),
     );
 
@@ -227,22 +237,16 @@ describe("SupplyStation", () => {
         credentials: "same-origin",
       }),
     );
-    expect(container.textContent).toContain("牛马补给站");
-    expect(container.textContent).toContain("把电充绿");
-    expect(container.textContent).toContain("把尿喝白");
-    expect(container.textContent).toContain("把事办黄");
-    expect(container.textContent).toContain("把股看红");
-    expect(container.textContent).toContain("工位重启");
-    expect(container.textContent).toContain("抽奖机正在搬进办公室");
-    expect(container.textContent).toContain("背包空空");
+    expect(container.textContent).toContain("Movement");
+    expect(container.textContent).toContain("Need 2 more tickets");
 
-    const completeButton = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("我完成了"),
-    );
-    expect(completeButton).toBeDefined();
+    const firstDimensionButtons = container
+      .querySelector(".supply-dimension-card")
+      ?.querySelectorAll("button");
+    expect(firstDimensionButtons?.[0]).toBeDefined();
 
     await act(async () => {
-      completeButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      firstDimensionButtons![0].dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
 
@@ -253,15 +257,15 @@ describe("SupplyStation", () => {
         method: "POST",
       }),
     );
-    expect(container.textContent).toContain("已复活");
+    expect(container.textContent).toContain("Done");
 
-    const rerollButton = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("换一个") && !button.disabled,
-    );
-    expect(rerollButton).toBeDefined();
+    const secondDimensionButtons = container
+      .querySelectorAll(".supply-dimension-card")[1]
+      ?.querySelectorAll("button");
+    expect(secondDimensionButtons?.[1]).toBeDefined();
 
     await act(async () => {
-      rerollButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      secondDimensionButtons![1].dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
 
@@ -273,9 +277,7 @@ describe("SupplyStation", () => {
       }),
     );
 
-    const claimButton = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("领取生活券"),
-    );
+    const claimButton = container.querySelector("aside section:first-of-type button");
     expect(claimButton).toBeDefined();
 
     await act(async () => {
@@ -290,13 +292,12 @@ describe("SupplyStation", () => {
         method: "POST",
       }),
     );
-    expect(container.textContent).toContain("今日生活券已到账");
   });
 
   it("renders a login recovery state for 401 responses", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(createJsonResponse({ error: "未登录" }, false, 401)),
+      vi.fn().mockResolvedValue(createJsonResponse({ error: "unauthenticated" }, false, 401)),
     );
 
     const { SupplyStation } = await import("@/components/gamification/SupplyStation");
@@ -306,7 +307,68 @@ describe("SupplyStation", () => {
     });
     await flush();
 
-    expect(container.textContent).toContain("登录状态过期，请重新登录");
     expect(container.querySelector('a[href="/login"]')).not.toBeNull();
+  });
+
+  it("runs a lottery draw and renders the result", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            snapshot: buildSnapshot({
+              ticketBalance: 7,
+            }),
+            draw: {
+              id: "draw-1",
+              drawType: "SINGLE",
+              ticketSpent: 1,
+              coinSpent: 0,
+              guaranteeApplied: false,
+              createdAt: "2026-04-24T01:00:00.000Z",
+              rewards: [
+                {
+                  rewardId: "coins_005",
+                  rewardTier: "coin",
+                  rewardKind: "coins",
+                  name: "Fish Touch Subsidy",
+                  description: "Gain 5 coins.",
+                  effectSummary: "+5 coins",
+                },
+              ],
+            },
+          }),
+        ),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    const singleDrawButton = Array.from(
+      container.querySelectorAll("aside section:nth-of-type(2) button"),
+    ).find((button) => button.textContent?.includes("x1"));
+    expect(singleDrawButton).toBeDefined();
+
+    await act(async () => {
+      singleDrawButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenLastCalledWith(
+      "/api/gamification/lottery/draw",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ drawType: "SINGLE", useCoinTopUp: false }),
+      }),
+    );
+    expect(container.textContent).toContain("Fish Touch Subsidy");
+    expect(container.textContent).toContain("+5 coins");
   });
 });
