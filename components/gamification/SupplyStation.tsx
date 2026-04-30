@@ -709,6 +709,11 @@ export function SupplyStation() {
               <p className="mt-2 max-w-2xl text-sm font-black text-slate-700">
                 今日补给单已生成，先把身体照顾好，再来薅一点运气。
               </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a className="supply-rule-link" href="/docs?tab=rules#supply-station-rules">
+                  玩法规则
+                </a>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <StatCard label="抽奖券" value={snapshot.ticketBalance} tone="bg-white" />
@@ -848,6 +853,9 @@ export function SupplyStation() {
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
               <h2 className="text-2xl font-black text-slate-950">抽奖机</h2>
               <p className="mt-2 text-sm font-bold text-slate-500">{snapshot.lottery.message}</p>
+              <a className="supply-inline-link mt-3" href="/docs?tab=rules#lottery-and-ten-draw">
+                查看抽奖规则
+              </a>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -905,6 +913,9 @@ export function SupplyStation() {
                   <p className="mt-1 text-sm font-bold text-slate-500">
                     {snapshot.backpack.emptyMessage}
                   </p>
+                  <a className="supply-inline-link mt-3" href="/docs?tab=rules#backpack-and-consumption">
+                    查看道具规则
+                  </a>
                 </div>
                 <span className="rounded-full border-2 border-slate-900 bg-sky-100 px-3 py-1 text-sm font-black text-slate-900">
                   {snapshot.backpack.ownedItemCount} 种
@@ -988,6 +999,10 @@ export function SupplyStation() {
                 {redemptionMessage}
               </div>
             ) : null}
+
+            <a className="supply-inline-link" href="/docs?tab=rules#luckin-redemption-rules">
+              查看兑换规则
+            </a>
 
             <RedemptionList
               title="我的兑换"
