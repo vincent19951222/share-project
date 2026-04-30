@@ -68,9 +68,14 @@ describe("GET /api/gamification/state", () => {
         todayEffects: [],
       },
       social: {
-        status: "placeholder",
+        status: "active",
         pendingSentCount: 0,
         pendingReceivedCount: 0,
+        teamWidePendingCount: 0,
+        sent: [],
+        received: [],
+        teamWide: [],
+        recentResponses: [],
       },
     });
 
@@ -208,11 +213,45 @@ describe("GET /api/gamification/state", () => {
         teamId,
         senderUserId: teammate.id,
         recipientUserId: userId,
-        invitationType: "WALK",
+        invitationType: "WALK_AROUND",
         itemUseRecordId: receivedUse.id,
         status: "PENDING",
         dayKey,
         message: "出去溜达一圈。",
+      },
+    });
+
+    const teamWideUse = await prisma.itemUseRecord.create({
+      data: {
+        userId: teammate.id,
+        teamId,
+        itemId: "team_standup_ping",
+        dayKey,
+        status: "SETTLED",
+        effectSnapshotJson: JSON.stringify({ type: "social_invitation" }),
+      },
+    });
+
+    const teamWideInvitation = await prisma.socialInvitation.create({
+      data: {
+        teamId,
+        senderUserId: teammate.id,
+        recipientUserId: null,
+        invitationType: "TEAM_STANDUP",
+        itemUseRecordId: teamWideUse.id,
+        status: "PENDING",
+        dayKey,
+        message: "全员起立两分钟",
+      },
+    });
+
+    await prisma.socialInvitationResponse.create({
+      data: {
+        teamId,
+        invitationId: teamWideInvitation.id,
+        responderUserId: userId,
+        dayKey,
+        responseText: "已起立",
       },
     });
 
@@ -271,9 +310,61 @@ describe("GET /api/gamification/state", () => {
     );
     expect(body.snapshot.lottery.recentDraws).toHaveLength(1);
     expect(body.snapshot.social).toMatchObject({
+      status: "active",
       pendingSentCount: 1,
       pendingReceivedCount: 1,
+      teamWidePendingCount: 1,
     });
+    expect(body.snapshot.social.sent).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          senderUserId: userId,
+          recipientUserId: teammate.id,
+          invitationType: "DRINK_WATER",
+          responseCount: 0,
+        }),
+      ]),
+    );
+    expect(body.snapshot.social.received).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          senderUserId: teammate.id,
+          recipientUserId: userId,
+          invitationType: "WALK_AROUND",
+        }),
+      ]),
+    );
+    expect(body.snapshot.social.teamWide).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: teamWideInvitation.id,
+          recipientUserId: null,
+          responseCount: 1,
+        }),
+      ]),
+    );
+    expect(body.snapshot.social.recentResponses).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          invitationId: teamWideInvitation.id,
+          responderUserId: userId,
+          responseText: "已起立",
+        }),
+      ]),
+    );
+    expect(body.snapshot.social.availableRecipients).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          userId: teammate.id,
+          username: teammate.username,
+        }),
+      ]),
+    );
+    expect(
+      body.snapshot.social.availableRecipients.some(
+        (member: { userId: string }) => member.userId === userId,
+      ),
+    ).toBe(false);
   });
 
   it("includes current user redemptions and admin pending queue", async () => {

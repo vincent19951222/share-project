@@ -37,7 +37,7 @@ export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calenda
 
 export type GamificationTaskStatus = "pending" | "completed";
 export type GamificationLotteryStatus = "placeholder" | "active";
-export type GamificationSocialStatus = "placeholder";
+export type GamificationSocialStatus = "placeholder" | "active";
 
 export interface GamificationTaskAssignmentSnapshot {
   id: string;
@@ -164,10 +164,49 @@ export interface GamificationBackpackSummary {
   emptyMessage: string;
 }
 
+export interface SocialInvitationSnapshot {
+  id: string;
+  senderUserId: string;
+  senderUsername: string | null;
+  recipientUserId: string | null;
+  recipientUsername: string | null;
+  invitationType: string;
+  status: "PENDING" | "RESPONDED" | "EXPIRED" | "CANCELLED";
+  dayKey: string;
+  message: string;
+  responseCount: number;
+  wechatWebhookSentAt: string | null;
+  respondedAt: string | null;
+  expiredAt: string | null;
+  createdAt: string;
+}
+
+export interface SocialInvitationResponseSnapshot {
+  id: string;
+  invitationId: string;
+  invitationType: string;
+  responderUserId: string;
+  responderUsername: string;
+  responseText: string | null;
+  createdAt: string;
+}
+
+export interface SocialRecipientSnapshot {
+  userId: string;
+  username: string;
+  avatarKey: string;
+}
+
 export interface GamificationSocialSummary {
   status: GamificationSocialStatus;
   pendingSentCount: number;
   pendingReceivedCount: number;
+  teamWidePendingCount: number;
+  sent: SocialInvitationSnapshot[];
+  received: SocialInvitationSnapshot[];
+  teamWide: SocialInvitationSnapshot[];
+  recentResponses: SocialInvitationResponseSnapshot[];
+  availableRecipients: SocialRecipientSnapshot[];
   message: string;
 }
 

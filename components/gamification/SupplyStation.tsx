@@ -12,6 +12,7 @@ import {
   fetchGamificationState,
   rerollGamificationTask,
   requestRealWorldRedemption,
+  respondToSocialInvitation,
   useGamificationItem,
 } from "@/lib/api";
 import type {
@@ -20,6 +21,7 @@ import type {
   GamificationLotteryDrawSnapshot,
   GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
+  SocialInvitationSnapshot,
 } from "@/lib/types";
 
 function getSupplyErrorMessage(caught: unknown) {
@@ -115,19 +117,37 @@ function PlaceholderButton({ children }: { children: string }) {
   );
 }
 
+function isSocialItem(item: GamificationBackpackItemSnapshot | null) {
+  return item?.category === "social" && item.useTiming === "instant";
+}
+
+function isTeamWideSocialItem(item: GamificationBackpackItemSnapshot | null) {
+  return item?.itemId === "team_standup_ping" || item?.itemId === "team_broadcast_coupon";
+}
+
 function BackpackItemDetail({
   item,
   activeAction,
   selectedRerollDimension,
+  selectedSocialRecipientId,
+  socialMessage,
+  socialRecipients,
   onRerollDimensionChange,
+  onSocialRecipientChange,
+  onSocialMessageChange,
   onUse,
   onRequestRedemption,
 }: {
   item: GamificationBackpackItemSnapshot | null;
   activeAction: string | null;
   selectedRerollDimension: string;
+  selectedSocialRecipientId: string;
+  socialMessage: string;
+  socialRecipients: { userId: string; username: string }[];
   onRerollDimensionChange: (dimensionKey: string) => void;
-  onUse: (itemId: string) => void;
+  onSocialRecipientChange: (userId: string) => void;
+  onSocialMessageChange: (message: string) => void;
+  onUse: (item: GamificationBackpackItemSnapshot) => void;
   onRequestRedemption: (item: GamificationBackpackItemSnapshot) => void;
 }) {
   if (!item) {
@@ -183,6 +203,34 @@ function BackpackItemDetail({
           </select>
         </label>
       ) : null}
+      {isSocialItem(item) ? (
+        <div className="mt-3 rounded-xl border-2 border-slate-900 bg-white p-3">
+          {!isTeamWideSocialItem(item) ? (
+            <label className="block text-xs font-black text-slate-600">
+              选择同队成员
+              <select
+                value={selectedSocialRecipientId}
+                onChange={(event) => onSocialRecipientChange(event.target.value)}
+                className="mt-1 w-full rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-black text-slate-900"
+              >
+                <option value="">请选择</option>
+                {socialRecipients.map((member) => (
+                  <option key={member.userId} value={member.userId}>
+                    {member.username}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+          <input
+            value={socialMessage}
+            maxLength={80}
+            placeholder="可选：加一句提醒"
+            onChange={(event) => onSocialMessageChange(event.target.value)}
+            className="mt-3 w-full rounded-lg border-2 border-slate-900 bg-yellow-50 px-3 py-2 text-sm font-black text-slate-900"
+          />
+        </div>
+      ) : null}
       {item.category === "real_world" && item.useTiming === "manual_redemption" ? (
         <button
           type="button"
@@ -195,8 +243,12 @@ function BackpackItemDetail({
       ) : (
         <button
           type="button"
-          disabled={activeAction !== null || !item.useEnabled}
-          onClick={() => onUse(item.itemId)}
+          disabled={
+            activeAction !== null ||
+            !item.useEnabled ||
+            (isSocialItem(item) && !isTeamWideSocialItem(item) && !selectedSocialRecipientId)
+          }
+          onClick={() => onUse(item)}
           className="mt-3 w-full rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
         >
           {item.itemId === "fitness_leave_coupon" ? "今天请假，不断联" : "今日使用"}
@@ -376,6 +428,59 @@ function AdminRedemptionQueue({
   );
 }
 
+function SocialInvitationList({
+  title,
+  items,
+  emptyText,
+  activeAction,
+  onRespond,
+}: {
+  title: string;
+  items: SocialInvitationSnapshot[];
+  emptyText: string;
+  activeAction: string | null;
+  onRespond?: (item: SocialInvitationSnapshot) => void;
+}) {
+  return (
+    <section className="rounded-[1.25rem] border-[3px] border-slate-900 bg-white p-3 shadow-[0_4px_0_0_#1f2937]">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-black text-slate-950">{title}</h3>
+        <span className="rounded-full border-2 border-slate-900 bg-yellow-100 px-2 py-1 text-xs font-black">
+          {items.length} 条
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="mt-3 text-sm font-bold text-slate-500">{emptyText}</p>
+      ) : (
+        <div className="mt-3 grid gap-2">
+          {items.map((item) => {
+            const busy = activeAction === `social:respond:${item.id}`;
+
+            return (
+              <div key={item.id} className="rounded-xl border-2 border-slate-900 bg-slate-50 p-3">
+                <p className="text-sm font-black text-slate-950">{item.message}</p>
+                <p className="mt-1 text-xs font-bold text-slate-500">
+                  {item.senderUsername ?? "队友"} / 响应 {item.responseCount}
+                </p>
+                {onRespond && item.status === "PENDING" ? (
+                  <button
+                    type="button"
+                    disabled={activeAction !== null}
+                    onClick={() => onRespond(item)}
+                    className="mt-3 rounded-full border-[3px] border-slate-900 bg-yellow-200 px-3 py-2 text-xs font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+                  >
+                    {busy ? "处理中..." : "响应"}
+                  </button>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function SupplyStation() {
   const [snapshot, setSnapshot] = useState<GamificationStateSnapshot | null>(null);
   const [busy, setBusy] = useState(true);
@@ -383,6 +488,8 @@ export function SupplyStation() {
   const [latestDraw, setLatestDraw] = useState<GamificationLotteryDrawSnapshot | null>(null);
   const [selectedBackpackItemId, setSelectedBackpackItemId] = useState<string | null>(null);
   const [selectedRerollDimension, setSelectedRerollDimension] = useState("movement");
+  const [selectedSocialRecipientId, setSelectedSocialRecipientId] = useState("");
+  const [socialMessage, setSocialMessage] = useState("");
   const [itemUseMessage, setItemUseMessage] = useState<string | null>(null);
   const [redemptionMessage, setRedemptionMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -439,7 +546,8 @@ export function SupplyStation() {
     }
   }
 
-  async function runItemUse(itemId: string) {
+  async function runItemUse(item: GamificationBackpackItemSnapshot) {
+    const itemId = item.itemId;
     setActiveAction(`item:${itemId}`);
     setError(null);
     setItemUseMessage(null);
@@ -457,11 +565,38 @@ export function SupplyStation() {
                   | "social"
                   | "learning",
               }
+            : isSocialItem(item)
+              ? {
+                  recipientUserId: isTeamWideSocialItem(item)
+                    ? undefined
+                    : selectedSocialRecipientId,
+                  message: socialMessage.trim() || undefined,
+                }
             : undefined,
       });
 
       setSnapshot(result.snapshot);
       setItemUseMessage(result.itemUse.message);
+      if (isSocialItem(item)) {
+        setSocialMessage("");
+      }
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
+
+  async function runSocialResponse(invitation: SocialInvitationSnapshot) {
+    setActiveAction(`social:respond:${invitation.id}`);
+    setError(null);
+    setItemUseMessage(null);
+    setRedemptionMessage(null);
+
+    try {
+      const result = await respondToSocialInvitation({ invitationId: invitation.id });
+      setSnapshot(result.snapshot);
+      setItemUseMessage("已响应，系统不会发银子，但同事会知道你还活着。");
     } catch (caught) {
       setError(getSupplyErrorMessage(caught));
     } finally {
@@ -583,6 +718,58 @@ export function SupplyStation() {
             </div>
           </div>
         </header>
+
+        <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-black text-slate-950">弱社交雷达</h2>
+              <p className="mt-2 text-sm font-bold text-slate-500">{snapshot!.social.message}</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center text-xs font-black">
+              <div className="rounded-[1rem] bg-orange-100 p-3">发出 {snapshot.social.pendingSentCount}</div>
+              <div className="rounded-[1rem] bg-sky-100 p-3">收到 {snapshot.social.pendingReceivedCount}</div>
+              <div className="rounded-[1rem] bg-lime-100 p-3">全队 {snapshot.social.teamWidePendingCount}</div>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            <SocialInvitationList
+              title="我收到的"
+              items={snapshot.social.received}
+              emptyText="暂时没人点名你。"
+              activeAction={activeAction}
+              onRespond={(item) => {
+                void runSocialResponse(item);
+              }}
+            />
+            <SocialInvitationList
+              title="全队邀请"
+              items={snapshot.social.teamWide}
+              emptyText="今天还没有全队邀请。"
+              activeAction={activeAction}
+              onRespond={(item) => {
+                void runSocialResponse(item);
+              }}
+            />
+            <SocialInvitationList
+              title="我发出的"
+              items={snapshot.social.sent}
+              emptyText="还没有发出弱社交邀请。"
+              activeAction={activeAction}
+            />
+          </div>
+          {snapshot.social.recentResponses.length > 0 ? (
+            <div className="mt-3 rounded-[1rem] border-2 border-lime-300 bg-lime-50 p-3">
+              <h3 className="text-sm font-black text-slate-950">最近响应</h3>
+              <div className="mt-2 grid gap-1">
+                {snapshot.social.recentResponses.map((response) => (
+                  <p key={response.id} className="text-sm font-black text-slate-700">
+                    {response.responderUsername}: {response.responseText ?? "已响应"}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </section>
 
         {error ? (
           <div className="rounded-[1rem] border-[3px] border-rose-300 bg-rose-50 px-4 py-3 text-sm font-black text-rose-700">
@@ -770,9 +957,14 @@ export function SupplyStation() {
                     item={selectedBackpackItem}
                     activeAction={activeAction}
                     selectedRerollDimension={selectedRerollDimension}
+                    selectedSocialRecipientId={selectedSocialRecipientId}
+                    socialMessage={socialMessage}
+                    socialRecipients={snapshot.social.availableRecipients}
                     onRerollDimensionChange={setSelectedRerollDimension}
-                    onUse={(itemId) => {
-                      void runItemUse(itemId);
+                    onSocialRecipientChange={setSelectedSocialRecipientId}
+                    onSocialMessageChange={setSocialMessage}
+                    onUse={(item) => {
+                      void runItemUse(item);
                     }}
                     onRequestRedemption={(item) => {
                       void runRequestRedemption(item);
@@ -816,17 +1008,19 @@ export function SupplyStation() {
               />
             ) : null}
 
+            {false ? (
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
               <h2 className="text-2xl font-black text-slate-950">弱社交雷达</h2>
-              <p className="mt-2 text-sm font-bold text-slate-500">{snapshot.social.message}</p>
+              <p className="mt-2 text-sm font-bold text-slate-500">{snapshot!.social.message}</p>
               <div className="mt-3 grid grid-cols-2 gap-2 text-center text-sm font-black">
-                <div className="rounded-[1rem] bg-orange-100 p-3">我发出的 {snapshot.social.pendingSentCount}</div>
-                <div className="rounded-[1rem] bg-sky-100 p-3">我收到的 {snapshot.social.pendingReceivedCount}</div>
+                <div className="rounded-[1rem] bg-orange-100 p-3">我发出的 {snapshot!.social.pendingSentCount}</div>
+                <div className="rounded-[1rem] bg-sky-100 p-3">我收到的 {snapshot!.social.pendingReceivedCount}</div>
               </div>
               <div className="mt-4">
                 <PlaceholderButton>响应 GM-12</PlaceholderButton>
               </div>
             </section>
+            ) : null}
           </aside>
         </main>
       </div>

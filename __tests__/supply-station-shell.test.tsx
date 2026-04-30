@@ -83,6 +83,85 @@ const luckinBackpackItem: GamificationStateSnapshot["backpack"]["previewItems"][
   knownDefinition: true,
 };
 
+function buildSocialFixture(): GamificationStateSnapshot["social"] {
+  return {
+    status: "active",
+    pendingSentCount: 1,
+    pendingReceivedCount: 1,
+    teamWidePendingCount: 1,
+    sent: [
+      {
+        id: "social-sent-1",
+        senderUserId: "u1",
+        senderUsername: "li",
+        recipientUserId: "u2",
+        recipientUsername: "luo",
+        invitationType: "DRINK_WATER",
+        status: "PENDING",
+        dayKey: "2026-04-29",
+        message: "drink invite message",
+        responseCount: 0,
+        wechatWebhookSentAt: null,
+        respondedAt: null,
+        expiredAt: null,
+        createdAt: "2026-04-29T01:00:00.000Z",
+      },
+    ],
+    received: [
+      {
+        id: "social-received-1",
+        senderUserId: "u2",
+        senderUsername: "luo",
+        recipientUserId: "u1",
+        recipientUsername: "li",
+        invitationType: "WALK_AROUND",
+        status: "PENDING",
+        dayKey: "2026-04-29",
+        message: "walk invite message",
+        responseCount: 0,
+        wechatWebhookSentAt: null,
+        respondedAt: null,
+        expiredAt: null,
+        createdAt: "2026-04-29T01:10:00.000Z",
+      },
+    ],
+    teamWide: [
+      {
+        id: "social-team-1",
+        senderUserId: "u3",
+        senderUsername: "liu",
+        recipientUserId: null,
+        recipientUsername: null,
+        invitationType: "TEAM_STANDUP",
+        status: "PENDING",
+        dayKey: "2026-04-29",
+        message: "standup invite message",
+        responseCount: 2,
+        wechatWebhookSentAt: null,
+        respondedAt: null,
+        expiredAt: null,
+        createdAt: "2026-04-29T01:20:00.000Z",
+      },
+    ],
+    recentResponses: [
+      {
+        id: "response-1",
+        invitationId: "social-team-1",
+        invitationType: "TEAM_STANDUP",
+        responderUserId: "u2",
+        responderUsername: "luo",
+        responseText: "已起立",
+        createdAt: "2026-04-29T01:25:00.000Z",
+      },
+    ],
+    availableRecipients: [
+      { userId: "u2", username: "luo", avatarKey: "male2" },
+      { userId: "u3", username: "liu", avatarKey: "female1" },
+    ],
+    message: "Social tools are active.",
+  };
+}
+
 function buildBackpackFixture(): GamificationStateSnapshot["backpack"] {
   return {
     status: "active",
@@ -207,9 +286,15 @@ function buildSnapshot(
       emptyMessage: "Backpack empty",
     },
     social: {
-      status: "placeholder",
+      status: "active",
       pendingSentCount: 0,
       pendingReceivedCount: 0,
+      teamWidePendingCount: 0,
+      sent: [],
+      received: [],
+      teamWide: [],
+      recentResponses: [],
+      availableRecipients: [],
       message: "Social tools open later",
     },
     redemptions: {
@@ -698,5 +783,56 @@ describe("SupplyStation", () => {
       }),
     );
     expect(container.textContent).toContain("我的兑换");
+  });
+
+  it("renders active social invitations and responds to one", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          createJsonResponse({ snapshot: buildSnapshot({ social: buildSocialFixture() }) }),
+        )
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            response: {
+              id: "response-new",
+              invitationId: "social-received-1",
+              responderUserId: "u1",
+            },
+            snapshot: buildSnapshot({ social: buildSocialFixture() }),
+          }),
+        ),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    expect(container.textContent).toContain("walk invite message");
+    expect(container.textContent).toContain("standup invite message");
+    expect(container.textContent).toContain("drink invite message");
+    expect(container.textContent).toContain("已起立");
+
+    const respondButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("响应"),
+    );
+    expect(respondButton).toBeDefined();
+
+    await act(async () => {
+      respondButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/gamification/social/respond",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ invitationId: "social-received-1" }),
+      }),
+    );
   });
 });

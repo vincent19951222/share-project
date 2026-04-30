@@ -16,6 +16,7 @@ import {
   summarizeUsageLimit,
 } from "@/lib/gamification/item-display";
 import { expirePastPendingItemUses } from "@/lib/gamification/item-use";
+import { expirePastSocialInvitations } from "@/lib/gamification/social-invitations";
 import { buildRedemptionSnapshot } from "@/lib/gamification/redemptions";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -27,6 +28,7 @@ import type {
   GamificationLotteryRewardSnapshot,
   GamificationStateSnapshot,
   GamificationTodayEffectSnapshot,
+  SocialInvitationSnapshot,
 } from "@/lib/types";
 
 const LOTTERY_TICKET_PRICE = 40;
@@ -126,7 +128,8 @@ function getItemUseAvailability(input: {
     input.effectType !== "fitness_season_multiplier" &&
     input.effectType !== "fitness_coin_and_season_multiplier" &&
     input.effectType !== "task_reroll" &&
-    input.effectType !== "leave_protection"
+    input.effectType !== "leave_protection" &&
+    input.effectType !== "social_invitation"
   ) {
     return {
       availableQuantity,
@@ -193,6 +196,40 @@ function buildTodayEffectSnapshot(record: {
     effectSummary: summarizeItemEffect(parsedEffect ?? definition?.effect),
     createdAt: record.createdAt.toISOString(),
     settledAt: record.settledAt?.toISOString() ?? null,
+  };
+}
+
+function toSocialInvitationSnapshot(record: {
+  id: string;
+  senderUserId: string;
+  senderUser?: { username: string } | null;
+  recipientUserId: string | null;
+  recipientUser?: { username: string } | null;
+  invitationType: string;
+  status: string;
+  dayKey: string;
+  message: string;
+  wechatWebhookSentAt: Date | null;
+  respondedAt: Date | null;
+  expiredAt: Date | null;
+  createdAt: Date;
+  responses: { id: string }[];
+}): SocialInvitationSnapshot {
+  return {
+    id: record.id,
+    senderUserId: record.senderUserId,
+    senderUsername: record.senderUser?.username ?? null,
+    recipientUserId: record.recipientUserId,
+    recipientUsername: record.recipientUser?.username ?? null,
+    invitationType: record.invitationType,
+    status: record.status as SocialInvitationSnapshot["status"],
+    dayKey: record.dayKey,
+    message: record.message,
+    responseCount: record.responses.length,
+    wechatWebhookSentAt: record.wechatWebhookSentAt?.toISOString() ?? null,
+    respondedAt: record.respondedAt?.toISOString() ?? null,
+    expiredAt: record.expiredAt?.toISOString() ?? null,
+    createdAt: record.createdAt.toISOString(),
   };
 }
 
@@ -364,6 +401,8 @@ export async function buildGamificationStateForUser(
     return null;
   }
 
+  await expirePastSocialInvitations({ teamId: user.teamId, todayDayKey: dayKey, now });
+
   const taskCardsById = new Map(getTaskCards().map((card) => [card.id, card]));
   const assignmentsByDimension = new Map(
     user.dailyTaskAssignments.map((assignment) => [assignment.dimensionKey, assignment]),
@@ -462,6 +501,58 @@ export async function buildGamificationStateForUser(
         })
       : Promise.resolve([]),
   ]);
+  const [sentInvitations, receivedInvitations, teamWideInvitations, recentResponses, teammates] =
+    await Promise.all([
+      prisma.socialInvitation.findMany({
+        where: { senderUserId: user.id, dayKey },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          senderUser: { select: { username: true } },
+          recipientUser: { select: { username: true } },
+          responses: { select: { id: true } },
+        },
+      }),
+      prisma.socialInvitation.findMany({
+        where: { recipientUserId: user.id, dayKey },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          senderUser: { select: { username: true } },
+          recipientUser: { select: { username: true } },
+          responses: { select: { id: true } },
+        },
+      }),
+      prisma.socialInvitation.findMany({
+        where: {
+          teamId: user.teamId,
+          recipientUserId: null,
+          dayKey,
+          senderUserId: { not: user.id },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          senderUser: { select: { username: true } },
+          recipientUser: { select: { username: true } },
+          responses: { select: { id: true } },
+        },
+      }),
+      prisma.socialInvitationResponse.findMany({
+        where: { teamId: user.teamId, dayKey },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          responderUser: { select: { username: true } },
+          invitation: { select: { invitationType: true } },
+        },
+      }),
+      prisma.user.findMany({
+        where: { teamId: user.teamId, id: { not: user.id } },
+        orderBy: { username: "asc" },
+        select: { id: true, username: true, avatarKey: true },
+      }),
+    ]);
 
   return {
     currentUserId: user.id,
@@ -504,10 +595,28 @@ export async function buildGamificationStateForUser(
       adminQueue: adminQueue.map((record) => buildRedemptionSnapshot(record)),
     },
     social: {
-      status: "placeholder",
-      pendingSentCount: user.sentSocialInvitations.length,
-      pendingReceivedCount: user.receivedSocialInvitations.length,
-      message: "点名喝水、出门溜达等弱社交道具将在 GM-12 开放。",
+      status: "active",
+      pendingSentCount: sentInvitations.filter((item) => item.status === "PENDING").length,
+      pendingReceivedCount: receivedInvitations.filter((item) => item.status === "PENDING").length,
+      teamWidePendingCount: teamWideInvitations.filter((item) => item.status === "PENDING").length,
+      sent: sentInvitations.map(toSocialInvitationSnapshot),
+      received: receivedInvitations.map(toSocialInvitationSnapshot),
+      teamWide: teamWideInvitations.map(toSocialInvitationSnapshot),
+      recentResponses: recentResponses.map((response) => ({
+        id: response.id,
+        invitationId: response.invitationId,
+        invitationType: response.invitation.invitationType,
+        responderUserId: response.responderUserId,
+        responderUsername: response.responderUser.username,
+        responseText: response.responseText,
+        createdAt: response.createdAt.toISOString(),
+      })),
+      availableRecipients: teammates.map((member) => ({
+        userId: member.id,
+        username: member.username,
+        avatarKey: member.avatarKey,
+      })),
+      message: "点名喝水、出门溜达和全员起立已开放；对方可以响应，也可以选择忽略。",
     },
   };
 }

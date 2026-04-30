@@ -6,6 +6,13 @@ import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 
+function wechatOk() {
+  return new Response(JSON.stringify({ errcode: 0, errmsg: "ok" }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 function request(userId: string | undefined, body: unknown) {
   return new NextRequest("http://localhost/api/gamification/items/use", {
     method: "POST",
@@ -21,14 +28,17 @@ describe("POST /api/gamification/items/use", () => {
   const fixedNow = new Date("2026-04-26T09:00:00+08:00");
   let userId: string;
   let teamId: string;
+  let teammateId: string;
 
   beforeEach(async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(fixedNow);
     await seedDatabase();
     const user = await prisma.user.findUniqueOrThrow({ where: { username: "li" } });
+    const teammate = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
     userId = user.id;
     teamId = user.teamId;
+    teammateId = teammate.id;
     await prisma.itemUseRecord.deleteMany({ where: { userId } });
     await prisma.inventoryItem.deleteMany({ where: { userId } });
     await prisma.dailyTaskAssignment.deleteMany({ where: { userId } });
@@ -152,5 +162,72 @@ describe("POST /api/gamification/items/use", () => {
     const response = await POST(request(userId, { itemId: "luckin_coffee_coupon" }));
 
     expect(response.status).toBe(409);
+  });
+
+  it("uses a direct social invitation item and returns invitation metadata", async () => {
+    process.env.ENTERPRISE_WECHAT_WEBHOOK_URL =
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(wechatOk()));
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "drink_water_ping", quantity: 1 },
+    });
+
+    const response = await POST(
+      request(userId, {
+        itemId: "drink_water_ping",
+        target: { recipientUserId: teammateId, message: "喝一口水" },
+      }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.itemUse).toMatchObject({
+      itemId: "drink_water_ping",
+      status: "SETTLED",
+      targetType: "SOCIAL_INVITATION",
+      inventoryConsumed: true,
+    });
+    expect(body.socialInvitation).toMatchObject({
+      status: "PENDING",
+      wechatStatus: "SENT",
+    });
+  });
+
+  it("rejects direct social invitation items without a recipient", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "walk_ping", quantity: 1 },
+    });
+
+    const response = await POST(request(userId, { itemId: "walk_ping", target: {} }));
+
+    expect(response.status).toBe(400);
+  });
+
+  it("uses a team-wide social invitation item without a recipient", async () => {
+    process.env.ENTERPRISE_WECHAT_WEBHOOK_URL =
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(wechatOk()));
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "team_standup_ping", quantity: 1 },
+    });
+
+    const response = await POST(
+      request(userId, {
+        itemId: "team_standup_ping",
+        target: { message: "都站起来" },
+      }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.itemUse).toMatchObject({
+      itemId: "team_standup_ping",
+      status: "SETTLED",
+      targetType: "SOCIAL_INVITATION",
+    });
+    expect(body.socialInvitation).toMatchObject({
+      status: "PENDING",
+      wechatStatus: "SENT",
+    });
   });
 });

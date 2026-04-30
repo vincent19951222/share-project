@@ -241,6 +241,8 @@ export interface UseGamificationItemRequest {
   itemId: string;
   target?: {
     dimensionKey?: "movement" | "hydration" | "social" | "learning";
+    recipientUserId?: string;
+    message?: string;
   };
 }
 
@@ -266,6 +268,30 @@ export async function useGamificationItem(payload: UseGamificationItemRequest): 
   });
 
   return readApiResult(response, "道具使用响应解析失败");
+}
+
+export async function respondToSocialInvitation(payload: {
+  invitationId: string;
+  responseText?: string;
+}): Promise<{
+  snapshot: GamificationStateSnapshot;
+  response: {
+    id: string;
+    invitationId: string;
+    responderUserId: string;
+    responseText: string | null;
+  };
+}> {
+  const response = await fetch("/api/gamification/social/respond", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return readApiResult(response, "social response parse failed");
 }
 
 async function readRedemptionPayload(response: Response): Promise<{

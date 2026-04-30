@@ -8,6 +8,7 @@ import {
   getShanghaiWeekKey,
 } from "@/lib/economy";
 import { settleBoostForPunch } from "@/lib/gamification/boost-settlement";
+import { createSocialInvitationFromItem } from "@/lib/gamification/social-invitations";
 import { prisma } from "@/lib/prisma";
 
 type TransactionClient = Prisma.TransactionClient;
@@ -29,6 +30,8 @@ export interface UseInventoryItemInput {
   now?: Date;
   target?: {
     dimensionKey?: TaskDimensionKey;
+    recipientUserId?: string;
+    message?: string;
   };
   rng?: () => number;
 }
@@ -42,6 +45,11 @@ export interface UseInventoryItemResult {
     targetId: string | null;
     inventoryConsumed: boolean;
     message: string;
+  };
+  socialInvitation?: {
+    id: string;
+    status: string;
+    wechatStatus: string;
   };
 }
 
@@ -69,7 +77,8 @@ function assertSupportedItem(definition: ItemDefinition | undefined): ItemDefini
   if (
     isFitnessBoostEffect(definition.effect) ||
     definition.effect.type === "task_reroll" ||
-    definition.effect.type === "leave_protection"
+    definition.effect.type === "leave_protection" ||
+    definition.effect.type === "social_invitation"
   ) {
     return definition;
   }
@@ -548,6 +557,27 @@ export async function useInventoryItem({
 }: UseInventoryItemInput): Promise<UseInventoryItemResult> {
   const definition = assertSupportedItem(getItemDefinition(itemId));
   const dayKey = getShanghaiDayKey(now);
+
+  if (definition.effect.type === "social_invitation") {
+    const result = await createSocialInvitationFromItem({
+      userId,
+      itemId,
+      now,
+      target: {
+        recipientUserId: target?.recipientUserId,
+        message: target?.message,
+      },
+    });
+
+    return {
+      itemUse: result.itemUse,
+      socialInvitation: {
+        id: result.invitation.id,
+        status: result.invitation.status,
+        wechatStatus: result.wechat.status,
+      },
+    };
+  }
 
   return prisma.$transaction(async (tx) => {
     const user = await tx.user.findUnique({

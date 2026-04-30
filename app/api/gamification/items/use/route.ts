@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseCookieValue } from "@/lib/auth";
 import { buildGamificationStateForUser } from "@/lib/gamification/state";
 import { ItemUseError, useInventoryItem } from "@/lib/gamification/item-use";
+import { SocialInvitationError } from "@/lib/gamification/social-invitations";
 
 type ItemUsePayload = {
   itemId?: unknown;
   target?: {
     dimensionKey?: unknown;
+    recipientUserId?: unknown;
+    message?: unknown;
   };
 };
 
@@ -41,7 +44,13 @@ export async function POST(request: NextRequest) {
     const result = await useInventoryItem({
       userId,
       itemId: payload.itemId,
-      target: dimensionKey ? { dimensionKey } : undefined,
+      target: {
+        ...(dimensionKey ? { dimensionKey } : {}),
+        ...(typeof payload.target?.recipientUserId === "string"
+          ? { recipientUserId: payload.target.recipientUserId }
+          : {}),
+        ...(typeof payload.target?.message === "string" ? { message: payload.target.message } : {}),
+      },
     });
     const snapshot = await buildGamificationStateForUser(userId);
 
@@ -52,9 +61,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       snapshot,
       itemUse: result.itemUse,
+      ...(result.socialInvitation ? { socialInvitation: result.socialInvitation } : {}),
     });
   } catch (error) {
     if (error instanceof ItemUseError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
+    if (error instanceof SocialInvitationError) {
       return NextResponse.json({ error: error.message }, { status: error.status });
     }
 

@@ -158,10 +158,12 @@ model SocialInvitationResponse {
   responderUser   User             @relation("SocialInvitationResponder", fields: [responderUserId], references: [id])
   dayKey          String
   responseText    String?
+  displayPayloadJson String?
   createdAt       DateTime         @default(now())
 
   @@unique([invitationId, responderUserId])
   @@index([teamId, dayKey, createdAt])
+  @@index([responderUserId, dayKey])
 }
 
 model DailyTaskAssignment {
