@@ -216,6 +216,7 @@ export async function seedDatabase(): Promise<void> {
         OR: [
           { userId: { in: extraUserIds } },
           { confirmedByUserId: { in: extraUserIds } },
+          { cancelledByUserId: { in: extraUserIds } },
         ],
       },
     });

@@ -60,6 +60,7 @@ model User {
   socialInvitationResponses SocialInvitationResponse[] @relation("SocialInvitationResponder")
   realWorldRedemptions  RealWorldRedemption[]
   confirmedRedemptions  RealWorldRedemption[]  @relation("RedemptionConfirmer")
+  cancelledRedemptions  RealWorldRedemption[]  @relation("RedemptionCanceller")
   createdAt             DateTime               @default(now())
 }
 
@@ -282,6 +283,8 @@ model RealWorldRedemption {
   confirmedByUserId String?
   confirmedByUser   User?     @relation("RedemptionConfirmer", fields: [confirmedByUserId], references: [id])
   confirmedAt       DateTime?
+  cancelledByUserId String?
+  cancelledByUser   User?     @relation("RedemptionCanceller", fields: [cancelledByUserId], references: [id])
   cancelledAt       DateTime?
   note              String?
   createdAt         DateTime  @default(now())

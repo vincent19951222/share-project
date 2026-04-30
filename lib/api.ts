@@ -3,6 +3,7 @@ import type {
   CalendarMonthSnapshot,
   CoffeeSnapshot,
   GamificationLotteryDrawSnapshot,
+  GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
 } from "@/lib/types";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
@@ -265,6 +266,55 @@ export async function useGamificationItem(payload: UseGamificationItemRequest): 
   });
 
   return readApiResult(response, "道具使用响应解析失败");
+}
+
+async function readRedemptionPayload(response: Response): Promise<{
+  redemption: GamificationRedemptionSnapshot;
+  inventory?: { itemId: string; quantity: number };
+}> {
+  return readApiResult<{
+    redemption: GamificationRedemptionSnapshot;
+    inventory?: { itemId: string; quantity: number };
+  }>(response, "兑换响应解析失败");
+}
+
+export async function requestRealWorldRedemption(itemId: string) {
+  const response = await fetch("/api/gamification/redemptions/request", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ itemId }),
+  });
+
+  return readRedemptionPayload(response);
+}
+
+export async function confirmRealWorldRedemption(redemptionId: string) {
+  const response = await fetch("/api/admin/gamification/redemptions/confirm", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ redemptionId }),
+  });
+
+  return readRedemptionPayload(response);
+}
+
+export async function cancelRealWorldRedemption(redemptionId: string) {
+  const response = await fetch("/api/admin/gamification/redemptions/cancel", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ redemptionId }),
+  });
+
+  return readRedemptionPayload(response);
 }
 
 export async function drawGamificationLottery({

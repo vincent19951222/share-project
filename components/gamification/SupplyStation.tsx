@@ -3,17 +3,22 @@
 import { useEffect, useState } from "react";
 import {
   ApiError,
+  cancelRealWorldRedemption,
   claimGamificationLifeTicket,
   completeGamificationTask,
+  confirmRealWorldRedemption,
   drawGamificationLottery,
   ensureTodayGamificationTasks,
+  fetchGamificationState,
   rerollGamificationTask,
+  requestRealWorldRedemption,
   useGamificationItem,
 } from "@/lib/api";
 import type {
   GamificationBackpackItemSnapshot,
   GamificationDimensionSnapshot,
   GamificationLotteryDrawSnapshot,
+  GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
 } from "@/lib/types";
 
@@ -116,12 +121,14 @@ function BackpackItemDetail({
   selectedRerollDimension,
   onRerollDimensionChange,
   onUse,
+  onRequestRedemption,
 }: {
   item: GamificationBackpackItemSnapshot | null;
   activeAction: string | null;
   selectedRerollDimension: string;
   onRerollDimensionChange: (dimensionKey: string) => void;
   onUse: (itemId: string) => void;
+  onRequestRedemption: (item: GamificationBackpackItemSnapshot) => void;
 }) {
   if (!item) {
     return (
@@ -176,14 +183,25 @@ function BackpackItemDetail({
           </select>
         </label>
       ) : null}
-      <button
-        type="button"
-        disabled={activeAction !== null || !item.useEnabled}
-        onClick={() => onUse(item.itemId)}
-        className="mt-3 w-full rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
-      >
-        {item.itemId === "fitness_leave_coupon" ? "今天请假，不断联" : "今日使用"}
-      </button>
+      {item.category === "real_world" && item.useTiming === "manual_redemption" ? (
+        <button
+          type="button"
+          disabled={activeAction !== null || item.availableQuantity <= 0}
+          onClick={() => onRequestRedemption(item)}
+          className="mt-3 w-full rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+        >
+          {activeAction === `redemption:request:${item.itemId}` ? "申请中..." : "申请兑换"}
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={activeAction !== null || !item.useEnabled}
+          onClick={() => onUse(item.itemId)}
+          className="mt-3 w-full rounded-full border-[3px] border-slate-900 bg-yellow-200 px-4 py-2 text-sm font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+        >
+          {item.itemId === "fitness_leave_coupon" ? "今天请假，不断联" : "今日使用"}
+        </button>
+      )}
       {item.useDisabledReason ? (
         <div className="mt-2 rounded-lg border-2 border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-500">
           {item.useDisabledReason}
@@ -236,6 +254,128 @@ function TodayEffectsPanel({
   );
 }
 
+function formatRedemptionTime(value: string) {
+  return new Date(value).toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function RedemptionList({
+  title,
+  items,
+  emptyText,
+}: {
+  title: string;
+  items: GamificationRedemptionSnapshot[];
+  emptyText: string;
+}) {
+  return (
+    <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-2xl font-black text-slate-950">{title}</h2>
+        <span className="rounded-full border-2 border-slate-900 bg-sky-100 px-3 py-1 text-sm font-black text-slate-900">
+          {items.length} 条
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="mt-3 rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-black text-slate-500">
+          {emptyText}
+        </p>
+      ) : (
+        <div className="mt-3 grid gap-2">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-[1rem] border-2 border-slate-900 bg-yellow-50 p-3 text-sm font-black text-slate-700 shadow-[0_3px_0_0_#1f2937]"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>
+                  {item.username ? `${item.username} · ` : ""}
+                  {item.itemName}
+                </span>
+                <span className="rounded-full border-2 border-slate-900 bg-white px-2 py-1 text-xs text-slate-900">
+                  {item.statusLabel}
+                </span>
+              </div>
+              <div className="mt-1 text-xs text-slate-500">
+                申请时间：{formatRedemptionTime(item.requestedAt)}
+              </div>
+              {item.note ? <div className="mt-1 text-xs text-slate-500">备注：{item.note}</div> : null}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function AdminRedemptionQueue({
+  items,
+  activeAction,
+  onConfirm,
+  onCancel,
+}: {
+  items: GamificationRedemptionSnapshot[];
+  activeAction: string | null;
+  onConfirm: (item: GamificationRedemptionSnapshot) => void;
+  onCancel: (item: GamificationRedemptionSnapshot) => void;
+}) {
+  return (
+    <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-yellow-50 p-4 shadow-[0_6px_0_0_#1f2937]">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-2xl font-black text-slate-950">待处理兑换</h2>
+        <span className="rounded-full border-2 border-slate-900 bg-white px-3 py-1 text-sm font-black text-slate-900">
+          {items.length} 条
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="mt-3 text-sm font-black text-slate-500">暂时没有线下兑换排队。</p>
+      ) : (
+        <div className="mt-3 grid gap-3">
+          {items.map((item) => {
+            const isBusy = activeAction === `redemption:confirm:${item.id}` || activeAction === `redemption:cancel:${item.id}`;
+
+            return (
+              <div
+                key={item.id}
+                className="rounded-[1rem] border-2 border-slate-900 bg-white p-3 shadow-[0_3px_0_0_#1f2937]"
+              >
+                <p className="text-sm font-black text-slate-950">
+                  {item.username ?? "未知成员"} 申请兑换 {item.itemName}
+                </p>
+                <p className="mt-1 text-xs font-bold text-slate-500">
+                  申请时间：{formatRedemptionTime(item.requestedAt)}
+                </p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    disabled={activeAction !== null}
+                    onClick={() => onConfirm(item)}
+                    className="rounded-full border-[3px] border-slate-900 bg-yellow-200 px-3 py-2 text-xs font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+                  >
+                    {isBusy ? "处理中..." : "确认已兑换"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={activeAction !== null}
+                    onClick={() => onCancel(item)}
+                    className="rounded-full border-[3px] border-slate-900 bg-white px-3 py-2 text-xs font-black text-slate-900 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-400"
+                  >
+                    取消并返还
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function SupplyStation() {
   const [snapshot, setSnapshot] = useState<GamificationStateSnapshot | null>(null);
   const [busy, setBusy] = useState(true);
@@ -244,6 +384,7 @@ export function SupplyStation() {
   const [selectedBackpackItemId, setSelectedBackpackItemId] = useState<string | null>(null);
   const [selectedRerollDimension, setSelectedRerollDimension] = useState("movement");
   const [itemUseMessage, setItemUseMessage] = useState<string | null>(null);
+  const [redemptionMessage, setRedemptionMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadState() {
@@ -270,6 +411,7 @@ export function SupplyStation() {
     setActiveAction(actionKey);
     setError(null);
     setItemUseMessage(null);
+    setRedemptionMessage(null);
 
     try {
       setSnapshot(await action());
@@ -284,6 +426,7 @@ export function SupplyStation() {
     setActiveAction(`lottery:${drawType}`);
     setError(null);
     setItemUseMessage(null);
+    setRedemptionMessage(null);
 
     try {
       const result = await drawGamificationLottery({ drawType, useCoinTopUp });
@@ -300,6 +443,7 @@ export function SupplyStation() {
     setActiveAction(`item:${itemId}`);
     setError(null);
     setItemUseMessage(null);
+    setRedemptionMessage(null);
 
     try {
       const result = await useGamificationItem({
@@ -318,6 +462,59 @@ export function SupplyStation() {
 
       setSnapshot(result.snapshot);
       setItemUseMessage(result.itemUse.message);
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
+
+  async function reloadSupplyStationState() {
+    setSnapshot(await fetchGamificationState());
+  }
+
+  async function runRequestRedemption(item: GamificationBackpackItemSnapshot) {
+    setActiveAction(`redemption:request:${item.itemId}`);
+    setError(null);
+    setItemUseMessage(null);
+    setRedemptionMessage(null);
+
+    try {
+      await requestRealWorldRedemption(item.itemId);
+      setRedemptionMessage("兑换申请已提交，瑞幸券已从背包扣除。管理员确认前不会自动生成咖啡记录。");
+      await reloadSupplyStationState();
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
+
+  async function runConfirmRedemption(redemption: GamificationRedemptionSnapshot) {
+    setActiveAction(`redemption:confirm:${redemption.id}`);
+    setError(null);
+    setRedemptionMessage(null);
+
+    try {
+      await confirmRealWorldRedemption(redemption.id);
+      setRedemptionMessage("已确认兑换，请在线下把咖啡债还上。");
+      await reloadSupplyStationState();
+    } catch (caught) {
+      setError(getSupplyErrorMessage(caught));
+    } finally {
+      setActiveAction(null);
+    }
+  }
+
+  async function runCancelRedemption(redemption: GamificationRedemptionSnapshot) {
+    setActiveAction(`redemption:cancel:${redemption.id}`);
+    setError(null);
+    setRedemptionMessage(null);
+
+    try {
+      await cancelRealWorldRedemption(redemption.id);
+      setRedemptionMessage("已取消兑换，瑞幸券已返还到对方背包。");
+      await reloadSupplyStationState();
     } catch (caught) {
       setError(getSupplyErrorMessage(caught));
     } finally {
@@ -577,6 +774,9 @@ export function SupplyStation() {
                     onUse={(itemId) => {
                       void runItemUse(itemId);
                     }}
+                    onRequestRedemption={(item) => {
+                      void runRequestRedemption(item);
+                    }}
                   />
 
                   <div>
@@ -590,6 +790,31 @@ export function SupplyStation() {
                 </p>
               )}
             </section>
+
+            {redemptionMessage ? (
+              <div className="rounded-[1rem] border-[3px] border-lime-300 bg-lime-50 px-4 py-3 text-sm font-black text-lime-800">
+                {redemptionMessage}
+              </div>
+            ) : null}
+
+            <RedemptionList
+              title="我的兑换"
+              items={snapshot.redemptions.mine}
+              emptyText="还没有真实福利兑换记录。抽到瑞幸券后，可以在背包里申请。"
+            />
+
+            {snapshot.currentUserRole === "ADMIN" || snapshot.redemptions.adminQueue.length > 0 ? (
+              <AdminRedemptionQueue
+                items={snapshot.redemptions.adminQueue}
+                activeAction={activeAction}
+                onConfirm={(item) => {
+                  void runConfirmRedemption(item);
+                }}
+                onCancel={(item) => {
+                  void runCancelRedemption(item);
+                }}
+              />
+            ) : null}
 
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
               <h2 className="text-2xl font-black text-slate-950">弱社交雷达</h2>

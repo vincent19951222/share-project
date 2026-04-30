@@ -171,8 +171,34 @@ export interface GamificationSocialSummary {
   message: string;
 }
 
+export type RealWorldRedemptionStatus = "REQUESTED" | "CONFIRMED" | "CANCELLED";
+
+export interface GamificationRedemptionSnapshot {
+  id: string;
+  userId: string;
+  username: string | null;
+  itemId: string;
+  itemName: string;
+  redemptionType: "luckin_coffee" | "unknown";
+  status: RealWorldRedemptionStatus;
+  statusLabel: string;
+  statusTone: "warning" | "success" | "muted" | "danger";
+  requestedAt: string;
+  confirmedAt: string | null;
+  cancelledAt: string | null;
+  confirmedByUsername: string | null;
+  cancelledByUsername: string | null;
+  note: string | null;
+}
+
+export interface GamificationRedemptionSectionSnapshot {
+  mine: GamificationRedemptionSnapshot[];
+  adminQueue: GamificationRedemptionSnapshot[];
+}
+
 export interface GamificationStateSnapshot {
   currentUserId: string;
+  currentUserRole: string;
   teamId: string;
   dayKey: string;
   ticketBalance: number;
@@ -181,6 +207,7 @@ export interface GamificationStateSnapshot {
   lottery: GamificationLotterySummary;
   backpack: GamificationBackpackSummary;
   social: GamificationSocialSummary;
+  redemptions: GamificationRedemptionSectionSnapshot;
 }
 
 export interface CoffeeMemberSnapshot {

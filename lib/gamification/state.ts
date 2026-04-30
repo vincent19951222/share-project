@@ -16,6 +16,7 @@ import {
   summarizeUsageLimit,
 } from "@/lib/gamification/item-display";
 import { expirePastPendingItemUses } from "@/lib/gamification/item-use";
+import { buildRedemptionSnapshot } from "@/lib/gamification/redemptions";
 import { prisma } from "@/lib/prisma";
 import type {
   GamificationBackpackGroupSnapshot,
@@ -277,6 +278,7 @@ export async function buildGamificationStateForUser(
     select: {
       id: true,
       teamId: true,
+      role: true,
       coins: true,
       ticketBalance: true,
       dailyTaskAssignments: {
@@ -433,9 +435,37 @@ export async function buildGamificationStateForUser(
       parseLotteryRewardSnapshot(result.rewardSnapshotJson),
     ),
   }));
+  const [myRedemptions, adminQueue] = await Promise.all([
+    prisma.realWorldRedemption.findMany({
+      where: { userId: user.id },
+      orderBy: { requestedAt: "desc" },
+      take: 10,
+      include: {
+        user: { select: { username: true } },
+        confirmedByUser: { select: { username: true } },
+        cancelledByUser: { select: { username: true } },
+      },
+    }),
+    user.role === "ADMIN"
+      ? prisma.realWorldRedemption.findMany({
+          where: {
+            teamId: user.teamId,
+            status: "REQUESTED",
+          },
+          orderBy: { requestedAt: "asc" },
+          take: 20,
+          include: {
+            user: { select: { username: true } },
+            confirmedByUser: { select: { username: true } },
+            cancelledByUser: { select: { username: true } },
+          },
+        })
+      : Promise.resolve([]),
+  ]);
 
   return {
     currentUserId: user.id,
+    currentUserRole: user.role,
     teamId: user.teamId,
     dayKey,
     ticketBalance: user.ticketBalance,
@@ -469,6 +499,10 @@ export async function buildGamificationStateForUser(
       recentDraws,
     },
     backpack: buildBackpackSummary(user),
+    redemptions: {
+      mine: myRedemptions.map((record) => buildRedemptionSnapshot(record)),
+      adminQueue: adminQueue.map((record) => buildRedemptionSnapshot(record)),
+    },
     social: {
       status: "placeholder",
       pendingSentCount: user.sentSocialInvitations.length,

@@ -119,11 +119,30 @@ function buildBackpackFixture(): GamificationStateSnapshot["backpack"] {
   };
 }
 
+const requestedRedemption: GamificationStateSnapshot["redemptions"]["mine"][number] = {
+  id: "redemption-1",
+  userId: "u1",
+  username: "luo",
+  itemId: "luckin_coffee_coupon",
+  itemName: "Luckin Coffee Coupon",
+  redemptionType: "luckin_coffee",
+  status: "REQUESTED",
+  statusLabel: "待管理员确认",
+  statusTone: "warning",
+  requestedAt: "2026-04-26T01:00:00.000Z",
+  confirmedAt: null,
+  cancelledAt: null,
+  confirmedByUsername: null,
+  cancelledByUsername: null,
+  note: null,
+};
+
 function buildSnapshot(
   overrides: Partial<GamificationStateSnapshot> = {},
 ): GamificationStateSnapshot {
   return {
     currentUserId: "u1",
+    currentUserRole: "MEMBER",
     teamId: "team-1",
     dayKey: "2026-04-29",
     ticketBalance: 8,
@@ -192,6 +211,10 @@ function buildSnapshot(
       pendingSentCount: 0,
       pendingReceivedCount: 0,
       message: "Social tools open later",
+    },
+    redemptions: {
+      mine: [],
+      adminQueue: [],
     },
     ...overrides,
   };
@@ -567,5 +590,113 @@ describe("SupplyStation", () => {
       }),
     );
     expect(container.textContent).toContain("Boost is pending for today.");
+  });
+
+  it("renders redemption status and admin queue", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        createJsonResponse({
+          snapshot: buildSnapshot({
+            currentUserRole: "ADMIN",
+            redemptions: {
+              mine: [requestedRedemption],
+              adminQueue: [
+                {
+                  ...requestedRedemption,
+                  id: "redemption-2",
+                  userId: "u2",
+                  username: "liu",
+                  requestedAt: "2026-04-26T01:30:00.000Z",
+                },
+              ],
+            },
+          }),
+        }),
+      ),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    expect(container.textContent).toContain("我的兑换");
+    expect(container.textContent).toContain("Luckin Coffee Coupon");
+    expect(container.textContent).toContain("待管理员确认");
+    expect(container.textContent).toContain("待处理兑换");
+    expect(container.textContent).toContain("liu");
+  });
+
+  it("requests redemption from a real-world backpack item", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          createJsonResponse({ snapshot: buildSnapshot({ backpack: buildBackpackFixture() }) }),
+        )
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            redemption: {
+              ...requestedRedemption,
+              id: "redemption-new",
+              requestedAt: "2026-04-26T02:00:00.000Z",
+            },
+            inventory: { itemId: "luckin_coffee_coupon", quantity: 1 },
+          }),
+        )
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            snapshot: buildSnapshot({
+              backpack: buildBackpackFixture(),
+              redemptions: { mine: [requestedRedemption], adminQueue: [] },
+            }),
+          }),
+        ),
+    );
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    const luckinButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("Luckin Coffee Coupon"),
+    );
+
+    await act(async () => {
+      luckinButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const requestButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("申请兑换"),
+    );
+    expect(requestButton).toBeDefined();
+
+    await act(async () => {
+      requestButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/gamification/redemptions/request",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ itemId: "luckin_coffee_coupon" }),
+      }),
+    );
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/gamification/state",
+      expect.objectContaining({
+        cache: "no-store",
+        credentials: "same-origin",
+      }),
+    );
+    expect(container.textContent).toContain("我的兑换");
   });
 });

@@ -4,6 +4,7 @@ import { GET } from "@/app/api/gamification/state/route";
 import { createCookieValue } from "@/lib/auth";
 import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
+import { getItemDefinition } from "@/lib/gamification/content";
 import { prisma } from "@/lib/prisma";
 
 function request(userId?: string) {
@@ -273,5 +274,49 @@ describe("GET /api/gamification/state", () => {
       pendingSentCount: 1,
       pendingReceivedCount: 1,
     });
+  });
+
+  it("includes current user redemptions and admin pending queue", async () => {
+    const member = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
+    const redemption = await prisma.realWorldRedemption.create({
+      data: {
+        userId: member.id,
+        teamId,
+        itemId: "luckin_coffee_coupon",
+        status: "REQUESTED",
+      },
+    });
+
+    const adminResponse = await GET(request(userId));
+    const adminBody = await adminResponse.json();
+
+    expect(adminResponse.status).toBe(200);
+    expect(adminBody.snapshot.currentUserRole).toBe("ADMIN");
+    expect(adminBody.snapshot.redemptions.adminQueue).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: redemption.id,
+          username: "luo",
+          itemName: getItemDefinition("luckin_coffee_coupon")?.name,
+          status: "REQUESTED",
+        }),
+      ]),
+    );
+
+    const memberResponse = await GET(request(member.id));
+    const memberBody = await memberResponse.json();
+
+    expect(memberResponse.status).toBe(200);
+    expect(memberBody.snapshot.currentUserRole).toBe("MEMBER");
+    expect(memberBody.snapshot.redemptions.mine).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: redemption.id,
+          status: "REQUESTED",
+          statusLabel: "待管理员确认",
+        }),
+      ]),
+    );
+    expect(memberBody.snapshot.redemptions.adminQueue).toEqual([]);
   });
 });
