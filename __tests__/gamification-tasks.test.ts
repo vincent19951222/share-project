@@ -12,6 +12,37 @@ import type { TaskDimensionKey } from "@/content/gamification/types";
 
 const TASK_DIMENSIONS: TaskDimensionKey[] = ["movement", "hydration", "social", "learning"];
 
+async function seedCompletedFourDimensionAssignments(input: {
+  userId: string;
+  teamId: string;
+  dayKey: string;
+}) {
+  await Promise.all(
+    TASK_DIMENSIONS.map((dimensionKey) =>
+      prisma.dailyTaskAssignment.upsert({
+        where: {
+          userId_dayKey_dimensionKey: {
+            userId: input.userId,
+            dayKey: input.dayKey,
+            dimensionKey,
+          },
+        },
+        update: {
+          completedAt: new Date(`${input.dayKey}T09:00:00+08:00`),
+        },
+        create: {
+          userId: input.userId,
+          teamId: input.teamId,
+          dayKey: input.dayKey,
+          dimensionKey,
+          taskCardId: `${dimensionKey}_001`,
+          completedAt: new Date(`${input.dayKey}T09:00:00+08:00`),
+        },
+      }),
+    ),
+  );
+}
+
 describe("gamification daily tasks", () => {
   const fixedNow = new Date("2026-04-24T09:00:00+08:00");
   let userId: string;
@@ -26,6 +57,7 @@ describe("gamification daily tasks", () => {
     userId = user.id;
     teamId = user.teamId;
     dayKey = getShanghaiDayKey(fixedNow);
+    await prisma.teamDynamic.deleteMany({ where: { teamId } });
   });
 
   afterEach(() => {
@@ -202,6 +234,30 @@ describe("gamification daily tasks", () => {
       sourceType: "daily_tasks",
       sourceId: `${userId}:${dayKey}`,
     });
+  });
+
+  it("writes a team dynamic when all-four completion streak reaches 3 days", async () => {
+    const dayKeys = ["2026-04-24", "2026-04-25", "2026-04-26"];
+
+    for (const key of dayKeys) {
+      await seedCompletedFourDimensionAssignments({ userId, teamId, dayKey: key });
+    }
+
+    await claimDailyTasksTicket({
+      userId,
+      now: new Date("2026-04-26T09:00:00+08:00"),
+    });
+
+    const dynamic = await prisma.teamDynamic.findFirstOrThrow({
+      where: {
+        teamId,
+        type: "GAME_TASK_STREAK_MILESTONE",
+        sourceType: "daily_task_streak",
+        sourceId: `${userId}:3:2026-04-26`,
+      },
+    });
+
+    expect(dynamic.title).toContain("连续 3 天");
   });
 
   it("does not grant a second ticket on repeated claim", async () => {

@@ -2,6 +2,11 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { getGamificationDimensions, getTaskCards } from "@/lib/gamification/content";
 import { adjustLotteryTickets } from "@/lib/gamification/db";
+import {
+  buildTaskStreakDynamic,
+  isGameTaskStreakMilestone,
+  safeCreateGameTeamDynamic,
+} from "@/lib/gamification/team-dynamics";
 import { buildGamificationStateForUser } from "@/lib/gamification/state";
 import { prisma } from "@/lib/prisma";
 import type { TaskCardDefinition, TaskDimensionKey } from "@/content/gamification/types";
@@ -18,6 +23,7 @@ type Rng = () => number;
 interface UserTeamIdentity {
   id: string;
   teamId: string;
+  username: string;
 }
 
 interface PreviousAssignment {
@@ -172,7 +178,7 @@ function isUniqueConflict(error: unknown): boolean {
 async function findUserIdentity(userId: string): Promise<UserTeamIdentity> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, teamId: true },
+    select: { id: true, teamId: true, username: true },
   });
 
   if (!user) {
@@ -180,6 +186,34 @@ async function findUserIdentity(userId: string): Promise<UserTeamIdentity> {
   }
 
   return user;
+}
+
+async function countConsecutiveAllFourCompletionDays(input: {
+  userId: string;
+  dayKey: string;
+}) {
+  let streak = 0;
+  let cursor = new Date(`${input.dayKey}T00:00:00+08:00`);
+
+  while (streak < 30) {
+    const key = getShanghaiDayKey(cursor);
+    const completedCount = await prisma.dailyTaskAssignment.count({
+      where: {
+        userId: input.userId,
+        dayKey: key,
+        completedAt: { not: null },
+      },
+    });
+
+    if (completedCount < DIMENSION_KEYS.length) {
+      break;
+    }
+
+    streak += 1;
+    cursor = new Date(cursor.getTime() - DAY_MS);
+  }
+
+  return streak;
 }
 
 async function buildSnapshotOrThrow(
@@ -407,6 +441,24 @@ export async function claimDailyTasksTicket({
     if (!isUniqueConflict(error)) {
       throw error;
     }
+  }
+
+  const allFourStreak = await countConsecutiveAllFourCompletionDays({
+    userId: user.id,
+    dayKey,
+  });
+
+  if (isGameTaskStreakMilestone(allFourStreak)) {
+    await safeCreateGameTeamDynamic(
+      buildTaskStreakDynamic({
+        teamId: user.teamId,
+        userId: user.id,
+        displayName: user.username,
+        milestone: allFourStreak,
+        dayKey,
+        occurredAt: now,
+      }),
+    );
   }
 
   return buildSnapshotOrThrow(userId, now);
