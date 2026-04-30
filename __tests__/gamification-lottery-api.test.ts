@@ -5,6 +5,7 @@ import { createCookieValue } from "@/lib/auth";
 import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
+import * as teamDynamicsService from "@/lib/team-dynamics-service";
 
 function request(userId?: string, body: Record<string, unknown> = {}) {
   return new NextRequest("http://localhost/api/gamification/lottery/draw", {
@@ -124,6 +125,24 @@ describe("POST /api/gamification/lottery/draw", () => {
       where: { teamId: user.teamId, type: "GAME_RARE_PRIZE" },
     });
     expect(count).toBe(0);
+  });
+
+  it("still completes a rare draw when team dynamics write fails", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { ticketBalance: 1 },
+    });
+    vi.spyOn(Math, "random").mockReturnValue(0.999);
+    vi.spyOn(teamDynamicsService, "createOrReuseTeamDynamic").mockRejectedValue(
+      new Error("team dynamics unavailable"),
+    );
+
+    const response = await POST(request(userId, { drawType: "SINGLE" }));
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    expect(body.teamDynamics[0]).toMatchObject({ status: "FAILED" });
+    expect(await prisma.lotteryDraw.count({ where: { userId } })).toBe(1);
   });
 
   it("runs a ten draw with top-up", async () => {

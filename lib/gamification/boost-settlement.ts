@@ -6,7 +6,7 @@ import {
   safeCreateGameTeamDynamic,
   shouldHighlightBoost,
 } from "@/lib/gamification/team-dynamics";
-import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
+import * as teamDynamicsService from "@/lib/team-dynamics-service";
 
 type TransactionClient = Prisma.TransactionClient;
 
@@ -322,7 +322,7 @@ export async function settleBoostForPunch(input: {
         occurredAt: punch.createdAt,
       }),
       (dynamicInput) =>
-        createOrReuseTeamDynamic({
+        teamDynamicsService.createOrReuseTeamDynamic({
           ...dynamicInput,
           client: input.tx,
         }),

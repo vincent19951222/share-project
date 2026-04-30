@@ -5,6 +5,7 @@ import {
   settleBoostForPunch,
 } from "@/lib/gamification/boost-settlement";
 import { prisma } from "@/lib/prisma";
+import * as teamDynamicsService from "@/lib/team-dynamics-service";
 
 describe("gamification boost settlement", () => {
   const fixedNow = new Date("2026-04-26T09:00:00+08:00");
@@ -263,5 +264,63 @@ describe("gamification boost settlement", () => {
       where: { teamId, type: "GAME_BOOST_MILESTONE" },
     });
     expect(count).toBe(0);
+  });
+
+  it("still settles a boost when team dynamics write fails", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "double_niuma_coupon", quantity: 1 },
+    });
+    const itemUse = await prisma.itemUseRecord.create({
+      data: {
+        userId,
+        teamId,
+        itemId: "double_niuma_coupon",
+        dayKey: "2026-04-26",
+        status: "PENDING",
+        targetType: "FITNESS_PUNCH",
+        effectSnapshotJson: JSON.stringify({
+          type: "fitness_coin_and_season_multiplier",
+          multiplier: 2,
+        }),
+      },
+    });
+    const punch = await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: 26,
+        dayKey: "2026-04-26",
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 4,
+        assetAwarded: 40,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 40,
+        seasonContributionAwarded: 40,
+        countedForSeasonSlot: false,
+      },
+    });
+    vi.spyOn(teamDynamicsService, "createOrReuseTeamDynamic").mockRejectedValue(
+      new Error("team dynamics unavailable"),
+    );
+
+    const result = await prisma.$transaction((tx) =>
+      settleBoostForPunch({
+        tx,
+        userId,
+        teamId,
+        dayKey: "2026-04-26",
+        punchRecordId: punch.id,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 40,
+        applyBonusDeltas: false,
+      }),
+    );
+    const refreshedUse = await prisma.itemUseRecord.findUniqueOrThrow({
+      where: { id: itemUse.id },
+    });
+
+    expect(result.itemUseRecordId).toBe(itemUse.id);
+    expect(refreshedUse.status).toBe("SETTLED");
   });
 });

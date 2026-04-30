@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
 import {
@@ -8,6 +8,7 @@ import {
   SocialInvitationError,
 } from "@/lib/gamification/social-invitations";
 import { prisma } from "@/lib/prisma";
+import * as teamDynamicsService from "@/lib/team-dynamics-service";
 
 function wechatOk() {
   return new Response(JSON.stringify({ errcode: 0, errmsg: "ok" }), {
@@ -53,6 +54,10 @@ describe("gamification social invitations", () => {
     vi.useRealTimers();
     delete process.env.ENTERPRISE_WECHAT_WEBHOOK_URL;
     await prisma.$disconnect();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("creates a direct invitation, consumes inventory, settles item use, and records wechat send", async () => {
@@ -314,6 +319,34 @@ describe("gamification social invitations", () => {
       where: { teamId, type: "GAME_SOCIAL_MOMENT" },
     });
     expect(count).toBe(0);
+  });
+
+  it("still records social response when team dynamics write fails", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId: senderId, teamId, itemId: "team_standup_ping", quantity: 1 },
+    });
+    const created = await createSocialInvitationFromItem({
+      userId: senderId,
+      itemId: "team_standup_ping",
+      target: {},
+      fetchImpl: vi.fn().mockResolvedValue(wechatOk()),
+    });
+
+    await respondToSocialInvitation({ userId: recipientId, invitationId: created.invitation.id });
+    vi.spyOn(teamDynamicsService, "createOrReuseTeamDynamic").mockRejectedValue(
+      new Error("team dynamics unavailable"),
+    );
+
+    const response = await respondToSocialInvitation({
+      userId: thirdUserId,
+      invitationId: created.invitation.id,
+    });
+    const responseCount = await prisma.socialInvitationResponse.count({
+      where: { invitationId: created.invitation.id },
+    });
+
+    expect(response.responderUserId).toBe(thirdUserId);
+    expect(responseCount).toBe(2);
   });
 
   it("expires old pending invitations", async () => {

@@ -2,6 +2,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vites
 import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
+import * as teamDynamicsService from "@/lib/team-dynamics-service";
 import {
   claimDailyTasksTicket,
   completeDailyTask,
@@ -61,6 +62,7 @@ describe("gamification daily tasks", () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.useRealTimers();
   });
 
@@ -258,6 +260,26 @@ describe("gamification daily tasks", () => {
     });
 
     expect(dynamic.title).toContain("连续 3 天");
+  });
+
+  it("still grants life ticket when team dynamics write fails", async () => {
+    const dayKeys = ["2026-04-24", "2026-04-25", "2026-04-26"];
+
+    for (const key of dayKeys) {
+      await seedCompletedFourDimensionAssignments({ userId, teamId, dayKey: key });
+    }
+
+    vi.spyOn(teamDynamicsService, "createOrReuseTeamDynamic").mockRejectedValue(
+      new Error("team dynamics unavailable"),
+    );
+
+    await claimDailyTasksTicket({
+      userId,
+      now: new Date("2026-04-26T09:00:00+08:00"),
+    });
+
+    const refreshed = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    expect(refreshed.ticketBalance).toBe(1);
   });
 
   it("does not grant a second ticket on repeated claim", async () => {
