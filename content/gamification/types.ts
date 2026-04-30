@@ -54,6 +54,7 @@ export interface RewardDefinition {
   weight: number;
   effect: RewardEffect;
   enabled: boolean;
+  highlightInDynamics?: boolean;
 }
 
 export type ItemEffect =
@@ -82,6 +83,7 @@ export interface ItemDefinition {
   maxUsePerTeamPerDay?: number;
   requiresAdminConfirmation: boolean;
   enabled: boolean;
+  highlightInDynamics?: boolean;
 }
 
 export interface GamificationContentBundle {

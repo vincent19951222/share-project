@@ -22,6 +22,7 @@ describe("gamification boost settlement", () => {
     await prisma.itemUseRecord.deleteMany({ where: { userId } });
     await prisma.inventoryItem.deleteMany({ where: { userId } });
     await prisma.punchRecord.deleteMany({ where: { userId } });
+    await prisma.teamDynamic.deleteMany({ where: { teamId } });
   });
 
   afterAll(async () => {
@@ -151,5 +152,116 @@ describe("gamification boost settlement", () => {
     expect(inventory.quantity).toBe(0);
     expect(updatedUse.status).toBe("SETTLED");
     expect(updatedUse.targetId).toBe(punch.id);
+  });
+
+  it("writes a team dynamic when double niuma coupon settles", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "double_niuma_coupon", quantity: 1 },
+    });
+    await prisma.itemUseRecord.create({
+      data: {
+        userId,
+        teamId,
+        itemId: "double_niuma_coupon",
+        dayKey: "2026-04-26",
+        status: "PENDING",
+        targetType: "FITNESS_PUNCH",
+        effectSnapshotJson: JSON.stringify({
+          type: "fitness_coin_and_season_multiplier",
+          multiplier: 2,
+        }),
+      },
+    });
+    const punch = await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: 26,
+        dayKey: "2026-04-26",
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 4,
+        assetAwarded: 40,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 40,
+        seasonContributionAwarded: 40,
+        countedForSeasonSlot: false,
+      },
+    });
+
+    await prisma.$transaction((tx) =>
+      settleBoostForPunch({
+        tx,
+        userId,
+        teamId,
+        dayKey: "2026-04-26",
+        punchRecordId: punch.id,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 40,
+        applyBonusDeltas: false,
+      }),
+    );
+
+    const dynamic = await prisma.teamDynamic.findFirstOrThrow({
+      where: {
+        teamId,
+        type: "GAME_BOOST_MILESTONE",
+        sourceType: "punch_record_boost",
+        sourceId: punch.id,
+      },
+    });
+
+    expect(dynamic.title).toContain("双倍牛马券");
+  });
+
+  it("does not write a team dynamic for a non-highlight small boost", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId, teamId, itemId: "small_boost_coupon", quantity: 1 },
+    });
+    await prisma.itemUseRecord.create({
+      data: {
+        userId,
+        teamId,
+        itemId: "small_boost_coupon",
+        dayKey: "2026-04-26",
+        status: "PENDING",
+        targetType: "FITNESS_PUNCH",
+        effectSnapshotJson: JSON.stringify({ type: "fitness_coin_multiplier", multiplier: 1.5 }),
+      },
+    });
+    const punch = await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: 26,
+        dayKey: "2026-04-26",
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 4,
+        assetAwarded: 40,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 40,
+        seasonContributionAwarded: 40,
+        countedForSeasonSlot: false,
+      },
+    });
+
+    await prisma.$transaction((tx) =>
+      settleBoostForPunch({
+        tx,
+        userId,
+        teamId,
+        dayKey: "2026-04-26",
+        punchRecordId: punch.id,
+        baseAssetAwarded: 40,
+        baseSeasonContribution: 40,
+        applyBonusDeltas: false,
+      }),
+    );
+
+    const count = await prisma.teamDynamic.count({
+      where: { teamId, type: "GAME_BOOST_MILESTONE" },
+    });
+    expect(count).toBe(0);
   });
 });

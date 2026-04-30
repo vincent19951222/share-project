@@ -1,6 +1,12 @@
 import type { Prisma } from "@/lib/generated/prisma/client";
 import type { ItemEffect } from "@/content/gamification/types";
 import { getItemDefinition } from "@/lib/gamification/content";
+import {
+  buildBoostMilestoneDynamic,
+  safeCreateGameTeamDynamic,
+  shouldHighlightBoost,
+} from "@/lib/gamification/team-dynamics";
+import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
 
 type TransactionClient = Prisma.TransactionClient;
 
@@ -157,6 +163,7 @@ export async function settleBoostForPunch(input: {
       baseSeasonContribution: true,
       boostSeasonBonus: true,
       seasonId: true,
+      createdAt: true,
     },
   });
 
@@ -282,6 +289,44 @@ export async function settleBoostForPunch(input: {
         data: { seasonIncome: { increment: settlement.boostSeasonBonus } },
       });
     }
+  }
+
+  if (
+    shouldHighlightBoost({
+      baseAssetAwarded: settlement.baseAssetAwarded,
+      boostAssetBonus: settlement.boostAssetBonus,
+      baseSeasonContribution: settlement.baseSeasonContribution,
+      boostSeasonBonus: settlement.boostSeasonBonus,
+      highlightInDynamics: definition?.highlightInDynamics,
+    })
+  ) {
+    const actor = await input.tx.user.findUnique({
+      where: { id: input.userId },
+      select: { username: true },
+    });
+
+    await safeCreateGameTeamDynamic(
+      buildBoostMilestoneDynamic({
+        teamId: input.teamId,
+        userId: input.userId,
+        displayName: actor?.username ?? input.userId,
+        punchRecordId: input.punchRecordId,
+        itemUseRecordId: itemUse.id,
+        itemId: itemUse.itemId,
+        itemName: boostLabel ?? itemUse.itemId,
+        baseAssetAwarded: settlement.baseAssetAwarded,
+        boostAssetBonus: settlement.boostAssetBonus,
+        baseSeasonContribution: settlement.baseSeasonContribution,
+        boostSeasonBonus: settlement.boostSeasonBonus,
+        dayKey: input.dayKey,
+        occurredAt: punch.createdAt,
+      }),
+      (dynamicInput) =>
+        createOrReuseTeamDynamic({
+          ...dynamicInput,
+          client: input.tx,
+        }),
+    );
   }
 
   return { ...boostSummary, itemUseRecordId: itemUse.id };
