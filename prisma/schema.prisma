@@ -101,6 +101,8 @@ model EnterpriseWechatSendLog {
 
   @@index([teamId, createdAt])
   @@index([purpose, createdAt])
+  @@index([targetType, targetId])
+  @@index([status, createdAt])
 }
 
 model EnterpriseWechatPushEvent {
