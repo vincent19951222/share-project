@@ -980,6 +980,39 @@ body {
   line-height: 1.45;
 }
 
+.supply-rule-link,
+.supply-inline-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border: 2px solid #1f2937;
+  border-radius: 999px;
+  background: #fef3c7;
+  box-shadow: 3px 3px 0 #1f2937;
+  color: #1f2937;
+  font-weight: 900;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.supply-rule-link {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.86rem;
+}
+
+.supply-inline-link {
+  padding: 0.42rem 0.72rem;
+  font-size: 0.78rem;
+}
+
+.supply-rule-link:active,
+.supply-inline-link:active {
+  box-shadow: 1px 1px 0 #1f2937;
+  transform: translate(2px, 2px);
+}
+
 @media (max-width: 980px) {
   .docs-center-body {
     grid-template-columns: minmax(0, 1fr);

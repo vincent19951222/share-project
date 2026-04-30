@@ -500,6 +500,24 @@ describe("SupplyStation", () => {
     expect(container.querySelector('a[href="/login"]')).not.toBeNull();
   });
 
+  it("links to the supply station docs rules", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot() })));
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    const ruleLink = Array.from(container.querySelectorAll("a")).find((link) =>
+      link.textContent?.includes("玩法规则"),
+    );
+
+    expect(ruleLink).toBeDefined();
+    expect(ruleLink?.getAttribute("href")).toBe("/docs?tab=rules#supply-station-rules");
+  });
+
   it("runs a lottery draw and renders the result", async () => {
     vi.stubGlobal(
       "fetch",
