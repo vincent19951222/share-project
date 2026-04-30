@@ -86,6 +86,28 @@ function createErrorResponse(status: number, body: unknown) {
   };
 }
 
+function gameWeeklySnapshot() {
+  return {
+    teamId: "team_1",
+    weekStartDayKey: "2026-04-20",
+    weekEndDayKey: "2026-04-26",
+    generatedAt: "2026-04-26T02:00:00.000Z",
+    published: false,
+    publishedDynamicId: null,
+    metrics: {},
+    metricCards: [
+      { key: "task-rate", label: "四维完成率", value: "50%", helper: "28/56 个任务完成", tone: "default" },
+      { key: "tickets-earned", label: "本周发券", value: "10", helper: "健身 5 · 四维 4 · 补券 1", tone: "highlight" },
+      { key: "draws", label: "抽奖次数", value: "3", helper: "单抽 2 · 十连 1", tone: "success" },
+      { key: "social-response", label: "弱社交响应", value: "100%", helper: "2/2 个邀请有回应", tone: "success" },
+    ],
+    summaryCards: [
+      { key: "rhythm", title: "补给站节奏", body: "本周四维任务完成率 50%。", tone: "default" },
+    ],
+    highlights: [],
+  };
+}
+
 function buildAdminState(): BoardState {
   return {
     ...initialState,
@@ -128,6 +150,9 @@ describe("ReportCenter", () => {
         if (String(input) === "/api/coffee/state") {
           return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
         }
+        if (String(input) === "/api/gamification/reports/weekly") {
+          return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
+        }
         if (String(input) === "/api/reports/weekly/draft") {
           return Promise.resolve(createJsonResponse({ draft: null }));
         }
@@ -164,6 +189,9 @@ describe("ReportCenter", () => {
     expect(container.textContent).toContain("活跃趋势");
     expect(container.textContent).toContain("咖啡能量站");
     expect(container.textContent).toContain("Daily Roast");
+    expect(container.textContent).toContain("牛马补给周报");
+    expect(container.textContent).toContain("四维完成率");
+    expect(container.textContent).toContain("本周发券");
     expect(container.textContent).toContain("今日全队 3 杯");
     expect(container.textContent).toContain("续命人数");
     expect(container.textContent).toContain("2/2");
@@ -206,6 +234,9 @@ describe("ReportCenter", () => {
       vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
         if (String(input) === "/api/coffee/state") {
           return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        }
+        if (String(input) === "/api/gamification/reports/weekly") {
+          return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
         }
         if (String(input) === "/api/reports/weekly/draft" && (!init?.method || init.method === "GET")) {
           return Promise.resolve(createJsonResponse({ draft: null }));

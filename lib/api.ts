@@ -5,6 +5,8 @@ import type {
   GamificationLotteryDrawSnapshot,
   GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
+  GamificationWeeklyReportPublishResult,
+  GamificationWeeklyReportSnapshot,
 } from "@/lib/types";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
 
@@ -188,6 +190,42 @@ export async function fetchGamificationState(): Promise<GamificationStateSnapsho
   });
 
   return readGamificationSnapshot(response);
+}
+
+export async function fetchGamificationWeeklyReport(
+  weekStartDayKey?: string,
+): Promise<GamificationWeeklyReportSnapshot> {
+  const search = weekStartDayKey
+    ? `?${new URLSearchParams({ weekStart: weekStartDayKey }).toString()}`
+    : "";
+  const response = await fetch(`/api/gamification/reports/weekly${search}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  const payload = await readApiResult<{
+    snapshot: GamificationWeeklyReportSnapshot;
+  }>(response, "获取牛马补给周报失败");
+
+  return payload.snapshot;
+}
+
+export async function publishGamificationWeeklyReportRequest(input: {
+  weekStartDayKey: string;
+  sendEnterpriseWechat: boolean;
+}): Promise<GamificationWeeklyReportPublishResult> {
+  const response = await fetch("/api/gamification/reports/weekly/publish", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+  const payload = await readApiResult<{
+    result: GamificationWeeklyReportPublishResult;
+  }>(response, "发布牛马补给周报失败");
+
+  return payload.result;
 }
 
 async function postGamificationAction(
