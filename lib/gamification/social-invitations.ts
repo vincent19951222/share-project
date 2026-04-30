@@ -1,7 +1,12 @@
-import { Prisma } from "@/lib/generated/prisma/client";
+import { Prisma, type SocialInvitationResponse } from "@/lib/generated/prisma/client";
 import type { ItemDefinition } from "@/content/gamification/types";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { getItemDefinition } from "@/lib/gamification/content";
+import {
+  buildSocialMomentDynamic,
+  buildTeamBroadcastDynamic,
+  safeCreateGameTeamDynamic,
+} from "@/lib/gamification/team-dynamics";
 import {
   sendEnterpriseWechatMessage,
   type EnterpriseWechatSendResult,
@@ -363,8 +368,25 @@ export async function createSocialInvitationFromItem(input: {
       itemUse: updatedItemUse,
       invitation,
       pushMessage,
+      senderName: sender.username,
     };
   });
+
+  const teamDynamic =
+    created.invitation.invitationType === "TEAM_BROADCAST"
+      ? await safeCreateGameTeamDynamic(
+          buildTeamBroadcastDynamic({
+            teamId: created.invitation.teamId,
+            senderUserId: input.userId,
+            senderName: created.senderName,
+            invitationId: created.invitation.id,
+            itemId: input.itemId,
+            message: created.invitation.message,
+            dayKey: created.invitation.dayKey,
+            occurredAt: created.invitation.createdAt,
+          }),
+        )
+      : { status: "SKIPPED" as const };
 
   const wechat = await sendWechatForInvitation({
     teamId: created.invitation.teamId,
@@ -389,6 +411,7 @@ export async function createSocialInvitationFromItem(input: {
     },
     invitation,
     wechat,
+    teamDynamic,
   };
 }
 
@@ -438,6 +461,9 @@ export async function respondToSocialInvitation(input: {
       invitationType: true,
       status: true,
       dayKey: true,
+      senderUser: {
+        select: { username: true },
+      },
     },
   });
 
@@ -461,8 +487,10 @@ export async function respondToSocialInvitation(input: {
     throw new SocialInvitationError("不能响应自己发起的全队邀请。", "RESPONDER_NOT_ALLOWED", 403);
   }
 
+  let response: SocialInvitationResponse;
+
   try {
-    return await prisma.$transaction(async (tx) => {
+    response = await prisma.$transaction(async (tx) => {
       const response = await tx.socialInvitationResponse.create({
         data: {
           invitationId: invitation.id,
@@ -494,4 +522,39 @@ export async function respondToSocialInvitation(input: {
 
     throw error;
   }
+
+  const responseCount = await prisma.socialInvitationResponse.count({
+    where: { invitationId: invitation.id },
+  });
+
+  if (invitation.recipientUserId === null && responseCount >= 2) {
+    const responders = await prisma.socialInvitationResponse.findMany({
+      where: { invitationId: invitation.id },
+      include: {
+        responderUser: {
+          select: { username: true },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    await safeCreateGameTeamDynamic(
+      buildSocialMomentDynamic({
+        teamId: invitation.teamId,
+        invitationId: invitation.id,
+        invitationType: invitation.invitationType,
+        senderUserId: invitation.senderUserId,
+        senderName: invitation.senderUser.username,
+        responseCount,
+        responders: responders.map((item) => ({
+          userId: item.responderUserId,
+          displayName: item.responderUser.username,
+        })),
+        dayKey: invitation.dayKey,
+        occurredAt: response.createdAt,
+      }),
+    );
+  }
+
+  return response;
 }

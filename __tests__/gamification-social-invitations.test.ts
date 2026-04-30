@@ -40,6 +40,7 @@ describe("gamification social invitations", () => {
 
     await prisma.socialInvitationResponse.deleteMany({ where: { teamId } });
     await prisma.socialInvitation.deleteMany({ where: { teamId } });
+    await prisma.teamDynamic.deleteMany({ where: { teamId } });
     await prisma.itemUseRecord.deleteMany({ where: { teamId } });
     await prisma.inventoryItem.deleteMany({ where: { teamId } });
     await prisma.enterpriseWechatSendLog.deleteMany({ where: { teamId } });
@@ -136,6 +137,30 @@ describe("gamification social invitations", () => {
       recipientUserId: null,
       status: "PENDING",
     });
+  });
+
+  it("writes a team broadcast dynamic when team broadcast coupon is used", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId: senderId, teamId, itemId: "team_broadcast_coupon", quantity: 1 },
+    });
+
+    const result = await createSocialInvitationFromItem({
+      userId: senderId,
+      itemId: "team_broadcast_coupon",
+      target: { message: "今天都站起来，别让椅子以为自己赢了。" },
+      fetchImpl: vi.fn().mockResolvedValue(wechatOk()),
+    });
+
+    const dynamic = await prisma.teamDynamic.findFirstOrThrow({
+      where: {
+        teamId,
+        type: "GAME_TEAM_BROADCAST",
+        sourceType: "social_invitation_broadcast",
+        sourceId: result.invitation.id,
+      },
+    });
+
+    expect(dynamic.summary).toContain("椅子");
   });
 
   it("rejects direct invitations without a recipient", async () => {
@@ -245,6 +270,50 @@ describe("gamification social invitations", () => {
       where: { invitationId: created.invitation.id },
     });
     expect(responseCount).toBe(2);
+  });
+
+  it("writes one social moment dynamic when a team-wide invitation reaches two responses", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId: senderId, teamId, itemId: "team_standup_ping", quantity: 1 },
+    });
+    const created = await createSocialInvitationFromItem({
+      userId: senderId,
+      itemId: "team_standup_ping",
+      target: {},
+      fetchImpl: vi.fn().mockResolvedValue(wechatOk()),
+    });
+
+    await respondToSocialInvitation({ userId: recipientId, invitationId: created.invitation.id });
+    await respondToSocialInvitation({ userId: thirdUserId, invitationId: created.invitation.id });
+
+    const count = await prisma.teamDynamic.count({
+      where: {
+        teamId,
+        type: "GAME_SOCIAL_MOMENT",
+        sourceType: "social_invitation_moment",
+        sourceId: created.invitation.id,
+      },
+    });
+    expect(count).toBe(1);
+  });
+
+  it("does not write social moment dynamic after only one team-wide response", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId: senderId, teamId, itemId: "team_standup_ping", quantity: 1 },
+    });
+    const created = await createSocialInvitationFromItem({
+      userId: senderId,
+      itemId: "team_standup_ping",
+      target: {},
+      fetchImpl: vi.fn().mockResolvedValue(wechatOk()),
+    });
+
+    await respondToSocialInvitation({ userId: recipientId, invitationId: created.invitation.id });
+
+    const count = await prisma.teamDynamic.count({
+      where: { teamId, type: "GAME_SOCIAL_MOMENT" },
+    });
+    expect(count).toBe(0);
   });
 
   it("expires old pending invitations", async () => {
