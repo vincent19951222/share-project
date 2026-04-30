@@ -1,6 +1,12 @@
 import type { RewardDefinition } from "@/content/gamification/types";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { getItemDefinition, getRewardDefinitions } from "@/lib/gamification/content";
+import {
+  buildRarePrizeDynamic,
+  type GameTeamDynamicResult,
+  safeCreateGameTeamDynamic,
+  shouldHighlightLotteryReward,
+} from "@/lib/gamification/team-dynamics";
 import { buildGamificationStateForUser } from "@/lib/gamification/state";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -40,6 +46,7 @@ interface DrawLotteryInput {
 interface DrawLotteryResult {
   snapshot: GamificationStateSnapshot;
   draw: GamificationLotteryDrawSnapshot;
+  teamDynamics: GameTeamDynamicResult[];
 }
 
 function getEnabledRewards() {
@@ -393,6 +400,55 @@ export async function drawLottery({
     return draw.id;
   });
 
+  const persistedDraw = await prisma.lotteryDraw.findUniqueOrThrow({
+    where: { id: drawId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          teamId: true,
+        },
+      },
+      results: {
+        orderBy: { position: "asc" },
+      },
+    },
+  });
+  const teamDynamics: GameTeamDynamicResult[] = [];
+
+  for (const result of persistedDraw.results) {
+    const rewardSnapshot = parseRewardSnapshot(result.rewardSnapshotJson);
+
+    if (
+      !shouldHighlightLotteryReward({
+        rewardTier: result.rewardTier,
+        rewardKind: result.rewardKind,
+      })
+    ) {
+      teamDynamics.push({ status: "SKIPPED" });
+      continue;
+    }
+
+    teamDynamics.push(
+      await safeCreateGameTeamDynamic(
+        buildRarePrizeDynamic({
+          teamId: persistedDraw.teamId,
+          userId: persistedDraw.user.id,
+          displayName: persistedDraw.user.username,
+          drawId: persistedDraw.id,
+          resultId: result.id,
+          rewardId: result.rewardId,
+          rewardName: rewardSnapshot.name,
+          rewardTier: result.rewardTier,
+          rewardKind: result.rewardKind,
+          dayKey,
+          occurredAt: persistedDraw.createdAt,
+        }),
+      ),
+    );
+  }
+
   const [draw, snapshot] = await Promise.all([
     buildDrawSnapshot(drawId),
     buildGamificationStateForUser(userId, now),
@@ -402,5 +458,5 @@ export async function drawLottery({
     throw new LotteryDrawError("用户不存在", 401);
   }
 
-  return { draw, snapshot };
+  return { draw, snapshot, teamDynamics };
 }

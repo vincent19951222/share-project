@@ -33,6 +33,7 @@ describe("POST /api/gamification/lottery/draw", () => {
 
     await prisma.lotteryDrawResult.deleteMany({});
     await prisma.lotteryDraw.deleteMany({});
+    await prisma.teamDynamic.deleteMany({ where: { teamId: user.teamId } });
     await prisma.lotteryTicketLedger.deleteMany({ where: { userId } });
     await prisma.inventoryItem.deleteMany({ where: { userId } });
     await prisma.user.update({
@@ -45,6 +46,7 @@ describe("POST /api/gamification/lottery/draw", () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.useRealTimers();
   });
 
@@ -82,6 +84,46 @@ describe("POST /api/gamification/lottery/draw", () => {
     expect(body.draw.rewards).toHaveLength(1);
     expect(body.snapshot.ticketBalance).toBe(0);
     expect(body.snapshot.lottery.recentDraws[0].id).toBe(body.draw.id);
+  });
+
+  it("writes a team dynamic when a rare reward is drawn", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { ticketBalance: 1 },
+    });
+    vi.spyOn(Math, "random").mockReturnValue(0.999);
+
+    const response = await POST(request(userId, { drawType: "SINGLE" }));
+    expect(response.status).toBe(200);
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const dynamic = await prisma.teamDynamic.findFirstOrThrow({
+      where: {
+        teamId: user.teamId,
+        type: "GAME_RARE_PRIZE",
+        sourceType: "lottery_draw_result",
+      },
+    });
+
+    expect(dynamic.title).toContain("瑞幸咖啡券");
+    expect(dynamic.actorUserId).toBe(userId);
+  });
+
+  it("does not write a team dynamic for common coin rewards", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { ticketBalance: 1 },
+    });
+    vi.spyOn(Math, "random").mockReturnValue(0.01);
+
+    const response = await POST(request(userId, { drawType: "SINGLE" }));
+    expect(response.status).toBe(200);
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const count = await prisma.teamDynamic.count({
+      where: { teamId: user.teamId, type: "GAME_RARE_PRIZE" },
+    });
+    expect(count).toBe(0);
   });
 
   it("runs a ten draw with top-up", async () => {
