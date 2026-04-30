@@ -249,6 +249,92 @@ export interface GamificationStateSnapshot {
   redemptions: GamificationRedemptionSectionSnapshot;
 }
 
+export interface GamificationWeeklyReportMetric {
+  key: string;
+  label: string;
+  value: string;
+  helper: string;
+  tone: "default" | "success" | "warning" | "highlight";
+}
+
+export interface GamificationWeeklyReportCard {
+  key: string;
+  title: string;
+  body: string;
+  tone: "default" | "success" | "warning" | "highlight";
+}
+
+export interface GamificationWeeklyReportHighlight {
+  id: string;
+  title: string;
+  summary: string;
+  sourceType: string;
+  sourceId: string;
+  occurredAt: string;
+}
+
+export interface GamificationWeeklyReportMetrics {
+  teamMemberCount: number;
+  daysInWindow: number;
+  expectedTaskCount: number;
+  completedTaskCount: number;
+  taskCompletionRate: number;
+  allFourCompletionDays: number;
+  fitnessTicketsEarned: number;
+  lifeTicketsEarned: number;
+  paidTicketsBought: number;
+  ticketsSpent: number;
+  netTicketChange: number;
+  drawCount: number;
+  singleDrawCount: number;
+  tenDrawCount: number;
+  coinSpent: number;
+  coinRewarded: number;
+  rareRewardCount: number;
+  realWorldRewardCount: number;
+  itemUseCount: number;
+  boostUseCount: number;
+  boostAssetBonusTotal: number;
+  boostSeasonBonusTotal: number;
+  leaveCouponUseCount: number;
+  pendingItemUseCount: number;
+  expiredItemUseCount: number;
+  socialInvitationCount: number;
+  directInvitationCount: number;
+  teamInvitationCount: number;
+  socialResponseCount: number;
+  socialResponseRate: number;
+  gameDynamicCount: number;
+  rarePrizeDynamicCount: number;
+  boostDynamicCount: number;
+  socialMomentDynamicCount: number;
+}
+
+export interface GamificationWeeklyReportSnapshot {
+  teamId: string;
+  weekStartDayKey: string;
+  weekEndDayKey: string;
+  generatedAt: string;
+  published: boolean;
+  publishedDynamicId: string | null;
+  metrics: GamificationWeeklyReportMetrics;
+  metricCards: GamificationWeeklyReportMetric[];
+  summaryCards: GamificationWeeklyReportCard[];
+  highlights: GamificationWeeklyReportHighlight[];
+}
+
+export interface GamificationWeeklyReportPublishResult {
+  snapshot: GamificationWeeklyReportSnapshot;
+  teamDynamic: {
+    status: "CREATED" | "EXISTING";
+    id: string;
+  };
+  wechat: {
+    status: "NOT_REQUESTED" | "SENT" | "SKIPPED" | "FAILED";
+    failureReason?: string;
+  };
+}
+
 export interface CoffeeMemberSnapshot {
   id: string;
   name: string;
