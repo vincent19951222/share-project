@@ -13,8 +13,12 @@ function normalizePathForUrl(dbPath: string) {
   return dbPath.replace(/\\/g, "/");
 }
 
+function isAbsoluteSqlitePath(inputPath: string) {
+  return path.isAbsolute(inputPath) || /^[A-Za-z]:[\\/]/.test(inputPath);
+}
+
 function resolvePathInput(inputPath: string) {
-  return path.isAbsolute(inputPath)
+  return isAbsoluteSqlitePath(inputPath)
     ? path.normalize(inputPath)
     : path.resolve(process.cwd(), inputPath);
 }

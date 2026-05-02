@@ -1,191 +1,218 @@
 # Production Release Checklist
 
-> 适用于当前 `share-project` 的 SQLite + Prisma 发布流程。
+> 适用于 `share-project` 当前 Next.js + Prisma + SQLite + PM2 发布流程。目标是把代码发布到生产目录，同时保护 `prod.db`。
 
-## Purpose
+## Release Target
 
-这份清单只解决一件事：
-
-把 `main` 上的新代码和新 migration 安全发布到服务器，同时保住线上已有数据。
-
-## Before You Start
-
-发布前先确认：
-
-- 已经合并到 `main`
-- `prisma/schema.prisma` 和 `prisma/migrations` 已经进入仓库
-- 本地已经至少跑过一次构建或关键测试
-- 服务器上的生产数据库不在仓库目录里
-
-推荐目标结构：
-
-Windows:
+Windows 生产约定：
 
 ```text
-repo:
-  E:\Projects\share-project
-
-prod db:
-  E:\data\share-project\prod.db
+code: E:\Projects\share-project
+db:   E:\data\share-project\prod.db
+env:  DATABASE_URL="file:/E:/data/share-project/prod.db"
 ```
 
-Linux:
+本地开发 / 验收约定：
 
 ```text
-repo:
-  /srv/share-project
-
-prod db:
-  /srv/share-project-data/prod.db
+db:   /Users/vincent/data/share-project/dev.db
+env:  DATABASE_URL="file:/Users/vincent/data/share-project/dev.db"
 ```
 
-## Release Flow
+不要把本地 `dev.db`、验收 seed、`scripts/fill-gamification-test-data.ts` 写到生产库。
 
-```text
-[merge to main]
-       |
-       v
-[backup prod db]
-       |
-       v
-[git pull origin main]
-       |
-       v
-[npx prisma migrate deploy]
-       |
-       v
-[npx prisma generate]
-       |
-       v
-[npm run build]
-       |
-       v
-[restart app]
-       |
-       v
-[smoke check]
-```
+## Pre-Release Gate
 
-## Linux Example
-
-### 1. Backup database
+发布前在本地或预发布分支完成：
 
 ```bash
-mkdir -p /srv/share-project-data/backups
-cp /srv/share-project-data/prod.db /srv/share-project-data/backups/prod-$(date +%F-%H%M%S).db
-```
-
-### 2. Pull latest code
-
-```bash
-cd /srv/share-project
-git pull origin main
-```
-
-### 3. Run migration
-
-```bash
-npx prisma migrate deploy
-npx prisma generate
-```
-
-### 4. Build app
-
-```bash
-npm install
+npm test
+npm run lint
 npm run build
 ```
 
-### 5. Restart app
-
-如果你们用 `pm2`：
+如果涉及数据库结构变化，在测试库先执行：
 
 ```bash
-pm2 restart share-project
+npx prisma db push
+npx tsx prisma/seed.ts
+npx tsx scripts/fill-gamification-test-data.ts
 ```
 
-如果你们用 `systemd`：
+通过后再考虑生产发布。生产环境不要执行 `prisma/seed.ts` 或验收数据填充脚本。
 
-```bash
-sudo systemctl restart share-project
+## Production Flow
+
+```text
+[confirm release commit]
+       |
+       v
+[backup prod.db]
+       |
+       v
+[pull code in production repo]
+       |
+       v
+[install dependencies]
+       |
+       v
+[sync prisma schema if needed]
+       |
+       v
+[build]
+       |
+       v
+[restart PM2 with production DATABASE_URL]
+       |
+       v
+[post-release smoke]
 ```
 
-### 6. Smoke check
+## Windows Commands
 
-检查以下内容：
+### 1. Confirm Production Env
 
-- 首页能打开
-- 登录可用
-- 主要页面可进入
-- 新功能涉及的数据结构正常工作
-- 服务器日志没有 Prisma migration 错误
+确认生产启动时使用：
 
-## Windows Example
+```powershell
+$env:DATABASE_URL="file:/E:/data/share-project/prod.db"
+```
 
-### 1. Backup database
+PM2 重启时也必须带上 `--update-env`，否则可能继续使用旧环境变量。
+
+### 2. Backup `prod.db`
+
+发布前必须备份：
 
 ```powershell
 New-Item -ItemType Directory -Force E:\data\share-project\backups
 Copy-Item E:\data\share-project\prod.db E:\data\share-project\backups\prod-$(Get-Date -Format "yyyy-MM-dd-HHmmss").db
 ```
 
-### 2. Pull latest code
+确认备份文件存在且大小合理：
+
+```powershell
+Get-ChildItem E:\data\share-project\backups | Sort-Object LastWriteTime -Descending | Select-Object -First 3
+```
+
+### 3. Pull Code
 
 ```powershell
 Set-Location E:\Projects\share-project
+git status
 git pull origin main
 ```
 
-### 3. Run migration
+如果这次先发预发布分支，把 `main` 换成对应分支名。
 
-```powershell
-npx prisma migrate deploy
-npx prisma generate
-```
-
-### 4. Build app
+### 4. Install Dependencies
 
 ```powershell
 npm install
+```
+
+### 5. Sync Prisma Schema
+
+如果 `prisma/schema.prisma` 相比生产当前版本有变化，先确认已经备份 `prod.db`，再执行：
+
+```powershell
+npx prisma db push
+npx prisma generate
+```
+
+如果本次只是前端、文案或纯业务逻辑变更，且 schema 没有变化，可以跳过 `db push`，但仍建议执行：
+
+```powershell
+npx prisma generate
+```
+
+注意：
+
+- 当前项目本地开发约定使用 `npx prisma db push` 同步 SQLite schema。
+- 不要在生产执行 `npx tsx prisma/seed.ts`。
+- 不要在生产执行 `npx tsx scripts/fill-gamification-test-data.ts`。
+
+### 6. Build
+
+```powershell
 npm run build
 ```
 
-### 5. Restart app
+构建失败不要重启生产服务，先修复构建问题。
 
-按你们当前的服务启动方式重启应用。
+### 7. Start Or Restart PM2
 
-### 6. Smoke check
+首次启动：
 
-至少确认：
+```powershell
+cmd /c "set DATABASE_URL=file:/E:/data/share-project/prod.db && pm2 start node_modules\next\dist\bin\next --name share-project -- start -p 3000"
+```
 
-- 页面能打开
-- 登录可用
-- 控制台没有 migration 报错
+已有服务重启：
+
+```powershell
+cmd /c "set DATABASE_URL=file:/E:/data/share-project/prod.db && pm2 restart share-project --update-env"
+```
+
+检查状态和日志：
+
+```powershell
+pm2 status
+pm2 logs share-project --lines 100
+```
+
+## Post-Release Smoke
+
+优先做不破坏生产数据的检查：
+
+- [ ] 打开 `/login`，页面无 500。
+- [ ] 使用已有账号登录成功。
+- [ ] 主面板能加载打卡、共享看板、咖啡、日历、战报中心、补给站入口。
+- [ ] 补给站能加载四维任务、抽奖券余额、背包、弱社交和兑换状态。
+- [ ] 团队动态能加载，不出现 Prisma schema 或 missing column 报错。
+- [ ] 战报中心能读取周报快照。
+- [ ] 管理员账号能看到兑换待处理队列。
+
+如果有专门的生产测试账号，再做可变更数据的 smoke：
+
+- [ ] 测试账号完成一次今日打卡，确认银子和抽奖券到账。
+- [ ] 测试账号在券不足 10 张但银子足够时，补券十连能按 `40 银子 / 张` 扣费。
+- [ ] 测试账号申请一次真实福利兑换。
+- [ ] 管理员确认或取消该兑换。
+- [ ] 管理员发布本周牛马补给周报，重复发布应复用同一条 Team Dynamic。
 
 ## Rollback Rule
 
-如果 migration 或启动失败：
+如果发布后出现启动失败、schema 错误或数据异常：
 
 ```text
-do not overwrite prod db with a local dev db
-restore from backup first
+stop writes first
+restore prod.db from the release backup
+roll back code to the previous commit
+restart PM2 with production DATABASE_URL
+run smoke again
 ```
 
-回滚优先级：
+不要用本地 `dev.db` 覆盖生产 `prod.db`。
 
-1. 停止继续写入线上库
-2. 回退代码版本
-3. 用刚才的备份恢复生产数据库
-4. 重新启动服务
+Windows 恢复示例：
 
-## Final Reminder
+```powershell
+pm2 stop share-project
+Copy-Item E:\data\share-project\backups\<backup-file>.db E:\data\share-project\prod.db -Force
+Set-Location E:\Projects\share-project
+git checkout <previous-good-commit>
+npm install
+npm run build
+cmd /c "set DATABASE_URL=file:/E:/data/share-project/prod.db && pm2 restart share-project --update-env"
+```
 
-发布时真正上线的是：
+## Final Checks
 
-- code
-- schema
-- migrations
-
-不是：
-
-- 某个人本地的 `dev.db`
+- [ ] 当前代码 commit / branch 已记录。
+- [ ] `prod.db` 已备份。
+- [ ] 生产 `DATABASE_URL` 指向 `file:/E:/data/share-project/prod.db`。
+- [ ] 生产未执行 seed 或验收数据脚本。
+- [ ] `npm run build` 在生产通过。
+- [ ] PM2 使用 `--update-env` 重启。
+- [ ] 发布后 smoke 通过。
