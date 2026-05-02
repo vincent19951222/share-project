@@ -1,6 +1,6 @@
 # Gamification Acceptance Checklist
 
-> 目标：用一份固定测试数据，把 GM-01 到 GM-16 的主链路验收到“能闭环、能解释、能运营观察”的状态。
+> 目标：用一份固定测试数据，把 GM-01 到 GM-17 的主链路验收到“能闭环、能解释、能运营观察”的状态。
 
 ## 测试环境
 
@@ -229,6 +229,12 @@ select status, count(*) from RealWorldRedemption group by status;
 
 管理员账号：`li / 0000`。
 
+- [ ] 进入 `/admin` 后能先看到“运营观察”，再看到“赛季设置”。
+- [ ] “运营观察”显示当前 7 天窗口、抽奖券净变化、抽奖次数、待处理兑换、弱社交响应率、真实福利产出、企微失败。
+- [ ] 风险卡能显示资产一致性、抽奖券囤积、兑换处理、弱社交频率、真实福利成本、企业微信发送六类观察结果。
+- [ ] 待处理兑换队列能看到待管理员处理的真实福利申请，且只读展示不改变兑换状态。
+- [ ] 高频点名关系、抽奖券余额排行、银子余额排行能正常展示。
+- [ ] 点击“刷新观察”后面板重新加载，不创建抽奖、兑换、动态或企业微信记录。
 - [ ] 管理员可以看到兑换待处理队列。
 - [ ] 管理员可以确认兑换。
 - [ ] 管理员可以取消兑换并返还库存。
@@ -240,15 +246,17 @@ select status, count(*) from RealWorldRedemption group by status;
 建议接口级复查：
 
 ```bash
-npm test -- __tests__/gamification-redemption-api.test.ts __tests__/gamification-weekly-report-api.test.ts
+npm test -- __tests__/gamification-ops-dashboard-api.test.ts __tests__/gamification-redemption-api.test.ts __tests__/gamification-weekly-report-api.test.ts
 ```
 
 ## 4. 文档总表更新
 
-- [ ] `docs/gamification-dev-roadmap.md` 当前状态表包含 GM-16。
+- [ ] `docs/gamification-dev-roadmap.md` 当前状态表包含 GM-17。
 - [ ] 文档中有 `## GM-16: Card Pool Tuning` 章节。
+- [ ] 文档中有 `## GM-17: Ops Dashboard` 章节。
 - [ ] 相关文档列表包含 GM-16 spec 和 plan。
-- [ ] 更新记录包含 `2026-05-02: GM-16 完成`。
+- [ ] 相关文档列表包含 GM-17 spec 和 plan。
+- [ ] 更新记录包含 `2026-05-02: GM-16 完成` 和 `2026-05-02: GM-17 完成`。
 - [ ] 本验收 checklist 路径可被团队成员找到：`docs/gamification-acceptance-checklist.md`。
 
 ## 5. 奖池 / 道具 / 兑换运营风险清单
@@ -264,6 +272,8 @@ npm test -- __tests__/gamification-redemption-api.test.ts __tests__/gamification
 | 企业微信失败 | 本地邀请成功但群里没提醒 | 检查 `EnterpriseWechatSendLog`，未配置 webhook 时接受 `SKIPPED` |
 | boost 滥用 | 单用户短期大量使用强 boost | 当前有每日 / 每周限制；验收时确认强 boost 一周最多一次 |
 | 兑换取消争议 | 管理员取消后用户不清楚库存是否返还 | 检查 `InventoryItem` 数量和兑换状态文案 |
+| 观察面板误当修复工具 | 管理员看到风险后以为系统已自动修复 | GM-17 只读；资产修复、阈值配置、奖池调整放到后续 GM |
+| 观察窗口误读 | 近 7 天指标被当成全量历史 | 面板标题显示窗口范围；涉及资产一致性时同时使用全量可重算流水 |
 | 测试库误操作生产库 | seed / acceptance 脚本写到了生产库 | 脚本已限制目标路径；执行前确认 `.env` 指向 `/Users/vincent/data/share-project/dev.db` |
 
 ## 上线前判定
@@ -274,6 +284,7 @@ npm test -- __tests__/gamification-redemption-api.test.ts __tests__/gamification
 - 经济数据校验无无法解释的差额。
 - 管理员兑换和周报发布流程通过。
 - GM-16 文档和奖池校验测试通过。
+- GM-17 运营观察面板、API 权限和只读刷新通过。
 
 可带观察上线：
 
@@ -281,6 +292,7 @@ npm test -- __tests__/gamification-redemption-api.test.ts __tests__/gamification
 - 抽奖券囤积。
 - 真实福利履约节奏。
 - 弱社交使用频率。
+- GM-17 风险卡里的 watch 项。
 
 不建议上线：
 
@@ -288,3 +300,4 @@ npm test -- __tests__/gamification-redemption-api.test.ts __tests__/gamification
 - 抽奖能产出当前不能使用、不能兑换、也没有明确展示状态的 active 奖励。
 - 管理员无法处理真实福利兑换。
 - 周报发布会改变用户资产或重复创建同周动态。
+- 运营观察刷新会修改用户资产、兑换状态、团队动态或企业微信发送日志。

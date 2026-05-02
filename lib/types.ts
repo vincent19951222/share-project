@@ -335,6 +335,91 @@ export interface GamificationWeeklyReportPublishResult {
   };
 }
 
+export type GamificationOpsRiskSeverity = "ok" | "watch" | "risk";
+
+export interface GamificationOpsWindow {
+  startDayKey: string;
+  endDayKey: string;
+  days: number;
+  generatedAt: string;
+}
+
+export interface GamificationOpsMetricCard {
+  key: string;
+  label: string;
+  value: string;
+  helper: string;
+  tone: "default" | "success" | "warning" | "danger" | "highlight";
+}
+
+export interface GamificationOpsRiskCard {
+  key: string;
+  title: string;
+  summary: string;
+  severity: GamificationOpsRiskSeverity;
+  detailItems: string[];
+}
+
+export interface GamificationOpsPendingRedemption {
+  id: string;
+  userId: string;
+  username: string;
+  itemId: string;
+  itemName: string;
+  requestedAt: string;
+  ageDays: number;
+}
+
+export interface GamificationOpsLeaderboardItem {
+  userId: string;
+  username: string;
+  value: number;
+  helper: string;
+}
+
+export interface GamificationOpsRepeatedDirectInvitation {
+  senderUserId: string;
+  senderUsername: string;
+  recipientUserId: string;
+  recipientUsername: string;
+  count: number;
+}
+
+export interface GamificationOpsMetrics {
+  teamMemberCount: number;
+  windowDays: number;
+  totalTicketBalance: number;
+  totalCoinBalance: number;
+  ticketsEarned: number;
+  ticketsSpent: number;
+  netTicketChange: number;
+  lotteryDrawCount: number;
+  lotteryCoinSpent: number;
+  lotteryCoinRewarded: number;
+  realWorldRewardCount: number;
+  pendingRedemptionCount: number;
+  overdueRedemptionCount: number;
+  socialInvitationCount: number;
+  socialResponseCount: number;
+  socialResponseRate: number;
+  repeatedDirectInvitationPairCount: number;
+  wechatFailureCount: number;
+  ticketBalanceMismatchCount: number;
+  coinBalanceMismatchCount: number;
+}
+
+export interface GamificationOpsDashboardSnapshot {
+  teamId: string;
+  window: GamificationOpsWindow;
+  metrics: GamificationOpsMetrics;
+  metricCards: GamificationOpsMetricCard[];
+  risks: GamificationOpsRiskCard[];
+  pendingRedemptions: GamificationOpsPendingRedemption[];
+  topTicketBalances: GamificationOpsLeaderboardItem[];
+  topCoinBalances: GamificationOpsLeaderboardItem[];
+  repeatedDirectInvitations: GamificationOpsRepeatedDirectInvitation[];
+}
+
 export interface CoffeeMemberSnapshot {
   id: string;
   name: string;

@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { GamificationOpsDashboard } from "@/components/admin/GamificationOpsDashboard";
 import { SeasonAdminPanel } from "@/components/admin/SeasonAdminPanel";
+import { buildGamificationOpsDashboard } from "@/lib/gamification/ops-dashboard";
 import { listSeasonsForTeam } from "@/lib/season-service";
 import { isAdminUser, loadCurrentUser } from "@/lib/session";
 
@@ -12,10 +14,14 @@ export default async function AdminPage() {
     redirect("/");
   }
 
-  const seasons = await listSeasonsForTeam(user.teamId);
+  const [seasons, opsSnapshot] = await Promise.all([
+    listSeasonsForTeam(user.teamId),
+    buildGamificationOpsDashboard({ teamId: user.teamId }),
+  ]);
 
   return (
-    <div className="p-4">
+    <div className="flex flex-col gap-4 p-4">
+      <GamificationOpsDashboard initialSnapshot={opsSnapshot} />
       <SeasonAdminPanel initialSeasons={seasons} />
     </div>
   );
