@@ -1,6 +1,6 @@
 # Gamification Acceptance Checklist
 
-> 目标：用一份固定测试数据，把 GM-01 到 GM-18 的主链路验收到“能闭环、能解释、能运营观察”的状态。
+> 目标：用一份固定测试数据，把 GM-01 到 GM-19 的主链路验收到“能闭环、能解释、能运营观察”的状态。
 
 ## 测试环境
 
@@ -110,6 +110,8 @@ npm run dev
 - [ ] 如果抽到道具，背包对应库存增加。
 - [ ] 如果抽到银子，用户银子增加。
 - [ ] 最近抽奖记录能在补给站抽奖区看到归档提示。
+- [ ] 点击抽奖机区域的“查看抽奖概率”，能跳到 `/docs?tab=rules#supply-station-probability`。
+- [ ] 抽奖概率说明显示 active 总权重 100、分层权重、直接银子期望和 active rewards。
 
 通过标准：
 
@@ -259,14 +261,18 @@ npm test -- __tests__/gamification-config-observatory-api.test.ts __tests__/gami
 
 - [ ] `docs/gamification-dev-roadmap.md` 当前状态表包含 GM-17。
 - [ ] `docs/gamification-dev-roadmap.md` 当前状态表包含 GM-18。
+- [ ] `docs/gamification-dev-roadmap.md` 当前状态表包含 GM-19。
 - [ ] 文档中有 `## GM-16: Card Pool Tuning` 章节。
 - [ ] 文档中有 `## GM-17: Ops Dashboard` 章节。
 - [ ] 文档中有 `## GM-18: Config Observatory` 章节。
+- [ ] 文档中有 `## GM-19: Probability Disclosure` 章节。
 - [ ] 相关文档列表包含 GM-16 spec 和 plan。
 - [ ] 相关文档列表包含 GM-17 spec 和 plan。
 - [ ] 相关文档列表包含 GM-18 spec 和 plan。
+- [ ] 相关文档列表包含 GM-19 spec 和 plan。
 - [ ] 更新记录包含 `2026-05-02: GM-16 完成` 和 `2026-05-02: GM-17 完成`。
 - [ ] 更新记录包含 `2026-05-02: GM-18 完成`。
+- [ ] 更新记录包含 `2026-05-02: GM-19 完成`。
 - [ ] 本验收 checklist 路径可被团队成员找到：`docs/gamification-acceptance-checklist.md`。
 
 ## 5. 奖池 / 道具 / 兑换运营风险清单
@@ -286,6 +292,8 @@ npm test -- __tests__/gamification-config-observatory-api.test.ts __tests__/gami
 | 观察窗口误读 | 近 7 天指标被当成全量历史 | 面板标题显示窗口范围；涉及资产一致性时同时使用全量可重算流水 |
 | 配置总览误当编辑后台 | 管理员以为能在页面直接改奖池或任务卡 | GM-18 只读；配置变更仍通过代码评审和发布流程 |
 | 禁用奖励被误解为废弃 | disabled rewards 仍在配置总览出现 | 面板明确区分 active / disabled，历史抽奖快照仍可解释 |
+| 概率披露与实际奖池不一致 | 文档写死概率，奖池代码已变 | GM-19 概率明细从 reward pool helper 推导，不手抄奖励列表 |
+| 用户误解权重为承诺出货 | 单次抽奖结果和百分比不一致 | 文档说明权重是长期近似概率，单抽不保证 |
 | 测试库误操作生产库 | seed / acceptance 脚本写到了生产库 | 脚本已限制目标路径；执行前确认 `.env` 指向 `/Users/vincent/data/share-project/dev.db` |
 
 ## 上线前判定
@@ -298,6 +306,7 @@ npm test -- __tests__/gamification-config-observatory-api.test.ts __tests__/gami
 - GM-16 文档和奖池校验测试通过。
 - GM-17 运营观察面板、API 权限和只读刷新通过。
 - GM-18 配置总览、API 权限和只读刷新通过。
+- GM-19 抽奖概率说明、Docs Center 深链和补给站概率入口通过。
 
 可带观察上线：
 
