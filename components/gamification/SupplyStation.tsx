@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getRewardAsset } from "@/content/gamification/reward-assets";
+import { REWARD_DEFINITIONS } from "@/content/gamification/reward-pool";
 import type { RewardDefinition, RewardRarity, RewardTier } from "@/content/gamification/types";
 import {
   ApiError,
@@ -25,7 +26,6 @@ import type {
   GamificationStateSnapshot,
   SocialInvitationSnapshot,
 } from "@/lib/types";
-import { getRewardDefinitions } from "@/lib/gamification/content";
 import { RewardTile } from "./RewardTile";
 
 function getSupplyErrorMessage(caught: unknown) {
@@ -36,7 +36,14 @@ function getSupplyErrorMessage(caught: unknown) {
   return caught instanceof Error ? caught.message : "牛马补给站加载失败，稍后再试。";
 }
 
-const rewardById = new Map(getRewardDefinitions().map((reward) => [reward.id, reward]));
+const rewardById = new Map(REWARD_DEFINITIONS.map((reward) => [reward.id, reward]));
+const rewardByItemId = new Map(
+  REWARD_DEFINITIONS.flatMap((reward) =>
+    reward.effect.type === "grant_item" || reward.effect.type === "grant_real_world_redemption"
+      ? [[reward.effect.itemId, reward] as const]
+      : [],
+  ),
+);
 
 const fallbackRarityByTier: Record<string, RewardRarity> = {
   coin: "common",
@@ -57,13 +64,7 @@ function getDrawRewardDefinition(rewardId: string): RewardDefinition | null {
 }
 
 function getBackpackRewardDefinition(itemId: string): RewardDefinition | null {
-  return (
-    getRewardDefinitions().find(
-      (reward) =>
-        (reward.effect.type === "grant_item" || reward.effect.type === "grant_real_world_redemption") &&
-        reward.effect.itemId === itemId,
-    ) ?? null
-  );
+  return rewardByItemId.get(itemId) ?? null;
 }
 
 function StatCard({
