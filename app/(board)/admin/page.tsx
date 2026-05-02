@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { GamificationConfigObservatory } from "@/components/admin/GamificationConfigObservatory";
 import { GamificationOpsDashboard } from "@/components/admin/GamificationOpsDashboard";
 import { SeasonAdminPanel } from "@/components/admin/SeasonAdminPanel";
@@ -23,10 +24,10 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <GamificationOpsDashboard initialSnapshot={opsSnapshot} />
-      <GamificationConfigObservatory initialSnapshot={configSnapshot} />
-      <SeasonAdminPanel initialSeasons={seasons} />
-    </div>
+    <AdminPageShell
+      opsPanel={<GamificationOpsDashboard initialSnapshot={opsSnapshot} />}
+      configPanel={<GamificationConfigObservatory initialSnapshot={configSnapshot} />}
+      seasonPanel={<SeasonAdminPanel initialSeasons={seasons} />}
+    />
   );
 }
