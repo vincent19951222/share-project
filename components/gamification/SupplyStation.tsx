@@ -105,18 +105,6 @@ function DimensionCard({
   );
 }
 
-function PlaceholderButton({ children }: { children: string }) {
-  return (
-    <button
-      type="button"
-      disabled
-      className="cursor-not-allowed rounded-full border-[3px] border-slate-300 bg-slate-100 px-4 py-2 text-sm font-black text-slate-400"
-    >
-      {children}
-    </button>
-  );
-}
-
 function isSocialItem(item: GamificationBackpackItemSnapshot | null) {
   return item?.category === "social" && item.useTiming === "instant";
 }
@@ -281,7 +269,7 @@ function TodayEffectsPanel({
   if (effects.length === 0) {
     return (
       <div className="rounded-[1rem] border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-xs font-black text-slate-500">
-        今天还没有待生效道具。GM-08 后可以先用道具，再去健身触发结算。
+        今天还没有待生效道具。可以先使用暴击券，再去真实健身触发结算。
       </div>
     );
   }
@@ -1023,19 +1011,6 @@ export function SupplyStation() {
               />
             ) : null}
 
-            {false ? (
-            <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
-              <h2 className="text-2xl font-black text-slate-950">弱社交雷达</h2>
-              <p className="mt-2 text-sm font-bold text-slate-500">{snapshot!.social.message}</p>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-center text-sm font-black">
-                <div className="rounded-[1rem] bg-orange-100 p-3">我发出的 {snapshot!.social.pendingSentCount}</div>
-                <div className="rounded-[1rem] bg-sky-100 p-3">我收到的 {snapshot!.social.pendingReceivedCount}</div>
-              </div>
-              <div className="mt-4">
-                <PlaceholderButton>响应 GM-12</PlaceholderButton>
-              </div>
-            </section>
-            ) : null}
           </aside>
         </main>
       </div>
