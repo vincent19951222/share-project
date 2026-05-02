@@ -1153,12 +1153,14 @@ body {
 .reward-tile-name {
   z-index: 1;
   width: 100%;
+  overflow: hidden;
   border-top: 1px solid color-mix(in srgb, var(--reward-tile-border, #111827) 45%, transparent);
   background: color-mix(in srgb, var(--reward-tile-border, #e5e7eb) 14%, #ffffff);
   padding: 0.25rem 0.2rem 0.28rem;
   font-size: 0.72rem;
   line-height: 1.05;
   text-align: center;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
