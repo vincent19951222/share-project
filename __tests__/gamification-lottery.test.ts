@@ -55,7 +55,8 @@ describe("gamification lottery", () => {
     await prisma.$disconnect();
   });
 
-  it("keeps direct coin expected value below one ticket price", () => {
+  it("keeps the GM-16 direct coin expected value at 8.75", () => {
+    expect(getDirectCoinExpectedValue()).toBeCloseTo(8.75, 5);
     expect(getDirectCoinExpectedValue()).toBeLessThan(40);
   });
 
@@ -243,11 +244,15 @@ describe("gamification lottery", () => {
       where: { id: result.draw.id },
       include: { results: true },
     });
-    const tiers = draw.results.map((item) => item.rewardTier);
+    const nonCoinResults = draw.results.filter((item) => item.rewardTier !== "coin");
+    const nonCoinSnapshots = result.draw.rewards.filter((reward) => reward.rewardTier !== "coin");
 
     expect(draw.guaranteeApplied).toBe(true);
-    expect(tiers.some((tier) => ["utility", "social", "rare"].includes(tier))).toBe(true);
+    expect(nonCoinResults).toHaveLength(1);
+    expect(nonCoinResults[0]?.rewardTier).toBe("utility");
     expect(result.draw.guaranteeApplied).toBe(true);
+    expect(nonCoinSnapshots).toHaveLength(1);
+    expect(nonCoinSnapshots[0]?.rewardTier).toBe("utility");
   });
 
   it("grants inventory for item rewards", async () => {
@@ -264,5 +269,34 @@ describe("gamification lottery", () => {
 
     const inventory = await prisma.inventoryItem.findMany({ where: { userId } });
     expect(inventory.reduce((sum, item) => sum + item.quantity, 0)).toBeGreaterThanOrEqual(1);
+  });
+
+  it("grants inventory for the GM-16 season sprint rare reward", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { ticketBalance: 1 },
+    });
+
+    const result = await drawLottery({
+      userId,
+      drawType: "SINGLE",
+      rng: sequenceRng([0.985]),
+    });
+
+    const inventory = await prisma.inventoryItem.findUniqueOrThrow({
+      where: {
+        userId_itemId: {
+          userId,
+          itemId: "season_sprint_coupon",
+        },
+      },
+    });
+
+    expect(result.draw.rewards[0]).toMatchObject({
+      rewardId: "reward_season_sprint",
+      rewardTier: "rare",
+      rewardKind: "inventory_item",
+    });
+    expect(inventory.quantity).toBe(1);
   });
 });
