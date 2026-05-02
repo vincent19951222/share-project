@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getRewardAsset } from "@/content/gamification/reward-assets";
+import type { RewardDefinition, RewardRarity, RewardTier } from "@/content/gamification/types";
 import {
   ApiError,
   cancelRealWorldRedemption,
@@ -23,6 +25,8 @@ import type {
   GamificationStateSnapshot,
   SocialInvitationSnapshot,
 } from "@/lib/types";
+import { getRewardDefinitions } from "@/lib/gamification/content";
+import { RewardTile } from "./RewardTile";
 
 function getSupplyErrorMessage(caught: unknown) {
   if (caught instanceof ApiError && caught.status === 401) {
@@ -30,6 +34,36 @@ function getSupplyErrorMessage(caught: unknown) {
   }
 
   return caught instanceof Error ? caught.message : "牛马补给站加载失败，稍后再试。";
+}
+
+const rewardById = new Map(getRewardDefinitions().map((reward) => [reward.id, reward]));
+
+const fallbackRarityByTier: Record<string, RewardRarity> = {
+  coin: "common",
+  utility: "uncommon",
+  social: "common",
+  cosmetic: "common",
+  rare: "epic",
+};
+
+function normalizeRewardTier(tier: string): RewardTier {
+  return tier === "coin" || tier === "utility" || tier === "social" || tier === "cosmetic" || tier === "rare"
+    ? tier
+    : "coin";
+}
+
+function getDrawRewardDefinition(rewardId: string): RewardDefinition | null {
+  return rewardById.get(rewardId) ?? null;
+}
+
+function getBackpackRewardDefinition(itemId: string): RewardDefinition | null {
+  return (
+    getRewardDefinitions().find(
+      (reward) =>
+        (reward.effect.type === "grant_item" || reward.effect.type === "grant_real_world_redemption") &&
+        reward.effect.itemId === itemId,
+    ) ?? null
+  );
 }
 
 function StatCard({
@@ -883,11 +917,33 @@ export function SupplyStation() {
                     {latestDraw.guaranteeApplied ? "，触发十连保底" : ""}
                   </div>
                   <div className="mt-2 grid gap-2">
-                    {latestDraw.rewards.map((reward, index) => (
-                      <div key={`${latestDraw.id}-${index}`} className="rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-700">
-                        {index + 1}. {reward.name} / {reward.effectSummary}
-                      </div>
-                    ))}
+                    {latestDraw.rewards.map((reward, index) => {
+                      const definition = getDrawRewardDefinition(reward.rewardId);
+                      const asset = definition ? getRewardAsset(definition) : null;
+                      const tier = normalizeRewardTier(reward.rewardTier);
+
+                      return (
+                        <div
+                          key={`${latestDraw.id}-${index}`}
+                          className="flex items-center gap-3 rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-700"
+                        >
+                          <RewardTile
+                            name={reward.name}
+                            rewardTier={tier}
+                            rarity={definition?.rarity ?? fallbackRarityByTier[tier]}
+                            iconSrc={asset?.status === "generated" ? asset.src : null}
+                            iconAlt={asset?.alt ?? reward.name}
+                            size="draw-result"
+                          />
+                          <div>
+                            <div>
+                              {index + 1}. {reward.name}
+                            </div>
+                            <div className="mt-1 text-slate-500">{reward.effectSummary}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ) : (
@@ -941,14 +997,33 @@ export function SupplyStation() {
                                 key={item.itemId}
                                 type="button"
                                 onClick={() => setSelectedBackpackItemId(item.itemId)}
-                                className={`flex items-center justify-between rounded-[0.85rem] border-2 px-3 py-2 text-left text-sm font-black transition ${
+                                className={`flex items-center justify-between gap-3 rounded-[0.85rem] border-2 px-3 py-2 text-left text-sm font-black transition ${
                                   isSelected
                                     ? "border-slate-900 bg-yellow-200 shadow-[0_3px_0_0_#1f2937]"
                                     : "border-slate-200 bg-white text-slate-700"
                                 }`}
                               >
-                                <span>{item.name}</span>
-                                <span>x{item.quantity}</span>
+                                {(() => {
+                                  const definition = getBackpackRewardDefinition(item.itemId);
+                                  const asset = definition ? getRewardAsset(definition) : null;
+                                  const tier = definition?.tier ?? "utility";
+
+                                  return (
+                                    <>
+                                      <RewardTile
+                                        name={item.name}
+                                        rewardTier={tier}
+                                        rarity={definition?.rarity ?? fallbackRarityByTier[tier]}
+                                        iconSrc={asset?.status === "generated" ? asset.src : null}
+                                        iconAlt={asset?.alt ?? item.name}
+                                        quantity={item.quantity}
+                                        selected={isSelected}
+                                      />
+                                      <span className="min-w-0 flex-1">{item.name}</span>
+                                      <span>x{item.quantity}</span>
+                                    </>
+                                  );
+                                })()}
                               </button>
                             );
                           })}
