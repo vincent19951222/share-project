@@ -83,6 +83,27 @@ const luckinBackpackItem: GamificationStateSnapshot["backpack"]["previewItems"][
   knownDefinition: true,
 };
 
+const taskRerollBackpackItem: GamificationStateSnapshot["backpack"]["previewItems"][number] = {
+  itemId: "task_reroll_coupon",
+  category: "task",
+  categoryLabel: "Task",
+  name: "Task Reroll Coupon",
+  description: "Reroll one task.",
+  quantity: 1,
+  reservedQuantity: 0,
+  availableQuantity: 1,
+  useEnabled: true,
+  useDisabledReason: null,
+  useTiming: "instant",
+  useTimingLabel: "Instant",
+  effectSummary: "Reroll a task.",
+  usageLimitSummary: "Once per day.",
+  stackable: true,
+  requiresAdminConfirmation: false,
+  enabled: true,
+  knownDefinition: true,
+};
+
 function buildSocialFixture(): GamificationStateSnapshot["social"] {
   return {
     status: "active",
@@ -165,9 +186,9 @@ function buildSocialFixture(): GamificationStateSnapshot["social"] {
 function buildBackpackFixture(): GamificationStateSnapshot["backpack"] {
   return {
     status: "active",
-    totalQuantity: 3,
-    ownedItemCount: 2,
-    previewItems: [smallBoostBackpackItem, luckinBackpackItem],
+    totalQuantity: 4,
+    ownedItemCount: 3,
+    previewItems: [smallBoostBackpackItem, luckinBackpackItem, taskRerollBackpackItem],
     groups: [
       {
         category: "boost",
@@ -180,6 +201,12 @@ function buildBackpackFixture(): GamificationStateSnapshot["backpack"] {
         label: "Real World",
         totalQuantity: 2,
         items: [luckinBackpackItem],
+      },
+      {
+        category: "task",
+        label: "Task",
+        totalQuantity: 1,
+        items: [taskRerollBackpackItem],
       },
     ],
     todayEffects: [
@@ -596,6 +623,8 @@ describe("SupplyStation", () => {
     );
     expect(container.textContent).toContain("Fish Touch Subsidy");
     expect(container.textContent).toContain("+5 coins");
+    expect(container.querySelector("[data-reward-tile='coin']")).not.toBeNull();
+    expect(container.textContent).toContain("N");
   });
 
   it("renders grouped backpack inventory and today's effects", async () => {
@@ -615,6 +644,9 @@ describe("SupplyStation", () => {
     expect(container.textContent).toContain("Real World");
     expect(container.textContent).toContain("Small Boost Coupon");
     expect(container.textContent).toContain("Luckin Coffee Coupon");
+    expect(container.querySelector("[data-reward-tile='utility']")).not.toBeNull();
+    expect(container.querySelector("[data-reward-tile='rare']")).not.toBeNull();
+    expect(container.querySelector("img[src='/gamification/rewards/icons/task_reroll_coupon.png']")).not.toBeNull();
     expect(container.textContent).toContain("今日效果");
     expect(container.textContent).toContain("Pending today");
     expect(container.textContent).toContain("今日使用");
