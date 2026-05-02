@@ -9,6 +9,7 @@ import {
   REWARD_ASSETS,
   REWARD_ASSET_PROMPT_VERSION,
 } from "@/content/gamification/reward-assets";
+import { getRewardAssetGenerationTrace } from "@/content/gamification/reward-asset-traces";
 
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const PNG_COLOR_TYPE_RGBA = 6;
@@ -133,12 +134,15 @@ describe("gamification reward assets", () => {
 
   it("records generation traceability for generated assets", () => {
     const asset = REWARD_ASSETS.find((entry) => entry.assetId === "task_reroll_coupon");
+    const trace = getRewardAssetGenerationTrace("task_reroll_coupon");
 
     expect(asset).toBeDefined();
     expect(asset?.status).toBe("generated");
-    expect(asset?.generationTrace?.prompt).toContain("任务换班券");
-    expect(asset?.generationTrace?.sourceImagePath).toContain("ig_");
-    expect(asset?.generationTrace?.processing).toContain("remove_chroma_key.py");
+    expect("generationTrace" in asset!).toBe(false);
+    expect(trace?.promptVersion).toBe(asset?.promptVersion);
+    expect(trace?.prompt).toContain("任务换班券");
+    expect(trace?.sourceImagePath).toContain("ig_");
+    expect(trace?.processing).toContain("remove_chroma_key.py");
   });
 
   it("ships the first transparent task reroll icon as a square PNG with transparent corners", () => {
