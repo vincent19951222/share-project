@@ -221,7 +221,7 @@ function buildBackpackFixture(): GamificationStateSnapshot["backpack"] {
         settledAt: null,
       },
     ],
-    emptyMessage: "Holding 2 item types.",
+    emptyMessage: "Holding 3 item types.",
   };
 }
 
@@ -623,8 +623,9 @@ describe("SupplyStation", () => {
     );
     expect(container.textContent).toContain("Fish Touch Subsidy");
     expect(container.textContent).toContain("+5 coins");
-    expect(container.querySelector("[data-reward-tile='coin']")).not.toBeNull();
-    expect(container.textContent).toContain("N");
+    const coinTile = container.querySelector("[data-reward-tile='coin']");
+    expect(coinTile).not.toBeNull();
+    expect(coinTile?.querySelector(".reward-tile-rarity")?.textContent).toBe("N");
   });
 
   it("renders grouped backpack inventory and today's effects", async () => {
