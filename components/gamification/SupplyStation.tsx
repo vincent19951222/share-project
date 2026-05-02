@@ -841,9 +841,14 @@ export function SupplyStation() {
             <section className="rounded-[1.5rem] border-[5px] border-slate-900 bg-white p-4 shadow-[0_6px_0_0_#1f2937]">
               <h2 className="text-2xl font-black text-slate-950">抽奖机</h2>
               <p className="mt-2 text-sm font-bold text-slate-500">{snapshot.lottery.message}</p>
-              <a className="supply-inline-link mt-3" href="/docs?tab=rules#lottery-and-ten-draw">
-                查看抽奖规则
-              </a>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a className="supply-inline-link" href="/docs?tab=rules#lottery-and-ten-draw">
+                  查看抽奖规则
+                </a>
+                <a className="supply-inline-link" href="/docs?tab=rules#supply-station-probability">
+                  查看抽奖概率
+                </a>
+              </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <button
                   type="button"

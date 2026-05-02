@@ -518,6 +518,24 @@ describe("SupplyStation", () => {
     expect(ruleLink?.getAttribute("href")).toBe("/docs?tab=rules#supply-station-rules");
   });
 
+  it("links to the lottery probability docs from the lottery area", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot() })));
+
+    const { SupplyStation } = await import("@/components/gamification/SupplyStation");
+
+    await act(async () => {
+      root.render(<SupplyStation />);
+    });
+    await flush();
+
+    const probabilityLink = Array.from(container.querySelectorAll("a")).find((link) =>
+      link.textContent?.includes("抽奖概率"),
+    );
+
+    expect(probabilityLink).toBeDefined();
+    expect(probabilityLink?.getAttribute("href")).toBe("/docs?tab=rules#supply-station-probability");
+  });
+
   it("runs a lottery draw and renders the result", async () => {
     vi.stubGlobal(
       "fetch",
