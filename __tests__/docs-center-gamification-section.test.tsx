@@ -33,6 +33,12 @@ describe("GamificationDocsSection", () => {
     expect(container.textContent).toContain("健身请假券");
     expect(container.textContent).toContain("瑞幸咖啡券");
     expect(container.textContent).toContain("弱社交");
+    expect(container.textContent).toContain("抽奖概率说明");
+    expect(container.textContent).toContain("Active 奖池总权重");
+    expect(container.textContent).toContain("coin 45 / utility 27 / social 24 / cosmetic 0 / rare 4");
+    expect(container.textContent).toContain("直接银子期望 8.75");
+    expect(container.textContent).toContain("摸鱼津贴");
+    expect(container.textContent).toContain("今日称号");
   });
 
   it("renders stable anchors for docs deep links", () => {
@@ -44,5 +50,6 @@ describe("GamificationDocsSection", () => {
     expect(container.querySelector("#supply-station-help")).not.toBeNull();
     expect(container.querySelector("#supply-station-faq")).not.toBeNull();
     expect(container.querySelector("#supply-station-changelog")).not.toBeNull();
+    expect(container.querySelector("#supply-station-probability")).not.toBeNull();
   });
 });

@@ -940,6 +940,58 @@ body {
   line-height: 1.7;
 }
 
+.docs-probability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.docs-probability-card {
+  border: 2px solid #1f2937;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 #1f2937;
+  padding: 0.75rem;
+}
+
+.docs-probability-card span {
+  display: inline-flex;
+  border: 2px solid #1f2937;
+  border-radius: 999px;
+  background: #fde047;
+  padding: 0.12rem 0.5rem;
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.docs-probability-card strong {
+  display: block;
+  margin-top: 0.45rem;
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.docs-probability-card p {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+}
+
+.docs-probability-disabled {
+  margin-top: 1rem;
+  border: 2px dashed #94a3b8;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  padding: 0.85rem;
+}
+
+.docs-probability-disabled h4 {
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
 .docs-block--highlight {
   background: #fde047;
 }

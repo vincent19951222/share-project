@@ -1,6 +1,12 @@
 import { gamificationDocs } from "@/content/docs-center/gamification";
+import { buildGamificationProbabilityDisclosure } from "@/lib/gamification/probability-disclosure";
 
 export function GamificationDocsSection() {
+  const probability = buildGamificationProbabilityDisclosure();
+  const tierWeightSummary = probability.tierWeights
+    .map((tier) => `${tier.tier} ${tier.weight}`)
+    .join(" / ");
+
   return (
     <section className="docs-gamification" aria-labelledby="supply-station-docs-title">
       <div className="docs-gamification__header">
@@ -37,6 +43,47 @@ export function GamificationDocsSection() {
           </article>
         ))}
       </div>
+
+      <article id="supply-station-probability" className="docs-block docs-block--highlight">
+        <p className="docs-eyebrow">抽奖透明度</p>
+        <h3>抽奖概率说明</h3>
+        <p>Active 奖池总权重 {probability.activeTotalWeight}。当前权重可以近似理解为长期概率百分比。</p>
+        <ul>
+          <li>分层权重：{tierWeightSummary}</li>
+          <li>直接银子期望 {probability.directCoinExpectedValue.toFixed(2)} 银子。</li>
+          {probability.notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+
+        <div className="docs-probability-grid" aria-label="Active rewards">
+          {probability.activeRewards.map((reward) => (
+            <div key={reward.id} className="docs-probability-card">
+              <span>{reward.probabilityLabel}</span>
+              <strong>{reward.name}</strong>
+              <p>
+                {reward.tier} · {reward.rarity} · {reward.effectSummary}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="docs-probability-disabled">
+          <h4>当前不可抽</h4>
+          <ul>
+            {probability.disabledRewards.map((reward) => (
+              <li key={reward.id}>
+                {reward.name}：{reward.effectSummary}
+              </li>
+            ))}
+            {probability.inactiveItemNotes.map((item) => (
+              <li key={item.itemId}>
+                {item.itemName}：{item.reason}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </article>
 
       <div id={gamificationDocs.anchors.help} className="docs-gamification__help">
         <p className="docs-eyebrow">使用说明</p>

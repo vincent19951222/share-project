@@ -1,3 +1,5 @@
+import { GAMIFICATION_PROBABILITY_REQUIRED_FACTS } from "@/lib/gamification/probability-disclosure";
+
 export type GamificationDocTone = "default" | "warning" | "success" | "highlight";
 
 export interface GamificationRuleBlock {
@@ -65,6 +67,7 @@ export const GAMIFICATION_REQUIRED_RULE_FACTS = [
   "weak_social_no_rewards",
   "luckin_admin_confirmation",
   "spent_resources_not_refunded",
+  ...GAMIFICATION_PROBABILITY_REQUIRED_FACTS,
 ] as const;
 
 export const gamificationDocs: GamificationDocsContent = {
@@ -141,6 +144,19 @@ export const gamificationDocs: GamificationDocsContent = {
         "ten_draw_max_top_up=10",
         "paid_ticket_daily_limit=10",
       ],
+      tone: "highlight",
+    },
+    {
+      id: "lottery-probability-rules",
+      title: "抽奖概率说明",
+      summary: "当前 active 奖池总权重是 100，权重可以直接近似理解为长期概率百分比。",
+      bullets: [
+        "当前 active 奖池总权重为 100。",
+        "分层权重为：coin 45 / utility 27 / social 24 / cosmetic 0 / rare 4。",
+        "当前直接银子期望是 8.75 银子。",
+        "disabled rewards 不会被抽到，未接入使用闭环的道具也不进入 active 奖池。",
+      ],
+      facts: [...GAMIFICATION_PROBABILITY_REQUIRED_FACTS],
       tone: "highlight",
     },
     {

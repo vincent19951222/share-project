@@ -60,6 +60,7 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
       ? [
           ...sections.map((section) => ({ id: section.id, label: section.title })),
           { id: "supply-station-rules", label: "补给站玩法规则" },
+          { id: "supply-station-probability", label: "抽奖概率说明" },
         ]
       : sections.map((section) => ({ id: section.id, label: section.title }));
   const updatedAt = docsChangelog[0]?.date ?? "2026-04-27";

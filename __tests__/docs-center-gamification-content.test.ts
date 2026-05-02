@@ -5,6 +5,7 @@ import {
   getGamificationDocAnchors,
   validateGamificationDocs,
 } from "@/content/docs-center/gamification";
+import { GAMIFICATION_PROBABILITY_REQUIRED_FACTS } from "@/lib/gamification/probability-disclosure";
 
 describe("gamification docs content", () => {
   it("has stable docs center anchors", () => {
@@ -24,6 +25,14 @@ describe("gamification docs content", () => {
     const facts = new Set(gamificationDocs.rules.flatMap((rule) => rule.facts));
 
     for (const fact of GAMIFICATION_REQUIRED_RULE_FACTS) {
+      expect(facts.has(fact)).toBe(true);
+    }
+  });
+
+  it("keeps probability disclosure facts in the rules", () => {
+    const facts = new Set(gamificationDocs.rules.flatMap((rule) => rule.facts));
+
+    for (const fact of GAMIFICATION_PROBABILITY_REQUIRED_FACTS) {
       expect(facts.has(fact)).toBe(true);
     }
   });
