@@ -420,6 +420,122 @@ export interface GamificationOpsDashboardSnapshot {
   repeatedDirectInvitations: GamificationOpsRepeatedDirectInvitation[];
 }
 
+export type GamificationConfigCheckStatus = "pass" | "fail" | "info";
+
+export type GamificationRewardPoolAvailability =
+  | "active_reward_pool"
+  | "eligible_but_not_in_pool"
+  | "unsupported_effect"
+  | "disabled_item";
+
+export interface GamificationConfigValidationCheck {
+  key: string;
+  label: string;
+  status: GamificationConfigCheckStatus;
+  detail: string;
+}
+
+export interface GamificationConfigValidationSnapshot {
+  ok: boolean;
+  summary: string;
+  checks: GamificationConfigValidationCheck[];
+}
+
+export interface GamificationDimensionCount {
+  key: string;
+  label: string;
+  count: number;
+}
+
+export interface GamificationTaskCardConfigRow {
+  id: string;
+  title: string;
+  description: string;
+  weight: number;
+  effort: string;
+  scene: string;
+  tags: string[];
+  enabled: boolean;
+}
+
+export interface GamificationDimensionPoolSnapshot {
+  key: string;
+  title: string;
+  subtitle: string;
+  enabledCardCount: number;
+  disabledCardCount: number;
+  totalEnabledWeight: number;
+  scenes: GamificationDimensionCount[];
+  efforts: GamificationDimensionCount[];
+  topTags: GamificationDimensionCount[];
+  sampleCards: GamificationTaskCardConfigRow[];
+}
+
+export interface GamificationRewardTierWeightSnapshot {
+  tier: string;
+  weight: number;
+  expectedWeight: number;
+  status: GamificationConfigCheckStatus;
+}
+
+export interface GamificationRewardConfigRow {
+  id: string;
+  tier: string;
+  kind: string;
+  rarity: string;
+  name: string;
+  description: string;
+  weight: number;
+  probability: number;
+  probabilityLabel: string;
+  effectSummary: string;
+  enabled: boolean;
+}
+
+export interface GamificationRewardPoolSnapshot {
+  activeTotalWeight: number;
+  expectedActiveTotalWeight: number;
+  directCoinExpectedValue: number;
+  tierWeights: GamificationRewardTierWeightSnapshot[];
+  activeRewards: GamificationRewardConfigRow[];
+  disabledRewards: GamificationRewardConfigRow[];
+}
+
+export interface GamificationItemConfigRow {
+  id: string;
+  category: string;
+  name: string;
+  description: string;
+  useTiming: string;
+  effectSummary: string;
+  stackable: boolean;
+  limitSummary: string;
+  requiresAdminConfirmation: boolean;
+  enabled: boolean;
+  rewardPoolAvailability: GamificationRewardPoolAvailability;
+  rewardPoolAvailabilityLabel: string;
+}
+
+export interface GamificationItemCategorySnapshot {
+  category: string;
+  enabledCount: number;
+  disabledCount: number;
+  items: GamificationItemConfigRow[];
+}
+
+export interface GamificationItemCatalogSnapshot {
+  categories: GamificationItemCategorySnapshot[];
+  availabilityCounts: Record<GamificationRewardPoolAvailability, number>;
+}
+
+export interface GamificationConfigObservatorySnapshot {
+  generatedAt: string;
+  validation: GamificationConfigValidationSnapshot;
+  dimensionPools: GamificationDimensionPoolSnapshot[];
+  rewardPool: GamificationRewardPoolSnapshot;
+  itemCatalog: GamificationItemCatalogSnapshot;
+}
+
 export interface CoffeeMemberSnapshot {
   id: string;
   name: string;
