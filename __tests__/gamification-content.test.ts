@@ -78,6 +78,17 @@ function getDirectCoinEv(rewards = getActiveRewards()) {
   }, 0);
 }
 
+function disableReward(bundle: GamificationContentBundle, rewardId: string) {
+  bundle.rewards = bundle.rewards.map((reward) =>
+    reward.id === rewardId
+      ? {
+          ...reward,
+          enabled: false,
+        }
+      : reward,
+  );
+}
+
 describe("gamification content", () => {
   it("defines the four fixed dimensions", () => {
     expect(getGamificationDimensions().map((dimension) => dimension.key)).toEqual([
@@ -151,6 +162,7 @@ describe("gamification content", () => {
 
   it("rejects rewards that grant missing items", () => {
     const bundle = cloneBundle();
+    disableReward(bundle, "reward_today_title");
     const reward: RewardDefinition = {
       id: "bad_reward",
       tier: "utility",
@@ -197,6 +209,7 @@ describe("gamification content", () => {
 
   it("rejects active rewards that grant unsupported item effects", () => {
     const bundle = cloneBundle();
+    disableReward(bundle, "reward_today_title");
     const unsupportedItem: ItemDefinition = {
       id: "unsupported_lottery_item",
       category: "lottery",

@@ -6,6 +6,7 @@ import type {
   GamificationContentBundle,
   ItemDefinition,
   RewardDefinition,
+  RewardTier,
   TaskCardDefinition,
 } from "@/content/gamification/types";
 
@@ -15,6 +16,25 @@ const DEFAULT_CONTENT_BUNDLE: GamificationContentBundle = {
   rewards: REWARD_DEFINITIONS,
   items: ITEM_DEFINITIONS,
 };
+
+const EXPECTED_ACTIVE_REWARD_TOTAL_WEIGHT = 100;
+const EXPECTED_ACTIVE_REWARD_TIER_WEIGHTS: Record<RewardTier, number> = {
+  coin: 45,
+  utility: 27,
+  social: 24,
+  cosmetic: 0,
+  rare: 4,
+};
+
+const SUPPORTED_ACTIVE_REWARD_ITEM_EFFECT_TYPES = new Set([
+  "task_reroll",
+  "fitness_coin_multiplier",
+  "fitness_season_multiplier",
+  "fitness_coin_and_season_multiplier",
+  "leave_protection",
+  "social_invitation",
+  "real_world_redemption",
+]);
 
 export function getGamificationDimensions() {
   return DEFAULT_CONTENT_BUNDLE.dimensions;
@@ -49,7 +69,7 @@ export function validateGamificationContent(bundle = DEFAULT_CONTENT_BUNDLE) {
 
   validateTaskCards(bundle.taskCards, dimensionKeys);
   validateItems(bundle.items, itemIds);
-  validateRewards(bundle.rewards, itemIds);
+  validateRewards(bundle.rewards, bundle.items, itemIds);
 }
 
 function validateTaskCards(taskCards: TaskCardDefinition[], dimensionKeys: Set<string>) {
@@ -94,8 +114,21 @@ function validateItems(items: ItemDefinition[], itemIds: Set<string>) {
   }
 }
 
-function validateRewards(rewards: RewardDefinition[], itemIds: Set<string>) {
+function validateRewards(
+  rewards: RewardDefinition[],
+  items: ItemDefinition[],
+  itemIds: Set<string>,
+) {
   const rewardIds = new Set<string>();
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  const activeTierWeights: Record<RewardTier, number> = {
+    coin: 0,
+    utility: 0,
+    social: 0,
+    cosmetic: 0,
+    rare: 0,
+  };
+  let activeTotalWeight = 0;
 
   for (const reward of rewards) {
     if (rewardIds.has(reward.id)) {
@@ -112,6 +145,47 @@ function validateRewards(rewards: RewardDefinition[], itemIds: Set<string>) {
       !itemIds.has(reward.effect.itemId)
     ) {
       throw new Error(`Unknown reward item: ${reward.effect.itemId}`);
+    }
+
+    if (!reward.enabled) {
+      continue;
+    }
+
+    activeTotalWeight += reward.weight;
+    activeTierWeights[reward.tier] += reward.weight;
+
+    if (reward.effect.type === "grant_title") {
+      throw new Error(`Active reward grants unsupported title: ${reward.id}`);
+    }
+
+    if (reward.effect.type !== "grant_item" && reward.effect.type !== "grant_real_world_redemption") {
+      continue;
+    }
+
+    const item = itemById.get(reward.effect.itemId);
+
+    if (!item) {
+      throw new Error(`Unknown reward item: ${reward.effect.itemId}`);
+    }
+
+    if (!item.enabled) {
+      throw new Error(`Active reward grants disabled item: ${reward.effect.itemId}`);
+    }
+
+    if (!SUPPORTED_ACTIVE_REWARD_ITEM_EFFECT_TYPES.has(item.effect.type)) {
+      throw new Error(`Active reward grants unsupported item effect: ${reward.effect.itemId}`);
+    }
+  }
+
+  if (activeTotalWeight !== EXPECTED_ACTIVE_REWARD_TOTAL_WEIGHT) {
+    throw new Error(`Invalid active reward total weight: ${activeTotalWeight}`);
+  }
+
+  for (const tier of Object.keys(EXPECTED_ACTIVE_REWARD_TIER_WEIGHTS) as RewardTier[]) {
+    const expected = EXPECTED_ACTIVE_REWARD_TIER_WEIGHTS[tier];
+
+    if (activeTierWeights[tier] !== expected) {
+      throw new Error(`Invalid active reward tier weight: ${tier}=${activeTierWeights[tier]}`);
     }
   }
 }
