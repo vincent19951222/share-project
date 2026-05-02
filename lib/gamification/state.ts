@@ -32,9 +32,8 @@ import type {
 } from "@/lib/types";
 
 const LOTTERY_TICKET_PRICE = 40;
-const DAILY_TOP_UP_LIMIT = 3;
+const DAILY_TOP_UP_LIMIT = 10;
 const TEN_DRAW_SIZE = 10;
-const TEN_DRAW_MIN_OWNED_TICKETS = 7;
 
 function parseLotteryRewardSnapshot(raw: string): GamificationLotteryRewardSnapshot {
   try {
@@ -457,9 +456,9 @@ export async function buildGamificationStateForUser(
     .reduce((sum, ledger) => sum + Math.max(0, ledger.delta), 0);
   const tenDrawTopUpRequired = Math.max(0, TEN_DRAW_SIZE - user.ticketBalance);
   const tenDrawTopUpCoinCost = tenDrawTopUpRequired * LOTTERY_TICKET_PRICE;
+  const remainingDailyTopUp = Math.max(0, DAILY_TOP_UP_LIMIT - dailyTopUpPurchased);
   const tenDrawCanTopUp =
-    user.ticketBalance >= TEN_DRAW_MIN_OWNED_TICKETS &&
-    user.ticketBalance < TEN_DRAW_SIZE &&
+    tenDrawTopUpRequired > 0 &&
     dailyTopUpPurchased + tenDrawTopUpRequired <= DAILY_TOP_UP_LIMIT &&
     user.coins >= tenDrawTopUpCoinCost;
 
@@ -586,7 +585,9 @@ export async function buildGamificationStateForUser(
           ? "十连抽已就绪。"
           : tenDrawCanTopUp
             ? `还差 ${tenDrawTopUpRequired} 张券，可用 ${tenDrawTopUpCoinCost} 银子补齐十连。`
-            : "攒到 7 张券后，可以用银子补齐十连。",
+            : tenDrawTopUpRequired > remainingDailyTopUp
+              ? `今日最多还能补 ${remainingDailyTopUp} 张券。`
+              : `还差 ${tenDrawTopUpRequired} 张券，需要 ${tenDrawTopUpCoinCost} 银子补齐十连。`,
       recentDraws,
     },
     backpack: buildBackpackSummary(user),

@@ -271,7 +271,7 @@ function buildSnapshot(
       tenDrawTopUpRequired: 2,
       tenDrawTopUpCoinCost: 80,
       dailyTopUpPurchased: 0,
-      dailyTopUpLimit: 3,
+      dailyTopUpLimit: 10,
       ticketPrice: 40,
       message: "Need 2 more tickets, can top up for 80 coins.",
       recentDraws: [],

@@ -16,10 +16,9 @@ import type {
 } from "@/lib/types";
 
 export const LOTTERY_TICKET_PRICE = 40;
-export const DAILY_TOP_UP_LIMIT = 3;
+export const DAILY_TOP_UP_LIMIT = 10;
 export const TEN_DRAW_SIZE = 10;
 export const SINGLE_DRAW_SIZE = 1;
-export const TEN_DRAW_MIN_OWNED_TICKETS = 7;
 
 const GUARANTEE_ELIGIBLE_TIERS = new Set(["utility", "social", "rare"]);
 
@@ -235,10 +234,6 @@ export async function drawLottery({
       throw new LotteryDrawError("抽奖券不足");
     }
 
-    if (drawType === "TEN" && user.ticketBalance < TEN_DRAW_MIN_OWNED_TICKETS) {
-      throw new LotteryDrawError("十连抽至少需要先攒到 7 张券");
-    }
-
     const topUpRequired = Math.max(0, drawCount - user.ticketBalance);
     const todayTopUpLedgers = await tx.lotteryTicketLedger.findMany({
       where: {
@@ -264,7 +259,7 @@ export async function drawLottery({
       }
 
       if (dailyTopUpPurchased + topUpRequired > DAILY_TOP_UP_LIMIT) {
-        throw new LotteryDrawError("今天补券额度已经用完");
+        throw new LotteryDrawError(`今天最多只能用银子补 ${DAILY_TOP_UP_LIMIT} 张券`);
       }
     }
 

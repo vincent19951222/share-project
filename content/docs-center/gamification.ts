@@ -57,9 +57,8 @@ export const GAMIFICATION_REQUIRED_RULE_FACTS = [
   "single_draw_no_guarantee",
   "ten_draw_has_guarantee",
   "ticket_price=40",
-  "ten_draw_min_existing_tickets=7",
-  "ten_draw_max_top_up=3",
-  "paid_ticket_daily_limit=3",
+  "ten_draw_max_top_up=10",
+  "paid_ticket_daily_limit=10",
   "boost_same_day_only",
   "boost_no_stacking",
   "leave_coupon_no_rewards",
@@ -69,7 +68,7 @@ export const GAMIFICATION_REQUIRED_RULE_FACTS = [
 ] as const;
 
 export const gamificationDocs: GamificationDocsContent = {
-  updatedAt: "2026-04-26",
+  updatedAt: "2026-05-02",
   anchors: {
     rules: "supply-station-rules",
     help: "supply-station-help",
@@ -83,7 +82,7 @@ export const gamificationDocs: GamificationDocsContent = {
     summary: "补齐每日任务、抽奖券、十连、背包、暴击、弱社交和瑞幸兑换的统一说明。",
     bullets: [
       "明确每天最多免费获得 2 张抽奖券：健身 1 张，四维全完成 1 张。",
-      "明确十连可以用银子补齐，价格 40 银子 / 张，每天最多补 3 张。",
+      "明确十连可以用银子补齐，价格 40 银子 / 张，每天最多补 10 张。",
       "明确道具和抽奖券永久有效，已消耗资源不因撤销打卡自动返还。",
       "明确瑞幸咖啡券需要管理员线下确认，不自动生成咖啡打卡记录。",
     ],
@@ -129,8 +128,8 @@ export const gamificationDocs: GamificationDocsContent = {
       bullets: [
         "单抽消耗 1 张券，没有保底。",
         "十连消耗 10 张券，至少保底 1 个实用道具、弱社交道具或稀有以上奖励。",
-        "如果已有 7-9 张券，可以用银子补齐十连。",
-        "补券价格是 40 银子 / 张，每天最多补 3 张。",
+        "十连优先消耗已有抽奖券，不足 10 张时可以用银子补齐。",
+        "补券价格是 40 银子 / 张，每天最多补 10 张。",
         "抽奖可能抽到银子，但长期期望低于购券成本，不能靠抽奖无限套利。",
       ],
       facts: [
@@ -139,9 +138,8 @@ export const gamificationDocs: GamificationDocsContent = {
         "single_draw_no_guarantee",
         "ten_draw_has_guarantee",
         "ticket_price=40",
-        "ten_draw_min_existing_tickets=7",
-        "ten_draw_max_top_up=3",
-        "paid_ticket_daily_limit=3",
+        "ten_draw_max_top_up=10",
+        "paid_ticket_daily_limit=10",
       ],
       tone: "highlight",
     },
@@ -283,7 +281,7 @@ export const gamificationDocs: GamificationDocsContent = {
     {
       id: "faq-ten-draw-top-up",
       question: "十连差几张券，可以用银子补吗？",
-      answer: "可以，但你必须已有至少 7 张券，最多补 3 张，价格是 40 银子 / 张。",
+      answer: "可以。十连优先用已有抽奖券，不足 10 张时按 40 银子 / 张补齐，每人每天最多补 10 张。",
       tags: ["lottery", "coins"],
     },
     {

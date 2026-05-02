@@ -178,12 +178,53 @@ describe("gamification lottery", () => {
     });
   });
 
-  it("rejects ten draw from fewer than seven tickets", async () => {
+  it("allows ten draw top-up from four tickets when coins can cover the gap", async () => {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        ticketBalance: 6,
-        coins: 1000,
+        ticketBalance: 4,
+        coins: 500,
+      },
+    });
+
+    const result = await drawLottery({
+      userId,
+      drawType: "TEN",
+      useCoinTopUp: true,
+      rng: sequenceRng([0.6, 0.62, 0.64, 0.66, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78]),
+    });
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const draw = await prisma.lotteryDraw.findUniqueOrThrow({ where: { id: result.draw.id } });
+    const topUpLedger = await prisma.lotteryTicketLedger.findFirstOrThrow({
+      where: {
+        userId,
+        dayKey,
+        reason: "COIN_PURCHASE_GRANTED",
+        sourceType: "lottery_topup",
+        sourceId: draw.id,
+      },
+    });
+
+    expect(draw).toMatchObject({
+      drawType: "TEN",
+      ticketSpent: 10,
+      coinSpent: 240,
+    });
+    expect(user.ticketBalance).toBe(0);
+    expect(user.coins).toBe(260);
+    expect(topUpLedger).toMatchObject({
+      delta: 6,
+      balanceAfter: 10,
+    });
+  });
+
+  it("rejects ten draw top-up when coins cannot cover the gap", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ticketBalance: 4,
+        coins: 239,
       },
     });
 
@@ -210,8 +251,8 @@ describe("gamification lottery", () => {
         userId,
         teamId,
         dayKey,
-        delta: 3,
-        balanceAfter: 3,
+        delta: 10,
+        balanceAfter: 10,
         reason: "COIN_PURCHASE_GRANTED",
         sourceType: "lottery_topup",
         sourceId: "previous-draw",

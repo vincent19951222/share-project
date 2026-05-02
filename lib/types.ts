@@ -97,7 +97,7 @@ export interface GamificationLotterySummary {
   tenDrawTopUpRequired: number;
   tenDrawTopUpCoinCost: number;
   dailyTopUpPurchased: number;
-  dailyTopUpLimit: 3;
+  dailyTopUpLimit: 10;
   ticketPrice: 40;
   message: string;
   recentDraws: GamificationLotteryDrawSnapshot[];

@@ -56,7 +56,7 @@ describe("GET /api/gamification/state", () => {
         tenDrawTopUpRequired: 10,
         tenDrawTopUpCoinCost: 400,
         dailyTopUpPurchased: 0,
-        dailyTopUpLimit: 3,
+        dailyTopUpLimit: 10,
         ticketPrice: 40,
       },
       backpack: {
@@ -90,6 +90,32 @@ describe("GET /api/gamification/state", () => {
         (dimension: { assignment: unknown }) => dimension.assignment === null,
       ),
     ).toBe(true);
+  });
+
+  it("enables ten draw top-up when four tickets can be filled with coins", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ticketBalance: 4,
+        coins: 500,
+      },
+    });
+
+    const response = await GET(request(userId));
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+
+    expect(body.snapshot.lottery).toMatchObject({
+      singleDrawEnabled: true,
+      tenDrawEnabled: true,
+      tenDrawTopUpRequired: 6,
+      tenDrawTopUpCoinCost: 240,
+      dailyTopUpPurchased: 0,
+      dailyTopUpLimit: 10,
+      ticketPrice: 40,
+      message: "还差 6 张券，可用 240 银子补齐十连。",
+    });
   });
 
   it("includes existing task, inventory, draw, ticket, and social summaries", async () => {

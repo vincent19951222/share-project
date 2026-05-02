@@ -149,8 +149,8 @@ describe("POST /api/gamification/lottery/draw", () => {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        ticketBalance: 8,
-        coins: 200,
+        ticketBalance: 4,
+        coins: 500,
       },
     });
 
@@ -170,7 +170,7 @@ describe("POST /api/gamification/lottery/draw", () => {
     expect(body.draw).toMatchObject({
       drawType: "TEN",
       ticketSpent: 10,
-      coinSpent: 80,
+      coinSpent: 240,
     });
     expect(body.draw.rewards).toHaveLength(10);
     expect(ledgers.some((ledger) => ledger.reason === "COIN_PURCHASE_GRANTED")).toBe(true);
