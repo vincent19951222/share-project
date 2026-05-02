@@ -81,4 +81,20 @@ describe("RewardTile", () => {
     expect(container.textContent).toContain("N");
     expect(container.textContent).toContain("SR");
   });
+
+  it("can render as decorative content inside interactive rows", () => {
+    act(() => {
+      root.render(
+        <button type="button">
+          <RewardTile name="任务换班券" rewardTier="utility" rarity="uncommon" decorative />
+          任务换班券 x1
+        </button>,
+      );
+    });
+
+    const tile = container.querySelector("[data-reward-tile='utility']");
+
+    expect(tile?.tagName).toBe("SPAN");
+    expect(tile?.getAttribute("aria-hidden")).toBe("true");
+  });
 });

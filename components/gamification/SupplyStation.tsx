@@ -934,6 +934,7 @@ export function SupplyStation() {
                             rarity={definition?.rarity ?? fallbackRarityByTier[tier]}
                             iconSrc={asset?.status === "generated" ? asset.src : null}
                             iconAlt={asset?.alt ?? reward.name}
+                            decorative
                             size="draw-result"
                           />
                           <div>
@@ -1019,6 +1020,7 @@ export function SupplyStation() {
                                         iconAlt={asset?.alt ?? item.name}
                                         quantity={item.quantity}
                                         selected={isSelected}
+                                        decorative
                                       />
                                       <span className="min-w-0 flex-1">{item.name}</span>
                                       <span>x{item.quantity}</span>

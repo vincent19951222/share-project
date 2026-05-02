@@ -32,6 +32,7 @@ export interface RewardTileProps {
   quantity?: number;
   selected?: boolean;
   disabled?: boolean;
+  decorative?: boolean;
   size?: RewardTileSize;
   className?: string;
 }
@@ -45,14 +46,16 @@ export function RewardTile({
   quantity,
   selected = false,
   disabled = false,
+  decorative = false,
   size = "inventory",
   className = "",
 }: RewardTileProps) {
   const badge = rarityBadgeByRarity[rarity];
 
   return (
-    <div
+    <span
       data-reward-tile={rewardTier}
+      aria-hidden={decorative ? true : undefined}
       className={[
         "reward-tile",
         tierClassByTier[rewardTier],
@@ -65,15 +68,15 @@ export function RewardTile({
         .join(" ")}
     >
       <span className="reward-tile-rarity">{badge}</span>
-      <div className="reward-tile-icon-wrap" aria-hidden={iconSrc ? undefined : true}>
+      <span className="reward-tile-icon-wrap" aria-hidden={iconSrc ? undefined : true}>
         {iconSrc ? (
           <img className="reward-tile-icon" src={iconSrc} alt={iconAlt ?? name} />
         ) : (
           <span className="reward-tile-fallback">?</span>
         )}
-      </div>
+      </span>
       {quantity !== undefined ? <span className="reward-tile-quantity">x{quantity}</span> : null}
       <span className="reward-tile-name">{name}</span>
-    </div>
+    </span>
   );
 }
