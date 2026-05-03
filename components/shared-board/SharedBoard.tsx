@@ -120,33 +120,73 @@ export function SharedBoard() {
   }
 
   return (
-    <section className="h-full overflow-y-auto p-4 no-scrollbar">
-      <div className="mb-3 flex justify-end">
-        <SyncStatus state={syncState} />
+    <section className="shared-board-scene h-full overflow-y-auto no-scrollbar">
+      <div className="shared-board-wall-bg" aria-hidden="true" />
+      <div className="shared-board-props" aria-hidden="true">
+        <img
+          src="/assets/home-scenes/shared-board/poster-no-excuses.webp"
+          alt=""
+          className="shared-board-prop shared-board-poster-left"
+        />
+        <img
+          src="/assets/home-scenes/shared-board/poster-focus-train-win.webp"
+          alt=""
+          className="shared-board-prop shared-board-poster-right"
+        />
+        <img
+          src="/assets/home-scenes/shared-board/discipline-note.webp"
+          alt=""
+          className="shared-board-prop shared-board-discipline-note"
+        />
+        <img
+          src="/assets/home-scenes/shared-board/dumbbell-edge.webp"
+          alt=""
+          className="shared-board-prop shared-board-dumbbell"
+        />
+        <img
+          src="/assets/home-scenes/shared-board/marker-pen.webp"
+          alt=""
+          className="shared-board-prop shared-board-marker"
+        />
+        <img
+          src="/assets/home-scenes/shared-board/paperclip.webp"
+          alt=""
+          className="shared-board-prop shared-board-paperclip"
+        />
       </div>
 
-      <NoteComposer
-        currentUser={{
-          name: currentMember.name,
-          avatarKey: currentMember.avatarKey,
-        }}
-        submitting={submitting}
-        onSubmit={createNote}
-      />
+      <div className="shared-board-content">
+        <div className="shared-board-cork">
+          <div className="shared-board-composer-wrap">
+            <div className="shared-board-sync-row">
+              <SyncStatus state={syncState} />
+            </div>
+            <img
+              src="/assets/home-scenes/shared-board/clipboard-clip.webp"
+              alt=""
+              className="shared-board-clip"
+              aria-hidden="true"
+            />
+            <NoteComposer
+              currentUser={{
+                name: currentMember.name,
+                avatarKey: currentMember.avatarKey,
+              }}
+              submitting={submitting}
+              onSubmit={createNote}
+            />
 
-      {message && (
-        <div
-          className={`mb-4 rounded-xl border-2 px-4 py-2 text-sm font-bold ${
-            message.tone === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-red-200 bg-red-50 text-red-600"
-          }`}
-        >
-          {message.text}
+            {message ? (
+              <div className={`shared-board-message shared-board-${message.tone}-row`}>
+                <span aria-hidden="true">{message.tone === "success" ? "✓" : "!"}</span>
+                <span>{message.text}</span>
+              </div>
+            ) : null}
+          </div>
+
+          <NoteMasonry notes={notes} deletingIds={deletingIds} onDelete={deleteNote} />
         </div>
-      )}
-
-      <NoteMasonry notes={notes} deletingIds={deletingIds} onDelete={deleteNote} />
+      </div>
     </section>
   );
 }

@@ -60,7 +60,7 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
   }
 
   return (
-    <section className="soft-card mb-4 p-6">
+    <section className="shared-board-composer">
       <div className="flex gap-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-blue-200 bg-blue-100 shadow-sm">
           <img
@@ -88,17 +88,29 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
 
           <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap items-center gap-4">
-              <label className="flex items-center gap-2 text-xs font-bold text-sub">
-                类型:
-                <select
-                  value={type}
-                  onChange={(event) => setType(event.target.value as BoardNoteType)}
-                  className="shared-note-select"
-                >
-                  <option value="FREE">自由笔记</option>
-                  <option value="ANNOUNCEMENT">团队通告</option>
-                </select>
-              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-sub">类型:</span>
+                <div className="shared-board-type-toggle" role="group" aria-label="便签类型">
+                  <button
+                    type="button"
+                    className={type === "FREE" ? "selected" : ""}
+                    onClick={() => setType("FREE")}
+                    aria-pressed={type === "FREE"}
+                    disabled={submitting}
+                  >
+                    自由笔记
+                  </button>
+                  <button
+                    type="button"
+                    className={type === "ANNOUNCEMENT" ? "selected" : ""}
+                    onClick={() => setType("ANNOUNCEMENT")}
+                    aria-pressed={type === "ANNOUNCEMENT"}
+                    disabled={submitting}
+                  >
+                    团队通告
+                  </button>
+                </div>
+              </div>
 
               <div className={`flex items-center gap-2 ${type === "ANNOUNCEMENT" ? "opacity-50" : ""}`}>
                 <span className="text-xs font-bold text-sub">颜色:</span>
@@ -107,11 +119,14 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
                     <button
                       key={item.value}
                       type="button"
-                      className={`color-option ${item.className} ${color === item.value ? "selected" : ""}`}
+                      className={`shared-board-color-chip ${item.className} ${color === item.value ? "selected" : ""}`}
                       onClick={() => setColor(item.value)}
                       disabled={type === "ANNOUNCEMENT"}
+                      aria-pressed={color === item.value}
                       aria-label={item.label}
-                    />
+                    >
+                      <span aria-hidden="true">✓</span>
+                    </button>
                   ))}
                 </div>
               </div>
