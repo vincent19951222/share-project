@@ -7,6 +7,11 @@ export const TEAM_DYNAMIC_TYPES = {
   STREAK_MILESTONE: "STREAK_MILESTONE",
   COFFEE_SUMMARY: "COFFEE_SUMMARY",
   BOARD_NOTICE_REFERENCE: "BOARD_NOTICE_REFERENCE",
+  GAME_RARE_PRIZE: "GAME_RARE_PRIZE",
+  GAME_TASK_STREAK_MILESTONE: "GAME_TASK_STREAK_MILESTONE",
+  GAME_BOOST_MILESTONE: "GAME_BOOST_MILESTONE",
+  GAME_TEAM_BROADCAST: "GAME_TEAM_BROADCAST",
+  GAME_SOCIAL_MOMENT: "GAME_SOCIAL_MOMENT",
 } as const;
 
 export type TeamDynamicType =
@@ -81,6 +86,26 @@ const TEAM_DYNAMIC_META: Record<TeamDynamicType, TeamDynamicMeta> = {
   [TEAM_DYNAMIC_TYPES.BOARD_NOTICE_REFERENCE]: {
     label: "公告引用",
     tone: "default",
+  },
+  [TEAM_DYNAMIC_TYPES.GAME_RARE_PRIZE]: {
+    label: "补给高光",
+    tone: "highlight",
+  },
+  [TEAM_DYNAMIC_TYPES.GAME_TASK_STREAK_MILESTONE]: {
+    label: "摸鱼自律",
+    tone: "success",
+  },
+  [TEAM_DYNAMIC_TYPES.GAME_BOOST_MILESTONE]: {
+    label: "暴击打卡",
+    tone: "highlight",
+  },
+  [TEAM_DYNAMIC_TYPES.GAME_TEAM_BROADCAST]: {
+    label: "团队小喇叭",
+    tone: "default",
+  },
+  [TEAM_DYNAMIC_TYPES.GAME_SOCIAL_MOMENT]: {
+    label: "牛马互动",
+    tone: "success",
   },
 };
 

@@ -153,6 +153,14 @@ describe("/api/activity-events", () => {
           assetAwarded: 20,
           createdAt: new Date("2026-04-23T11:18:00+08:00"),
         },
+        {
+          teamId,
+          userId,
+          type: ACTIVITY_EVENT_TYPES.PUNCH,
+          message: "li 刚刚打卡，拿下 60 银子，小暴击券生效",
+          assetAwarded: 60,
+          createdAt: new Date("2026-04-23T12:18:00+08:00"),
+        },
       ],
     });
 
@@ -168,6 +176,7 @@ describe("/api/activity-events", () => {
 
     expect(punchResponse.status).toBe(200);
     expect(punchBody.events.map((event: { text: string }) => event.text)).toEqual([
+      "li 刚刚打卡，拿下 60 银子，小暴击券生效",
       "luo 刚刚打卡，拿下 20 银子",
     ]);
   });

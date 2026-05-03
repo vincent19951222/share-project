@@ -12,6 +12,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
+    "compress:reward-icons": "node scripts/compress-reward-icons.mjs",
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest"

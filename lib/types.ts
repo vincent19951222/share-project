@@ -33,7 +33,508 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
-export type AppTab = "punch" | "board" | "coffee" | "dash" | "calendar";
+export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";
+
+export type GamificationTaskStatus = "pending" | "completed";
+export type GamificationLotteryStatus = "placeholder" | "active";
+export type GamificationSocialStatus = "placeholder" | "active";
+
+export interface GamificationTaskAssignmentSnapshot {
+  id: string;
+  taskCardId: string;
+  title: string;
+  description: string;
+  status: GamificationTaskStatus;
+  completedAt: string | null;
+  completionText: string | null;
+  rerollCount: number;
+  rerollLimit: 1;
+  canComplete: boolean;
+  canReroll: boolean;
+}
+
+export interface GamificationDimensionSnapshot {
+  key: "movement" | "hydration" | "social" | "learning";
+  title: string;
+  subtitle: string;
+  description: string;
+  assignment: GamificationTaskAssignmentSnapshot | null;
+}
+
+export interface GamificationTicketSummary {
+  maxFreeTicketsToday: 2;
+  todayEarned: number;
+  todaySpent: number;
+  lifeTicketEarned: boolean;
+  fitnessTicketEarned: boolean;
+  taskCompletedCount: number;
+  lifeTicketClaimable: boolean;
+}
+
+export interface GamificationLotteryRewardSnapshot {
+  rewardId: string;
+  rewardTier: string;
+  rewardKind: string;
+  name: string;
+  description: string;
+  effectSummary: string;
+}
+
+export interface GamificationLotteryDrawSnapshot {
+  id: string;
+  drawType: "SINGLE" | "TEN";
+  ticketSpent: number;
+  coinSpent: number;
+  guaranteeApplied: boolean;
+  createdAt: string;
+  rewards: GamificationLotteryRewardSnapshot[];
+}
+
+export interface GamificationLotterySummary {
+  status: GamificationLotteryStatus;
+  singleDrawEnabled: boolean;
+  tenDrawEnabled: boolean;
+  tenDrawTopUpRequired: number;
+  tenDrawTopUpCoinCost: number;
+  dailyTopUpPurchased: number;
+  dailyTopUpLimit: 10;
+  ticketPrice: 40;
+  message: string;
+  recentDraws: GamificationLotteryDrawSnapshot[];
+}
+
+export type GamificationBackpackCategory =
+  | "boost"
+  | "protection"
+  | "social"
+  | "lottery"
+  | "task"
+  | "cosmetic"
+  | "real_world"
+  | "unknown";
+
+export type GamificationItemUseTiming = "today" | "instant" | "manual_redemption" | "unknown";
+
+export interface GamificationBackpackItemSnapshot {
+  itemId: string;
+  category: GamificationBackpackCategory;
+  categoryLabel: string;
+  name: string;
+  description: string;
+  quantity: number;
+  reservedQuantity: number;
+  availableQuantity: number;
+  useEnabled: boolean;
+  useDisabledReason: string | null;
+  useTiming: GamificationItemUseTiming;
+  useTimingLabel: string;
+  effectSummary: string;
+  usageLimitSummary: string;
+  stackable: boolean;
+  requiresAdminConfirmation: boolean;
+  enabled: boolean;
+  knownDefinition: boolean;
+}
+
+export interface GamificationBackpackGroupSnapshot {
+  category: GamificationBackpackCategory;
+  label: string;
+  totalQuantity: number;
+  items: GamificationBackpackItemSnapshot[];
+}
+
+export interface GamificationTodayEffectSnapshot {
+  id: string;
+  itemId: string;
+  name: string;
+  status: "PENDING" | "SETTLED" | "EXPIRED" | "CANCELLED";
+  statusLabel: string;
+  effectSummary: string;
+  createdAt: string;
+  settledAt: string | null;
+}
+
+export interface GamificationBackpackSummary {
+  status: "active";
+  totalQuantity: number;
+  ownedItemCount: number;
+  previewItems: GamificationBackpackItemSnapshot[];
+  groups: GamificationBackpackGroupSnapshot[];
+  todayEffects: GamificationTodayEffectSnapshot[];
+  emptyMessage: string;
+}
+
+export interface SocialInvitationSnapshot {
+  id: string;
+  senderUserId: string;
+  senderUsername: string | null;
+  recipientUserId: string | null;
+  recipientUsername: string | null;
+  invitationType: string;
+  status: "PENDING" | "RESPONDED" | "EXPIRED" | "CANCELLED";
+  dayKey: string;
+  message: string;
+  responseCount: number;
+  wechatWebhookSentAt: string | null;
+  respondedAt: string | null;
+  expiredAt: string | null;
+  createdAt: string;
+}
+
+export interface SocialInvitationResponseSnapshot {
+  id: string;
+  invitationId: string;
+  invitationType: string;
+  responderUserId: string;
+  responderUsername: string;
+  responseText: string | null;
+  createdAt: string;
+}
+
+export interface SocialRecipientSnapshot {
+  userId: string;
+  username: string;
+  avatarKey: string;
+}
+
+export interface GamificationSocialSummary {
+  status: GamificationSocialStatus;
+  pendingSentCount: number;
+  pendingReceivedCount: number;
+  teamWidePendingCount: number;
+  sent: SocialInvitationSnapshot[];
+  received: SocialInvitationSnapshot[];
+  teamWide: SocialInvitationSnapshot[];
+  recentResponses: SocialInvitationResponseSnapshot[];
+  availableRecipients: SocialRecipientSnapshot[];
+  message: string;
+}
+
+export type RealWorldRedemptionStatus = "REQUESTED" | "CONFIRMED" | "CANCELLED";
+
+export interface GamificationRedemptionSnapshot {
+  id: string;
+  userId: string;
+  username: string | null;
+  itemId: string;
+  itemName: string;
+  redemptionType: "luckin_coffee" | "unknown";
+  status: RealWorldRedemptionStatus;
+  statusLabel: string;
+  statusTone: "warning" | "success" | "muted" | "danger";
+  requestedAt: string;
+  confirmedAt: string | null;
+  cancelledAt: string | null;
+  confirmedByUsername: string | null;
+  cancelledByUsername: string | null;
+  note: string | null;
+}
+
+export interface GamificationRedemptionSectionSnapshot {
+  mine: GamificationRedemptionSnapshot[];
+  adminQueue: GamificationRedemptionSnapshot[];
+}
+
+export interface GamificationStateSnapshot {
+  currentUserId: string;
+  currentUserRole: string;
+  teamId: string;
+  dayKey: string;
+  ticketBalance: number;
+  dimensions: GamificationDimensionSnapshot[];
+  ticketSummary: GamificationTicketSummary;
+  lottery: GamificationLotterySummary;
+  backpack: GamificationBackpackSummary;
+  social: GamificationSocialSummary;
+  redemptions: GamificationRedemptionSectionSnapshot;
+}
+
+export interface GamificationWeeklyReportMetric {
+  key: string;
+  label: string;
+  value: string;
+  helper: string;
+  tone: "default" | "success" | "warning" | "highlight";
+}
+
+export interface GamificationWeeklyReportCard {
+  key: string;
+  title: string;
+  body: string;
+  tone: "default" | "success" | "warning" | "highlight";
+}
+
+export interface GamificationWeeklyReportHighlight {
+  id: string;
+  title: string;
+  summary: string;
+  sourceType: string;
+  sourceId: string;
+  occurredAt: string;
+}
+
+export interface GamificationWeeklyReportMetrics {
+  teamMemberCount: number;
+  daysInWindow: number;
+  expectedTaskCount: number;
+  completedTaskCount: number;
+  taskCompletionRate: number;
+  allFourCompletionDays: number;
+  fitnessTicketsEarned: number;
+  lifeTicketsEarned: number;
+  paidTicketsBought: number;
+  ticketsSpent: number;
+  netTicketChange: number;
+  drawCount: number;
+  singleDrawCount: number;
+  tenDrawCount: number;
+  coinSpent: number;
+  coinRewarded: number;
+  rareRewardCount: number;
+  realWorldRewardCount: number;
+  itemUseCount: number;
+  boostUseCount: number;
+  boostAssetBonusTotal: number;
+  boostSeasonBonusTotal: number;
+  leaveCouponUseCount: number;
+  pendingItemUseCount: number;
+  expiredItemUseCount: number;
+  socialInvitationCount: number;
+  directInvitationCount: number;
+  teamInvitationCount: number;
+  socialResponseCount: number;
+  socialResponseRate: number;
+  gameDynamicCount: number;
+  rarePrizeDynamicCount: number;
+  boostDynamicCount: number;
+  socialMomentDynamicCount: number;
+}
+
+export interface GamificationWeeklyReportSnapshot {
+  teamId: string;
+  weekStartDayKey: string;
+  weekEndDayKey: string;
+  generatedAt: string;
+  published: boolean;
+  publishedDynamicId: string | null;
+  metrics: GamificationWeeklyReportMetrics;
+  metricCards: GamificationWeeklyReportMetric[];
+  summaryCards: GamificationWeeklyReportCard[];
+  highlights: GamificationWeeklyReportHighlight[];
+}
+
+export interface GamificationWeeklyReportPublishResult {
+  snapshot: GamificationWeeklyReportSnapshot;
+  teamDynamic: {
+    status: "CREATED" | "EXISTING";
+    id: string;
+  };
+  wechat: {
+    status: "NOT_REQUESTED" | "SENT" | "SKIPPED" | "FAILED";
+    failureReason?: string;
+  };
+}
+
+export type GamificationOpsRiskSeverity = "ok" | "watch" | "risk";
+
+export interface GamificationOpsWindow {
+  startDayKey: string;
+  endDayKey: string;
+  days: number;
+  generatedAt: string;
+}
+
+export interface GamificationOpsMetricCard {
+  key: string;
+  label: string;
+  value: string;
+  helper: string;
+  tone: "default" | "success" | "warning" | "danger" | "highlight";
+}
+
+export interface GamificationOpsRiskCard {
+  key: string;
+  title: string;
+  summary: string;
+  severity: GamificationOpsRiskSeverity;
+  detailItems: string[];
+}
+
+export interface GamificationOpsPendingRedemption {
+  id: string;
+  userId: string;
+  username: string;
+  itemId: string;
+  itemName: string;
+  requestedAt: string;
+  ageDays: number;
+}
+
+export interface GamificationOpsLeaderboardItem {
+  userId: string;
+  username: string;
+  value: number;
+  helper: string;
+}
+
+export interface GamificationOpsRepeatedDirectInvitation {
+  senderUserId: string;
+  senderUsername: string;
+  recipientUserId: string;
+  recipientUsername: string;
+  count: number;
+}
+
+export interface GamificationOpsMetrics {
+  teamMemberCount: number;
+  windowDays: number;
+  totalTicketBalance: number;
+  totalCoinBalance: number;
+  ticketsEarned: number;
+  ticketsSpent: number;
+  netTicketChange: number;
+  lotteryDrawCount: number;
+  lotteryCoinSpent: number;
+  lotteryCoinRewarded: number;
+  realWorldRewardCount: number;
+  pendingRedemptionCount: number;
+  overdueRedemptionCount: number;
+  socialInvitationCount: number;
+  socialResponseCount: number;
+  socialResponseRate: number;
+  repeatedDirectInvitationPairCount: number;
+  wechatFailureCount: number;
+  ticketBalanceMismatchCount: number;
+  coinBalanceMismatchCount: number;
+}
+
+export interface GamificationOpsDashboardSnapshot {
+  teamId: string;
+  window: GamificationOpsWindow;
+  metrics: GamificationOpsMetrics;
+  metricCards: GamificationOpsMetricCard[];
+  risks: GamificationOpsRiskCard[];
+  pendingRedemptions: GamificationOpsPendingRedemption[];
+  topTicketBalances: GamificationOpsLeaderboardItem[];
+  topCoinBalances: GamificationOpsLeaderboardItem[];
+  repeatedDirectInvitations: GamificationOpsRepeatedDirectInvitation[];
+}
+
+export type GamificationConfigCheckStatus = "pass" | "fail" | "info";
+
+export type GamificationRewardPoolAvailability =
+  | "active_reward_pool"
+  | "eligible_but_not_in_pool"
+  | "unsupported_effect"
+  | "disabled_item";
+
+export interface GamificationConfigValidationCheck {
+  key: string;
+  label: string;
+  status: GamificationConfigCheckStatus;
+  detail: string;
+}
+
+export interface GamificationConfigValidationSnapshot {
+  ok: boolean;
+  summary: string;
+  checks: GamificationConfigValidationCheck[];
+}
+
+export interface GamificationDimensionCount {
+  key: string;
+  label: string;
+  count: number;
+}
+
+export interface GamificationTaskCardConfigRow {
+  id: string;
+  title: string;
+  description: string;
+  weight: number;
+  effort: string;
+  scene: string;
+  tags: string[];
+  enabled: boolean;
+}
+
+export interface GamificationDimensionPoolSnapshot {
+  key: string;
+  title: string;
+  subtitle: string;
+  enabledCardCount: number;
+  disabledCardCount: number;
+  totalEnabledWeight: number;
+  scenes: GamificationDimensionCount[];
+  efforts: GamificationDimensionCount[];
+  topTags: GamificationDimensionCount[];
+  sampleCards: GamificationTaskCardConfigRow[];
+}
+
+export interface GamificationRewardTierWeightSnapshot {
+  tier: string;
+  weight: number;
+  expectedWeight: number;
+  status: GamificationConfigCheckStatus;
+}
+
+export interface GamificationRewardConfigRow {
+  id: string;
+  tier: string;
+  kind: string;
+  rarity: string;
+  name: string;
+  description: string;
+  weight: number;
+  probability: number;
+  probabilityLabel: string;
+  effectSummary: string;
+  enabled: boolean;
+}
+
+export interface GamificationRewardPoolSnapshot {
+  activeTotalWeight: number;
+  expectedActiveTotalWeight: number;
+  directCoinExpectedValue: number;
+  tierWeights: GamificationRewardTierWeightSnapshot[];
+  activeRewards: GamificationRewardConfigRow[];
+  disabledRewards: GamificationRewardConfigRow[];
+}
+
+export interface GamificationItemConfigRow {
+  id: string;
+  category: string;
+  name: string;
+  description: string;
+  useTiming: string;
+  effectSummary: string;
+  stackable: boolean;
+  limitSummary: string;
+  requiresAdminConfirmation: boolean;
+  enabled: boolean;
+  rewardPoolAvailability: GamificationRewardPoolAvailability;
+  rewardPoolAvailabilityLabel: string;
+}
+
+export interface GamificationItemCategorySnapshot {
+  category: string;
+  enabledCount: number;
+  disabledCount: number;
+  items: GamificationItemConfigRow[];
+}
+
+export interface GamificationItemCatalogSnapshot {
+  categories: GamificationItemCategorySnapshot[];
+  availabilityCounts: Record<GamificationRewardPoolAvailability, number>;
+}
+
+export interface GamificationConfigObservatorySnapshot {
+  generatedAt: string;
+  validation: GamificationConfigValidationSnapshot;
+  dimensionPools: GamificationDimensionPoolSnapshot[];
+  rewardPool: GamificationRewardPoolSnapshot;
+  itemCatalog: GamificationItemCatalogSnapshot;
+}
 
 export interface CoffeeMemberSnapshot {
   id: string;

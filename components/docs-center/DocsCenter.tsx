@@ -11,6 +11,7 @@ import type { DocsSection as DocsSectionContent, DocsTabId } from "@/content/doc
 import { DocsSection } from "./DocsSection";
 import { DocsTableOfContents, type DocsTocHrefBase } from "./DocsTableOfContents";
 import { DocsTabs } from "./DocsTabs";
+import { GamificationDocsSection } from "./GamificationDocsSection";
 
 function getSectionsForTab(tab: DocsTabId): DocsSectionContent[] {
   if (tab === "rules") {
@@ -54,6 +55,14 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
 
   const activeTabMeta = docsTabs.find((tab) => tab.id === activeTab) ?? docsTabs[0];
   const sections = getSectionsForTab(activeTabMeta.id);
+  const tocItems =
+    activeTabMeta.id === "rules"
+      ? [
+          ...sections.map((section) => ({ id: section.id, label: section.title })),
+          { id: "supply-station-rules", label: "补给站玩法规则" },
+          { id: "supply-station-probability", label: "抽奖概率说明" },
+        ]
+      : sections.map((section) => ({ id: section.id, label: section.title }));
   const updatedAt = docsChangelog[0]?.date ?? "2026-04-27";
 
   function handleTabChange(tab: DocsTabId) {
@@ -91,7 +100,7 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
           </div>
           <DocsTableOfContents
             hrefBase={buildTocHrefBase(safePathname, activeTabMeta.id)}
-            items={sections.map((section) => ({ id: section.id, label: section.title }))}
+            items={tocItems}
           />
         </aside>
 
@@ -99,6 +108,7 @@ export function DocsCenter({ initialTab }: DocsCenterProps) {
           {sections.map((section) => (
             <DocsSection key={section.id} section={section} />
           ))}
+          {activeTabMeta.id === "rules" ? <GamificationDocsSection /> : null}
         </div>
       </div>
     </section>

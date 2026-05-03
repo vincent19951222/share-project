@@ -21,8 +21,14 @@ model Team {
   weeklyReportDrafts WeeklyReportDraft[]
   enterpriseWechatSendLogs EnterpriseWechatSendLog[]
   enterpriseWechatPushEvents EnterpriseWechatPushEvent[]
+  dailyTaskAssignments DailyTaskAssignment[]
+  lotteryTicketLedgers LotteryTicketLedger[]
+  inventoryItems InventoryItem[]
+  itemUseRecords ItemUseRecord[]
+  lotteryDraws LotteryDraw[]
   socialInvitations SocialInvitation[]
   socialInvitationResponses SocialInvitationResponse[]
+  realWorldRedemptions RealWorldRedemption[]
 }
 
 model User {
@@ -34,6 +40,7 @@ model User {
   currentStreak         Int                    @default(0)
   lastPunchDayKey       String?
   coins                 Int                    @default(0)
+  ticketBalance         Int                    @default(0)
   teamId                String
   team                  Team                   @relation(fields: [teamId], references: [id])
   punchRecords          PunchRecord[]
@@ -43,9 +50,17 @@ model User {
   coffeeRecords         CoffeeRecord[]
   teamDynamicReadStates TeamDynamicReadState[]
   weeklyReportDrafts    WeeklyReportDraft[]
+  dailyTaskAssignments  DailyTaskAssignment[]
+  lotteryTicketLedgers  LotteryTicketLedger[]
+  inventoryItems        InventoryItem[]
+  itemUseRecords        ItemUseRecord[]
+  lotteryDraws          LotteryDraw[]
   sentSocialInvitations SocialInvitation[]     @relation("SocialInvitationSender")
   receivedSocialInvitations SocialInvitation[] @relation("SocialInvitationRecipient")
   socialInvitationResponses SocialInvitationResponse[] @relation("SocialInvitationResponder")
+  realWorldRedemptions  RealWorldRedemption[]
+  confirmedRedemptions  RealWorldRedemption[]  @relation("RedemptionConfirmer")
+  cancelledRedemptions  RealWorldRedemption[]  @relation("RedemptionCanceller")
   createdAt             DateTime               @default(now())
 }
 
@@ -86,6 +101,8 @@ model EnterpriseWechatSendLog {
 
   @@index([teamId, createdAt])
   @@index([purpose, createdAt])
+  @@index([targetType, targetId])
+  @@index([status, createdAt])
 }
 
 model EnterpriseWechatPushEvent {
@@ -114,11 +131,14 @@ model SocialInvitation {
   status              String
   dayKey              String
   message             String
+  itemUseRecordId     String?                  @unique
+  itemUseRecord       ItemUseRecord?           @relation(fields: [itemUseRecordId], references: [id])
   wechatSendLogId     String?
   wechatSendLog       EnterpriseWechatSendLog? @relation(fields: [wechatSendLogId], references: [id])
   wechatWebhookSentAt DateTime?
   respondedAt         DateTime?
   expiredAt           DateTime?
+  rewardSettledAt     DateTime?
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @updatedAt
   responses           SocialInvitationResponse[]
@@ -138,10 +158,144 @@ model SocialInvitationResponse {
   responderUser   User             @relation("SocialInvitationResponder", fields: [responderUserId], references: [id])
   dayKey          String
   responseText    String?
+  displayPayloadJson String?
   createdAt       DateTime         @default(now())
 
   @@unique([invitationId, responderUserId])
   @@index([teamId, dayKey, createdAt])
+  @@index([responderUserId, dayKey])
+}
+
+model DailyTaskAssignment {
+  id                     String    @id @default(cuid())
+  userId                 String
+  user                   User      @relation(fields: [userId], references: [id])
+  teamId                 String
+  team                   Team      @relation(fields: [teamId], references: [id])
+  dayKey                 String
+  dimensionKey           String
+  taskCardId             String
+  rerollCount            Int       @default(0)
+  rerolledFromTaskCardId String?
+  completedAt            DateTime?
+  completionText         String?
+  note                   String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@unique([userId, dayKey, dimensionKey])
+  @@index([teamId, dayKey])
+}
+
+model LotteryTicketLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  teamId       String
+  team         Team     @relation(fields: [teamId], references: [id])
+  dayKey       String
+  delta        Int
+  balanceAfter Int
+  reason       String
+  sourceType   String?
+  sourceId     String?
+  metadataJson String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([teamId, dayKey, createdAt])
+  @@unique([sourceType, sourceId])
+}
+
+model InventoryItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id])
+  itemId    String
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, itemId])
+  @@index([teamId, itemId])
+}
+
+model ItemUseRecord {
+  id                 String            @id @default(cuid())
+  userId             String
+  user               User              @relation(fields: [userId], references: [id])
+  teamId             String
+  team               Team              @relation(fields: [teamId], references: [id])
+  itemId             String
+  dayKey             String
+  status             String
+  targetType         String?
+  targetId           String?
+  effectSnapshotJson String
+  settledAt          DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  socialInvitation   SocialInvitation?
+
+  @@index([userId, dayKey, status])
+  @@index([teamId, dayKey, status])
+  @@index([targetType, targetId])
+}
+
+model LotteryDraw {
+  id               String              @id @default(cuid())
+  userId           String
+  user             User                @relation(fields: [userId], references: [id])
+  teamId           String
+  team             Team                @relation(fields: [teamId], references: [id])
+  drawType         String
+  ticketSpent      Int
+  coinSpent        Int                 @default(0)
+  guaranteeApplied Boolean             @default(false)
+  createdAt        DateTime            @default(now())
+  results          LotteryDrawResult[]
+
+  @@index([userId, createdAt])
+  @@index([teamId, createdAt])
+}
+
+model LotteryDrawResult {
+  id                 String      @id @default(cuid())
+  drawId             String
+  draw               LotteryDraw @relation(fields: [drawId], references: [id])
+  position           Int
+  rewardId           String
+  rewardTier         String
+  rewardKind         String
+  rewardSnapshotJson String
+  createdAt          DateTime    @default(now())
+
+  @@unique([drawId, position])
+}
+
+model RealWorldRedemption {
+  id                String    @id @default(cuid())
+  teamId            String
+  team              Team      @relation(fields: [teamId], references: [id])
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  itemId            String
+  status            String
+  requestedAt       DateTime  @default(now())
+  confirmedByUserId String?
+  confirmedByUser   User?     @relation("RedemptionConfirmer", fields: [confirmedByUserId], references: [id])
+  confirmedAt       DateTime?
+  cancelledByUserId String?
+  cancelledByUser   User?     @relation("RedemptionCanceller", fields: [cancelledByUserId], references: [id])
+  cancelledAt       DateTime?
+  note              String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([teamId, status, requestedAt])
+  @@index([userId, status, requestedAt])
 }
 
 model TeamDynamic {
@@ -212,21 +366,29 @@ model SeasonMemberStat {
 }
 
 model PunchRecord {
-  id                    String   @id @default(cuid())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id])
-  seasonId              String?
-  season                Season?  @relation(fields: [seasonId], references: [id])
-  dayIndex              Int
-  dayKey                String
-  punched               Boolean
-  punchType             String?
-  streakAfterPunch      Int      @default(0)
-  assetAwarded          Int      @default(0)
-  countedForSeasonSlot  Boolean  @default(false)
-  createdAt             DateTime @default(now())
+  id                         String   @id @default(cuid())
+  userId                     String
+  user                       User     @relation(fields: [userId], references: [id])
+  seasonId                   String?
+  season                     Season?  @relation(fields: [seasonId], references: [id])
+  dayIndex                   Int
+  dayKey                     String
+  punched                    Boolean
+  punchType                  String?
+  streakAfterPunch           Int      @default(0)
+  assetAwarded               Int      @default(0)
+  baseAssetAwarded           Int      @default(0)
+  boostAssetBonus            Int      @default(0)
+  baseSeasonContribution     Int      @default(0)
+  boostSeasonBonus           Int      @default(0)
+  seasonContributionAwarded  Int      @default(0)
+  boostItemUseRecordId       String?
+  boostSummaryJson           String?
+  countedForSeasonSlot       Boolean  @default(false)
+  createdAt                  DateTime @default(now())
 
   @@unique([userId, dayKey])
+  @@index([boostItemUseRecordId])
 }
 
 model BoardNote {

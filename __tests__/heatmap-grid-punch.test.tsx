@@ -178,6 +178,7 @@ describe("HeatmapGrid punch flow", () => {
       button.textContent?.includes("确认打卡"),
     );
     expect(confirmButton).toBeDefined();
+    expect(container.textContent).toContain("获得 1 张健身券");
 
     await act(async () => {
       confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -216,6 +217,7 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterResponse.gridData[0][0]).toBe(true);
     expect(stateAfterResponse.logs).toHaveLength(1);
     expect(stateAfterResponse.logs[0].type).toBe("success");
+    expect(stateAfterResponse.logs[0].text).toContain("健身券 +1");
     expect(stateAfterResponse.logs[0].text).toContain("服务器状态已同步");
     expect(container.textContent).toContain("✓");
   });
@@ -321,6 +323,7 @@ describe("HeatmapGrid punch flow", () => {
     });
 
     expect(container.textContent).toContain("撤销今天打卡");
+    expect(container.textContent).toContain("未使用的健身券");
 
     const undoButton = Array.from(container.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("确认撤销"),
@@ -383,5 +386,65 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterResponse.logs[0].type).toBe("highlight");
     expect(stateAfterResponse.logs[0].text).toContain("已撤销今日健身打卡");
     expect(container.textContent).toContain("+");
+  });
+
+  it("shows the spent fitness ticket error when punch undo is blocked", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 409,
+        json: async () => ({
+          error: "今天打卡送出的健身券已经花掉了，不能撤销打卡。",
+        }),
+      }),
+    );
+
+    const punchedState: BoardState = {
+      ...initialState,
+      gridData: [[true, null], [false, null]],
+      currentUser: {
+        assetBalance: 20,
+        currentStreak: 1,
+        nextReward: 20,
+        seasonIncome: 0,
+        isAdmin: false,
+      },
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={punchedState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const punchedCellButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "✓",
+    );
+    expect(punchedCellButton).toBeDefined();
+
+    await act(async () => {
+      punchedCellButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const undoButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认撤销"),
+    );
+    expect(undoButton).toBeDefined();
+
+    await act(async () => {
+      undoButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    const stateAfterFailure = readState(container);
+
+    expect(stateAfterFailure.gridData[0][0]).toBe(true);
+    expect(stateAfterFailure.logs[0].type).toBe("alert");
+    expect(stateAfterFailure.logs[0].text).toContain("健身券已经花掉了");
+    expect(container.textContent).toContain("今天打卡送出的健身券已经花掉了，不能撤销打卡。");
   });
 });

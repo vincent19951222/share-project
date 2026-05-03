@@ -34,11 +34,19 @@ export interface ActivityEventWithUser {
   };
 }
 
-export function buildPunchActivityMessage(username: string, reward: number) {
+export function buildPunchActivityMessage(username: string, reward: number, boostLabel?: string | null) {
+  if (boostLabel) {
+    return `${username} 刚刚打卡，拿下 ${reward} 银子，${boostLabel}生效`;
+  }
+
   return `${username} 刚刚打卡，拿下 ${reward} 银子`;
 }
 
-export function buildUndoPunchActivityMessage(username: string) {
+export function buildUndoPunchActivityMessage(username: string, consumedBoostLabel?: string | null) {
+  if (consumedBoostLabel) {
+    return `${username} 撤销了今天的打卡，已消耗的${consumedBoostLabel}不返还`;
+  }
+
   return `${username} 撤销了今天的打卡`;
 }
 

@@ -94,6 +94,20 @@ describe("DocsCenter", () => {
     expect(container.querySelector('a[href="/manual?tab=help#asset-check"]')).not.toBeNull();
   });
 
+  it("shows gamification rules inside the docs center", async () => {
+    await act(async () => {
+      root.render(<DocsCenter initialTab="rules" />);
+    });
+
+    expect(container.textContent).toContain("补给站玩法规则");
+    expect(container.textContent).toContain("每天最多两张免费券");
+    expect(container.textContent).toContain("十连消耗 10 张券");
+    expect(container.textContent).toContain("抽奖概率说明");
+    expect(container.querySelector("#supply-station-rules")).not.toBeNull();
+    expect(container.querySelector("#supply-station-probability")).not.toBeNull();
+    expect(container.querySelector('a[href="/docs?tab=rules#supply-station-probability"]')).not.toBeNull();
+  });
+
   it("falls back to /docs when pathname is unavailable", async () => {
     pathnameMock = null;
 

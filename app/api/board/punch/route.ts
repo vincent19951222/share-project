@@ -9,10 +9,21 @@ import {
 } from "@/lib/activity-events";
 import { buildBoardSnapshotForUser, getCurrentBoardDay } from "@/lib/board-state";
 import {
-  getNextPunchRewardPreview,
-  getNextPunchStreak,
+  FITNESS_PUNCH_REVERSAL_SOURCE_TYPE,
+  FITNESS_PUNCH_SOURCE_TYPE,
+  FITNESS_PUNCH_TICKET_GRANT_REASON,
+  FITNESS_PUNCH_TICKET_REVOKE_REASON,
+  FitnessTicketAlreadySpentError,
+  shouldGrantFitnessPunchTicket,
+} from "@/lib/gamification/fitness-ticket";
+import {
+  getPunchRewardForStreak,
   getShanghaiDayKey,
 } from "@/lib/economy";
+import {
+  getNextPunchStreakWithLeaveProtection,
+} from "@/lib/gamification/item-use";
+import { settleBoostForPunch } from "@/lib/gamification/boost-settlement";
 import {
   pushFullTeamAttendanceIfNeeded,
   pushSeasonTargetReachedIfNeeded,
@@ -85,17 +96,16 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const today = getCurrentBoardDay(now);
     const todayDayKey = getShanghaiDayKey(now);
-    const nextStreak = getNextPunchStreak(
-      user.currentStreak,
-      user.lastPunchDayKey,
+    const nextStreak = await getNextPunchStreakWithLeaveProtection({
+      userId: user.id,
+      currentStreak: user.currentStreak,
+      lastPunchDayKey: user.lastPunchDayKey,
       todayDayKey,
-    );
-    const reward = getNextPunchRewardPreview(
-      user.currentStreak,
-      user.lastPunchDayKey,
-      todayDayKey,
-    );
+    });
+    const reward = getPunchRewardForStreak(nextStreak);
     const activeSeason = user.team.seasons[0] ?? null;
+    const baseReward = reward;
+    const baseSeasonContribution = activeSeason ? baseReward : 0;
     const memberOrder = Math.max(
       user.team.users.findIndex((member) => member.id === user.id),
       0,
@@ -132,7 +142,7 @@ export async function POST(request: NextRequest) {
             : activeSeason.filledSlots;
         }
 
-        await tx.punchRecord.create({
+        const punch = await tx.punchRecord.create({
           data: {
             userId: user.id,
             seasonId: activeSeason?.id ?? null,
@@ -141,29 +151,81 @@ export async function POST(request: NextRequest) {
             punched: true,
             punchType: "default",
             streakAfterPunch: nextStreak,
-            assetAwarded: reward,
+            assetAwarded: baseReward,
+            baseAssetAwarded: baseReward,
+            boostAssetBonus: 0,
+            baseSeasonContribution,
+            boostSeasonBonus: 0,
+            seasonContributionAwarded: baseSeasonContribution,
             countedForSeasonSlot: countsForSeasonSlot,
           },
         });
+        const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
 
-        await tx.user.update({
+        const boostSettlement = await settleBoostForPunch({
+          tx,
+          userId: user.id,
+          teamId: user.teamId,
+          dayKey: todayDayKey,
+          punchRecordId: punch.id,
+          baseAssetAwarded: baseReward,
+          baseSeasonContribution,
+          applyBonusDeltas: false,
+        });
+
+        const updatedUser = await tx.user.update({
           where: { id: user.id },
           data: {
             coins: {
-              increment: reward,
+              increment: boostSettlement.assetAwarded,
             },
             currentStreak: nextStreak,
             lastPunchDayKey: todayDayKey,
+            ...(grantsFitnessTicket
+              ? {
+                  ticketBalance: {
+                    increment: 1,
+                  },
+                }
+              : {}),
+          },
+          select: {
+            ticketBalance: true,
           },
         });
+
+        if (grantsFitnessTicket) {
+          await tx.lotteryTicketLedger.create({
+            data: {
+              userId: user.id,
+              teamId: user.teamId,
+              dayKey: todayDayKey,
+              delta: 1,
+              balanceAfter: updatedUser.ticketBalance,
+              reason: FITNESS_PUNCH_TICKET_GRANT_REASON,
+              sourceType: FITNESS_PUNCH_SOURCE_TYPE,
+              sourceId: punch.id,
+              metadataJson: JSON.stringify({
+                punchRecordId: punch.id,
+                dayKey: todayDayKey,
+                punchType: punch.punchType,
+              }),
+              createdAt: now,
+            },
+          });
+        }
 
         await tx.activityEvent.create({
           data: {
             teamId: user.teamId,
             userId: user.id,
             type: ACTIVITY_EVENT_TYPES.PUNCH,
-            message: buildPunchActivityMessage(user.username, reward),
-            assetAwarded: reward,
+            message: buildPunchActivityMessage(
+              user.username,
+              boostSettlement.assetAwarded,
+              boostSettlement.boostLabel,
+            ),
+            assetAwarded: boostSettlement.assetAwarded,
             createdAt: now,
           },
         });
@@ -191,7 +253,7 @@ export async function POST(request: NextRequest) {
               },
               data: {
                 seasonIncome: {
-                  increment: reward,
+                  increment: boostSettlement.seasonContributionAwarded,
                 },
                 ...(countsForSeasonSlot
                   ? {
@@ -208,7 +270,7 @@ export async function POST(request: NextRequest) {
               data: {
                 seasonId: activeSeason.id,
                 userId: user.id,
-                seasonIncome: reward,
+                seasonIncome: boostSettlement.seasonContributionAwarded,
                 slotContribution: countsForSeasonSlot ? 1 : 0,
                 colorIndex: memberOrder,
                 memberOrder,
@@ -385,12 +447,86 @@ export async function DELETE(request: NextRequest) {
             id: true,
             seasonId: true,
             assetAwarded: true,
+            seasonContributionAwarded: true,
+            boostItemUseRecordId: true,
+            boostSummaryJson: true,
             countedForSeasonSlot: true,
+            punched: true,
+            punchType: true,
           },
         });
 
         if (!todayPunch) {
           throw new TodayPunchNotFoundError();
+        }
+
+        const grantLedger = shouldGrantFitnessPunchTicket(todayPunch)
+          ? await tx.lotteryTicketLedger.findFirst({
+              where: {
+                userId: user.id,
+                dayKey: todayDayKey,
+                reason: FITNESS_PUNCH_TICKET_GRANT_REASON,
+                sourceType: FITNESS_PUNCH_SOURCE_TYPE,
+                sourceId: todayPunch.id,
+              },
+              select: {
+                id: true,
+              },
+            })
+          : null;
+
+        const revokeLedger = grantLedger
+          ? await tx.lotteryTicketLedger.findFirst({
+              where: {
+                userId: user.id,
+                dayKey: todayDayKey,
+                reason: FITNESS_PUNCH_TICKET_REVOKE_REASON,
+                sourceType: FITNESS_PUNCH_REVERSAL_SOURCE_TYPE,
+                sourceId: todayPunch.id,
+              },
+              select: {
+                id: true,
+              },
+            })
+          : null;
+
+        if (grantLedger && !revokeLedger) {
+          const ticketUser = await tx.user.findUniqueOrThrow({
+            where: { id: user.id },
+            select: { ticketBalance: true },
+          });
+
+          if (ticketUser.ticketBalance < 1) {
+            throw new FitnessTicketAlreadySpentError();
+          }
+
+          const balanceAfter = ticketUser.ticketBalance - 1;
+
+          await tx.lotteryTicketLedger.create({
+            data: {
+              userId: user.id,
+              teamId: user.teamId,
+              dayKey: todayDayKey,
+              delta: -1,
+              balanceAfter,
+              reason: FITNESS_PUNCH_TICKET_REVOKE_REASON,
+              sourceType: FITNESS_PUNCH_REVERSAL_SOURCE_TYPE,
+              sourceId: todayPunch.id,
+              metadataJson: JSON.stringify({
+                punchRecordId: todayPunch.id,
+                grantLedgerId: grantLedger.id,
+                dayKey: todayDayKey,
+              }),
+              createdAt: now,
+            },
+          });
+
+          await tx.user.update({
+            where: { id: user.id },
+            data: {
+              ticketBalance: balanceAfter,
+            },
+          });
         }
 
         const previousPunch = await tx.punchRecord.findFirst({
@@ -406,6 +542,14 @@ export async function DELETE(request: NextRequest) {
             streakAfterPunch: true,
           },
         });
+
+        const seasonRollbackAmount =
+          todayPunch.seasonContributionAwarded > 0
+            ? todayPunch.seasonContributionAwarded
+            : todayPunch.assetAwarded;
+        const consumedBoostLabel = todayPunch.boostSummaryJson
+          ? (JSON.parse(todayPunch.boostSummaryJson) as { boostLabel?: string | null }).boostLabel
+          : null;
 
         await tx.punchRecord.delete({
           where: { id: todayPunch.id },
@@ -427,7 +571,7 @@ export async function DELETE(request: NextRequest) {
             teamId: user.teamId,
             userId: user.id,
             type: ACTIVITY_EVENT_TYPES.UNDO_PUNCH,
-            message: buildUndoPunchActivityMessage(user.username),
+            message: buildUndoPunchActivityMessage(user.username, consumedBoostLabel),
             assetAwarded: null,
             createdAt: now,
           },
@@ -456,7 +600,7 @@ export async function DELETE(request: NextRequest) {
               },
               data: {
                 seasonIncome: {
-                  decrement: todayPunch.assetAwarded,
+                  decrement: seasonRollbackAmount,
                 },
                 ...(todayPunch.countedForSeasonSlot
                   ? {
@@ -488,7 +632,10 @@ export async function DELETE(request: NextRequest) {
         }
       });
     } catch (error) {
-      if (error instanceof TodayPunchNotFoundError) {
+      if (
+        error instanceof TodayPunchNotFoundError ||
+        error instanceof FitnessTicketAlreadySpentError
+      ) {
         return NextResponse.json({ error: error.message }, { status: 409 });
       }
 

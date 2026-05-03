@@ -9,6 +9,7 @@ import { AssetIcon } from "@/components/ui/AssetIcon";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { TeamDynamicsBell } from "./TeamDynamicsBell";
+import type { AppTab } from "@/lib/types";
 
 export function Navbar() {
   const { state, dispatch } = useBoard();
@@ -21,7 +22,7 @@ export function Navbar() {
     state.members[0] ??
     null;
 
-  function handleTabChange(tab: "punch" | "board" | "coffee" | "calendar" | "dash") {
+  function handleTabChange(tab: AppTab) {
     dispatch({ type: "SET_TAB", tab });
     setMobileTabsOpen(false);
   }
@@ -80,6 +81,14 @@ export function Navbar() {
               >
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
                 续命咖啡
+              </TabBtn>
+              <TabBtn
+                active={state.activeTab === "supply"}
+                className="supply-tab"
+                onClick={() => handleTabChange("supply")}
+              >
+                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
+                牛马补给站
               </TabBtn>
               <TabBtn
                 active={state.activeTab === "calendar"}
@@ -165,6 +174,16 @@ export function Navbar() {
               <span className="flex items-center gap-2">
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
                 续命咖啡
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={state.activeTab === "supply"}
+              className="mobile-tab-btn supply-tab justify-between"
+              onClick={() => handleTabChange("supply")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
+                牛马补给站
               </span>
             </TabBtn>
             <TabBtn

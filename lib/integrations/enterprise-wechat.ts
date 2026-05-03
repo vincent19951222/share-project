@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 type FetchImpl = (input: string, init: RequestInit) => Promise<Response>;
 
 const MAX_CONTENT_PREVIEW_LENGTH = 280;
+const MAX_MESSAGE_LENGTH = 3800;
 const MAX_RESPONSE_SNIPPET_LENGTH = 500;
 
 export type EnterpriseWechatMessage =
@@ -36,6 +37,13 @@ export type EnterpriseWechatSendResult =
       errorMessage?: string;
     };
 
+export type EnterpriseWechatSendPurpose =
+  | "MANUAL_TEST"
+  | "WEAK_SOCIAL_INVITATION"
+  | "WEEKLY_REPORT"
+  | "TEAM_BROADCAST"
+  | "TEAM_MILESTONE";
+
 function compactLines(lines: Array<string | undefined>): string[] {
   return lines
     .map((line) => line?.trim() ?? "")
@@ -51,17 +59,11 @@ function truncate(value: string, maxLength: number): string {
 }
 
 function normalizeMessageContent(content: string): string {
-  return content.trim();
+  return truncate(content.trim(), MAX_MESSAGE_LENGTH);
 }
 
 function resolveWebhookUrl(override?: string): string {
-  return (
-    override?.trim() ||
-    process.env.ENTERPRISE_WECHAT_WEBHOOK_URL?.trim() ||
-    process.env.WEWORK_WEBHOOK_URL?.trim() ||
-    process.env.WEWORK_WEEKLY_REPORT_WEBHOOK_URL?.trim() ||
-    ""
-  );
+  return override?.trim() || process.env.ENTERPRISE_WECHAT_WEBHOOK_URL?.trim() || "";
 }
 
 function buildPayload(message: EnterpriseWechatMessage) {
@@ -135,6 +137,23 @@ function parseWechatResponseSnippet(bodyText: string): {
   }
 }
 
+function sanitizeExternalText(value: string | undefined, webhookUrl: string): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const withoutWebhook = webhookUrl ? value.split(webhookUrl).join("[redacted-webhook]") : value;
+  return withoutWebhook.replace(/key=[^&\s"]+/g, "key=[redacted]");
+}
+
+function formatMarkdownLine(line: string) {
+  if (line.startsWith("- ") || line.startsWith("> ")) {
+    return line;
+  }
+
+  return `- ${line}`;
+}
+
 export function formatEnterpriseWechatText(input: {
   title: string;
   lines: string[];
@@ -142,24 +161,38 @@ export function formatEnterpriseWechatText(input: {
 }): EnterpriseWechatMessage {
   return {
     type: "text",
-    content: compactLines([input.title, ...input.lines, input.footer]).join("\n"),
+    content: truncate(
+      compactLines([`【${input.title.trim()}】`, ...input.lines, input.footer]).join("\n"),
+      MAX_MESSAGE_LENGTH,
+    ),
   };
 }
 
 export function formatEnterpriseWechatMarkdown(input: {
   title: string;
+  quote?: string;
   lines: string[];
   footer?: string;
 }): EnterpriseWechatMessage {
+  const lines = compactLines(input.lines).map(formatMarkdownLine);
+
   return {
     type: "markdown",
-    content: compactLines([`**${input.title}**`, ...input.lines, input.footer]).join("\n"),
+    content: truncate(
+      compactLines([
+        `**${input.title.trim()}**`,
+        input.quote ? `> ${input.quote.trim()}` : undefined,
+        ...lines,
+        input.footer,
+      ]).join("\n"),
+      MAX_MESSAGE_LENGTH,
+    ),
   };
 }
 
 export async function recordEnterpriseWechatPushEvent(input: {
   teamId: string;
-  purpose: string;
+  purpose: EnterpriseWechatSendPurpose;
   eventKey: string;
   targetType?: string;
   targetId?: string;
@@ -193,7 +226,7 @@ export async function recordEnterpriseWechatPushEvent(input: {
 
 export async function sendEnterpriseWechatMessage(input: {
   teamId?: string;
-  purpose: string;
+  purpose: EnterpriseWechatSendPurpose;
   targetType?: string;
   targetId?: string;
   webhookUrl?: string;
@@ -255,7 +288,10 @@ export async function sendEnterpriseWechatMessage(input: {
       body: JSON.stringify(buildPayload({ ...input.message, content })),
     });
     const responseBody = await response.text();
-    const responseBodySnippet = truncate(responseBody, MAX_RESPONSE_SNIPPET_LENGTH);
+    const responseBodySnippet = truncate(
+      sanitizeExternalText(responseBody, webhookUrl) ?? "",
+      MAX_RESPONSE_SNIPPET_LENGTH,
+    );
     const parsed = parseWechatResponseSnippet(responseBody);
 
     if (!response.ok) {
@@ -285,7 +321,7 @@ export async function sendEnterpriseWechatMessage(input: {
       };
     }
 
-    if (parsed.wechatErrcode !== undefined && parsed.wechatErrcode !== 0) {
+    if (parsed.wechatErrcode !== 0) {
       const log = await createSendLog({
         teamId: input.teamId,
         purpose: input.purpose,
@@ -335,7 +371,11 @@ export async function sendEnterpriseWechatMessage(input: {
       wechatErrmsg: parsed.wechatErrmsg ?? "ok",
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown network error";
+    const errorMessage =
+      sanitizeExternalText(
+        error instanceof Error ? error.message : "Unknown network error",
+        webhookUrl,
+      ) ?? "Unknown network error";
     const log = await createSendLog({
       teamId: input.teamId,
       purpose: input.purpose,
