@@ -130,6 +130,17 @@ body {
 
 .punch-scene-content {
   height: 100%;
+  min-height: 0;
+}
+
+.punch-scene .soft-card {
+  border-color: #111827;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 6px 0 0 #111827;
+}
+
+.punch-scene .heatmap-shell {
+  backdrop-filter: blur(2px);
 }
 
 .team-header {
@@ -333,6 +344,10 @@ body {
   .punch-scene {
     border-radius: 1.2rem;
     padding: 0.75rem;
+  }
+
+  .punch-scene-content {
+    gap: 0.75rem;
   }
 
   .punch-scene-poster-left,
