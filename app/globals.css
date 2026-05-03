@@ -2616,20 +2616,87 @@ body {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.5); opacity: 0.5; }
 }
+@media (max-width: 1200px) {
+  .shared-board-content {
+    width: min(100%, 66rem);
+    padding-top: 3rem;
+  }
+  .shared-board-cork {
+    padding-inline: 1.25rem;
+  }
+  .shared-board-poster-left,
+  .shared-board-poster-right {
+    width: 6.6rem;
+  }
+  .shared-board-discipline-note {
+    width: 4.9rem;
+  }
+  .shared-board-dumbbell {
+    width: 7.4rem;
+  }
+  .shared-board-marker {
+    width: 4.2rem;
+  }
+  .shared-board-paperclip {
+    width: 3.2rem;
+  }
+}
 @media (max-width: 900px) {
   .shared-board-content {
+    width: 100%;
     padding: 1rem 0.75rem 2rem;
   }
   .shared-board-cork {
     min-height: auto;
+    border-width: 4px;
+    border-radius: 0.35rem;
     padding-inline: 0.85rem;
+    box-shadow: 0 0.7rem 0 rgba(17, 24, 39, 0.85), 0 1rem 1.4rem rgba(15, 23, 42, 0.18);
   }
   .shared-board-prop {
     display: none;
   }
+  .shared-board-composer-wrap {
+    max-width: none;
+  }
+  .shared-board-note-wall,
+  .note-masonry {
+    column-gap: 0.85rem;
+  }
 }
 @media (max-width: 640px) {
+  .app-top-nav > div:first-child {
+    border-radius: 1rem;
+    padding: 0.35rem 0.45rem;
+  }
+  .app-top-nav .font-black.text-2xl {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+    white-space: nowrap;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .app-top-nav .font-black.text-2xl > div {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  .app-top-nav > div:first-child > div:first-child,
+  .app-top-nav > div:first-child > div:last-child {
+    gap: 0.4rem;
+  }
+  .app-top-nav .mobile-nav-toggle,
+  .app-top-nav .team-dynamics-bell {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  .app-top-nav button.rounded-full.bg-white {
+    padding-right: 0.45rem;
+  }
+  .app-top-nav button.rounded-full.bg-white span.font-bold.text-sm {
+    display: none;
+  }
   .shared-board-composer {
+    border-width: 3px;
     padding: 2rem 0.85rem 0.85rem;
   }
   .shared-board-composer > div {
@@ -2643,6 +2710,37 @@ body {
   }
   .shared-board-type-toggle {
     width: 100%;
+  }
+  .shared-board-type-toggle button {
+    min-width: 0;
+    padding-inline: 0.45rem;
+  }
+  .shared-board-color-chip {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+  .shared-board-cork {
+    padding: 1.1rem 0.65rem 1.35rem;
+  }
+  .shared-board-clip {
+    width: 11rem;
+  }
+  .shared-board-note-wall,
+  .note-masonry {
+    column-count: 1;
+  }
+  .note-card {
+    --note-rotate: 0deg;
+    min-height: 11.5rem;
+    padding-inline: 0.85rem;
+    box-shadow: 0.35rem 0.35rem 0 rgba(17, 24, 39, 0.86);
+  }
+  .note-card:hover {
+    transform: translateY(-2px) rotate(var(--note-rotate));
+  }
+  .note-pin {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {
