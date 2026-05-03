@@ -17,8 +17,13 @@ export function TeamHeader() {
       : state.gridData.filter((row) => row[todayIndex] === true).length;
 
   return (
-    <header className="team-header w-full soft-card shrink-0 z-20">
-      <div className="team-header-vault flex shrink-0 items-center gap-4">
+    <header className="team-header team-header-bulletin w-full soft-card shrink-0 z-20">
+      <span className="team-header-pin team-header-pin-tl" aria-hidden="true" />
+      <span className="team-header-pin team-header-pin-tr" aria-hidden="true" />
+      <span className="team-header-pin team-header-pin-bl" aria-hidden="true" />
+      <span className="team-header-pin team-header-pin-br" aria-hidden="true" />
+
+      <div className="team-header-vault team-header-vault-note flex shrink-0 items-center gap-4">
         <div className="team-header-vault-visual" aria-hidden="true">
           <img
             src="/assets/home-scenes/punch/vault-safe.webp"
@@ -26,7 +31,7 @@ export function TeamHeader() {
             className="h-full w-full object-contain"
           />
         </div>
-        <div className="flex flex-col">
+        <div className="team-header-vault-copy flex flex-col">
           <span className="text-[10px] font-bold text-sub tracking-wider uppercase">牛马金库</span>
           <div className="text-2xl font-extrabold flex items-baseline gap-1">
             {teamVaultTotal.toLocaleString("zh-CN")}
@@ -39,7 +44,7 @@ export function TeamHeader() {
         <SeasonProgressBar activeSeason={state.activeSeason ?? null} />
       </div>
 
-      <div className="team-header-account">
+      <div className="team-header-account team-header-ledger">
         <div className="team-header-account-inner">
           <div className="team-header-account-summary">
             <div className="flex flex-col gap-1">

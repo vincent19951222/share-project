@@ -78,6 +78,10 @@ describe("home punch scene", () => {
     expect(container.querySelector(".punch-scene-props")).not.toBeNull();
     expect(content).not.toBeNull();
     expect(content?.querySelector(".team-header")).not.toBeNull();
+    expect(content?.querySelector(".team-header-bulletin")).not.toBeNull();
+    expect(content?.querySelector(".team-header-vault-note")).not.toBeNull();
+    expect(content?.querySelector(".team-header-ledger")).not.toBeNull();
+    expect(content?.querySelectorAll(".team-header-pin")).toHaveLength(4);
     expect(content?.querySelector(".heatmap-shell")).not.toBeNull();
     expect(content?.querySelector(".activity-stream")).not.toBeNull();
     expect(sceneImageSources).toEqual(

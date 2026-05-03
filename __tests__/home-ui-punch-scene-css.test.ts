@@ -61,4 +61,25 @@ describe("home punch scene CSS", () => {
     expect(heatmapRule).toMatch(/backdrop-filter:\s*blur\(2px\)/);
     expect(mobileContentRule).toMatch(/gap:\s*0\.75rem/);
   });
+
+  it("styles the team header as a pinned bulletin board", () => {
+    const css = readFileSync("app/globals.css", "utf8");
+    const bulletinRule = extractRuleBody(css, ".team-header-bulletin");
+    const pinRule = extractRuleBody(css, ".team-header-pin");
+    const vaultVisualRule = extractRuleBody(css, ".team-header-vault-visual");
+    const ledgerRule = extractRuleBody(css, ".team-header-ledger");
+    const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
+    const mobileVaultNoteRule = extractRuleBody(mobileBlock, ".team-header-vault-note");
+
+    expect(bulletinRule).toMatch(/background:[\s\S]*#fff7cc/);
+    expect(bulletinRule).toMatch(/border-color:\s*#111827/);
+    expect(bulletinRule).toMatch(/box-shadow:\s*0 6px 0 0 #111827/);
+    expect(pinRule).toMatch(/background:\s*#fde047/);
+    expect(pinRule).toMatch(/border:\s*2px solid #111827/);
+    expect(vaultVisualRule).toMatch(/width:\s*clamp\(3\.75rem,\s*6vw,\s*5\.5rem\)/);
+    expect(vaultVisualRule).toMatch(/background:\s*#fef3c7/);
+    expect(ledgerRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.86\)/);
+    expect(ledgerRule).toMatch(/border-left:\s*3px dashed #111827/);
+    expect(mobileVaultNoteRule).toMatch(/align-items:\s*center/);
+  });
 });
