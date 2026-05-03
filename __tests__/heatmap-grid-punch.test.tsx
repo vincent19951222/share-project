@@ -115,6 +115,8 @@ describe("HeatmapGrid punch flow", () => {
     expect(container.querySelector(".heatmap-member-rail")).not.toBeNull();
     expect(container.querySelector(".heatmap-day-ruler")).not.toBeNull();
     expect(container.querySelector(".heatmap-grid-track")).not.toBeNull();
+    expect(container.querySelectorAll(".heatmap-desktop-shell .heatmap-day-today")).toHaveLength(1);
+    expect(container.querySelectorAll(".heatmap-desktop-shell .heatmap-cell-today")).toHaveLength(5);
     expect(container.querySelectorAll(".heatmap-member-item")).toHaveLength(5);
     expect(container.querySelectorAll(".heatmap-member-avatar")).toHaveLength(5);
     expect(container.querySelectorAll(".heatmap-grid-row")).toHaveLength(5);

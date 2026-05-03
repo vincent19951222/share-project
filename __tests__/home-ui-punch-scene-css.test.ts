@@ -46,20 +46,30 @@ function extractRuleBody(css: string, selector: string) {
 describe("home punch scene CSS", () => {
   it("styles the punch scene as a framed gym shell with readable foreground panels", () => {
     const css = readFileSync("app/globals.css", "utf8");
+    const propsRule = extractRuleBody(css, ".punch-scene-props {");
     const contentRule = extractRuleBody(css, ".punch-scene-content");
     const cardRule = extractRuleBody(css, ".punch-scene .soft-card");
     const heatmapRule = extractRuleBody(css, ".punch-scene .heatmap-shell");
+    const dumbbellRule = extractRuleBody(css, ".punch-scene-dumbbell {");
+    const towelRule = extractRuleBody(css, ".punch-scene-towel {");
     const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
     const mobileContentRule = extractRuleBody(mobileBlock, ".punch-scene-content");
 
     expect(css).toMatch(/\.punch-scene\s*\{[\s\S]*isolation:\s*isolate/);
     expect(css).toMatch(/\.punch-scene\s*\{[\s\S]*padding:\s*clamp\(0\.75rem,\s*1\.5vw,\s*1\.25rem\)/);
+    expect(propsRule).toMatch(/z-index:\s*1/);
     expect(contentRule).toMatch(/min-height:\s*0/);
+    expect(contentRule).toMatch(/position:\s*relative/);
+    expect(contentRule).toMatch(/z-index:\s*2/);
+    expect(contentRule).toMatch(/padding-inline:\s*clamp\(7\.5rem,\s*10vw,\s*12\.5rem\)/);
     expect(cardRule).toMatch(/border-color:\s*#111827/);
-    expect(cardRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.93\)/);
+    expect(cardRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.97\)/);
     expect(cardRule).toMatch(/box-shadow:\s*0 6px 0 0 #111827/);
     expect(heatmapRule).toMatch(/backdrop-filter:\s*blur\(2px\)/);
+    expect(dumbbellRule).toMatch(/left:\s*clamp/);
+    expect(towelRule).toMatch(/right:\s*clamp/);
     expect(mobileContentRule).toMatch(/gap:\s*0\.75rem/);
+    expect(mobileContentRule).toMatch(/padding-inline:\s*0/);
   });
 
   it("styles the team header as a pinned bulletin board", () => {
@@ -71,7 +81,7 @@ describe("home punch scene CSS", () => {
     const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
     const mobileVaultNoteRule = extractRuleBody(mobileBlock, ".team-header-vault-note");
 
-    expect(bulletinRule).toMatch(/background:[\s\S]*#fff7cc/);
+    expect(bulletinRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.97\)/);
     expect(bulletinRule).toMatch(/border-color:\s*#111827/);
     expect(bulletinRule).toMatch(/box-shadow:\s*0 6px 0 0 #111827/);
     expect(pinRule).toMatch(/background:\s*#fde047/);
@@ -89,6 +99,8 @@ describe("home punch scene CSS", () => {
     const railRule = extractRuleBody(css, ".heatmap-member-rail");
     const rulerRule = extractRuleBody(css, ".heatmap-day-ruler");
     const trackRule = extractRuleBody(css, ".heatmap-grid-track");
+    const todayCellRule = extractRuleBody(css, ".heatmap-cell-today");
+    const todayButtonRule = extractRuleBody(css, ".heatmap-cell-today.my-punch-btn");
     const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
     const mobileMemberRule = extractRuleBody(mobileBlock, ".heatmap-mobile-member {");
 
@@ -99,6 +111,10 @@ describe("home punch scene CSS", () => {
     expect(rulerRule).toMatch(/background:\s*#111827/);
     expect(rulerRule).toMatch(/color:\s*#f8fafc/);
     expect(trackRule).toMatch(/background-image:[\s\S]*linear-gradient\(90deg,\s*rgba\(17,\s*24,\s*39,\s*0\.08\)/);
+    expect(todayCellRule).toMatch(/background:\s*#fef08a/);
+    expect(todayCellRule).toMatch(/border-color:\s*#fde047/);
+    expect(todayButtonRule).toMatch(/background:\s*#111827/);
+    expect(todayButtonRule).toMatch(/color:\s*#fde047/);
     expect(mobileMemberRule).toMatch(/background:\s*#fef3c7/);
   });
 

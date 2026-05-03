@@ -164,9 +164,22 @@ export function HeatmapGrid() {
     const day = index + 1;
     const status = state.gridData[rowIndex][index];
     const isCurrentUser = rowIndex === currentUserIndex;
+    const cellClassName = [
+      "cell",
+      "heatmap-cell-day",
+      day === state.today ? "heatmap-cell-today" : "",
+    ].filter(Boolean).join(" ");
 
     if (day < state.today) {
-      return <div key={day} className={`cell ${status ? "cell-punched" : "cell-missed"}`}>{status ? "✓" : ""}</div>;
+      return (
+        <div
+          key={day}
+          data-day={day}
+          className={`${cellClassName} ${status ? "cell-punched" : "cell-missed"}`}
+        >
+          {status ? "✓" : ""}
+        </div>
+      );
     }
 
     if (day === state.today && !status && isCurrentUser) {
@@ -176,6 +189,7 @@ export function HeatmapGrid() {
           busy={submitting}
           error={error}
           onConfirm={handlePunchConfirm}
+          triggerClassName={`${cellClassName} my-punch-btn text-xl cursor-pointer disabled:opacity-50`}
           helperText="确认后会记为今日健身打卡，并获得 1 张健身券。"
         />
       );
@@ -189,7 +203,7 @@ export function HeatmapGrid() {
           error={error}
           onConfirm={handlePunchUndo}
           triggerContent="✓"
-          triggerClassName="cell cell-punched cursor-pointer disabled:opacity-50"
+          triggerClassName={`${cellClassName} cell-punched cursor-pointer disabled:opacity-50`}
           title="撤销今天打卡"
           description="确认撤销今天的打卡吗？"
           helperText="撤销后会回滚今天获得的银子、连签、赛季进度和未使用的健身券。"
@@ -200,10 +214,10 @@ export function HeatmapGrid() {
     }
 
     if (day === state.today && status) {
-      return <div key={day} className="cell cell-punched">✓</div>;
+      return <div key={day} data-day={day} className={`${cellClassName} cell-punched`}>✓</div>;
     }
 
-    return <div key={day} className="cell cell-future opacity-50" />;
+    return <div key={day} data-day={day} className={`${cellClassName} cell-future opacity-50`} />;
   }
 
   return (
@@ -242,7 +256,7 @@ export function HeatmapGrid() {
               return (
                 <div
                   key={day}
-                  className={`heatmap-day-label w-12 flex justify-center items-center text-xs font-bold rounded-full h-6 ${
+                  className={`heatmap-day-label ${isToday ? "heatmap-day-today" : ""} w-12 flex justify-center items-center text-xs font-bold rounded-full h-6 ${
                     isToday
                       ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]"
                       : "text-slate-400"
@@ -280,7 +294,7 @@ export function HeatmapGrid() {
                   <div
                     key={day}
                     data-day={day}
-                    className={`heatmap-mobile-day flex items-center justify-center text-xs font-bold rounded-full ${
+                    className={`heatmap-mobile-day ${isToday ? "heatmap-day-today" : ""} flex items-center justify-center text-xs font-bold rounded-full ${
                       isToday
                         ? "bg-yellow-300 text-slate-900 border-2 border-slate-800 shadow-[0_2px_0_0_rgba(31,41,55,1)]"
                         : "text-slate-400"
