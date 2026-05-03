@@ -84,6 +84,10 @@ describe("home punch scene", () => {
     expect(content?.querySelectorAll(".team-header-pin")).toHaveLength(4);
     expect(content?.querySelector(".heatmap-shell")).not.toBeNull();
     expect(content?.querySelector(".activity-stream")).not.toBeNull();
+    expect(content?.querySelector(".activity-stream-console")).not.toBeNull();
+    expect(content?.querySelector(".activity-stream-header")).not.toBeNull();
+    expect(content?.querySelector(".activity-stream-list")).not.toBeNull();
+    expect(content?.querySelector(".activity-stream-empty")).not.toBeNull();
     expect(sceneImageSources).toEqual(
       expect.arrayContaining([
         "/assets/home-scenes/punch/gym-wall-bg.webp",

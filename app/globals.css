@@ -167,6 +167,31 @@ body {
   background-size: 3.75rem 3.75rem;
 }
 
+.activity-stream-console {
+  border-color: #111827;
+  background: #111827;
+  color: #f8fafc;
+}
+
+.activity-stream-header {
+  border-bottom-color: #111827;
+  background: #fde047;
+  color: #111827;
+}
+
+.activity-stream-list {
+  margin: 0.45rem;
+  border: 2px solid #111827;
+  border-radius: 1rem;
+  background: rgba(248, 250, 252, 0.96);
+}
+
+.activity-stream-empty {
+  border: 2px dashed #111827;
+  background: #fff7cc;
+  color: #111827;
+}
+
 .team-header {
   position: relative;
   display: flex;
@@ -435,6 +460,10 @@ body {
   .activity-stream {
     height: clamp(12rem, 30vh, 15rem);
     min-height: 12rem;
+  }
+
+  .activity-stream-console {
+    border-width: 4px;
   }
 
   .punch-board-shell {

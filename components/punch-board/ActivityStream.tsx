@@ -138,8 +138,8 @@ export function ActivityStream() {
   const hasActivity = sortedEvents.length > 0 || state.logs.length > 0;
 
   return (
-    <footer className="activity-stream soft-card relative flex h-[20vh] w-full shrink-0 flex-col overflow-hidden">
-      <div className="flex justify-between rounded-t-[1.25rem] border-b-2 border-slate-100 bg-slate-50 px-6 py-2 text-[10px] font-bold tracking-wider text-sub">
+    <footer className="activity-stream activity-stream-console soft-card relative flex h-[20vh] w-full shrink-0 flex-col overflow-hidden">
+      <div className="activity-stream-header flex justify-between rounded-t-[1.25rem] border-b-2 border-slate-100 bg-slate-50 px-6 py-2 text-[10px] font-bold tracking-wider text-sub">
         <span>活动动态（实时）</span>
         <span
           className={`flex items-center gap-1 ${
@@ -155,9 +155,9 @@ export function ActivityStream() {
         </span>
       </div>
 
-      <div ref={streamRef} className="flex flex-1 flex-col gap-2 overflow-y-auto p-3 px-6 text-sm">
+      <div ref={streamRef} className="activity-stream-list flex flex-1 flex-col gap-2 overflow-y-auto p-3 px-6 text-sm">
         {!hasActivity ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-sub">
+          <div className="activity-stream-empty rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-sub">
             最近 24 小时还没有新动态
           </div>
         ) : null}

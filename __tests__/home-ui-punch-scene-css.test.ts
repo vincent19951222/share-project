@@ -101,4 +101,23 @@ describe("home punch scene CSS", () => {
     expect(trackRule).toMatch(/background-image:[\s\S]*linear-gradient\(90deg,\s*rgba\(17,\s*24,\s*39,\s*0\.08\)/);
     expect(mobileMemberRule).toMatch(/background:\s*#fef3c7/);
   });
+
+  it("styles the activity stream as a high-contrast training log", () => {
+    const css = readFileSync("app/globals.css", "utf8");
+    const consoleRule = extractRuleBody(css, ".activity-stream-console");
+    const headerRule = extractRuleBody(css, ".activity-stream-header");
+    const listRule = extractRuleBody(css, ".activity-stream-list");
+    const emptyRule = extractRuleBody(css, ".activity-stream-empty");
+    const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
+    const mobileConsoleRule = extractRuleBody(mobileBlock, ".activity-stream-console");
+
+    expect(consoleRule).toMatch(/border-color:\s*#111827/);
+    expect(consoleRule).toMatch(/background:\s*#111827/);
+    expect(consoleRule).toMatch(/color:\s*#f8fafc/);
+    expect(headerRule).toMatch(/background:\s*#fde047/);
+    expect(headerRule).toMatch(/color:\s*#111827/);
+    expect(listRule).toMatch(/background:\s*rgba\(248,\s*250,\s*252,\s*0\.96\)/);
+    expect(emptyRule).toMatch(/border:\s*2px dashed #111827/);
+    expect(mobileConsoleRule).toMatch(/border-width:\s*4px/);
+  });
 });
