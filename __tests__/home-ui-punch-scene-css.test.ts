@@ -82,4 +82,23 @@ describe("home punch scene CSS", () => {
     expect(ledgerRule).toMatch(/border-left:\s*3px dashed #111827/);
     expect(mobileVaultNoteRule).toMatch(/align-items:\s*center/);
   });
+
+  it("styles the heatmap as a gym training tracker", () => {
+    const css = readFileSync("app/globals.css", "utf8");
+    const panelRule = extractRuleBody(css, ".heatmap-training-panel");
+    const railRule = extractRuleBody(css, ".heatmap-member-rail");
+    const rulerRule = extractRuleBody(css, ".heatmap-day-ruler");
+    const trackRule = extractRuleBody(css, ".heatmap-grid-track");
+    const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
+    const mobileMemberRule = extractRuleBody(mobileBlock, ".heatmap-mobile-member {");
+
+    expect(panelRule).toMatch(/border-color:\s*#111827/);
+    expect(panelRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.9\)/);
+    expect(railRule).toMatch(/border-right:\s*3px solid #111827/);
+    expect(railRule).toMatch(/background:\s*#fef3c7/);
+    expect(rulerRule).toMatch(/background:\s*#111827/);
+    expect(rulerRule).toMatch(/color:\s*#f8fafc/);
+    expect(trackRule).toMatch(/background-image:[\s\S]*linear-gradient\(90deg,\s*rgba\(17,\s*24,\s*39,\s*0\.08\)/);
+    expect(mobileMemberRule).toMatch(/background:\s*#fef3c7/);
+  });
 });

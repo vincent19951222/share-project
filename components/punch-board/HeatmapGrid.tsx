@@ -208,8 +208,8 @@ export function HeatmapGrid() {
 
   return (
     <>
-      <main className="heatmap-shell heatmap-desktop-shell flex-1 w-full soft-card flex relative overflow-hidden">
-        <div className="heatmap-members-column w-28 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
+      <main className="heatmap-shell heatmap-training-panel heatmap-desktop-shell flex-1 w-full soft-card flex relative overflow-hidden">
+        <div className="heatmap-members-column heatmap-member-rail w-28 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
           <div className="heatmap-members-heading h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">
             MEMBERS
           </div>
@@ -234,7 +234,7 @@ export function HeatmapGrid() {
           ref={desktopScrollRef}
           className="heatmap-scroll-pane flex-1 overflow-x-auto no-scrollbar relative flex flex-col scroll-smooth"
         >
-          <div className="heatmap-days-header h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center px-4 gap-3 shrink-0 w-max sticky top-0 z-0">
+          <div className="heatmap-days-header heatmap-day-ruler h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center px-4 gap-3 shrink-0 w-max sticky top-0 z-0">
             {Array.from({ length: state.totalDays }, (_, index) => {
               const day = index + 1;
               const isToday = day === state.today;
@@ -253,7 +253,7 @@ export function HeatmapGrid() {
               );
             })}
           </div>
-          <div className="heatmap-grid-body flex-1 py-2 px-4 w-max relative">
+          <div className="heatmap-grid-body heatmap-grid-track flex-1 py-2 px-4 w-max relative">
             <div className="flex flex-col justify-between h-full relative z-10">
               {state.members.map((member, rowIndex) => (
                 <div key={member.id} className="heatmap-grid-row flex gap-3 h-12 items-center">
@@ -265,7 +265,7 @@ export function HeatmapGrid() {
         </div>
       </main>
 
-      <main className="heatmap-mobile-shell flex-1 w-full soft-card relative overflow-hidden">
+      <main className="heatmap-mobile-shell heatmap-training-panel flex-1 w-full soft-card relative overflow-hidden">
         <div ref={mobileScrollRef} className="heatmap-mobile-scroll no-scrollbar overflow-auto scroll-smooth">
           <div className="heatmap-mobile-table w-max">
             <div className="heatmap-mobile-header flex items-center">
