@@ -43,6 +43,95 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+.punch-scene {
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 1.65rem;
+  background: #f8fafc;
+  padding: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+.punch-scene-background,
+.punch-scene-props {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.punch-scene-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.12) 0%, rgba(248, 250, 252, 0.5) 48%, rgba(15, 23, 42, 0.2) 100%),
+    radial-gradient(circle at 18% 18%, rgba(253, 224, 71, 0.18), transparent 30%),
+    radial-gradient(circle at 83% 15%, rgba(20, 184, 166, 0.14), transparent 28%);
+}
+
+.punch-scene-wall {
+  position: absolute;
+  inset: 0 0 18% 0;
+  width: 100%;
+  height: 82%;
+  object-fit: cover;
+}
+
+.punch-scene-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 28%;
+  object-fit: cover;
+}
+
+.punch-scene-poster,
+.punch-scene-stopwatch,
+.punch-scene-dumbbell,
+.punch-scene-towel {
+  position: absolute;
+  display: block;
+  filter: drop-shadow(0 8px 0 rgba(15, 23, 42, 0.18));
+}
+
+.punch-scene-poster-left {
+  top: clamp(5rem, 12vh, 7.5rem);
+  left: clamp(0.55rem, 1.8vw, 1.6rem);
+  width: clamp(4.5rem, 7vw, 6.5rem);
+}
+
+.punch-scene-poster-right {
+  top: clamp(10.5rem, 24vh, 14rem);
+  right: clamp(0.75rem, 2.5vw, 2.25rem);
+  width: clamp(4.25rem, 6.5vw, 5.75rem);
+}
+
+.punch-scene-stopwatch {
+  top: clamp(4.25rem, 9vh, 6.25rem);
+  right: clamp(1rem, 4vw, 3.5rem);
+  width: clamp(4.25rem, 6.5vw, 6rem);
+}
+
+.punch-scene-dumbbell {
+  right: clamp(0.5rem, 2vw, 1.75rem);
+  bottom: clamp(1.5rem, 3vw, 2.5rem);
+  width: clamp(6.5rem, 11vw, 9.5rem);
+}
+
+.punch-scene-towel {
+  left: clamp(1rem, 4vw, 3.5rem);
+  bottom: clamp(0.65rem, 2vw, 1.5rem);
+  width: clamp(6rem, 10vw, 8.75rem);
+}
+
+.punch-scene-content {
+  height: 100%;
+}
+
 .team-header {
   display: flex;
   min-height: 6.75rem;
@@ -239,6 +328,24 @@ body {
     inset: auto;
     min-height: auto;
     padding-bottom: 1rem;
+  }
+
+  .punch-scene {
+    border-radius: 1.2rem;
+    padding: 0.75rem;
+  }
+
+  .punch-scene-poster-left,
+  .punch-scene-poster-right,
+  .punch-scene-stopwatch {
+    opacity: 0.45;
+    top: 5rem;
+    width: 4.5rem;
+  }
+
+  .punch-scene-dumbbell,
+  .punch-scene-towel {
+    opacity: 0.5;
   }
 
   .coffee-checkin-shell {
