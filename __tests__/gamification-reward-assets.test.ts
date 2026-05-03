@@ -133,36 +133,45 @@ describe("gamification reward assets", () => {
   });
 
   it("records generation traceability for generated assets", () => {
-    const asset = REWARD_ASSETS.find((entry) => entry.assetId === "task_reroll_coupon");
-    const trace = getRewardAssetGenerationTrace("task_reroll_coupon");
+    const generatedAssets = REWARD_ASSETS.filter((asset) => asset.status === "generated");
 
-    expect(asset).toBeDefined();
-    expect(asset?.status).toBe("generated");
-    expect("generationTrace" in asset!).toBe(false);
-    expect(trace?.promptVersion).toBe(asset?.promptVersion);
-    expect(trace?.prompt).toContain("任务换班券");
-    expect(trace?.sourceImagePath).toContain("ig_");
-    expect(trace?.processing).toContain("remove_chroma_key.py");
+    expect(generatedAssets).toHaveLength(18);
+
+    for (const asset of generatedAssets) {
+      const trace = getRewardAssetGenerationTrace(asset.assetId);
+
+      expect("generationTrace" in asset).toBe(false);
+      expect(trace, asset.assetId).toBeDefined();
+      expect(trace?.promptVersion, asset.assetId).toBe(asset.promptVersion);
+      expect(trace?.prompt, asset.assetId).toContain(asset.alt);
+      expect(trace?.sourceImagePath, asset.assetId).toMatch(/\.png$/);
+      expect(trace?.processing, asset.assetId).toContain("remove_chroma_key.py");
+    }
   });
 
-  it("ships the first transparent task reroll icon as a square PNG with transparent corners", () => {
-    const asset = REWARD_ASSETS.find((entry) => entry.assetId === "task_reroll_coupon");
+  it("ships all active reward icons as square PNGs with transparent corners", () => {
+    const activeRewardAssetIds = new Set(getActiveRewards().map((reward) => getRewardAssetId(reward)));
+    const activeAssets = REWARD_ASSETS.filter((asset) => activeRewardAssetIds.has(asset.assetId));
+    const plannedActiveAssets = activeAssets.filter((asset) => asset.status !== "generated");
 
-    expect(asset).toBeDefined();
+    expect(activeAssets).toHaveLength(18);
+    expect(plannedActiveAssets).toEqual([]);
 
-    const filePath = join(process.cwd(), "public", asset!.src.replace(/^\//, ""));
+    for (const asset of activeAssets) {
+      const filePath = join(process.cwd(), "public", asset.src.replace(/^\//, ""));
 
-    expect(existsSync(filePath)).toBe(true);
+      expect(existsSync(filePath), asset.assetId).toBe(true);
 
-    const metadata = readRgbaPng(filePath);
+      const metadata = readRgbaPng(filePath);
 
-    expect(metadata.width).toBe(metadata.height);
-    expect(metadata.width).toBeGreaterThanOrEqual(256);
-    expect(metadata.bitDepth).toBe(8);
-    expect(metadata.colorType).toBe(PNG_COLOR_TYPE_RGBA);
-    expect(metadata.alphaAt(0, 0)).toBe(0);
-    expect(metadata.alphaAt(metadata.width - 1, 0)).toBe(0);
-    expect(metadata.alphaAt(0, metadata.height - 1)).toBe(0);
-    expect(metadata.alphaAt(metadata.width - 1, metadata.height - 1)).toBe(0);
+      expect(metadata.width, asset.assetId).toBe(metadata.height);
+      expect(metadata.width, asset.assetId).toBeGreaterThanOrEqual(256);
+      expect(metadata.bitDepth, asset.assetId).toBe(8);
+      expect(metadata.colorType, asset.assetId).toBe(PNG_COLOR_TYPE_RGBA);
+      expect(metadata.alphaAt(0, 0), asset.assetId).toBe(0);
+      expect(metadata.alphaAt(metadata.width - 1, 0), asset.assetId).toBe(0);
+      expect(metadata.alphaAt(0, metadata.height - 1), asset.assetId).toBe(0);
+      expect(metadata.alphaAt(metadata.width - 1, metadata.height - 1), asset.assetId).toBe(0);
+    }
   });
 });
