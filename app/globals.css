@@ -2366,51 +2366,73 @@ body {
   width: 4rem;
   transform: rotate(-18deg);
 }
+.shared-board-note-wall {
+  margin-top: 1.15rem;
+  column-count: 4;
+  column-gap: 1.15rem;
+}
 .note-masonry {
   column-count: 4;
-  column-gap: 1.25rem;
+  column-gap: 1.15rem;
 }
 @media (max-width: 1400px) {
+  .shared-board-note-wall,
   .note-masonry { column-count: 3; }
 }
 @media (max-width: 1024px) {
+  .shared-board-note-wall,
   .note-masonry { column-count: 2; }
 }
 @media (max-width: 640px) {
+  .shared-board-note-wall,
   .note-masonry { column-count: 1; }
 }
 
+.shared-board-empty-note {
+  display: block;
+  width: min(100%, 26rem);
+  margin: 1rem auto 0;
+  border: 4px dashed #111827;
+  border-radius: 0.35rem;
+  background-color: #fee875;
+  box-shadow: 0 0.45rem 0 #111827;
+  padding: 2rem 1.25rem;
+  text-align: center;
+  transform: rotate(-1deg);
+}
 .note-card {
+  --note-rotate: 0deg;
   break-inside: avoid;
   display: inline-block;
   width: 100%;
-  margin-bottom: 1.25rem;
+  min-height: 13.5rem;
+  margin-bottom: 1.15rem;
   position: relative;
-  border: 4px solid #1f2937;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  box-shadow: 0 4px 0 0 #1f2937;
+  border: 4px solid #111827;
+  border-radius: 0.35rem;
+  padding: 2.25rem 1rem 1rem;
+  box-shadow: 0.45rem 0.45rem 0 rgba(17, 24, 39, 0.86);
+  transform: rotate(var(--note-rotate));
+  transform-origin: 50% 1.2rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.note-card:nth-child(4n + 1) { --note-rotate: -1.2deg; }
+.note-card:nth-child(4n + 2) { --note-rotate: 0.9deg; }
+.note-card:nth-child(4n + 3) { --note-rotate: -0.4deg; }
+.note-card:nth-child(4n + 4) { --note-rotate: 1.35deg; }
 .note-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 0 0 rgba(31, 41, 55, 0.3);
+  transform: translateY(-4px) rotate(var(--note-rotate));
+  box-shadow: 0.7rem 0.7rem 0 rgba(17, 24, 39, 0.78);
 }
-.note-free-yellow { background-color: #fef9c3; border-color: #fde047; }
-.note-free-blue { background-color: #dbeafe; border-color: #93c5fd; }
-.note-free-green { background-color: #dcfce7; border-color: #86efac; }
-.note-free-pink { background-color: #fce7f3; border-color: #f9a8d4; }
+.note-free-yellow { background-color: #fee875; border-color: #111827; }
+.note-free-blue { background-color: #b9ddfb; border-color: #111827; }
+.note-free-green { background-color: #d9efc7; border-color: #111827; }
+.note-free-pink { background-color: #f7bfd0; border-color: #111827; }
 .note-announcement {
-  background-color: #facc15;
-  border-color: #1f2937;
-  box-shadow: 0 6px 0 0 #1f2937;
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.22) 12%,
-    rgba(250, 204, 21, 0.92) 12%,
-    rgba(250, 204, 21, 0.92) 100%
-  );
+  background-color: #fde047;
+  border-color: #111827;
+  box-shadow: 0.45rem 0.45rem 0 #111827;
+  padding-top: 3.15rem;
 }
 .note-announcement .text-main {
   color: #111827;
@@ -2419,13 +2441,69 @@ body {
   color: #78350f;
 }
 .note-announcement .note-close-btn {
-  background: rgba(255, 251, 235, 0.92);
+  background: rgba(255, 251, 235, 0.94);
 }
-
+.note-pin {
+  position: absolute;
+  top: -1.05rem;
+  left: 50%;
+  z-index: 3;
+  width: 2.6rem;
+  height: 2.6rem;
+  object-fit: contain;
+  transform: translateX(-50%) rotate(-9deg);
+  filter: drop-shadow(0 0.16rem 0 rgba(17, 24, 39, 0.45));
+}
+.note-tape {
+  position: absolute;
+  z-index: 2;
+  top: -0.75rem;
+  left: 50%;
+  width: 8.4rem;
+  height: 2.15rem;
+  object-fit: contain;
+  opacity: 0.88;
+  transform: translateX(-50%) rotate(-3deg);
+}
+.note-fold {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-left: 3px solid rgba(17, 24, 39, 0.75);
+  border-top: 3px solid rgba(17, 24, 39, 0.75);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(17, 24, 39, 0.08));
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+}
+.note-announcement-ribbon {
+  position: absolute;
+  top: 0.8rem;
+  left: -0.55rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  border: 3px solid #111827;
+  background-color: #111827;
+  color: #fde047;
+  padding: 0.2rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  box-shadow: 0 0.25rem 0 rgba(17, 24, 39, 0.42);
+}
+.note-announcement-rule {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  top: 5.05rem;
+  height: 3px;
+  background-color: #111827;
+}
 .note-close-btn {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 5;
   width: 2rem;
   height: 2rem;
   background: rgba(255, 255, 255, 0.9);

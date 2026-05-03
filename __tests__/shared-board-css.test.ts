@@ -12,10 +12,14 @@ describe("shared board CSS", () => {
   it("gives announcement notes a stronger high-contrast visual treatment", () => {
     const css = readFileSync("app/globals.css", "utf8");
 
-    expect(css).toMatch(/\.note-announcement\s*\{[\s\S]*background-color:\s*#facc15/);
-    expect(css).toMatch(/\.note-announcement\s*\{[\s\S]*border-color:\s*#1f2937/);
-    expect(css).toMatch(/\.note-announcement\s*\{[\s\S]*box-shadow:\s*0 6px 0 0 #1f2937/);
-    expect(css).toMatch(/\.note-announcement[\s\S]*\.text-main\s*\{[\s\S]*color:\s*#111827/);
-    expect(css).toMatch(/\.note-announcement[\s\S]*\.text-sub\s*\{[\s\S]*color:\s*#78350f/);
+    expect(css).toContain("office-wall-bg.webp");
+    expect(css).toContain("cork-board-bg.webp");
+    expect(css).toContain(".shared-board-note-wall");
+    expect(css).toContain(".note-announcement-ribbon");
+    expect(css).toContain(".note-announcement-rule");
+    expect(css).toContain(".note-fold");
+    expect(css).toContain(".note-pin");
+    const noteCardBlock = css.match(/\.note-card\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(noteCardBlock).not.toContain("border-radius: 1rem");
   });
 });

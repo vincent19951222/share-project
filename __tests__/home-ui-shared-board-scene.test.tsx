@@ -112,6 +112,30 @@ describe("shared board note wall scene", () => {
     expect(mediaSources).toContain("/assets/home-scenes/shared-board/paperclip.webp");
   });
 
+  it("renders sticky-note card hooks without changing note permissions", async () => {
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={activeBoardState}>
+          <SharedBoard />
+        </BoardProvider>,
+      );
+    });
+
+    expect(container.querySelectorAll(".note-card")).toHaveLength(2);
+    expect(container.querySelector(".shared-board-note-wall")).not.toBeNull();
+    expect(container.querySelector(".note-free-yellow")).not.toBeNull();
+    expect(container.querySelector(".note-card .note-fold")).not.toBeNull();
+
+    const pin = container.querySelector<HTMLImageElement>(".note-free-yellow .note-pin");
+    expect(pin?.getAttribute("src")).toMatch(
+      /^\/assets\/home-scenes\/shared-board\/pushpin-(red|blue|yellow)\.webp$/,
+    );
+
+    expect(container.querySelector(".note-announcement-ribbon")?.textContent).toBe("团队通告");
+    expect(container.querySelector(".note-announcement-rule")).not.toBeNull();
+    expect(container.querySelector("[aria-label='删除便签']")).not.toBeNull();
+  });
+
   it("renders a board-mounted success row after publishing", async () => {
     (fetch as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce(createJsonResponse({ notes }))

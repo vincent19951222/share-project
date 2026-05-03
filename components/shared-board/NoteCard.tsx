@@ -11,18 +11,50 @@ const COLOR_CLASS = {
   PINK: "note-free-pink",
 } as const;
 
+const PIN_ASSETS = [
+  "/assets/home-scenes/shared-board/pushpin-red.webp",
+  "/assets/home-scenes/shared-board/pushpin-blue.webp",
+  "/assets/home-scenes/shared-board/pushpin-yellow.webp",
+] as const;
+
 interface NoteCardProps {
   note: BoardNoteDto;
   deleting?: boolean;
   onDelete: (id: string) => void;
 }
 
+function getPinSrc(note: BoardNoteDto) {
+  const hashSource = `${note.author.id}:${note.id}`;
+  const hash = Array.from(hashSource).reduce((total, char) => total + char.charCodeAt(0), 0);
+  return PIN_ASSETS[hash % PIN_ASSETS.length];
+}
+
 export function NoteCard({ note, deleting = false, onDelete }: NoteCardProps) {
   const isAnnouncement = note.type === "ANNOUNCEMENT";
   const colorClass = isAnnouncement ? "note-announcement" : COLOR_CLASS[note.color ?? "YELLOW"];
+  const shouldTape = isAnnouncement || note.color === "PINK" || note.color === "GREEN";
 
   return (
     <article className={`note-card ${colorClass} ${deleting ? "pointer-events-none opacity-60" : ""}`}>
+      {!isAnnouncement && (
+        <img className="note-pin" src={getPinSrc(note)} alt="" aria-hidden="true" />
+      )}
+      {shouldTape && (
+        <img
+          className="note-tape"
+          src="/assets/home-scenes/shared-board/paper-tape.webp"
+          alt=""
+          aria-hidden="true"
+        />
+      )}
+      <span className="note-fold" aria-hidden="true" />
+      {isAnnouncement && (
+        <>
+          <span className="note-announcement-ribbon">团队通告</span>
+          <span className="note-announcement-rule" aria-hidden="true" />
+        </>
+      )}
+
       {note.canDelete && (
         <button
           type="button"
