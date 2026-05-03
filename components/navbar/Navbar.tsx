@@ -42,7 +42,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav ref={navRef} className="w-full shrink-0 px-2 py-2 z-50">
+      <nav ref={navRef} className="app-top-nav w-full shrink-0 px-2 py-2 z-50">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3 sm:gap-6">
             <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
@@ -58,7 +58,7 @@ export function Navbar() {
               </div>
               脱脂牛马
             </div>
-            <div className="calendar-tab-strip hidden min-w-0 gap-2 overflow-x-auto rounded-full border-2 border-slate-200 bg-slate-100 p-1 min-[761px]:flex">
+            <div className="calendar-tab-strip home-tab-strip hidden min-w-0 gap-2 overflow-x-auto rounded-full border-2 border-slate-200 bg-slate-100 p-1 min-[761px]:flex">
               <TabBtn
                 active={state.activeTab === "punch"}
                 onClick={() => handleTabChange("punch")}
@@ -83,14 +83,6 @@ export function Navbar() {
                 续命咖啡
               </TabBtn>
               <TabBtn
-                active={state.activeTab === "supply"}
-                className="supply-tab"
-                onClick={() => handleTabChange("supply")}
-              >
-                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
-                牛马补给站
-              </TabBtn>
-              <TabBtn
                 active={state.activeTab === "calendar"}
                 className="calendar-tab"
                 onClick={() => handleTabChange("calendar")}
@@ -105,6 +97,14 @@ export function Navbar() {
               >
                 <AssetIcon name="report" className="h-4 w-4 object-contain" />
                 战报中心
+              </TabBtn>
+              <TabBtn
+                active={state.activeTab === "supply"}
+                className="supply-tab"
+                onClick={() => handleTabChange("supply")}
+              >
+                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
+                牛马补给站
               </TabBtn>
             </div>
           </div>
@@ -177,16 +177,6 @@ export function Navbar() {
               </span>
             </TabBtn>
             <TabBtn
-              active={state.activeTab === "supply"}
-              className="mobile-tab-btn supply-tab justify-between"
-              onClick={() => handleTabChange("supply")}
-            >
-              <span className="flex items-center gap-2">
-                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
-                牛马补给站
-              </span>
-            </TabBtn>
-            <TabBtn
               active={state.activeTab === "calendar"}
               className="mobile-tab-btn calendar-tab justify-between"
               onClick={() => handleTabChange("calendar")}
@@ -204,6 +194,16 @@ export function Navbar() {
               <span className="flex items-center gap-2">
                 <AssetIcon name="report" className="h-4 w-4 object-contain" />
                 战报中心
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={state.activeTab === "supply"}
+              className="mobile-tab-btn supply-tab justify-between"
+              onClick={() => handleTabChange("supply")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
+                牛马补给站
               </span>
             </TabBtn>
           </div>

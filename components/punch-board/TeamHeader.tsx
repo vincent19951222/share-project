@@ -1,7 +1,6 @@
 "use client";
 
 import { useBoard } from "@/lib/store";
-import { AssetIcon } from "@/components/ui/AssetIcon";
 import { SeasonProgressBar } from "./SeasonProgressBar";
 
 export function TeamHeader() {
@@ -19,9 +18,13 @@ export function TeamHeader() {
 
   return (
     <header className="team-header w-full soft-card shrink-0 z-20">
-      <div className="flex shrink-0 items-center gap-4">
-        <div className="h-10 w-10 flex items-center justify-center bg-orange-100 rounded-full border-2 border-orange-200 shadow-sm text-orange-500 p-2">
-          <AssetIcon name="vaultTrophy" className="h-full w-full object-contain" />
+      <div className="team-header-vault flex shrink-0 items-center gap-4">
+        <div className="team-header-vault-visual" aria-hidden="true">
+          <img
+            src="/assets/home-scenes/punch/vault-safe.webp"
+            alt=""
+            className="h-full w-full object-contain"
+          />
         </div>
         <div className="flex flex-col">
           <span className="text-[10px] font-bold text-sub tracking-wider uppercase">牛马金库</span>

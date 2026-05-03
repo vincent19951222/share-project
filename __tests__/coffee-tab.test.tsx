@@ -108,17 +108,27 @@ describe("coffee tab navigation", () => {
       root.render(<Navbar />);
     });
 
-    const tabIconSources = Array.from(container.querySelectorAll(".tab-btn img")).map((image) =>
+    const desktopTabs = Array.from(container.querySelectorAll(".calendar-tab-strip .tab-btn"));
+    const tabLabels = desktopTabs.map((button) => button.textContent?.trim());
+    const tabIconSources = Array.from(container.querySelectorAll(".calendar-tab-strip .tab-btn img")).map((image) =>
       image.getAttribute("src"),
     );
 
+    expect(tabLabels).toEqual([
+      "健身打卡",
+      "共享看板",
+      "续命咖啡",
+      "牛马日历",
+      "战报中心",
+      "牛马补给站",
+    ]);
     expect(tabIconSources).toEqual([
       "/assets/icons/workout-pixel.svg",
       "/assets/icons/board-pixel.svg",
       "/assets/icons/coffee-pixel.svg",
-      "/assets/icons/supply-pixel.svg",
       "/assets/icons/calendar-pixel.svg",
       "/assets/icons/report-pixel.svg",
+      "/assets/icons/supply-pixel.svg",
     ]);
   });
 
@@ -158,7 +168,7 @@ describe("coffee tab navigation", () => {
     expect(container.querySelector(".mobile-tab-panel")).toBeNull();
   });
 
-  it("uses the managed vault trophy icon in the team header", async () => {
+  it("uses the managed vault safe asset in the team header", async () => {
     const { TeamHeader } = await import("@/components/punch-board/TeamHeader");
 
     await act(async () => {
@@ -166,7 +176,7 @@ describe("coffee tab navigation", () => {
     });
 
     expect(
-      container.querySelector('img[src*="/assets/icons/vault-trophy-pixel.svg"]'),
+      container.querySelector('img[src*="/assets/home-scenes/punch/vault-safe.webp"]'),
     ).not.toBeNull();
     expect(container.textContent).toContain("全队个人银子总和");
     expect(container.textContent).toContain("个人长期累计资产");

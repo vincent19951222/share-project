@@ -8,6 +8,34 @@ body {
   overflow: hidden;
 }
 
+.app-top-nav {
+  color: #f8fafc;
+}
+
+.app-top-nav > div:first-child {
+  border: 3px solid #111827;
+  border-radius: 1.35rem;
+  background: #111827;
+  box-shadow: 0 5px 0 0 rgba(17, 24, 39, 0.55);
+  padding: 0.45rem 0.6rem;
+}
+
+.app-top-nav .font-black.text-2xl {
+  color: #f8fafc;
+}
+
+.home-tab-strip {
+  border-color: rgba(248, 250, 252, 0.14);
+  background: rgba(15, 23, 42, 0.78);
+}
+
+.app-top-nav .team-dynamics-bell,
+.app-top-nav .mobile-nav-toggle,
+.app-top-nav button[aria-label="展开导航"],
+.app-top-nav button[aria-label="收起导航"] {
+  border-color: #f8fafc;
+}
+
 .soft-card {
   background-color: #ffffff;
   border: 6px solid #f1f5f9;
@@ -1321,11 +1349,23 @@ body {
 }
 .tab-btn.inactive {
   background-color: transparent;
-  color: #64748b;
+  color: #cbd5e1;
 }
 .tab-btn.inactive:hover {
-  background-color: #f1f5f9;
-  color: #1e293b;
+  background-color: rgba(248, 250, 252, 0.14);
+  color: #ffffff;
+}
+
+.home-tab-strip .tab-btn.active,
+.home-tab-strip .tab-btn.board-tab.active,
+.home-tab-strip .tab-btn.coffee-tab.active,
+.home-tab-strip .tab-btn.calendar-tab.active,
+.home-tab-strip .tab-btn.report-tab.active,
+.home-tab-strip .tab-btn.supply-tab.active {
+  border-color: #111827;
+  background-color: #fde047;
+  color: #111827;
+  box-shadow: 0 3px 0 0 #111827;
 }
 
 .calendar-tab-strip {
