@@ -12,4 +12,10 @@ describe("package scripts", () => {
     expect(packageJson.scripts.prebuild).toBe("npm run prepare:prisma");
     expect(packageJson.scripts.pretest).toBe("npm run prepare:prisma");
   });
+
+  it("exposes a reward icon compression command", () => {
+    expect(packageJson.scripts["compress:reward-icons"]).toBe(
+      "node scripts/compress-reward-icons.mjs",
+    );
+  });
 });
