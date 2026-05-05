@@ -2691,7 +2691,7 @@ body {
 
 .calendar-prev-btn:disabled,
 .calendar-return-btn:disabled {
-  cursor: wait;
+  cursor: not-allowed;
   opacity: 0.58;
   transform: none;
   box-shadow: 0 4px 0 #111827;
@@ -3039,7 +3039,7 @@ body {
   }
 
   .calendar-summary-chip {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto auto minmax(1.4rem, auto) auto;
     gap: 0.25rem 0.45rem;
     min-height: 3.4rem;
     border-width: 2px;

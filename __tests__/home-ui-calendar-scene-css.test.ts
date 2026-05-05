@@ -100,6 +100,9 @@ describe("home calendar scene CSS", () => {
     const tabletBlocks = extractBlocks(css, "@media (max-width: 1024px)");
     const mobileBlocks = extractBlocks(css, "@media (max-width: 760px)");
     const reducedMotionBlocks = extractBlocks(css, "@media (prefers-reduced-motion: reduce)");
+    const disabledReturnRule = extractRuleBody(css, ".calendar-return-btn:disabled");
+
+    expect(disabledReturnRule).toMatch(/cursor:\s*not-allowed/);
 
     expect(
       tabletBlocks.some(
@@ -109,6 +112,13 @@ describe("home calendar scene CSS", () => {
     expect(
       mobileBlocks.some(
         (block) => block.includes(".calendar-scene-props") && block.includes(".calendar-paper-surface"),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".calendar-summary-chip") &&
+          /grid-template-columns:\s*auto auto minmax\(1\.4rem,\s*auto\) auto/.test(block),
       ),
     ).toBe(true);
     expect(
