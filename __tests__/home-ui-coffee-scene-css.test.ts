@@ -1,13 +1,6 @@
 import { readFileSync } from "fs";
 import { describe, expect, it } from "vitest";
 
-function extractBlock(css: string, marker: string) {
-  const markerIndex = css.indexOf(marker);
-  expect(markerIndex).toBeGreaterThanOrEqual(0);
-
-  return extractBlockAt(css, marker, markerIndex);
-}
-
 function extractBlocks(css: string, marker: string) {
   const blocks: string[] = [];
   let markerIndex = css.indexOf(marker);
@@ -40,11 +33,23 @@ function extractBlockAt(css: string, marker: string, markerIndex: number) {
 }
 
 function extractRuleBody(css: string, selector: string) {
-  const selectorIndex = css.indexOf(selector);
-  expect(selectorIndex).toBeGreaterThanOrEqual(0);
+  let blockStart = css.indexOf("{");
 
-  const blockStart = css.indexOf("{", selectorIndex);
-  expect(blockStart).toBeGreaterThan(selectorIndex);
+  while (blockStart >= 0) {
+    const previousClose = css.lastIndexOf("}", blockStart);
+    const previousOpen = css.lastIndexOf("{", blockStart - 1);
+    const selectorStart = Math.max(previousClose, previousOpen) + 1;
+    const selectorList = css.slice(selectorStart, blockStart).trim();
+    const selectors = selectorList.split(",").map((item) => item.trim());
+
+    if (!selectorList.startsWith("@") && selectors.includes(selector)) {
+      break;
+    }
+
+    blockStart = css.indexOf("{", blockStart + 1);
+  }
+
+  expect(blockStart).toBeGreaterThanOrEqual(0);
 
   let depth = 1;
   let cursor = blockStart + 1;
@@ -63,7 +68,7 @@ function extractRuleBody(css: string, selector: string) {
 describe("home coffee scene CSS", () => {
   it("styles the coffee tab as a layered receipt counter scene", () => {
     const css = readFileSync("app/globals.css", "utf8");
-    const sceneRule = extractRuleBody(css, ".coffee-scene {");
+    const sceneRule = extractRuleBody(css, ".coffee-scene");
     const backgroundRule = extractRuleBody(css, ".coffee-scene-background");
     const propsRule = extractRuleBody(css, ".coffee-scene-props");
     const contentRule = extractRuleBody(css, ".coffee-scene-content");
