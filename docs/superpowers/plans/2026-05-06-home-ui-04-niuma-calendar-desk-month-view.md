@@ -1810,7 +1810,7 @@ git commit -m "feat: style calendar desk binder scene"
 - Modify: `__tests__/calendar-board.test.tsx`
 - Test: `__tests__/calendar-board.test.tsx`
 
-- [ ] **Step 1: Update current-month assertions for fixed return button and compact coffee count**
+- [x] **Step 1: Update current-month assertions for fixed return button and compact coffee count**
 
 In the first test in `__tests__/calendar-board.test.tsx`, change the test name from:
 
@@ -1871,7 +1871,7 @@ expect(getDayCell(container, 4).querySelector(".calendar-coffee-count")).toBeNul
 expect(getDayCell(container, 4).querySelector(".calendar-empty-mark")).not.toBeNull();
 ```
 
-- [ ] **Step 2: Update historical month and return-to-current assertions**
+- [x] **Step 2: Update historical month and return-to-current assertions**
 
 Replace:
 
@@ -1899,7 +1899,7 @@ expect(container.textContent).toContain("回到本月");
 expect(container.querySelector(".calendar-return-btn")?.getAttribute("disabled")).not.toBeNull();
 ```
 
-- [ ] **Step 3: Update refresh test coffee assertions**
+- [x] **Step 3: Update refresh test coffee assertions**
 
 In the refresh test, replace:
 
@@ -1925,7 +1925,7 @@ with:
 expect(getDayCell(container, 1).querySelector(".calendar-coffee-count")?.textContent).toContain("2");
 ```
 
-- [ ] **Step 4: Run existing calendar board tests**
+- [x] **Step 4: Run existing calendar board tests**
 
 Run:
 
@@ -1935,7 +1935,7 @@ npm test -- __tests__/calendar-board.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit test updates**
+- [x] **Step 5: Commit test updates**
 
 ```bash
 git add __tests__/calendar-board.test.tsx
