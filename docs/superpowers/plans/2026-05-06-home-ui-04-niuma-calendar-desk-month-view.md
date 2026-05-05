@@ -56,7 +56,7 @@
 - Create: `__tests__/home-ui-calendar-assets.test.ts`
 - Create during execution: `public/assets/home-scenes/calendar/`
 
-- [ ] **Step 1: Write the failing asset contract test**
+- [x] **Step 1: Write the failing asset contract test**
 
 Create `__tests__/home-ui-calendar-assets.test.ts`:
 
@@ -92,7 +92,7 @@ describe("home calendar scene assets", () => {
 });
 ```
 
-- [ ] **Step 2: Run the asset test and verify it fails**
+- [x] **Step 2: Run the asset test and verify it fails**
 
 Run:
 
@@ -102,7 +102,7 @@ npm test -- __tests__/home-ui-calendar-assets.test.ts
 
 Expected: FAIL because `public/assets/home-scenes/calendar/*.webp` does not exist yet.
 
-- [ ] **Step 3: Commit the failing test**
+- [x] **Step 3: Commit the failing test**
 
 ```bash
 git add __tests__/home-ui-calendar-assets.test.ts
