@@ -741,7 +741,7 @@ git commit -m "test: add calendar scene component contract"
 - Modify: `components/calendar/CalendarDayCell.tsx`
 - Test: `__tests__/home-ui-calendar-scene.test.tsx`
 
-- [ ] **Step 1: Update CalendarHeader props and markup**
+- [x] **Step 1: Update CalendarHeader props and markup**
 
 Replace `components/calendar/CalendarHeader.tsx` with:
 
@@ -796,7 +796,7 @@ export function CalendarHeader({
 }
 ```
 
-- [ ] **Step 2: Update CalendarDayCell markup**
+- [x] **Step 2: Update CalendarDayCell markup**
 
 Replace `components/calendar/CalendarDayCell.tsx` with:
 
@@ -837,7 +837,7 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
 }
 ```
 
-- [ ] **Step 3: Update CalendarGrid for neighbor cells**
+- [x] **Step 3: Update CalendarGrid for neighbor cells**
 
 Replace the render branch in `components/calendar/CalendarGrid.tsx` with:
 
@@ -879,7 +879,7 @@ export function CalendarGrid({ snapshot }: { snapshot: CalendarMonthSnapshot }) 
 
 Keep `WEEKDAY_LABELS`, `getFirstDayOffset`, and the imports unchanged.
 
-- [ ] **Step 4: Update CalendarBoard scene wrappers and summary chips**
+- [x] **Step 4: Update CalendarBoard scene wrappers and summary chips**
 
 In `components/calendar/CalendarBoard.tsx`, replace the return block with:
 
@@ -977,7 +977,7 @@ In `components/calendar/CalendarBoard.tsx`, replace the return block with:
   );
 ```
 
-- [ ] **Step 5: Run the scene component test and verify it passes**
+- [x] **Step 5: Run the scene component test and verify it passes**
 
 Run:
 
@@ -987,7 +987,7 @@ npm test -- __tests__/home-ui-calendar-scene.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit component markup**
+- [x] **Step 6: Commit component markup**
 
 ```bash
 git add components/calendar/CalendarBoard.tsx components/calendar/CalendarHeader.tsx components/calendar/CalendarGrid.tsx components/calendar/CalendarDayCell.tsx __tests__/home-ui-calendar-scene.test.tsx
