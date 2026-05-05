@@ -365,7 +365,7 @@ git commit -m "feat: add calendar scene media assets"
 - Modify: `components/calendar/calendar-data.ts`
 - Modify: `__tests__/calendar-data.test.ts`
 
-- [ ] **Step 1: Update failing calendar-data tests**
+- [x] **Step 1: Update failing calendar-data tests**
 
 Modify the import and the grid expectations in `__tests__/calendar-data.test.ts` so the leading blanks become previous-month neighbor cells and the grid pads to complete weeks:
 
@@ -446,7 +446,7 @@ expect(buildCalendarGrid(snapshot, 9)).toEqual([
 ]);
 ```
 
-- [ ] **Step 2: Run tests and verify they fail**
+- [x] **Step 2: Run tests and verify they fail**
 
 Run:
 
@@ -456,7 +456,7 @@ npm test -- __tests__/calendar-data.test.ts
 
 Expected: FAIL because `buildCalendarGrid` still returns `kind: "blank"` and does not pad trailing neighbor cells.
 
-- [ ] **Step 3: Implement neighbor cell grid data**
+- [x] **Step 3: Implement neighbor cell grid data**
 
 Replace the cell interfaces and add helper functions in `components/calendar/calendar-data.ts`:
 
@@ -539,7 +539,7 @@ export function buildCalendarGrid(
 }
 ```
 
-- [ ] **Step 4: Run helper tests and verify they pass**
+- [x] **Step 4: Run helper tests and verify they pass**
 
 Run:
 
@@ -549,7 +549,7 @@ npm test -- __tests__/calendar-data.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit helper changes**
+- [x] **Step 5: Commit helper changes**
 
 ```bash
 git add components/calendar/calendar-data.ts __tests__/calendar-data.test.ts
