@@ -101,14 +101,17 @@ describe("home coffee scene CSS", () => {
   it("includes responsive and reduced-motion coverage for the coffee scene", () => {
     const css = readFileSync("app/globals.css", "utf8");
     const mobileBlocks = extractBlocks(css, "@media (max-width: 980px)");
-    const reducedMotionBlock = extractBlock(css, "@media (prefers-reduced-motion: reduce)");
+    const reducedMotionBlocks = extractBlocks(css, "@media (prefers-reduced-motion: reduce)");
 
     expect(
       mobileBlocks.some(
         (block) => block.includes(".coffee-counter-layout") && block.includes(".coffee-scene-props"),
       ),
     ).toBe(true);
-    expect(reducedMotionBlock).toContain(".coffee-scene *");
-    expect(reducedMotionBlock).toMatch(/transition-duration:\s*0\.01ms/);
+    expect(
+      reducedMotionBlocks.some(
+        (block) => block.includes(".coffee-scene *") && /transition-duration:\s*0\.01ms/.test(block),
+      ),
+    ).toBe(true);
   });
 });
