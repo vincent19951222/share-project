@@ -230,6 +230,7 @@ describe("CoffeeCheckin", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
 
     const dialog = container.querySelector('[role="dialog"]');
+    expect(dialog?.querySelector(".coffee-dialog-ticket")).not.toBeNull();
     const confirmButton = Array.from(dialog!.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("确认 1 杯"),
     );
@@ -245,6 +246,37 @@ describe("CoffeeCheckin", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(container.textContent).toContain("今天已续命 1 杯");
+  });
+
+  it("renders the coffee receipt counter scene with media layers and stable visual hooks", async () => {
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(2)],
+    });
+
+    await act(async () => {
+      root.render(renderCoffeeCheckin());
+      await Promise.resolve();
+    });
+
+    expect(container.querySelector(".coffee-scene")).not.toBeNull();
+    expect(container.querySelector(".coffee-scene-background")).not.toBeNull();
+    expect(container.querySelector(".coffee-scene-props")).not.toBeNull();
+    expect(container.querySelector(".coffee-scene-content")).not.toBeNull();
+    expect(container.querySelector(".coffee-receipt-ticket")).not.toBeNull();
+    expect(container.querySelector(".coffee-activity-ticket")).not.toBeNull();
+    expect(container.querySelector(".coffee-calendar-paper")).not.toBeNull();
+    expect(container.querySelector(".coffee-current-user-badge")?.textContent).toBe("我");
+    expect(container.textContent).toContain("今天");
+
+    expect(
+      container.querySelector('img[src="/assets/home-scenes/coffee/takeaway-cup.webp"]'),
+    ).not.toBeNull();
+    expect(
+      container.querySelector('img[src="/assets/home-scenes/coffee/note-no-coffee-no-gain.webp"]'),
+    ).not.toBeNull();
+    expect(
+      container.querySelector('img[src="/assets/home-scenes/coffee/note-but-first-coffee.webp"]'),
+    ).not.toBeNull();
   });
 
   it("uses the pixel coffee icon for checked-in team calendar cells", async () => {
