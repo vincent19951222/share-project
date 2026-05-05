@@ -567,7 +567,7 @@ git commit -m "feat: add calendar neighbor day cells"
 - Modify later: `components/calendar/CalendarGrid.tsx`
 - Modify later: `components/calendar/CalendarDayCell.tsx`
 
-- [ ] **Step 1: Create the failing scene component test**
+- [x] **Step 1: Create the failing scene component test**
 
 Create `__tests__/home-ui-calendar-scene.test.tsx`:
 
@@ -713,7 +713,7 @@ describe("home calendar scene", () => {
 });
 ```
 
-- [ ] **Step 2: Run the scene test and verify it fails**
+- [x] **Step 2: Run the scene test and verify it fails**
 
 Run:
 
@@ -723,7 +723,7 @@ npm test -- __tests__/home-ui-calendar-scene.test.tsx
 
 Expected: FAIL because current components do not render `calendar-scene`, props images, fixed return button, compact coffee count, empty mark, or neighbor cells.
 
-- [ ] **Step 3: Commit the failing scene test**
+- [x] **Step 3: Commit the failing scene test**
 
 ```bash
 git add __tests__/home-ui-calendar-scene.test.tsx
