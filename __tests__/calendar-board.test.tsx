@@ -79,6 +79,20 @@ function getDayCell(container: HTMLElement, day: number) {
   return cell as HTMLElement;
 }
 
+function getReturnButton(container: HTMLElement) {
+  const button = container.querySelector(".calendar-return-btn");
+
+  expect(button).toBeInstanceOf(HTMLButtonElement);
+  return button as HTMLButtonElement;
+}
+
+function getCoffeeCountText(container: HTMLElement, day: number) {
+  const count = getDayCell(container, day).querySelector(".calendar-coffee-count");
+
+  expect(count).toBeInstanceOf(HTMLElement);
+  return count?.textContent?.trim();
+}
+
 function getVisibleState(container: HTMLElement) {
   return {
     monthLabel: container.textContent?.match(/20\d{2}年\d{1,2}月/)?.[0] ?? null,
@@ -154,16 +168,14 @@ describe("CalendarBoard", () => {
       expect(container.textContent).toMatch(/本月喝了\s*2\s*杯/);
       expect(container.textContent).toContain("回到本月");
       expect(container.querySelectorAll("button")).toHaveLength(2);
-      expect(container.querySelector(".calendar-return-btn")?.getAttribute("disabled")).not.toBeNull();
+      expect(getReturnButton(container).disabled).toBe(true);
       expect(
         Array.from(container.querySelectorAll("button")).some((button) =>
           button.textContent?.includes("下个月"),
         ),
       ).toBe(false);
       expect(container.textContent).not.toContain("下个月");
-      expect(getDayCell(container, 2).querySelector(".calendar-coffee-count")?.textContent).toContain(
-        "2",
-      );
+      expect(getCoffeeCountText(container, 2)).toBe("2");
       expect(
         getDayCell(container, 2).querySelectorAll('img[src*="/assets/icons/coffee-pixel.svg"]')
           .length,
@@ -174,9 +186,6 @@ describe("CalendarBoard", () => {
       expect(getDayCell(container, 1).querySelectorAll("img[alt='']").length).toBe(0);
       expect(getDayCell(container, 2).textContent).toContain("2");
       expect(getDayCell(container, 2).querySelector("[aria-label='已训练']")).not.toBeNull();
-      expect(getDayCell(container, 2).querySelector(".calendar-coffee-count")?.textContent).toContain(
-        "2",
-      );
       expect(getDayCell(container, 4).textContent).toContain("4");
       expect(getDayCell(container, 4).querySelector("[aria-label='已训练']")).toBeNull();
       expect(getDayCell(container, 4).querySelector(".calendar-coffee-count")).toBeNull();
@@ -217,12 +226,8 @@ describe("CalendarBoard", () => {
       expect(container.textContent).toMatch(/本月练了\s*2\s*天/);
       expect(container.textContent).toMatch(/本月喝了\s*3\s*杯/);
       expect(container.textContent).toContain("回到本月");
-      expect(getDayCell(container, 2).querySelector(".calendar-coffee-count")?.textContent).toContain(
-        "2",
-      );
-      expect(getDayCell(container, 3).querySelector(".calendar-coffee-count")?.textContent).toContain(
-        "1",
-      );
+      expect(getCoffeeCountText(container, 2)).toBe("2");
+      expect(getCoffeeCountText(container, 3)).toBe("1");
     });
 
     await clickButtonByText(container, "回到本月");
@@ -233,7 +238,7 @@ describe("CalendarBoard", () => {
       expect(container.textContent).toMatch(/本月练了\s*2\s*天/);
       expect(container.textContent).toMatch(/本月喝了\s*2\s*杯/);
       expect(container.textContent).toContain("回到本月");
-      expect(container.querySelector(".calendar-return-btn")?.getAttribute("disabled")).not.toBeNull();
+      expect(getReturnButton(container).disabled).toBe(true);
       expect(container.textContent).not.toContain("详情");
       expect(container.textContent).not.toContain("查看明细");
     });
@@ -272,9 +277,7 @@ describe("CalendarBoard", () => {
 
     await waitFor(() => {
       expect(container.textContent).toMatch(/本月喝了\s*1\s*杯/);
-      expect(getDayCell(container, 1).querySelector(".calendar-coffee-count")?.textContent).toContain(
-        "1",
-      );
+      expect(getCoffeeCountText(container, 1)).toBe("1");
     });
 
     await act(async () => {
@@ -303,9 +306,7 @@ describe("CalendarBoard", () => {
 
     await waitFor(() => {
       expect(container.textContent).toMatch(/本月喝了\s*2\s*杯/);
-      expect(getDayCell(container, 1).querySelector(".calendar-coffee-count")?.textContent).toContain(
-        "2",
-      );
+      expect(getCoffeeCountText(container, 1)).toBe("2");
     });
   });
 });
