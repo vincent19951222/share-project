@@ -2175,14 +2175,23 @@ body {
 /* Shared Board Styles */
 .shared-board-scene {
   position: relative;
+  isolation: isolate;
   min-height: 100%;
   overflow-x: hidden;
+  border-radius: 1.65rem;
   background-color: #f8f4e9;
 }
-.shared-board-wall-bg {
-  position: fixed;
+.shared-board-background {
+  position: absolute;
   inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
   pointer-events: none;
+}
+.shared-board-wall-bg {
+  position: absolute;
+  inset: 0;
   background-image: url("/assets/home-scenes/shared-board/office-wall-bg.webp");
   background-size: cover;
   background-position: center;
@@ -2191,15 +2200,21 @@ body {
 .shared-board-content {
   position: relative;
   z-index: 2;
-  width: min(100%, 78rem);
+  min-height: 100%;
+  padding: 3.15rem clamp(6.4rem, 9vw, 11rem) 3rem;
+}
+.shared-board-wall-set {
+  position: relative;
+  width: min(100%, 90rem);
   margin-inline: auto;
-  padding: 4.25rem 1.5rem 3rem;
 }
 .shared-board-cork {
   position: relative;
-  min-height: 42rem;
+  z-index: 2;
+  min-height: 38.5rem;
+  margin-top: -0.9rem;
   border: 6px solid #111827;
-  border-radius: 0.5rem;
+  border-radius: 1.35rem;
   background-color: #b9834f;
   background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(67, 35, 16, 0.1)),
@@ -2207,48 +2222,98 @@ body {
   background-size: cover;
   background-position: center;
   box-shadow: 0 1.25rem 0 rgba(17, 24, 39, 0.85), 0 2rem 2.5rem rgba(15, 23, 42, 0.24);
-  padding: 2.3rem clamp(1rem, 2.5vw, 2.2rem) 2.5rem;
+  padding: 3.15rem clamp(1.65rem, 2.4vw, 2.35rem) 2.5rem;
 }
 .shared-board-composer-wrap {
   position: relative;
-  max-width: 54rem;
-  margin: 0 auto 2rem;
+  z-index: 6;
+  width: min(100%, 82rem);
+  margin: 0 auto;
 }
 .shared-board-composer {
   position: relative;
   z-index: 2;
   border: 4px solid #111827;
-  border-radius: 0.35rem;
+  border-radius: 1.25rem;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 251, 235, 0.94)),
     repeating-linear-gradient(0deg, transparent 0 2.15rem, rgba(148, 163, 184, 0.16) 2.15rem 2.22rem);
   box-shadow: 0 0.55rem 0 #111827;
-  padding: 2.1rem 1.35rem 1rem;
+  padding: 2.2rem 1.55rem 1.35rem;
+}
+.shared-board-composer-grid {
+  display: grid;
+  grid-template-columns: 4.1rem minmax(25rem, 1fr) minmax(24rem, 0.78fr);
+  align-items: center;
+  gap: 1.35rem;
+}
+.shared-board-composer-avatar {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-color: #fde047;
+  border-width: 3px;
+  box-shadow: 0 0.18rem 0 #111827;
+}
+.shared-board-input-panel {
+  min-width: 0;
+}
+.shared-note-input-wrap {
+  position: relative;
+}
+.shared-board-controls-panel {
+  display: grid;
+  min-height: 8.6rem;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1.35rem;
+  border-left: 2px dashed rgba(100, 116, 139, 0.5);
+  padding-left: 1.35rem;
+}
+.shared-board-control-stack {
+  display: grid;
+  gap: 1.15rem;
+  align-self: center;
+}
+.shared-board-control-row {
+  display: grid;
+  grid-template-columns: 3.25rem auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+.shared-board-publish-btn {
+  min-height: 3rem;
+  align-self: end;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+.shared-board-inline-error {
+  min-height: 1rem;
+  margin-top: 0.45rem;
 }
 .shared-board-clip {
   position: absolute;
   z-index: 4;
-  top: -2.1rem;
+  top: -1.9rem;
   left: 50%;
-  width: min(14rem, 40vw);
+  width: min(14.4rem, 40vw);
   transform: translateX(-50%);
   pointer-events: none;
 }
 .shared-board-sync-row {
   position: absolute;
   z-index: 5;
-  top: 0.75rem;
-  right: 1rem;
+  top: -2.25rem;
+  right: 1.15rem;
 }
 .shared-board-message {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  margin-top: 0.85rem;
+  margin-top: 0.42rem;
   border: 3px solid currentColor;
   border-radius: 0.35rem;
   background-color: #f8fafc;
-  padding: 0.55rem 0.8rem;
+  padding: 0.6rem 1.6rem;
   font-size: 0.82rem;
   font-weight: 900;
   box-shadow: 0 0.25rem 0 #111827;
@@ -2324,6 +2389,8 @@ body {
   position: absolute;
   z-index: 1;
   inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
   pointer-events: none;
 }
 .shared-board-prop {
@@ -2331,49 +2398,49 @@ body {
   user-select: none;
 }
 .shared-board-poster-left {
-  top: 5.2rem;
-  left: max(1rem, calc(50% - 44rem));
-  width: 8.8rem;
+  top: clamp(4.9rem, 14vh, 8.5rem);
+  left: clamp(0.65rem, 2vw, 2rem);
+  width: clamp(7rem, 8vw, 9.4rem);
   transform: rotate(-5deg);
 }
 .shared-board-poster-right {
-  top: 6.4rem;
-  right: max(1rem, calc(50% - 45rem));
-  width: 8rem;
+  top: clamp(9rem, 20vh, 13rem);
+  right: clamp(0.65rem, 2vw, 2rem);
+  width: clamp(6.6rem, 7.6vw, 8.7rem);
   transform: rotate(4deg);
 }
 .shared-board-discipline-note {
-  top: 24rem;
-  left: max(0.5rem, calc(50% - 43rem));
-  width: 6rem;
+  top: clamp(24rem, 45vh, 31rem);
+  left: clamp(1rem, 2.7vw, 3rem);
+  width: clamp(4.9rem, 5.8vw, 6.6rem);
   transform: rotate(6deg);
 }
 .shared-board-dumbbell {
-  top: 31rem;
-  left: max(-2rem, calc(50% - 47rem));
-  width: 9.5rem;
+  top: clamp(18rem, 35vh, 25rem);
+  left: clamp(-2.4rem, -1vw, -0.5rem);
+  width: clamp(8.6rem, 10vw, 11.8rem);
   transform: rotate(-12deg);
 }
 .shared-board-marker {
-  top: 26rem;
-  right: max(0.25rem, calc(50% - 45rem));
-  width: 5.3rem;
+  top: clamp(26rem, 48vh, 34rem);
+  right: clamp(-0.7rem, 1vw, 0.8rem);
+  width: clamp(4.8rem, 5.3vw, 6rem);
   transform: rotate(12deg);
 }
 .shared-board-paperclip {
-  top: 35rem;
-  right: max(3rem, calc(50% - 39rem));
-  width: 4rem;
+  top: clamp(35rem, 62vh, 42rem);
+  right: clamp(2rem, 7vw, 7rem);
+  width: clamp(3.2rem, 3.9vw, 4.2rem);
   transform: rotate(-18deg);
 }
 .shared-board-note-wall {
-  margin-top: 1.15rem;
+  margin-top: 0.8rem;
   column-count: 4;
-  column-gap: 1.15rem;
+  column-gap: 1.55rem;
 }
 .note-masonry {
   column-count: 4;
-  column-gap: 1.15rem;
+  column-gap: 1.55rem;
 }
 @media (max-width: 1400px) {
   .shared-board-note-wall,
@@ -2405,12 +2472,12 @@ body {
   break-inside: avoid;
   display: inline-block;
   width: 100%;
-  min-height: 13.5rem;
-  margin-bottom: 1.15rem;
+  min-height: 14.35rem;
+  margin-bottom: 1.55rem;
   position: relative;
   border: 4px solid #111827;
   border-radius: 0.35rem;
-  padding: 2.25rem 1rem 1rem;
+  padding: 2.35rem 1.15rem 1.15rem;
   box-shadow: 0.45rem 0.45rem 0 rgba(17, 24, 39, 0.86);
   transform: rotate(var(--note-rotate));
   transform-origin: 50% 1.2rem;
@@ -2555,16 +2622,24 @@ body {
 
 .shared-note-input {
   width: 100%;
-  padding: 1rem;
+  min-height: 8.1rem;
+  padding: 1.15rem 1.25rem 1.8rem;
   border: 3px solid #111827;
   border-radius: 0.35rem;
   resize: none;
   outline: none;
   font-weight: 800;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: #1e293b;
   background-color: rgba(255, 255, 255, 0.82);
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+.shared-board-counter {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.55rem;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 .shared-note-input:focus {
   border-color: #1f2937;
@@ -2618,11 +2693,21 @@ body {
 }
 @media (max-width: 1200px) {
   .shared-board-content {
-    width: min(100%, 66rem);
-    padding-top: 3rem;
+    padding: 3rem clamp(4rem, 7vw, 7rem) 3rem;
   }
   .shared-board-cork {
     padding-inline: 1.25rem;
+  }
+  .shared-board-composer-wrap {
+    width: min(100%, 74rem);
+  }
+  .shared-board-composer-grid {
+    grid-template-columns: 3.6rem minmax(20rem, 1fr) minmax(20rem, 0.8fr);
+    gap: 1rem;
+  }
+  .shared-board-controls-panel {
+    gap: 1rem;
+    padding-left: 1rem;
   }
   .shared-board-poster-left,
   .shared-board-poster-right {
@@ -2643,13 +2728,12 @@ body {
 }
 @media (max-width: 900px) {
   .shared-board-content {
-    width: 100%;
     padding: 1rem 0.75rem 2rem;
   }
   .shared-board-cork {
     min-height: auto;
     border-width: 4px;
-    border-radius: 0.35rem;
+    border-radius: 1rem;
     padding-inline: 0.85rem;
     box-shadow: 0 0.7rem 0 rgba(17, 24, 39, 0.85), 0 1rem 1.4rem rgba(15, 23, 42, 0.18);
   }
@@ -2657,7 +2741,23 @@ body {
     display: none;
   }
   .shared-board-composer-wrap {
-    max-width: none;
+    width: 100%;
+  }
+  .shared-board-composer-grid {
+    grid-template-columns: 3.25rem 1fr;
+    align-items: start;
+  }
+  .shared-board-controls-panel {
+    grid-column: 1 / -1;
+    min-height: auto;
+    grid-template-columns: 1fr;
+    border-left: 0;
+    border-top: 2px dashed rgba(100, 116, 139, 0.45);
+    padding-top: 0.9rem;
+    padding-left: 0;
+  }
+  .shared-board-publish-btn {
+    justify-self: end;
   }
   .shared-board-note-wall,
   .note-masonry {
@@ -2699,8 +2799,13 @@ body {
     border-width: 3px;
     padding: 2rem 0.85rem 0.85rem;
   }
-  .shared-board-composer > div {
-    flex-direction: column;
+  .shared-board-composer-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  .shared-board-composer-avatar {
+    width: 2.75rem;
+    height: 2.75rem;
   }
   .shared-board-sync-row {
     position: static;
@@ -2711,6 +2816,9 @@ body {
   .shared-board-type-toggle {
     width: 100%;
   }
+  .shared-board-control-row {
+    grid-template-columns: 2.8rem 1fr;
+  }
   .shared-board-type-toggle button {
     min-width: 0;
     padding-inline: 0.45rem;
@@ -2720,9 +2828,11 @@ body {
     height: 1.85rem;
   }
   .shared-board-cork {
+    margin-top: 0.75rem;
     padding: 1.1rem 0.65rem 1.35rem;
   }
   .shared-board-clip {
+    top: -1.9rem;
     width: 11rem;
   }
   .shared-board-note-wall,

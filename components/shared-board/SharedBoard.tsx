@@ -121,7 +121,10 @@ export function SharedBoard() {
 
   return (
     <section className="shared-board-scene h-full overflow-y-auto no-scrollbar">
-      <div className="shared-board-wall-bg" aria-hidden="true" />
+      <div className="shared-board-background" aria-hidden="true">
+        <div className="shared-board-wall-bg" />
+      </div>
+
       <div className="shared-board-props" aria-hidden="true">
         <img
           src="/assets/home-scenes/shared-board/poster-no-excuses.webp"
@@ -156,7 +159,7 @@ export function SharedBoard() {
       </div>
 
       <div className="shared-board-content">
-        <div className="shared-board-cork">
+        <div className="shared-board-wall-set">
           <div className="shared-board-composer-wrap">
             <div className="shared-board-sync-row">
               <SyncStatus state={syncState} />
@@ -184,7 +187,9 @@ export function SharedBoard() {
             ) : null}
           </div>
 
-          <NoteMasonry notes={notes} deletingIds={deletingIds} onDelete={deleteNote} />
+          <div className="shared-board-cork">
+            <NoteMasonry notes={notes} deletingIds={deletingIds} onDelete={deleteNote} />
+          </div>
         </div>
       </div>
     </section>

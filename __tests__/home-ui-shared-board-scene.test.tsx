@@ -90,8 +90,11 @@ describe("shared board note wall scene", () => {
     });
 
     expect(container.querySelector(".shared-board-scene")).not.toBeNull();
+    expect(container.querySelector(".shared-board-background")).not.toBeNull();
     expect(container.querySelector(".shared-board-wall-bg")).not.toBeNull();
     expect(container.querySelector(".shared-board-props")).not.toBeNull();
+    expect(container.querySelector(".shared-board-content")).not.toBeNull();
+    expect(container.querySelector(".shared-board-wall-set")).not.toBeNull();
     expect(container.querySelector(".shared-board-cork")).not.toBeNull();
     expect(container.querySelector(".shared-board-composer")).not.toBeNull();
     expect(container.querySelector(".shared-board-clip")).not.toBeNull();
@@ -110,6 +113,29 @@ describe("shared board note wall scene", () => {
     expect(mediaSources).toContain("/assets/home-scenes/shared-board/dumbbell-edge.webp");
     expect(mediaSources).toContain("/assets/home-scenes/shared-board/marker-pen.webp");
     expect(mediaSources).toContain("/assets/home-scenes/shared-board/paperclip.webp");
+  });
+
+  it("keeps scene props outside the content safe area and groups composer with the cork board", async () => {
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={activeBoardState}>
+          <SharedBoard />
+        </BoardProvider>,
+      );
+    });
+
+    const scene = container.querySelector(".shared-board-scene");
+    const background = container.querySelector(".shared-board-background");
+    const props = container.querySelector(".shared-board-props");
+    const content = container.querySelector(".shared-board-content");
+    const wallSet = container.querySelector(".shared-board-wall-set");
+
+    expect(scene?.children[0]).toBe(background);
+    expect(scene?.children[1]).toBe(props);
+    expect(scene?.children[2]).toBe(content);
+    expect(content?.children[0]).toBe(wallSet);
+    expect(wallSet?.querySelector(".shared-board-composer-wrap")).not.toBeNull();
+    expect(wallSet?.querySelector(".shared-board-cork")).not.toBeNull();
   });
 
   it("renders sticky-note card hooks without changing note permissions", async () => {

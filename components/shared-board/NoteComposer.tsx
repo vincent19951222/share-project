@@ -61,8 +61,8 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
 
   return (
     <section className="shared-board-composer">
-      <div className="flex gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-blue-200 bg-blue-100 shadow-sm">
+      <div className="shared-board-composer-grid">
+        <div className="shared-board-composer-avatar flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-blue-200 bg-blue-100 shadow-sm">
           <img
             src={getAvatarUrl(currentUser.avatarKey)}
             alt={currentUser.name}
@@ -70,84 +70,84 @@ export function NoteComposer({ currentUser, submitting, onSubmit }: NoteComposer
           />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <textarea
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.ctrlKey && event.key === "Enter") {
-                event.preventDefault();
-                void submit();
-              }
-            }}
-            placeholder="分享你的想法、训练心得、约饭约练或团队提醒..."
-            className="shared-note-input"
-            rows={4}
-            maxLength={BOARD_NOTE_MAX_LENGTH + 1}
-          />
-
-          <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-sub">类型:</span>
-                <div className="shared-board-type-toggle" role="group" aria-label="便签类型">
-                  <button
-                    type="button"
-                    className={type === "FREE" ? "selected" : ""}
-                    onClick={() => setType("FREE")}
-                    aria-pressed={type === "FREE"}
-                    disabled={submitting}
-                  >
-                    自由笔记
-                  </button>
-                  <button
-                    type="button"
-                    className={type === "ANNOUNCEMENT" ? "selected" : ""}
-                    onClick={() => setType("ANNOUNCEMENT")}
-                    aria-pressed={type === "ANNOUNCEMENT"}
-                    disabled={submitting}
-                  >
-                    团队通告
-                  </button>
-                </div>
-              </div>
-
-              <div className={`flex items-center gap-2 ${type === "ANNOUNCEMENT" ? "opacity-50" : ""}`}>
-                <span className="text-xs font-bold text-sub">颜色:</span>
-                <div className="flex gap-1">
-                  {COLORS.map((item) => (
-                    <button
-                      key={item.value}
-                      type="button"
-                      className={`shared-board-color-chip ${item.className} ${color === item.value ? "selected" : ""}`}
-                      onClick={() => setColor(item.value)}
-                      disabled={type === "ANNOUNCEMENT"}
-                      aria-pressed={color === item.value}
-                      aria-label={item.label}
-                    >
-                      <span aria-hidden="true">✓</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="quest-btn min-w-24 gap-2 px-6 py-2 text-sm"
-              onClick={() => void submit()}
-              disabled={!canSubmit}
-            >
-              {submitting ? "发布中" : "发布"}
-            </button>
-          </div>
-
-          <div className="mt-2 flex items-center justify-between">
-            <p className="min-h-4 text-xs font-bold text-red-500">{error}</p>
-            <p className={`text-xs font-bold ${isTooLong ? "text-red-500" : "text-sub"}`}>
+        <div className="shared-board-input-panel">
+          <div className="shared-note-input-wrap">
+            <textarea
+              value={content}
+              onChange={(event) => setContent(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.ctrlKey && event.key === "Enter") {
+                  event.preventDefault();
+                  void submit();
+                }
+              }}
+              placeholder="说点什么吧..."
+              className="shared-note-input"
+              rows={4}
+              maxLength={BOARD_NOTE_MAX_LENGTH + 1}
+            />
+            <p className={`shared-board-counter ${isTooLong ? "text-red-500" : "text-sub"}`}>
               {content.length}/{BOARD_NOTE_MAX_LENGTH}
             </p>
           </div>
+          <p className="shared-board-inline-error text-xs font-bold text-red-500">{error}</p>
+        </div>
+
+        <div className="shared-board-controls-panel">
+          <div className="shared-board-control-stack">
+            <div className="shared-board-control-row">
+              <span className="text-xs font-bold text-sub">类型:</span>
+              <div className="shared-board-type-toggle" role="group" aria-label="便签类型">
+                <button
+                  type="button"
+                  className={type === "FREE" ? "selected" : ""}
+                  onClick={() => setType("FREE")}
+                  aria-pressed={type === "FREE"}
+                  disabled={submitting}
+                >
+                  自由笔记
+                </button>
+                <button
+                  type="button"
+                  className={type === "ANNOUNCEMENT" ? "selected" : ""}
+                  onClick={() => setType("ANNOUNCEMENT")}
+                  aria-pressed={type === "ANNOUNCEMENT"}
+                  disabled={submitting}
+                >
+                  团队通告
+                </button>
+              </div>
+            </div>
+
+            <div className={`shared-board-control-row ${type === "ANNOUNCEMENT" ? "opacity-50" : ""}`}>
+              <span className="text-xs font-bold text-sub">颜色:</span>
+              <div className="flex gap-1">
+                {COLORS.map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    className={`shared-board-color-chip ${item.className} ${color === item.value ? "selected" : ""}`}
+                    onClick={() => setColor(item.value)}
+                    disabled={type === "ANNOUNCEMENT"}
+                    aria-pressed={color === item.value}
+                    aria-label={item.label}
+                  >
+                    <span aria-hidden="true">✓</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="quest-btn shared-board-publish-btn min-w-24 gap-2 px-6 py-2 text-sm"
+            onClick={() => void submit()}
+            disabled={!canSubmit}
+          >
+            <span aria-hidden="true">➤</span>
+            {submitting ? "发布中" : "发布"}
+          </button>
         </div>
       </div>
     </section>

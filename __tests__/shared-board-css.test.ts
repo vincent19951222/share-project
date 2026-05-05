@@ -22,4 +22,26 @@ describe("shared board CSS", () => {
     const noteCardBlock = css.match(/\.note-card\s*\{[^}]*\}/)?.[0] ?? "";
     expect(noteCardBlock).not.toContain("border-radius: 1rem");
   });
+
+  it("uses the same rounded scene-shell clipping model as the punch scene", () => {
+    const css = readFileSync("app/globals.css", "utf8");
+
+    const sceneBlock = css.match(/\.shared-board-scene\s*\{[^}]*\}/)?.[0] ?? "";
+    const backgroundBlock = css.match(/\.shared-board-background\s*\{[^}]*\}/)?.[0] ?? "";
+    const propsBlock = css.match(/\.shared-board-props\s*\{[^}]*\}/)?.[0] ?? "";
+
+    expect(sceneBlock).toMatch(/border-radius:\s*1\.\d+rem/);
+    expect(backgroundBlock).toContain("border-radius: inherit");
+    expect(propsBlock).toContain("border-radius: inherit");
+  });
+
+  it("rounds the main shared board content surfaces like punch scene cards", () => {
+    const css = readFileSync("app/globals.css", "utf8");
+
+    const corkBlock = css.match(/\.shared-board-cork\s*\{[^}]*\}/)?.[0] ?? "";
+    const composerBlock = css.match(/\.shared-board-composer\s*\{[^}]*\}/)?.[0] ?? "";
+
+    expect(corkBlock).toMatch(/border-radius:\s*1\.\d+rem/);
+    expect(composerBlock).toMatch(/border-radius:\s*1\.\d+rem/);
+  });
 });
