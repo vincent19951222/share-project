@@ -230,7 +230,6 @@ describe("CoffeeCheckin", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
 
     const dialog = container.querySelector('[role="dialog"]');
-    expect(dialog?.querySelector(".coffee-dialog-ticket")).not.toBeNull();
     const confirmButton = Array.from(dialog!.querySelectorAll("button")).find((button) =>
       button.textContent?.includes("确认 1 杯"),
     );
@@ -246,6 +245,30 @@ describe("CoffeeCheckin", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(container.textContent).toContain("今天已续命 1 杯");
+  });
+
+  it("renders the coffee dialog with a stable ticket visual hook", async () => {
+    mockCoffeeFetch({
+      stateSnapshots: [snapshot(0)],
+    });
+
+    await act(async () => {
+      root.render(renderCoffeeCheckin());
+      await Promise.resolve();
+    });
+
+    const calendarAddButton = container.querySelector(
+      'button[aria-label="确认今天咖啡打卡"]',
+    );
+    expect(calendarAddButton).toBeDefined();
+
+    await act(async () => {
+      calendarAddButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    const dialog = container.querySelector('[role="dialog"]');
+    expect(dialog?.querySelector(".coffee-dialog-ticket")).not.toBeNull();
   });
 
   it("renders the coffee receipt counter scene with media layers and stable visual hooks", async () => {

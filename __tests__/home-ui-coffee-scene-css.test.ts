@@ -5,6 +5,23 @@ function extractBlock(css: string, marker: string) {
   const markerIndex = css.indexOf(marker);
   expect(markerIndex).toBeGreaterThanOrEqual(0);
 
+  return extractBlockAt(css, marker, markerIndex);
+}
+
+function extractBlocks(css: string, marker: string) {
+  const blocks: string[] = [];
+  let markerIndex = css.indexOf(marker);
+
+  while (markerIndex >= 0) {
+    blocks.push(extractBlockAt(css, marker, markerIndex));
+    markerIndex = css.indexOf(marker, markerIndex + marker.length);
+  }
+
+  expect(blocks.length).toBeGreaterThan(0);
+  return blocks;
+}
+
+function extractBlockAt(css: string, marker: string, markerIndex: number) {
   const blockStart = css.indexOf("{", markerIndex);
   expect(blockStart).toBeGreaterThan(markerIndex);
 
@@ -83,11 +100,14 @@ describe("home coffee scene CSS", () => {
 
   it("includes responsive and reduced-motion coverage for the coffee scene", () => {
     const css = readFileSync("app/globals.css", "utf8");
-    const mobileBlock = extractBlock(css, "@media (max-width: 980px)");
+    const mobileBlocks = extractBlocks(css, "@media (max-width: 980px)");
     const reducedMotionBlock = extractBlock(css, "@media (prefers-reduced-motion: reduce)");
 
-    expect(mobileBlock).toContain(".coffee-counter-layout");
-    expect(mobileBlock).toContain(".coffee-scene-props");
+    expect(
+      mobileBlocks.some(
+        (block) => block.includes(".coffee-counter-layout") && block.includes(".coffee-scene-props"),
+      ),
+    ).toBe(true);
     expect(reducedMotionBlock).toContain(".coffee-scene *");
     expect(reducedMotionBlock).toMatch(/transition-duration:\s*0\.01ms/);
   });
