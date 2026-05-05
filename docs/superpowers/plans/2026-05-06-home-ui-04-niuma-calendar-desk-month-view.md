@@ -2012,7 +2012,7 @@ Expected: no commit is created if there are no verification-only fixes.
   - `components/calendar/CalendarGrid.tsx`
   - `components/calendar/CalendarDayCell.tsx`
 
-- [ ] **Step 1: Start the dev server**
+- [x] **Step 1: Start the dev server**
 
 Run:
 
@@ -2022,7 +2022,7 @@ npm run dev
 
 Expected: Next.js starts on `http://localhost:3001`.
 
-- [ ] **Step 2: Open the app and navigate to `牛马日历`**
+- [x] **Step 2: Open the app and navigate to `牛马日历`**
 
 Use the in-app browser or Playwright against:
 
@@ -2032,7 +2032,7 @@ http://localhost:3001
 
 Expected: after login/session handling, the `牛马日历` tab can be selected and shows the calendar scene.
 
-- [ ] **Step 3: Verify desktop viewport**
+- [x] **Step 3: Verify desktop viewport**
 
 Check `1440x900`:
 
@@ -2048,7 +2048,7 @@ Concrete pass criteria:
 - Empty days show a short dash.
 - Coffee days show one coffee icon and a number.
 
-- [ ] **Step 4: Verify wide desktop viewport**
+- [x] **Step 4: Verify wide desktop viewport**
 
 Check `1728x1117`.
 
@@ -2058,7 +2058,7 @@ Concrete pass criteria:
 - Left and right props remain inside the scene boundary.
 - Month table cells keep stable proportions and text does not overlap.
 
-- [ ] **Step 5: Verify tablet viewport**
+- [x] **Step 5: Verify tablet viewport**
 
 Check `900x900`.
 
@@ -2068,7 +2068,7 @@ Concrete pass criteria:
 - Props are visually weaker and do not compete with the table.
 - Seven calendar columns remain visible without horizontal scrolling.
 
-- [ ] **Step 6: Verify mobile viewport**
+- [x] **Step 6: Verify mobile viewport**
 
 Check `390x844`.
 
@@ -2079,7 +2079,7 @@ Concrete pass criteria:
 - Day numbers, `练` chip, coffee count, and empty dash do not overlap.
 - No real calendar data is hidden.
 
-- [ ] **Step 7: Verify reduced motion**
+- [x] **Step 7: Verify reduced motion**
 
 Enable reduced motion in the browser/emulation.
 
@@ -2088,7 +2088,7 @@ Concrete pass criteria:
 - No continuous prop motion or hover transform remains.
 - Color and disabled-state changes remain visible.
 
-- [ ] **Step 8: Commit browser-polish fixes**
+- [x] **Step 8: Commit browser-polish fixes**
 
 If browser verification required adjustments, commit them:
 
