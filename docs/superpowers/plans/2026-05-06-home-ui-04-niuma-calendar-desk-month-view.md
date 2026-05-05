@@ -1949,7 +1949,7 @@ git commit -m "test: update calendar board visual expectations"
 **Files:**
 - No planned file edits.
 
-- [ ] **Step 1: Run all focused calendar and scene tests**
+- [x] **Step 1: Run all focused calendar and scene tests**
 
 Run:
 
@@ -1959,7 +1959,7 @@ npm test -- __tests__/home-ui-calendar-assets.test.ts __tests__/home-ui-calendar
 
 Expected: PASS.
 
-- [ ] **Step 2: Run full test suite**
+- [x] **Step 2: Run full test suite**
 
 Run:
 
@@ -1969,7 +1969,7 @@ npm test
 
 Expected: PASS.
 
-- [ ] **Step 3: Run lint**
+- [x] **Step 3: Run lint**
 
 Run:
 
@@ -1979,7 +1979,7 @@ npm run lint
 
 Expected: PASS with TypeScript reporting no errors.
 
-- [ ] **Step 4: Run build**
+- [x] **Step 4: Run build**
 
 Run:
 
@@ -1989,7 +1989,7 @@ npm run build
 
 Expected: PASS and Next.js production build completes.
 
-- [ ] **Step 5: Commit any verification-only fixes**
+- [x] **Step 5: Commit any verification-only fixes**
 
 If the verification steps required small fixes, commit only those fixes:
 
