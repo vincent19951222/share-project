@@ -131,7 +131,7 @@ git commit -m "test: add calendar scene asset contract"
 - If generated text is misspelled or extra readable text appears, regenerate that asset before processing.
 - If a subject includes green key-color contamination, regenerate with `#ff00ff` and keep `--auto-key border`.
 
-- [ ] **Step 1: Create staging and final directories**
+- [x] **Step 1: Create staging and final directories**
 
 Run:
 
@@ -141,7 +141,7 @@ mkdir -p /private/tmp/share-project-home-scenes-calendar/raw /private/tmp/share-
 
 Expected: all four directories exist.
 
-- [ ] **Step 2: Generate `calendar-desk-bg` with imagegen**
+- [x] **Step 2: Generate `calendar-desk-bg` with imagegen**
 
 Use the built-in `image_gen` tool through the `imagegen` skill. Prompt:
 
@@ -163,7 +163,7 @@ Copy the selected generated output to:
 /private/tmp/share-project-home-scenes-calendar/raw/calendar-desk-bg.png
 ```
 
-- [ ] **Step 3: Generate `binder-paper-texture` with imagegen**
+- [x] **Step 3: Generate `binder-paper-texture` with imagegen**
 
 Prompt:
 
@@ -185,7 +185,7 @@ Copy the selected generated output to:
 /private/tmp/share-project-home-scenes-calendar/raw/binder-paper-texture.png
 ```
 
-- [ ] **Step 4: Generate alpha overlay assets with imagegen**
+- [x] **Step 4: Generate alpha overlay assets with imagegen**
 
 Generate each asset separately. Copy selected outputs to `/private/tmp/share-project-home-scenes-calendar/raw/<filename>.png`.
 
@@ -291,7 +291,7 @@ Color palette: pale brown, warm beige
 Constraints: generate on a perfectly flat solid #00ff00 chroma-key background outside the stain; do not use #00ff00 anywhere in the stain; no text; no logos; no watermark
 ```
 
-- [ ] **Step 5: Remove chroma-key backgrounds from alpha overlays**
+- [x] **Step 5: Remove chroma-key backgrounds from alpha overlays**
 
 Run once per overlay:
 
@@ -307,7 +307,7 @@ python "${CODEX_HOME:-$HOME/.codex}/skills/.system/imagegen/scripts/remove_chrom
 
 Expected: each alpha PNG has transparent corners and no visible key-color fringe.
 
-- [ ] **Step 6: Resize and compress final WebP assets**
+- [x] **Step 6: Resize and compress final WebP assets**
 
 Run:
 
@@ -340,7 +340,7 @@ magick /private/tmp/share-project-home-scenes-calendar/alpha/calendar-coffee-rin
 cwebp -q 88 /private/tmp/share-project-home-scenes-calendar/resized/calendar-coffee-ring-stain.png -o public/assets/home-scenes/calendar/calendar-coffee-ring-stain.webp
 ```
 
-- [ ] **Step 7: Verify asset contract passes**
+- [x] **Step 7: Verify asset contract passes**
 
 Run:
 
@@ -350,7 +350,7 @@ npm test -- __tests__/home-ui-calendar-assets.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit assets**
+- [x] **Step 8: Commit assets**
 
 ```bash
 git add public/assets/home-scenes/calendar __tests__/home-ui-calendar-assets.test.ts
