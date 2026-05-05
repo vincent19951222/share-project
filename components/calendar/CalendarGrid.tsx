@@ -33,28 +33,31 @@ export function CalendarGrid({ snapshot }: { snapshot: CalendarMonthSnapshot }) 
   const cells = buildCalendarGrid(snapshot, getFirstDayOffset(snapshot.monthKey));
 
   return (
-    <section className="calendar-grid-section flex min-h-0 flex-1 flex-col gap-3">
-      <div className="calendar-weekday-row grid grid-cols-7 gap-2 text-center text-[11px] font-black text-slate-500 sm:text-xs">
-        {WEEKDAY_LABELS.map((label) => (
-          <div key={label} className="calendar-weekday rounded-full bg-slate-100 py-2">
-            <span className="calendar-week-prefix">周</span>{label}
-          </div>
-        ))}
-      </div>
-      <div className="calendar-month-grid grid grid-cols-7 gap-2 pb-1">
-        {cells.map((cell, index) =>
-          cell.kind === "neighbor" ? (
-            <div
-              key={`neighbor-${cell.monthRelation}-${index}`}
-              className={`calendar-day-cell calendar-neighbor-cell calendar-neighbor-cell-${cell.monthRelation}`}
-              aria-hidden="true"
-            >
-              {cell.day}
+    <section className="calendar-grid-section" aria-label={`${snapshot.monthKey} 牛马记录`}>
+      <div className="calendar-month-table">
+        <div className="calendar-weekday-row">
+          {WEEKDAY_LABELS.map((label) => (
+            <div key={label} className="calendar-weekday">
+              <span className="calendar-week-prefix">周</span>
+              {label}
             </div>
-          ) : (
-            <CalendarDayCell key={`${snapshot.monthKey}-${cell.day}`} cell={cell} />
-          ),
-        )}
+          ))}
+        </div>
+        <div className="calendar-month-grid">
+          {cells.map((cell, index) =>
+            cell.kind === "neighbor" ? (
+              <div
+                key={`${cell.monthRelation}-${cell.day}-${index}`}
+                className={`calendar-neighbor-cell calendar-neighbor-cell-${cell.monthRelation}`}
+                aria-hidden="true"
+              >
+                {cell.day}
+              </div>
+            ) : (
+              <CalendarDayCell key={`${snapshot.monthKey}-${cell.day}`} cell={cell} />
+            ),
+          )}
+        </div>
       </div>
     </section>
   );

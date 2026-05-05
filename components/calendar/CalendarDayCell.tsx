@@ -7,11 +7,11 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
   return (
     <div
       className={`calendar-day-cell ${cell.isToday ? "calendar-day-cell-today" : ""} ${
-        hasActivity ? "calendar-day-cell-active" : ""
+        hasActivity ? "calendar-day-cell-active" : "calendar-day-cell-empty"
       }`}
     >
-      <div className="calendar-day-top flex items-start justify-between gap-2">
-        <span className="calendar-day-number text-base font-black text-slate-900 sm:text-lg">{cell.day}</span>
+      <div className="calendar-day-top">
+        <span className="calendar-day-number">{cell.day}</span>
         {cell.workedOut ? (
           <span className="calendar-workout-chip" aria-label="已训练">
             练
@@ -20,19 +20,15 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
       </div>
       {cell.coffeeCups > 0 ? (
         <div
-          className="calendar-coffee-stack"
+          className="calendar-coffee-count"
           aria-label={`咖啡 ${cell.coffeeCups} 杯`}
           role="img"
         >
-          {Array.from({ length: cell.coffeeCups }, (_, index) => (
-            <AssetIcon
-              key={`${cell.day}-${index}`}
-              name="coffee"
-              className="image-render-pixel h-4 w-4 shrink-0 sm:h-5 sm:w-5"
-            />
-          ))}
+          <AssetIcon name="coffee" className="calendar-coffee-icon" />
+          <span>{cell.coffeeCups}</span>
         </div>
       ) : null}
+      {!hasActivity ? <span className="calendar-empty-mark" aria-hidden="true" /> : null}
     </div>
   );
 }

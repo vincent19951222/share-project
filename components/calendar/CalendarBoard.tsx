@@ -123,39 +123,93 @@ export function CalendarBoard() {
     snapshot !== null && snapshot.monthKey !== snapshot.currentMonthKey;
 
   return (
-    <section className="calendar-board-viewport absolute inset-0 overflow-y-auto p-4 sm:p-6">
-      <div className="soft-card calendar-board-shell flex min-h-full flex-col gap-4 overflow-hidden p-4 sm:p-6">
-        <CalendarHeader
-          monthLabel={monthLabel}
-          busy={busy}
-          canReturnToCurrentMonth={canReturnToCurrentMonth}
-          onPreviousMonth={() => {
-            void showPreviousMonth();
-          }}
-          onReturnToCurrentMonth={showCurrentMonth}
-        />
-        {snapshot ? (
-          <>
-            {error ? (
-              <div className="rounded-[1rem] border-[3px] border-rose-300 bg-rose-50 px-4 py-3 text-sm font-black text-rose-700">
-                {error}
-              </div>
-            ) : null}
-            <div className="calendar-summary-row flex flex-wrap gap-3 text-sm font-black text-slate-900">
-              <div className="calendar-summary-chip bg-yellow-200">
-                本月练了 {snapshot.workoutDays} 天
-              </div>
-              <div className="calendar-summary-chip bg-orange-100">
-                本月喝了 {snapshot.coffeeCupTotal} 杯
-              </div>
+    <section className="calendar-board-viewport absolute inset-0 overflow-y-auto p-3 sm:p-5">
+      <div className="calendar-scene">
+        <div className="calendar-scene-background" aria-hidden="true" />
+        <div className="calendar-scene-props" aria-hidden="true">
+          <img
+            className="calendar-prop calendar-prop-rings"
+            src="/assets/home-scenes/calendar/binder-rings-left.webp"
+            alt=""
+          />
+          <img
+            className="calendar-prop calendar-prop-clip"
+            src="/assets/home-scenes/calendar/binder-clip.webp"
+            alt=""
+          />
+          <img
+            className="calendar-prop calendar-prop-highlighter"
+            src="/assets/home-scenes/calendar/highlighter-focus-progress.webp"
+            alt=""
+          />
+          <img
+            className="calendar-prop calendar-prop-sticker"
+            src="/assets/home-scenes/calendar/sticker-just-lift.webp"
+            alt=""
+          />
+          <img
+            className="calendar-prop calendar-prop-note"
+            src="/assets/home-scenes/calendar/note-keep-going-purple.webp"
+            alt=""
+          />
+          <img
+            className="calendar-prop calendar-prop-stamp"
+            src="/assets/home-scenes/calendar/calendar-coffee-stamp-paper.webp"
+            alt=""
+          />
+          <img
+            className="calendar-prop calendar-prop-stain"
+            src="/assets/home-scenes/calendar/calendar-coffee-ring-stain.webp"
+            alt=""
+          />
+        </div>
+        <div className="calendar-scene-content">
+          <div className="calendar-binder-shell">
+            <div className="calendar-paper-surface">
+              <CalendarHeader
+                monthLabel={monthLabel}
+                busy={busy}
+                canReturnToCurrentMonth={canReturnToCurrentMonth}
+                onPreviousMonth={() => {
+                  void showPreviousMonth();
+                }}
+                onReturnToCurrentMonth={showCurrentMonth}
+              />
+              {snapshot ? (
+                <>
+                  {error ? (
+                    <div className="calendar-error-message">
+                      {error}
+                    </div>
+                  ) : null}
+                  <div className="calendar-summary-row">
+                    <div className="calendar-summary-chip calendar-summary-chip-workout">
+                      <span className="calendar-summary-icon" aria-hidden="true">
+                        <img src="/assets/icons/workout-pixel.svg" alt="" />
+                      </span>
+                      <span className="calendar-summary-label">本月练了</span>
+                      <strong className="calendar-summary-value">{snapshot.workoutDays}</strong>
+                      <span className="calendar-summary-unit">天</span>
+                    </div>
+                    <div className="calendar-summary-chip calendar-summary-chip-coffee">
+                      <span className="calendar-summary-icon" aria-hidden="true">
+                        <img src="/assets/icons/coffee-pixel.svg" alt="" />
+                      </span>
+                      <span className="calendar-summary-label">本月喝了</span>
+                      <strong className="calendar-summary-value">{snapshot.coffeeCupTotal}</strong>
+                      <span className="calendar-summary-unit">杯</span>
+                    </div>
+                  </div>
+                  <CalendarGrid snapshot={snapshot} />
+                </>
+              ) : (
+                <div className="calendar-loading-state">
+                  {error ?? "牛马日历加载中..."}
+                </div>
+              )}
             </div>
-            <CalendarGrid snapshot={snapshot} />
-          </>
-        ) : (
-          <div className="grid min-h-64 place-items-center rounded-[1.1rem] border-[3px] border-dashed border-slate-300 bg-slate-50 px-4 text-center font-black text-slate-500">
-            {error ?? "牛马日历加载中..."}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

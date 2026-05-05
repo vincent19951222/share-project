@@ -13,36 +13,35 @@ export function CalendarHeader({
   onPreviousMonth,
   onReturnToCurrentMonth,
 }: CalendarHeaderProps) {
+  const returnDisabled = busy || !canReturnToCurrentMonth;
+
   return (
-    <header className="calendar-header flex flex-wrap items-end justify-between gap-4 border-b-[4px] border-slate-100 pb-4">
-      <div className="calendar-header-copy min-w-0">
-        <p className="calendar-header-eyebrow text-xs font-black uppercase tracking-[0.12em] text-slate-500">
-          Monthly Record View
-        </p>
-        <h1 className="calendar-header-title mt-1 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-          牛马日历
-        </h1>
-        <p className="calendar-header-month mt-2 text-sm font-bold text-slate-600 sm:text-base">{monthLabel}</p>
+    <header className="calendar-header">
+      <div className="calendar-header-copy">
+        <p className="calendar-header-eyebrow">Monthly Record View</p>
+        <div className="calendar-header-title-row">
+          <h1 className="calendar-header-title">牛马日历</h1>
+          <span className="calendar-header-divider" aria-hidden="true" />
+          <p className="calendar-header-month">{monthLabel}</p>
+        </div>
       </div>
-      <div className="calendar-header-actions flex flex-wrap gap-3">
+      <div className="calendar-header-actions">
         <button
           type="button"
           disabled={busy}
           onClick={onPreviousMonth}
-          className="quest-btn min-h-11 px-4 py-2 text-sm disabled:translate-y-0 disabled:cursor-wait disabled:opacity-60 disabled:shadow-[0_4px_0_0_#1f2937]"
+          className="calendar-prev-btn"
         >
           上个月
         </button>
-        {canReturnToCurrentMonth ? (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={onReturnToCurrentMonth}
-            className="calendar-return-btn min-h-11 px-4 py-2 text-sm"
-          >
-            回到本月
-          </button>
-        ) : null}
+        <button
+          type="button"
+          disabled={returnDisabled}
+          onClick={onReturnToCurrentMonth}
+          className="calendar-return-btn"
+        >
+          回到本月
+        </button>
       </div>
     </header>
   );
