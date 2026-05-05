@@ -97,9 +97,15 @@ describe("home calendar scene CSS", () => {
 
   it("includes responsive and reduced-motion coverage for the calendar scene", () => {
     const css = readFileSync("app/globals.css", "utf8");
+    const tabletBlocks = extractBlocks(css, "@media (max-width: 1024px)");
     const mobileBlocks = extractBlocks(css, "@media (max-width: 760px)");
     const reducedMotionBlocks = extractBlocks(css, "@media (prefers-reduced-motion: reduce)");
 
+    expect(
+      tabletBlocks.some(
+        (block) => block.includes(".calendar-scene") && /margin-top:\s*clamp/.test(block),
+      ),
+    ).toBe(true);
     expect(
       mobileBlocks.some(
         (block) => block.includes(".calendar-scene-props") && block.includes(".calendar-paper-surface"),
@@ -108,6 +114,13 @@ describe("home calendar scene CSS", () => {
     expect(
       reducedMotionBlocks.some(
         (block) => block.includes(".calendar-scene *") && /transition-duration:\s*0\.01ms/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      reducedMotionBlocks.some(
+        (block) =>
+          block.includes(".calendar-day-cell-today:hover") &&
+          /transform:\s*none/.test(block),
       ),
     ).toBe(true);
   });

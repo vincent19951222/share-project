@@ -2932,6 +2932,10 @@ body {
 }
 
 @media (max-width: 1024px) {
+  .calendar-scene {
+    margin-top: clamp(4.5rem, 8vw, 5.75rem);
+  }
+
   .calendar-scene-content {
     padding: 0.85rem;
   }
@@ -3124,6 +3128,11 @@ body {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .calendar-day-cell-today:hover {
+    transform: none;
+    box-shadow: inset 0 0 0 3px #111827, 0 4px 0 #111827;
   }
 }
 
