@@ -1002,7 +1002,7 @@ git commit -m "feat: add calendar desk scene markup"
 - Create: `__tests__/home-ui-calendar-scene-css.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Create the failing CSS contract test**
+- [x] **Step 1: Create the failing CSS contract test**
 
 Create `__tests__/home-ui-calendar-scene-css.test.ts`:
 
@@ -1116,7 +1116,7 @@ describe("home calendar scene CSS", () => {
 });
 ```
 
-- [ ] **Step 2: Run the CSS test and verify it fails**
+- [x] **Step 2: Run the CSS test and verify it fails**
 
 Run:
 
@@ -1126,7 +1126,7 @@ npm test -- __tests__/home-ui-calendar-scene-css.test.ts
 
 Expected: FAIL because the new scene CSS does not exist yet.
 
-- [ ] **Step 3: Add calendar scene CSS**
+- [x] **Step 3: Add calendar scene CSS**
 
 Append this block near the existing `calendar-*` CSS in `app/globals.css`, then remove or override older duplicate rules only when they conflict with these selectors:
 
@@ -1785,7 +1785,7 @@ Append this block near the existing `calendar-*` CSS in `app/globals.css`, then 
 }
 ```
 
-- [ ] **Step 4: Run CSS test and scene component test**
+- [x] **Step 4: Run CSS test and scene component test**
 
 Run:
 
@@ -1795,7 +1795,7 @@ npm test -- __tests__/home-ui-calendar-scene-css.test.ts __tests__/home-ui-calen
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit CSS**
+- [x] **Step 5: Commit CSS**
 
 ```bash
 git add app/globals.css __tests__/home-ui-calendar-scene-css.test.ts
