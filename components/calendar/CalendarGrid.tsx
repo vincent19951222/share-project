@@ -43,12 +43,14 @@ export function CalendarGrid({ snapshot }: { snapshot: CalendarMonthSnapshot }) 
       </div>
       <div className="calendar-month-grid grid grid-cols-7 gap-2 pb-1">
         {cells.map((cell, index) =>
-          cell.kind === "blank" ? (
+          cell.kind === "neighbor" ? (
             <div
-              key={`blank-${index}`}
-              className="calendar-day-cell calendar-day-cell-blank"
+              key={`neighbor-${cell.monthRelation}-${index}`}
+              className={`calendar-day-cell calendar-neighbor-cell calendar-neighbor-cell-${cell.monthRelation}`}
               aria-hidden="true"
-            />
+            >
+              {cell.day}
+            </div>
           ) : (
             <CalendarDayCell key={`${snapshot.monthKey}-${cell.day}`} cell={cell} />
           ),

@@ -38,7 +38,7 @@ describe("calendar-data", () => {
     expect(readCalendarMonthKey("2026-03", "2026-04")).toBe("2026-03");
   });
 
-  it("builds a grid with leading blanks and today's day highlighted", () => {
+  it("builds a full-week grid with neighbor days and today's day highlighted", () => {
     const snapshot = {
       monthKey: "2026-04",
       currentMonthKey: "2026-04",
@@ -56,14 +56,37 @@ describe("calendar-data", () => {
     };
 
     expect(buildCalendarGrid(snapshot, 2)).toEqual([
-      { kind: "blank" },
-      { kind: "blank" },
+      { kind: "neighbor", day: 30, monthRelation: "previous" },
+      { kind: "neighbor", day: 31, monthRelation: "previous" },
       { kind: "day", day: 1, workedOut: true, coffeeCups: 0, isToday: false },
       { kind: "day", day: 2, workedOut: false, coffeeCups: 2, isToday: false },
       { kind: "day", day: 3, workedOut: true, coffeeCups: 4, isToday: true },
       { kind: "day", day: 4, workedOut: false, coffeeCups: 0, isToday: false },
       { kind: "day", day: 5, workedOut: false, coffeeCups: 0, isToday: false },
     ]);
+  });
+
+  it("pads month endings with next-month neighbor days", () => {
+    const snapshot = {
+      monthKey: "2026-04",
+      currentMonthKey: "2026-04",
+      todayDay: 30,
+      totalDays: 30,
+      workoutDays: 1,
+      coffeeCupTotal: 1,
+      days: [{ day: 30, workedOut: true, coffeeCups: 1 }],
+    };
+
+    const cells = buildCalendarGrid(snapshot, 4);
+
+    expect(cells).toHaveLength(35);
+    expect(cells.slice(0, 4)).toEqual([
+      { kind: "neighbor", day: 28, monthRelation: "previous" },
+      { kind: "neighbor", day: 29, monthRelation: "previous" },
+      { kind: "neighbor", day: 30, monthRelation: "previous" },
+      { kind: "neighbor", day: 31, monthRelation: "previous" },
+    ]);
+    expect(cells[34]).toEqual({ kind: "neighbor", day: 1, monthRelation: "next" });
   });
 
   it("does not highlight today on non-current months or when today is absent", () => {
@@ -78,7 +101,7 @@ describe("calendar-data", () => {
     };
     const cells = buildCalendarGrid(snapshot, 0);
 
-    expect(cells).toHaveLength(3);
+    expect(cells).toHaveLength(7);
     expect(cells[2]).toMatchObject({ kind: "day", day: 3, isToday: false });
 
     const absentTodaySnapshot = {
@@ -112,22 +135,31 @@ describe("calendar-data", () => {
       days: [{ day: 1, workedOut: true, coffeeCups: 1 }],
     };
 
-    expect(buildCalendarGrid(snapshot, -2)).toHaveLength(2);
+    expect(buildCalendarGrid(snapshot, -2)).toHaveLength(7);
     expect(buildCalendarGrid(snapshot, 9)).toEqual([
-      { kind: "blank" },
-      { kind: "blank" },
-      { kind: "blank" },
-      { kind: "blank" },
-      { kind: "blank" },
-      { kind: "blank" },
+      { kind: "neighbor", day: 26, monthRelation: "previous" },
+      { kind: "neighbor", day: 27, monthRelation: "previous" },
+      { kind: "neighbor", day: 28, monthRelation: "previous" },
+      { kind: "neighbor", day: 29, monthRelation: "previous" },
+      { kind: "neighbor", day: 30, monthRelation: "previous" },
+      { kind: "neighbor", day: 31, monthRelation: "previous" },
       { kind: "day", day: 1, workedOut: true, coffeeCups: 1, isToday: true },
       { kind: "day", day: 2, workedOut: false, coffeeCups: 0, isToday: false },
+      { kind: "neighbor", day: 1, monthRelation: "next" },
+      { kind: "neighbor", day: 2, monthRelation: "next" },
+      { kind: "neighbor", day: 3, monthRelation: "next" },
+      { kind: "neighbor", day: 4, monthRelation: "next" },
+      { kind: "neighbor", day: 5, monthRelation: "next" },
+      { kind: "neighbor", day: 6, monthRelation: "next" },
     ]);
     expect(buildCalendarGrid(snapshot, 2.9)).toEqual([
-      { kind: "blank" },
-      { kind: "blank" },
+      { kind: "neighbor", day: 30, monthRelation: "previous" },
+      { kind: "neighbor", day: 31, monthRelation: "previous" },
       { kind: "day", day: 1, workedOut: true, coffeeCups: 1, isToday: true },
       { kind: "day", day: 2, workedOut: false, coffeeCups: 0, isToday: false },
+      { kind: "neighbor", day: 1, monthRelation: "next" },
+      { kind: "neighbor", day: 2, monthRelation: "next" },
+      { kind: "neighbor", day: 3, monthRelation: "next" },
     ]);
   });
 
@@ -146,7 +178,7 @@ describe("calendar-data", () => {
     };
 
     const leapCells = buildCalendarGrid(leapFebruarySnapshot, 0);
-    expect(leapCells).toHaveLength(29);
+    expect(leapCells).toHaveLength(35);
     expect(leapCells[28]).toMatchObject({
       kind: "day",
       day: 29,
@@ -165,7 +197,7 @@ describe("calendar-data", () => {
     };
 
     const longMonthCells = buildCalendarGrid(longMonthSnapshot, 0);
-    expect(longMonthCells).toHaveLength(31);
+    expect(longMonthCells).toHaveLength(35);
     expect(longMonthCells[30]).toMatchObject({
       kind: "day",
       day: 31,

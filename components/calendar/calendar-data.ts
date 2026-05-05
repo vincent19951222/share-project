@@ -63,8 +63,10 @@ export function isFutureMonthKey(monthKey: string, currentMonthKey: string): boo
   return target.month > current.month;
 }
 
-export interface CalendarBlankCell {
-  kind: "blank";
+export interface CalendarNeighborCell {
+  kind: "neighbor";
+  day: number;
+  monthRelation: "previous" | "next";
 }
 
 export interface CalendarDayCell {
@@ -75,19 +77,34 @@ export interface CalendarDayCell {
   isToday: boolean;
 }
 
-export type CalendarGridCell = CalendarBlankCell | CalendarDayCell;
+export type CalendarGridCell = CalendarNeighborCell | CalendarDayCell;
+
+function getTotalDaysInMonth(monthKey: string): number {
+  const { year, month } = parseMonthKey(monthKey);
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+function getPreviousMonthTotalDays(monthKey: string): number {
+  return getTotalDaysInMonth(getPreviousMonthKey(monthKey));
+}
 
 export function buildCalendarGrid(
   snapshot: CalendarMonthSnapshot,
   firstDayOffset: number,
 ): CalendarGridCell[] {
   const normalizedOffset = Number.isFinite(firstDayOffset) ? Math.trunc(firstDayOffset) : 0;
-  const leadingBlankCount = Math.max(0, Math.min(6, normalizedOffset));
+  const leadingNeighborCount = Math.max(0, Math.min(6, normalizedOffset));
+  const previousMonthTotalDays = getPreviousMonthTotalDays(snapshot.monthKey);
   const dayRecords = new Map(snapshot.days.map((dayRecord) => [dayRecord.day, dayRecord] as const));
 
-  const blankCells: CalendarGridCell[] = Array.from({ length: leadingBlankCount }, () => ({
-    kind: "blank",
-  }));
+  const leadingCells: CalendarGridCell[] = Array.from(
+    { length: leadingNeighborCount },
+    (_, index) => ({
+      kind: "neighbor",
+      day: previousMonthTotalDays - leadingNeighborCount + index + 1,
+      monthRelation: "previous",
+    }),
+  );
 
   const dayCells: CalendarGridCell[] = Array.from({ length: snapshot.totalDays }, (_, index) => {
     const day = index + 1;
@@ -105,5 +122,16 @@ export function buildCalendarGrid(
     };
   });
 
-  return [...blankCells, ...dayCells];
+  const cells = [...leadingCells, ...dayCells];
+  const trailingNeighborCount = (7 - (cells.length % 7)) % 7;
+  const trailingCells: CalendarGridCell[] = Array.from(
+    { length: trailingNeighborCount },
+    (_, index) => ({
+      kind: "neighbor",
+      day: index + 1,
+      monthRelation: "next",
+    }),
+  );
+
+  return [...cells, ...trailingCells];
 }
