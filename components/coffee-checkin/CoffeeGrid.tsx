@@ -12,6 +12,25 @@ interface CoffeeGridProps {
   onRemoveCup: () => void;
 }
 
+const weekdayFormatter = new Intl.DateTimeFormat("zh-CN", {
+  weekday: "short",
+  timeZone: "Asia/Shanghai",
+});
+
+function getCoffeeDateLabel(day: number, today: number) {
+  const now = new Date();
+  const date = new Date(now);
+  date.setDate(now.getDate() + (day - today));
+
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const dateNumber = String(date.getDate()).padStart(2, "0");
+
+  return {
+    date: `${month}-${dateNumber}`,
+    weekday: day === today ? "今天" : weekdayFormatter.format(date),
+  };
+}
+
 function CoffeeCupIcon({ cups }: { cups: number }) {
   return (
     <span className="flex flex-col items-center gap-0.5 text-xs leading-none">
@@ -38,7 +57,11 @@ function CoffeeCell({
   onOpenActions: () => void;
 }) {
   if (isFuture) {
-    return <div className="coffee-calendar-cell h-[3.25rem] w-[3.25rem] shrink-0 rounded-2xl border-2 border-dashed border-orange-300" />;
+    return (
+      <div className="coffee-calendar-cell coffee-calendar-cell-future">
+        <span aria-hidden="true">-</span>
+      </div>
+    );
   }
 
   if (isTodayForCurrentUser) {
@@ -48,28 +71,27 @@ function CoffeeCell({
         disabled={busy}
         onClick={onOpenActions}
         aria-label={cups === 0 ? "确认今天咖啡打卡" : "调整今天咖啡杯数"}
-        className={`coffee-calendar-cell grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 font-black shadow-[0_4px_0_0_#1f2937] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60 ${
-          cups === 0 ? "bg-yellow-300 text-xl" : "bg-orange-100 text-amber-950"
+        className={`coffee-calendar-cell coffee-calendar-cell-today-user disabled:cursor-wait disabled:opacity-60 ${
+          cups === 0 ? "coffee-calendar-cell-empty-today" : "coffee-calendar-cell-filled-today"
         }`}
       >
-        {cups === 0 ? "+" : <CoffeeCupIcon cups={cups} />}
+        {cups === 0 ? <span className="coffee-cell-plus">+</span> : <CoffeeCupIcon cups={cups} />}
+        <span className="coffee-cell-today-caption">
+          {cups === 0 ? "今天还没续命" : `今天已续命 ${cups} 杯`}
+        </span>
       </button>
     );
   }
 
   if (cups > 0) {
     return (
-      <div className="coffee-calendar-cell grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-slate-900 bg-orange-100 font-black text-amber-950 shadow-[0_3px_0_0_rgba(63,42,29,0.65)]">
+      <div className="coffee-calendar-cell coffee-calendar-cell-filled">
         <CoffeeCupIcon cups={cups} />
       </div>
     );
   }
 
-  return (
-    <div className="coffee-calendar-cell grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-2xl border-2 border-orange-200 bg-orange-50 font-black text-orange-200">
-      ·
-    </div>
-  );
+  return <div className="coffee-calendar-cell coffee-calendar-cell-empty" />;
 }
 
 export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGridProps) {
@@ -101,25 +123,19 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
 
   return (
     <>
-    <section className="coffee-grid-desktop-shell flex min-h-0 flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-50 bg-white shadow-sm">
-      <header className="flex min-h-20 items-center justify-between gap-4 border-b-[3px] border-orange-100 bg-orange-50 px-5 py-4">
+    <section className="coffee-grid-desktop-shell coffee-calendar-paper">
+      <header className="coffee-calendar-header">
         <div>
-          <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
-            Team Coffee Calendar
-          </div>
-          <h2 className="mt-1 text-3xl font-black leading-none text-amber-950">
-            团队续命月历
-          </h2>
+          <div className="coffee-calendar-eyebrow">Team Coffee Calendar</div>
+          <h2 className="coffee-calendar-title">团队续命月历</h2>
         </div>
-        <div className="flex flex-wrap justify-end gap-2 text-xs font-black text-amber-800">
-          <span>已续命</span>
-          <span>空杯</span>
-          <span>今天</span>
+        <div className="coffee-calendar-header-icon" aria-hidden="true">
+          <AssetIcon name="coffee" className="h-10 w-10 object-contain" />
         </div>
       </header>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <aside className="flex w-28 shrink-0 flex-col border-r-[3px] border-orange-100 bg-orange-50">
+        <aside className="coffee-member-rail flex w-28 shrink-0 flex-col">
           <div className="flex h-11 items-center justify-center border-b-[3px] border-orange-100 text-xs font-black text-amber-700">
             MEMBERS
           </div>
@@ -134,6 +150,9 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
                 <span className="min-w-0 truncate text-xs font-black text-amber-950">
                   {member.name}
                 </span>
+                {member.id === snapshot.currentUserId ? (
+                  <span className="coffee-current-user-badge">我</span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -143,17 +162,15 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
           <div className="flex h-11 w-max shrink-0 gap-2 border-b-[3px] border-orange-100 bg-orange-50 px-4">
             {Array.from({ length: snapshot.totalDays }, (_, index) => {
               const day = index + 1;
+              const label = getCoffeeDateLabel(day, snapshot.today);
               return (
                 <div
                   key={day}
                   ref={day === snapshot.today ? desktopTodayColumnRef : undefined}
-                  className={`grid h-7 w-[3.25rem] place-items-center self-center rounded-full text-xs font-black ${
-                    day === snapshot.today
-                      ? "border-2 border-slate-900 bg-teal-200 text-slate-900 shadow-[0_2px_0_0_#1f2937]"
-                      : "text-amber-700"
-                  }`}
+                  className={`coffee-day-heading ${day === snapshot.today ? "coffee-day-column-today" : ""}`}
                 >
-                  {day}
+                  <span>{label.date}</span>
+                  <span>{label.weekday}</span>
                 </div>
               );
             })}
@@ -184,20 +201,14 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
 
     </section>
 
-    <section className="coffee-grid-mobile-shell hidden min-h-0 flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-50 bg-white shadow-sm">
-      <header className="flex min-h-16 items-center justify-between gap-3 border-b-[3px] border-orange-100 bg-orange-50 px-4 py-3">
+    <section className="coffee-grid-mobile-shell coffee-calendar-paper coffee-calendar-paper-mobile">
+      <header className="coffee-calendar-header">
         <div>
-          <div className="text-[10px] font-black uppercase tracking-[0.12em] text-amber-700">
-            Team Coffee Calendar
-          </div>
-          <h2 className="mt-1 text-2xl font-black leading-none text-amber-950">
-            团队续命月历
-          </h2>
+          <div className="coffee-calendar-eyebrow">Team Coffee Calendar</div>
+          <h2 className="coffee-calendar-title">团队续命月历</h2>
         </div>
-        <div className="flex shrink-0 flex-wrap justify-end gap-2 text-[10px] font-black text-amber-800">
-          <span>已续命</span>
-          <span>空杯</span>
-          <span>今天</span>
+        <div className="coffee-calendar-header-icon" aria-hidden="true">
+          <AssetIcon name="coffee" className="h-10 w-10 object-contain" />
         </div>
       </header>
 
@@ -209,17 +220,15 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
             </div>
             {Array.from({ length: snapshot.totalDays }, (_, index) => {
               const day = index + 1;
+              const label = getCoffeeDateLabel(day, snapshot.today);
               return (
                 <div
                   key={day}
                   ref={day === snapshot.today ? mobileTodayColumnRef : undefined}
-                  className={`coffee-grid-mobile-day grid place-items-center rounded-full text-xs font-black ${
-                    day === snapshot.today
-                      ? "border-2 border-slate-900 bg-teal-200 text-slate-900 shadow-[0_2px_0_0_#1f2937]"
-                      : "text-amber-700"
-                  }`}
+                  className={`coffee-grid-mobile-day coffee-day-heading ${day === snapshot.today ? "coffee-day-column-today" : ""}`}
                 >
-                  {day}
+                  <span>{label.date}</span>
+                  <span>{label.weekday}</span>
                 </div>
               );
             })}
@@ -235,6 +244,9 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
                 <span className="coffee-grid-mobile-name min-w-0 truncate font-black text-amber-950">
                   {member.name}
                 </span>
+                {member.id === snapshot.currentUserId ? (
+                  <span className="coffee-current-user-badge">我</span>
+                ) : null}
               </div>
               {Array.from({ length: snapshot.totalDays }, (_, index) => {
                 const day = index + 1;
@@ -259,31 +271,29 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
 
     {actionsOpen ? (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/20 p-4"
+          className="coffee-dialog-backdrop fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/25 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="coffee-calendar-dialog-title"
         >
-          <div className="w-full max-w-sm rounded-[1.25rem] border-[4px] border-slate-900 bg-orange-50 p-5 shadow-[8px_8px_0_0_rgba(63,42,29,0.9)]">
-            <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
-              Today Coffee
-            </div>
+          <div className="coffee-dialog-ticket">
+            <div className="coffee-dialog-eyebrow">Today Coffee</div>
             <h3
               id="coffee-calendar-dialog-title"
-              className="mt-1 text-2xl font-black leading-tight text-amber-950"
+              className="coffee-dialog-title"
             >
               {currentUserTodayCups === 0 ? "确认今天喝咖啡？" : "调整今天的杯数"}
             </h3>
-            <p className="mt-3 text-sm font-bold text-amber-900">
+            <p className="coffee-dialog-description">
               {currentUserTodayCups === 0
                 ? "确认后会先记录为 1 杯，后面如果继续喝，可以再从这里加。"
                 : `当前记录 ${currentUserTodayCups} 杯，可以继续 +1，也可以撤回最新一杯。`}
             </p>
-            <div className="mt-5 flex flex-wrap justify-end gap-3">
+            <div className="coffee-dialog-actions">
               <button
                 type="button"
                 onClick={() => setActionsOpen(false)}
-                className="rounded-full border-[3px] border-slate-900 bg-white px-4 py-2 text-sm font-black shadow-[0_3px_0_0_#1f2937]"
+                className="bg-white"
               >
                 取消
               </button>
@@ -292,7 +302,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
                   type="button"
                   disabled={busy}
                   onClick={() => runAndClose(onRemoveCup)}
-                  className="rounded-full border-[3px] border-slate-900 bg-orange-200 px-4 py-2 text-sm font-black shadow-[0_3px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
+                  className="bg-orange-200 disabled:cursor-wait disabled:opacity-60"
                 >
                   -1 杯
                 </button>
@@ -301,7 +311,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
                 type="button"
                 disabled={busy}
                 onClick={() => runAndClose(onAddCup)}
-                className="rounded-full border-[3px] border-slate-900 bg-teal-200 px-4 py-2 text-sm font-black shadow-[0_3px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
+                className="bg-teal-200 disabled:cursor-wait disabled:opacity-60"
               >
                 {currentUserTodayCups === 0 ? "确认 1 杯" : "+1 杯"}
               </button>

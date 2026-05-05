@@ -151,6 +151,567 @@ body {
   backdrop-filter: blur(2px);
 }
 
+.coffee-scene {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  overflow: hidden;
+  border-radius: 1.65rem;
+  padding: clamp(0.85rem, 1.5vw, 1.4rem);
+  background: #f5efe3;
+}
+
+.coffee-scene-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.coffee-scene-props {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.coffee-scene-background {
+  background-image: url("/assets/home-scenes/coffee/coffee-counter-bg.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+.coffee-scene-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 252, 244, 0.28);
+}
+
+.coffee-scene-content {
+  position: relative;
+  z-index: 2;
+  min-height: 0;
+  height: 100%;
+  padding-inline: clamp(7.25rem, 9vw, 11.5rem);
+}
+
+.coffee-counter-layout {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(520px, 1.9fr);
+  gap: clamp(1rem, 1.6vw, 1.35rem);
+}
+
+.coffee-scene-prop {
+  position: absolute;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px rgba(63, 42, 29, 0.2));
+  user-select: none;
+}
+
+.coffee-scene-cup {
+  left: clamp(0.35rem, 1.5vw, 1.25rem);
+  top: clamp(1.25rem, 3vw, 2.25rem);
+  width: clamp(5.5rem, 8vw, 8.75rem);
+  transform: rotate(-10deg);
+}
+
+.coffee-scene-note-left {
+  left: clamp(0.8rem, 2vw, 2rem);
+  top: clamp(14rem, 28vh, 21rem);
+  width: clamp(4.75rem, 7vw, 7.25rem);
+  transform: rotate(8deg);
+}
+
+.coffee-scene-note-right {
+  right: clamp(0.8rem, 2vw, 2rem);
+  top: clamp(1.75rem, 5vh, 4rem);
+  width: clamp(5.25rem, 7vw, 7.5rem);
+  transform: rotate(-7deg);
+}
+
+.coffee-scene-sugar {
+  left: clamp(0.3rem, 1.4vw, 1.2rem);
+  bottom: clamp(5.25rem, 10vh, 8rem);
+  width: clamp(4.75rem, 7vw, 7.5rem);
+  transform: rotate(-14deg);
+}
+
+.coffee-scene-beans-left {
+  left: clamp(1.4rem, 2vw, 2.5rem);
+  bottom: clamp(1.25rem, 4vh, 2.75rem);
+  width: clamp(3.75rem, 5vw, 5.5rem);
+  transform: rotate(12deg);
+}
+
+.coffee-scene-beans-right {
+  right: clamp(1.3rem, 2vw, 2.5rem);
+  top: clamp(12rem, 24vh, 18rem);
+  width: clamp(3.75rem, 5vw, 5.25rem);
+  transform: rotate(-12deg);
+}
+
+.coffee-scene-ring {
+  left: clamp(1.25rem, 2vw, 2.4rem);
+  bottom: clamp(0.8rem, 3vh, 2rem);
+  width: clamp(4.5rem, 6vw, 6.5rem);
+  opacity: 0.72;
+}
+
+.coffee-scene-stamp {
+  right: clamp(0.35rem, 1.5vw, 1.35rem);
+  bottom: clamp(5rem, 10vh, 8.5rem);
+  width: clamp(6.25rem, 8.5vw, 9rem);
+  transform: rotate(8deg);
+}
+
+.coffee-scene-clip {
+  right: clamp(1.1rem, 2vw, 2.1rem);
+  bottom: clamp(1rem, 4vh, 2.5rem);
+  width: clamp(4.25rem, 6vw, 6.75rem);
+  transform: rotate(-3deg);
+}
+
+.coffee-scene-state {
+  display: grid;
+  min-height: min(34rem, 100%);
+  place-items: center;
+  border: 4px solid #111827;
+  border-radius: 1.35rem;
+  background: rgba(255, 251, 235, 0.94);
+  padding: 2rem;
+  text-align: center;
+  color: #3f250c;
+  font-weight: 900;
+  box-shadow: 0 6px 0 0 #111827;
+}
+
+.coffee-scene-state-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #111827;
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 0.75rem 1.1rem;
+  color: #111827;
+  font-size: 0.875rem;
+  font-weight: 900;
+  box-shadow: 0 4px 0 0 #111827;
+}
+
+.coffee-scene-state-action-primary {
+  background: #fde047;
+}
+
+.coffee-receipt-ticket,
+.coffee-activity-ticket {
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #111827;
+  border-radius: 1.1rem 1.1rem 0.5rem 0.5rem;
+  background-color: rgba(255, 253, 247, 0.97);
+  background-image: url("/assets/home-scenes/coffee/receipt-paper-texture.webp");
+  background-size: 360px auto;
+  color: #2f1d0c;
+  box-shadow: 8px 8px 0 0 rgba(63, 42, 29, 0.88);
+}
+
+.coffee-receipt-ticket::after,
+.coffee-activity-ticket::after,
+.coffee-dialog-ticket::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 0.75rem;
+  background:
+    linear-gradient(135deg, transparent 50%, #111827 50%) 0 0 / 1rem 0.75rem repeat-x,
+    linear-gradient(225deg, transparent 50%, #111827 50%) 0 0 / 1rem 0.75rem repeat-x;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.coffee-receipt {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.coffee-receipt-header {
+  border-bottom: 3px dashed rgba(63, 42, 29, 0.55);
+  padding: clamp(1.1rem, 2vw, 1.65rem);
+  text-align: center;
+}
+
+.coffee-receipt-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  border-bottom: 3px dashed rgba(63, 42, 29, 0.3);
+  padding: 1rem;
+}
+
+.coffee-stat-tile {
+  min-height: 6rem;
+  border: 2px solid rgba(17, 24, 39, 0.45);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.85rem;
+}
+
+.coffee-stat-mint {
+  background: rgba(204, 251, 241, 0.78);
+}
+
+.coffee-stat-latte {
+  background: rgba(255, 237, 213, 0.86);
+}
+
+.coffee-stat-yellow {
+  background: rgba(254, 240, 138, 0.9);
+}
+
+.coffee-stat-plain {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.coffee-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #3f250c;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.coffee-stat-label span {
+  display: inline-grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff7ed;
+  font-size: 0.85rem;
+}
+
+.coffee-stat-value {
+  margin-top: 0.55rem;
+  color: #111827;
+  font-size: clamp(1.75rem, 2.4vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coffee-receipt-body {
+  display: grid;
+  min-height: 0;
+  gap: 0.9rem;
+  padding: 1rem 1rem 1.35rem;
+}
+
+.coffee-today-panel {
+  border: 3px solid #111827;
+  border-radius: 0.65rem;
+  background: rgba(255, 247, 237, 0.8);
+  padding: 1rem;
+}
+
+.coffee-today-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.coffee-cup-action {
+  min-height: 3.45rem;
+  border: 3px solid #111827;
+  border-radius: 0.55rem;
+  background: #ffffff;
+  padding-inline: 1rem;
+  color: #111827;
+  font-size: 1rem;
+  font-weight: 900;
+  box-shadow: 0 4px 0 0 #111827;
+}
+
+.coffee-cup-action:last-child {
+  background: #14b8a6;
+  color: #ffffff;
+}
+
+.coffee-cup-summary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 3px solid #111827;
+  border-radius: 0.65rem;
+  background: #ffffff;
+  padding: 0.75rem 0.9rem;
+}
+
+.coffee-activity-ticket {
+  min-height: 11rem;
+  box-shadow: 6px 6px 0 0 rgba(63, 42, 29, 0.76);
+}
+
+.coffee-activity-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(63, 42, 29, 0.18);
+  padding: 0.65rem 0.9rem;
+  color: #3f250c;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.coffee-activity-list {
+  display: flex;
+  max-height: 12rem;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0.85rem 0.95rem 1.2rem;
+}
+
+.coffee-activity-row {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-bottom: 1px dashed rgba(63, 42, 29, 0.22);
+  padding-block: 0.45rem;
+}
+
+.coffee-activity-empty {
+  border: 2px dashed rgba(63, 42, 29, 0.28);
+  border-radius: 0.45rem;
+  background: rgba(255, 247, 237, 0.76);
+  padding: 0.75rem;
+  color: #92400e;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.coffee-calendar-paper {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 4px solid #111827;
+  border-radius: 1.25rem;
+  background-color: rgba(255, 253, 247, 0.97);
+  background-image: url("/assets/home-scenes/coffee/receipt-paper-texture.webp");
+  background-size: 440px auto;
+  color: #2f1d0c;
+  box-shadow: 8px 8px 0 0 rgba(63, 42, 29, 0.78);
+}
+
+.coffee-grid-mobile-shell {
+  display: none;
+}
+
+.coffee-calendar-header {
+  display: flex;
+  min-height: 5.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 4px solid #111827;
+  padding: 1rem 1.35rem;
+}
+
+.coffee-calendar-eyebrow {
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.coffee-calendar-title {
+  margin-top: 0.25rem;
+  color: #111827;
+  font-size: clamp(1.75rem, 2.3vw, 2.35rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coffee-calendar-header-icon {
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+  border-radius: 999px;
+  color: #111827;
+}
+
+.coffee-member-rail {
+  border-right: 2px solid rgba(17, 24, 39, 0.16);
+  background: rgba(255, 247, 237, 0.68);
+}
+
+.coffee-current-user-badge {
+  display: inline-grid;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  border: 2px solid #111827;
+  border-radius: 999px;
+  background: #fde047;
+  color: #111827;
+  font-size: 0.75rem;
+  font-weight: 900;
+  box-shadow: 0 2px 0 0 #111827;
+}
+
+.coffee-day-heading {
+  display: grid;
+  width: 3.7rem;
+  height: 3.1rem;
+  flex: 0 0 3.7rem;
+  place-items: center;
+  align-content: center;
+  border-radius: 0.6rem;
+  color: #3f250c;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.coffee-day-column-today {
+  border: 2px solid #0f766e;
+  background: rgba(20, 184, 166, 0.16);
+  color: #0f766e;
+  box-shadow: inset 0 0 0 999px rgba(20, 184, 166, 0.08);
+}
+
+.coffee-calendar-cell {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 3.25rem;
+  place-items: center;
+  border-radius: 0.55rem;
+  font-weight: 900;
+}
+
+.coffee-calendar-cell-filled,
+.coffee-calendar-cell-filled-today {
+  border: 2px solid #f3d99c;
+  background: #fff7df;
+  color: #3f250c;
+  box-shadow: 0 2px 0 0 rgba(63, 42, 29, 0.18);
+}
+
+.coffee-calendar-cell-empty {
+  border: 2px dashed rgba(17, 24, 39, 0.16);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.coffee-calendar-cell-empty-today {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.coffee-calendar-cell-future {
+  border: 2px dashed rgba(17, 24, 39, 0.12);
+  background: rgba(255, 255, 255, 0.25);
+  color: rgba(17, 24, 39, 0.32);
+}
+
+.coffee-calendar-cell-today-user {
+  border: 2px solid #0f766e;
+  background: #ccfbf1;
+  color: #0f766e;
+  box-shadow: 0 3px 0 0 #0f766e;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.coffee-calendar-cell-today-user:hover {
+  transform: translateY(-1px);
+}
+
+.coffee-cell-plus {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.coffee-cell-today-caption {
+  display: none;
+}
+
+.coffee-dialog-backdrop {
+  backdrop-filter: blur(2px);
+}
+
+.coffee-dialog-ticket {
+  position: relative;
+  width: min(100%, 24rem);
+  overflow: hidden;
+  border: 4px solid #111827;
+  border-radius: 1rem 1rem 0.45rem 0.45rem;
+  background-color: #fffdf7;
+  background-image: url("/assets/home-scenes/coffee/receipt-paper-texture.webp");
+  background-size: 360px auto;
+  padding: 1.35rem 1.35rem 1.75rem;
+  color: #2f1d0c;
+  box-shadow: 8px 8px 0 0 rgba(63, 42, 29, 0.9);
+}
+
+.coffee-dialog-eyebrow {
+  color: #92400e;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.coffee-dialog-title {
+  margin-top: 0.35rem;
+  color: #111827;
+  font-size: 1.65rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.coffee-dialog-description {
+  margin-top: 0.85rem;
+  color: #78350f;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.coffee-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.coffee-dialog-actions button {
+  border: 3px solid #111827;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.88rem;
+  font-weight: 900;
+  box-shadow: 0 3px 0 0 #111827;
+}
+
 .heatmap-training-panel {
   border-color: #111827;
   background: rgba(255, 255, 255, 0.9);
@@ -3346,4 +3907,79 @@ body {
 .game-weekly-report--error {
   color: #991b1b;
   font-weight: 900;
+}
+
+@media (max-width: 980px) {
+  .coffee-scene {
+    border-radius: 1.2rem;
+    padding: 0.75rem;
+  }
+
+  .coffee-scene-content {
+    padding-inline: 0;
+  }
+
+  .coffee-counter-layout {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+  }
+
+  .coffee-scene-props {
+    opacity: 0.35;
+  }
+
+  .coffee-scene-cup,
+  .coffee-scene-note-left,
+  .coffee-scene-note-right,
+  .coffee-scene-sugar,
+  .coffee-scene-stamp,
+  .coffee-scene-clip {
+    display: none;
+  }
+
+  .coffee-receipt-ticket {
+    min-height: max-content;
+    overflow: visible;
+  }
+
+  .coffee-today-controls {
+    grid-template-columns: minmax(3.6rem, auto) minmax(0, 1fr) minmax(3.6rem, auto);
+    gap: 0.5rem;
+  }
+
+  .coffee-cup-action {
+    min-height: 2.65rem;
+    padding-inline: 0.75rem;
+    border-width: 2px;
+    font-size: 0.78rem;
+    box-shadow: 0 3px 0 0 #111827;
+  }
+
+  .coffee-cup-summary {
+    gap: 0.5rem;
+    border-width: 2px;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .coffee-grid-desktop-shell {
+    display: none;
+  }
+
+  .coffee-grid-mobile-shell {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coffee-scene *,
+  .coffee-scene *::before,
+  .coffee-scene *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
 }

@@ -64,11 +64,8 @@ export function CoffeeActivityFeed() {
   );
 
   return (
-    <section
-      aria-label="咖啡实时动态"
-      className="overflow-hidden rounded-2xl border-[3px] border-dashed border-amber-900/25 bg-white/70"
-    >
-      <div className="flex justify-between border-b-2 border-amber-100 bg-orange-50 px-4 py-2 text-[10px] font-black tracking-wider text-amber-700">
+    <section aria-label="咖啡实时动态" className="coffee-activity-ticket">
+      <div className="coffee-activity-header">
         <span>实时动态</span>
         <span
           className={`flex items-center gap-1 ${
@@ -84,9 +81,9 @@ export function CoffeeActivityFeed() {
         </span>
       </div>
 
-      <div ref={streamRef} className="flex max-h-48 flex-col gap-2 overflow-y-auto p-4 text-sm">
+      <div ref={streamRef} className="coffee-activity-list">
         {sortedEvents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-amber-200 bg-orange-50 px-4 py-3 text-xs font-bold text-amber-700">
+          <div className="coffee-activity-empty">
             今天还没有咖啡打卡
           </div>
         ) : null}
@@ -99,7 +96,7 @@ export function CoffeeActivityFeed() {
           });
 
           return (
-            <div key={event.id} className="flex w-full items-start gap-2 text-main">
+            <div key={event.id} className="coffee-activity-row text-main">
               <span className="mt-1 shrink-0 font-mono text-[10px] text-slate-300">
                 [{timestamp}]
               </span>

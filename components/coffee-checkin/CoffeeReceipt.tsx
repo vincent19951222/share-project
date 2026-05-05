@@ -21,16 +21,26 @@ function StatTile({
   tone: "mint" | "latte" | "yellow" | "plain";
 }) {
   const toneClass = {
-    mint: "bg-teal-100",
-    latte: "bg-orange-100",
-    yellow: "bg-yellow-200",
-    plain: "bg-white",
+    mint: "coffee-stat-mint",
+    latte: "coffee-stat-latte",
+    yellow: "coffee-stat-yellow",
+    plain: "coffee-stat-plain",
+  }[tone];
+
+  const icon = {
+    mint: "☕",
+    latte: "●",
+    yellow: "☕",
+    plain: "♕",
   }[tone];
 
   return (
-    <article className={`min-h-24 rounded-2xl border-[3px] border-slate-900 p-4 shadow-[4px_4px_0_0_rgba(63,42,29,0.28)] ${toneClass}`}>
-      <div className="text-xs font-black text-amber-800">{label}</div>
-      <div className="mt-3 text-3xl font-black leading-none text-amber-950">{value}</div>
+    <article className={`coffee-stat-tile ${toneClass}`}>
+      <div className="coffee-stat-label">
+        <span aria-hidden="true">{icon}</span>
+        {label}
+      </div>
+      <div className="coffee-stat-value">{value}</div>
     </article>
   );
 }
@@ -62,8 +72,8 @@ export function CoffeeReceipt({
     : "暂无";
 
   return (
-    <section className="coffee-receipt flex min-h-0 flex-col overflow-hidden rounded-[1.2rem] border-4 border-slate-900 bg-orange-50 shadow-[8px_8px_0_0_rgba(63,42,29,0.9)]">
-      <header className="border-b-[3px] border-dashed border-amber-900/40 bg-yellow-50 p-6">
+    <section className="coffee-receipt coffee-receipt-ticket">
+      <header className="coffee-receipt-header">
         <div className="text-xs font-black uppercase tracking-[0.12em] text-amber-700">
           Daily Coffee Receipt
         </div>
@@ -80,15 +90,15 @@ export function CoffeeReceipt({
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 border-b-[3px] border-dashed border-amber-900/25 p-4">
+      <div className="coffee-receipt-stats">
         <StatTile label="今日总杯数" value={String(snapshot.stats.todayTotalCups)} tone="mint" />
         <StatTile label="今日续命人数" value={`${snapshot.stats.todayDrinkers}/${snapshot.members.length}`} tone="latte" />
         <StatTile label="我的今日杯数" value={String(myCups)} tone="yellow" />
         <StatTile label="今日咖啡王" value={coffeeKing} tone="plain" />
       </div>
 
-      <div className="grid gap-3 p-4">
-        <div className="coffee-today-panel rounded-2xl border-[3px] border-slate-900 bg-orange-100 p-4">
+      <div className="coffee-receipt-body">
+        <div className="coffee-today-panel">
           <div className="coffee-today-eyebrow text-xs font-black uppercase tracking-[0.12em] text-amber-700">
             My Coffee Today
           </div>
@@ -100,11 +110,11 @@ export function CoffeeReceipt({
               type="button"
               disabled={busy || myCups === 0}
               onClick={onRemoveCup}
-              className="coffee-cup-action h-12 rounded-full border-[3px] border-slate-900 bg-orange-200 px-4 text-sm font-black shadow-[0_4px_0_0_#1f2937] disabled:cursor-not-allowed disabled:opacity-40"
+              className="coffee-cup-action disabled:cursor-not-allowed disabled:opacity-40"
             >
               -1 杯
             </button>
-            <div className="coffee-cup-summary flex min-w-0 items-center justify-between gap-3 rounded-2xl border-[3px] border-slate-900 bg-white px-4 py-3">
+            <div className="coffee-cup-summary">
               <div>
                 <div className="coffee-cup-summary-label text-xs font-black text-amber-700">当前杯数</div>
                 <div className="coffee-cup-summary-value text-2xl font-black text-amber-950">{myCups} 杯</div>
@@ -115,7 +125,7 @@ export function CoffeeReceipt({
               type="button"
               disabled={busy}
               onClick={onAddCup}
-              className="coffee-cup-action h-12 rounded-full border-[3px] border-slate-900 bg-teal-200 px-4 text-sm font-black shadow-[0_4px_0_0_#1f2937] disabled:cursor-wait disabled:opacity-60"
+              className="coffee-cup-action disabled:cursor-wait disabled:opacity-60"
             >
               +1 杯
             </button>
