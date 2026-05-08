@@ -78,12 +78,20 @@ function createJsonResponse(body: unknown) {
   };
 }
 
-function createErrorResponse(status: number, body: unknown) {
-  return {
-    ok: false,
-    status,
-    json: async () => body,
-  };
+async function waitFor(assertion: () => void | Promise<void>, attempts = 20) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await assertion();
+      return;
+    } catch (error) {
+      await act(async () => {
+        await Promise.resolve();
+      });
+      if (attempt === attempts - 1) {
+        throw error;
+      }
+    }
+  }
 }
 
 function gameWeeklySnapshot() {
@@ -127,7 +135,6 @@ async function renderReportCenter(root: Root, state: BoardState) {
         </CoffeeProvider>
       </BoardProvider>,
     );
-    await Promise.resolve();
   });
 }
 
@@ -180,52 +187,61 @@ describe("ReportCenter", () => {
   it("renders the lightweight dashboard with a playful coffee report", async () => {
     await renderReportCenter(root, initialState);
 
-    expect(container.textContent).toContain("4月牛马战报");
-    expect(container.textContent).toContain("本月打卡 4 次，全勤 1 天，团队节奏还有上升空间。");
-    expect(container.textContent).toContain("团队完成率");
-    expect(container.textContent).toContain("总打卡次数");
-    expect(container.textContent).toContain("牛马金库");
-    expect(container.textContent).toContain("减脂挑战 · 3/5");
-    expect(container.textContent).toContain("活跃趋势");
-    expect(container.textContent).toContain("咖啡能量站");
-    expect(container.textContent).toContain("Daily Roast");
-    expect(container.textContent).toContain("牛马补给周报");
-    expect(container.textContent).toContain("四维完成率");
-    expect(container.textContent).toContain("本周发券");
-    expect(container.textContent).toContain("今日全队 3 杯");
-    expect(container.textContent).toContain("续命人数");
-    expect(container.textContent).toContain("2/2");
-    expect(container.textContent).toContain("本月累计");
-    expect(container.textContent).toContain("13 杯");
-    expect(container.textContent).toContain("今日状态");
-    expect(container.textContent).toContain("Relax");
-    expect(container.textContent).toContain("本周咖啡王");
-    expect(container.textContent).toContain("luo · 7 杯");
-    expect(container.querySelector("img[src='/assets/report-center/coffee-cup-label.png']")).not.toBeNull();
-    expect(container.querySelector("img[src='/assets/report-center/coffee-receipt.png']")).not.toBeNull();
+    await waitFor(() => {
+      expect(container.textContent).toContain("4月牛马战报");
+      expect(container.textContent).toContain("本月打卡 4 次，全勤 1 天，团队节奏还有上升空间。");
+      expect(container.textContent).toContain("团队完成率");
+      expect(container.textContent).toContain("总打卡次数");
+      expect(container.textContent).toContain("牛马金库");
+      expect(container.textContent).toContain("减脂挑战 · 3/5");
+      expect(container.textContent).toContain("活跃趋势");
+      expect(container.textContent).toContain("咖啡能量站");
+      expect(container.textContent).toContain("Daily Roast");
+      expect(container.textContent).toContain("牛马补给周报");
+      expect(container.textContent).toContain("四维完成率");
+      expect(container.textContent).toContain("本周发券");
+      expect(container.textContent).toContain("今日全队 3 杯");
+      expect(container.textContent).toContain("续命人数");
+      expect(container.textContent).toContain("2/2");
+      expect(container.textContent).toContain("本月累计");
+      expect(container.textContent).toContain("13 杯");
+      expect(container.textContent).toContain("今日状态");
+      expect(container.textContent).toContain("Relax");
+      expect(container.textContent).toContain("本周咖啡王");
+      expect(container.textContent).toContain("luo · 7 杯");
+      expect(container.querySelector(".report-scene")).not.toBeNull();
+      expect(container.querySelector(".report-scene-content")).not.toBeNull();
+      expect(container.querySelector("img[src='/assets/report-center/coffee-cup-label.png']")).not.toBeNull();
+      expect(container.querySelector("img[src='/assets/report-center/coffee-receipt.png']")).not.toBeNull();
+      expect(container.querySelector("svg[aria-label='团队每日打卡人数趋势']")).not.toBeNull();
+    });
+
     expect(container.textContent).not.toContain("气氛组播报");
     expect(container.textContent).not.toContain("OCTOBER REPORT");
     expect(container.textContent).not.toContain("+12,450");
     expect(container.textContent).not.toContain("Bob");
     expect(container.textContent).not.toContain("10.01");
-    expect(container.querySelector("svg[aria-label='团队每日打卡人数趋势']")).not.toBeNull();
   });
 
   it("shows weekly report admin actions only for admins", async () => {
     await renderReportCenter(root, buildAdminState());
 
-    expect(container.textContent).toContain("本周周报");
-    expect(container.textContent).toContain("还没生成本周草稿");
-    expect(findButton(container, "生成本周周报")).toBeTruthy();
-    expect(findButton(container, "发布到团队动态")).toBeTruthy();
+    await waitFor(() => {
+      expect(container.textContent).toContain("本周周报");
+      expect(container.textContent).toContain("还没生成本周草稿");
+      expect(findButton(container, "生成本周周报")).toBeTruthy();
+      expect(findButton(container, "发布到团队动态")).toBeTruthy();
+    });
   });
 
   it("hides the weekly report admin panel from regular members", async () => {
     await renderReportCenter(root, initialState);
 
-    expect(container.textContent).not.toContain("本周周报");
-    expect(findButton(container, "生成本周周报")).toBeUndefined();
-    expect(findButton(container, "发布到团队动态")).toBeUndefined();
+    await waitFor(() => {
+      expect(container.textContent).not.toContain("本周周报");
+      expect(findButton(container, "生成本周周报")).toBeUndefined();
+      expect(findButton(container, "发布到团队动态")).toBeUndefined();
+    });
   });
 
   it("renders generated weekly draft summary and week range for admins", async () => {
@@ -287,16 +303,20 @@ describe("ReportCenter", () => {
 
     await renderReportCenter(root, buildAdminState());
 
+    await waitFor(() => {
+      expect(findButton(container, "生成本周周报")).toBeTruthy();
+    });
+
     const generateButton = findButton(container, "生成本周周报");
-    expect(generateButton).toBeTruthy();
 
     await act(async () => {
       generateButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      await Promise.resolve();
     });
 
-    expect(container.textContent).toContain("已生成草稿");
-    expect(container.textContent).toContain("本周打卡 9 次，全勤 2 天，赛季进度 3/5。");
-    expect(container.textContent).toContain("2026.04.27 - 2026.04.30");
+    await waitFor(() => {
+      expect(container.textContent).toContain("已生成草稿");
+      expect(container.textContent).toContain("本周打卡 9 次，全勤 2 天，赛季进度 3/5。");
+      expect(container.textContent).toContain("2026.04.27 - 2026.04.30");
+    });
   });
 });
