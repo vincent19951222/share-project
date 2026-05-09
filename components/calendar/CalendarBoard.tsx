@@ -123,7 +123,7 @@ export function CalendarBoard() {
     snapshot !== null && snapshot.monthKey !== snapshot.currentMonthKey;
 
   return (
-    <section className="calendar-board-viewport absolute inset-0 overflow-y-auto p-3 sm:p-5">
+    <section className="calendar-board-viewport absolute inset-0">
       <div className="calendar-scene">
         <div className="calendar-scene-background" aria-hidden="true" />
         <div className="calendar-scene-props" aria-hidden="true">

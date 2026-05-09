@@ -135,7 +135,7 @@ report-scene
 - `CoffeeReportPanel`
   - 保留“咖啡杯 + 小票 + 近 7 天柱图”的信息结构。
   - 改成右侧附刊卡，不再像独立大模块抢主区。
-  - 现有咖啡素材允许替换为更贴近原型的新版本。
+  - 保留当前已存在的像素杯子和小票素材，作为咖啡模块的视觉主体；本轮只调整它们在右侧附刊中的壳层、比例和周边纸面关系，不重生成替换图。
 - `GamificationWeeklyReportPanel`
   - 改为底部左侧附刊纸面。
   - 顶部是中英混排标题，左侧状态 badge，内部四项指标横排，摘要卡和高光改为更像“剪报摘要”。
@@ -160,7 +160,12 @@ public/assets/home-scenes/report/
 public/assets/report-center/
 ```
 
-本轮不再扩充。咖啡相关旧素材如继续使用，也应迁移到 `public/assets/home-scenes/report/` 下再引用。
+本轮不再扩充。`CoffeeReportPanel` 当前已存在的两张像素素材：
+
+- `public/assets/report-center/coffee-cup-label.png`
+- `public/assets/report-center/coffee-receipt.png`
+
+作为这个咖啡模块的既有视觉资产保留，不要求迁移、不要求替换；其余新增编辑台 props 统一进入 `public/assets/home-scenes/report/`。
 
 ### 资源命名与格式规则
 
@@ -186,8 +191,15 @@ public/assets/report-center/
 | `bar-chart-note.webp` | props | 右中柱状图纸片 | alpha webp | `<= 120 KB` |
 | `stronger-stamp.webp` | props | 左下圆章印记 | alpha webp | `<= 90 KB` |
 | `focus-marker.webp` | props | 右下记号笔 | alpha webp | `<= 140 KB` |
-| `coffee-cup-energy.webp` | props | 咖啡区纸杯插画 | alpha webp | `<= 120 KB` |
-| `coffee-receipt-mini.webp` | props | 咖啡区统计小票 | alpha webp | `<= 120 KB` |
+
+### A-1. 保留的现有咖啡模块素材
+
+这两张图继续保留并直接复用，不走本轮生图流程：
+
+| 文件名 | 当前路径 | 用途 |
+| --- | --- | --- |
+| `coffee-cup-label.png` | `public/assets/report-center/coffee-cup-label.png` | 咖啡区本周咖啡王杯身主体 |
+| `coffee-receipt.png` | `public/assets/report-center/coffee-receipt.png` | 咖啡区统计小票主体 |
 
 ### B. 可用 CSS 直接构造的非图片元素
 
@@ -208,6 +220,7 @@ public/assets/report-center/
 - 四张 `Milestones` 继续使用当前四项真实指标
 - `TrendChart` 的峰值、低谷、今日点位继续读取真实计算结果
 - `CoffeeReportPanel` 继续使用真实咖啡统计
+- `CoffeeReportPanel` 继续引用当前两张像素素材，不替换业务模块主体插画
 - `GamificationWeeklyReportPanel` 继续使用真实周报 API 返回结构
 - `WeeklyReportAdminPanel` 继续使用当前生成与发布接口，不新加操作
 
@@ -219,7 +232,8 @@ public/assets/report-center/
 
 - 必需文件存在
 - 体积低于预算
-- 引用路径全部位于 `public/assets/home-scenes/report/`
+- 新增 scene props 的引用路径全部位于 `public/assets/home-scenes/report/`
+- `CoffeeReportPanel` 保留的两张既有素材允许继续位于 `public/assets/report-center/`
 
 ### 2. 生图顺序
 
@@ -237,8 +251,6 @@ public/assets/report-center/
 8. `bar-chart-note`
 9. `stronger-stamp`
 10. `focus-marker`
-11. `coffee-cup-energy`
-12. `coffee-receipt-mini`
 
 ### 3. 生图要求
 
@@ -316,10 +328,10 @@ public/assets/report-center/
 4. `ReportHeader`、`Milestones`、`TrendChart`、`CoffeeReportPanel`、`GamificationWeeklyReportPanel`、`WeeklyReportAdminPanel` 都纳入同一视觉体系。
 5. 未新增任何业务入口、统计口径或管理能力。
 6. 移动端不遮挡、不溢出，管理员区仍可用。
+7. 咖啡能量站继续保留当前像素杯子和小票素材，只调整外层编辑台壳层与排版关系。
 
 ## 实施边界结论
 
 - 本轮 `spec-05` 只服务 `战报中心` tab。
 - 共享规则只复用既有 `spec-01` 与 `2026-05-05` workflow，不在本 spec 内重新定义跨 tab contract。
 - 管理员周报面板必须保留，并作为“编辑台校对区”并入同一 scene。
-

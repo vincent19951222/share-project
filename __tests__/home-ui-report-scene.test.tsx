@@ -180,9 +180,13 @@ describe("home report scene", () => {
       expect(container.querySelector(".report-scene-background")).not.toBeNull();
       expect(container.querySelector(".report-scene-props")).not.toBeNull();
       expect(container.querySelector(".report-scene-content")).not.toBeNull();
+      expect(container.querySelector(".report-header-strip")).not.toBeNull();
+      expect(container.querySelector(".report-header-copy")).not.toBeNull();
+      expect(container.querySelector(".report-header-vault")).not.toBeNull();
       expect(container.querySelector(".report-scene-analysis")).not.toBeNull();
       expect(container.querySelector(".report-scene-bottom")).not.toBeNull();
       expect(container.querySelector(".report-scene-admin")).not.toBeNull();
+      expect(container.querySelector(".report-milestones")).not.toBeNull();
       expect(container.textContent).toContain("4月牛马战报");
       expect(container.textContent).toContain("本周高光");
       expect(container.textContent).toContain("本周周报");
@@ -202,5 +206,32 @@ describe("home report scene", () => {
         "/assets/home-scenes/report/focus-marker.webp",
       ]),
     );
+
+    const headerAssetSources = Array.from(container.querySelectorAll(".report-header-strip img")).map((image) =>
+      image.getAttribute("src"),
+    );
+
+    expect(headerAssetSources).toEqual(
+      expect.arrayContaining([
+        "/assets/home-scenes/report/keep-going-stamp.webp",
+        "/assets/home-scenes/report/mini-chart-slip.webp",
+        "/assets/home-scenes/report/vault-safe-yellow.webp",
+      ]),
+    );
+
+    const milestoneTiles = Array.from(container.querySelectorAll(".report-metric-tile"));
+
+    expect(milestoneTiles).toHaveLength(4);
+    expect(container.querySelectorAll(".report-scene-metrics > .report-metric-tile")).toHaveLength(4);
+    expect(container.querySelector(".report-metric-tile[data-metric-id='completion-rate']")).not.toBeNull();
+    expect(container.querySelector(".report-metric-tile[data-metric-id='total-punches']")).not.toBeNull();
+    expect(container.querySelector(".report-metric-tile[data-metric-id='perfect-days']")).not.toBeNull();
+    expect(container.querySelector(".report-metric-tile[data-metric-id='monthly-highlight']")).not.toBeNull();
+
+    for (const tile of milestoneTiles) {
+      expect(tile.querySelector(".report-metric-accent")).not.toBeNull();
+      expect(tile.querySelector(".report-metric-icon")).not.toBeNull();
+      expect(tile.querySelector(".report-metric-body")).not.toBeNull();
+    }
   });
 });

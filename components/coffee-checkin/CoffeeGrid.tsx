@@ -136,16 +136,16 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <aside className="coffee-member-rail flex w-28 shrink-0 flex-col">
-          <div className="flex h-11 items-center justify-center border-b-[3px] border-orange-100 text-xs font-black text-amber-700">
+          <div className="coffee-member-heading flex items-center justify-center border-b-[3px] border-orange-100 text-xs font-black text-amber-700">
             MEMBERS
           </div>
-          <div className="flex flex-1 flex-col justify-between gap-2 p-3">
+          <div className="coffee-member-list flex flex-1 flex-col justify-between">
             {snapshot.members.map((member) => (
-              <div key={member.id} className="flex h-14 min-w-0 items-center gap-2">
+              <div key={member.id} className="coffee-member-row flex min-w-0 items-center gap-2">
                 <img
                   src={getAvatarUrl(member.avatarKey)}
                   alt={member.name}
-                  className="h-9 w-9 shrink-0 rounded-full border-2 border-slate-900 bg-white object-cover"
+                  className="coffee-member-avatar shrink-0 rounded-full border-2 border-slate-900 bg-white object-cover"
                 />
                 <span className="min-w-0 truncate text-xs font-black text-amber-950">
                   {member.name}
@@ -159,7 +159,7 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col overflow-x-auto overflow-y-hidden scroll-smooth">
-          <div className="flex h-11 w-max shrink-0 gap-2 border-b-[3px] border-orange-100 bg-orange-50 px-4">
+          <div className="coffee-days-header flex w-max shrink-0 border-b-[3px] border-orange-100 bg-orange-50">
             {Array.from({ length: snapshot.totalDays }, (_, index) => {
               const day = index + 1;
               const label = getCoffeeDateLabel(day, snapshot.today);
@@ -175,9 +175,9 @@ export function CoffeeGrid({ snapshot, busy, onAddCup, onRemoveCup }: CoffeeGrid
               );
             })}
           </div>
-          <div className="flex w-max flex-1 flex-col justify-between gap-2 p-4">
+          <div className="coffee-grid-body flex w-max flex-1 flex-col justify-between">
             {snapshot.members.map((member, rowIndex) => (
-              <div key={member.id} className="flex h-14 items-center gap-2">
+              <div key={member.id} className="coffee-calendar-row flex items-center">
                 {Array.from({ length: snapshot.totalDays }, (_, index) => {
                   const day = index + 1;
                   return (

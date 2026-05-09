@@ -167,21 +167,26 @@ export function CoffeeReportPanel({
   error,
 }: CoffeeReportPanelProps) {
   return (
-    <aside className="coffee-report-panel relative flex min-h-[620px] flex-col overflow-hidden rounded-[1.45rem] border-[6px] border-orange-100 bg-[radial-gradient(circle_at_50%_12%,rgba(255,248,214,0.95),transparent_34%),linear-gradient(180deg,#fff8ea,#ffedd5)] p-5 shadow-sm xl:col-span-1 xl:min-h-0">
+    <aside className="coffee-report-panel coffee-report-inset-shell relative flex min-h-[560px] flex-col overflow-hidden rounded-[1.35rem] border-[4px] border-[#b45309] bg-[radial-gradient(circle_at_50%_12%,rgba(255,248,214,0.9),transparent_30%),linear-gradient(180deg,#fff8ea,#f7ddbd)] p-4 shadow-[0_8px_0_0_rgba(120,53,15,0.15)] xl:min-h-0">
       <div className="pointer-events-none absolute inset-x-4 top-16 h-28 rounded-full bg-white/50 blur-2xl" aria-hidden="true" />
-      <div className="coffee-report-heading flex items-start justify-between gap-4">
+      <div className="coffee-report-heading coffee-report-appendix-head flex items-start justify-between gap-3 border-b-[3px] border-dashed border-amber-700/35 pb-4">
         <div className="min-w-0">
-          <div className="report-chip bg-white text-amber-900">团队咖啡打卡</div>
-          <h2 className="coffee-report-title mt-3 text-2xl font-black leading-tight text-amber-950">
+          <div className="report-chip border-amber-900/20 bg-white text-amber-900">团队咖啡打卡</div>
+          <h2 className="coffee-report-title mt-3 text-[1.8rem] font-black leading-tight text-amber-950">
             咖啡能量站
           </h2>
+          <p className="mt-2 text-sm font-bold leading-relaxed text-amber-900/80">
+            一页附录，专门记录最近几天的续命曲线和今日咖啡情况。
+          </p>
         </div>
         <div className="coffee-report-icon grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-[3px] border-slate-900 bg-yellow-200 shadow-[0_4px_0_0_#1f2937]">
           <AssetIcon name="coffee" className="h-8 w-8 object-contain" />
         </div>
       </div>
 
-      <CoffeeReceiptScene coffee={coffee} loading={loading} error={error} />
+      <div className="coffee-report-visual-center">
+        <CoffeeReceiptScene coffee={coffee} loading={loading} error={error} />
+      </div>
 
       <CoffeeBars days={coffee.recentDays} />
     </aside>

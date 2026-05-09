@@ -33,6 +33,7 @@ function extractBlockAt(css: string, marker: string, markerIndex: number) {
 }
 
 function extractRuleBody(css: string, selector: string) {
+  const matchingBodies: string[] = [];
   let blockStart = css.indexOf("{");
 
   while (blockStart >= 0) {
@@ -43,26 +44,14 @@ function extractRuleBody(css: string, selector: string) {
     const selectors = selectorList.split(",").map((item) => item.trim());
 
     if (!selectorList.startsWith("@") && selectors.includes(selector)) {
-      break;
+      matchingBodies.push(extractBlockAt(css, selector, css.lastIndexOf(selector, blockStart)));
     }
 
     blockStart = css.indexOf("{", blockStart + 1);
   }
 
-  expect(blockStart).toBeGreaterThanOrEqual(0);
-
-  let depth = 1;
-  let cursor = blockStart + 1;
-
-  while (depth > 0 && cursor < css.length) {
-    const char = css[cursor];
-    if (char === "{") depth += 1;
-    if (char === "}") depth -= 1;
-    cursor += 1;
-  }
-
-  expect(depth).toBe(0);
-  return css.slice(blockStart + 1, cursor - 1);
+  expect(matchingBodies.length).toBeGreaterThan(0);
+  return matchingBodies.join("\n");
 }
 
 describe("home coffee scene CSS", () => {
@@ -87,12 +76,29 @@ describe("home coffee scene CSS", () => {
 
   it("styles receipt, realtime feed, calendar paper, and coffee dialog surfaces", () => {
     const css = readFileSync("app/globals.css", "utf8");
+    const desktopShellRule = extractRuleBody(css, ".coffee-grid-desktop-shell");
+    const daysHeaderRule = extractRuleBody(css, ".coffee-days-header");
+    const dayHeadingRule = extractRuleBody(css, ".coffee-day-heading");
+    const rowRule = extractRuleBody(css, ".coffee-calendar-row");
+    const cellRule = extractRuleBody(css, ".coffee-calendar-cell");
+    const gridBodyRule = extractRuleBody(css, ".coffee-grid-body");
     const receiptRule = extractRuleBody(css, ".coffee-receipt-ticket");
     const feedRule = extractRuleBody(css, ".coffee-activity-ticket");
     const calendarRule = extractRuleBody(css, ".coffee-calendar-paper");
     const todayColumnRule = extractRuleBody(css, ".coffee-day-column-today");
     const dialogRule = extractRuleBody(css, ".coffee-dialog-ticket");
 
+    expect(desktopShellRule).toMatch(/--coffee-grid-cell-size:\s*2\.75rem/);
+    expect(desktopShellRule).toMatch(/--coffee-grid-col-gap:\s*0\.5rem/);
+    expect(desktopShellRule).toMatch(/--coffee-grid-inline-pad:\s*0\.8rem/);
+    expect(daysHeaderRule).toMatch(/gap:\s*var\(--coffee-grid-col-gap\)/);
+    expect(daysHeaderRule).toMatch(/padding-inline:\s*var\(--coffee-grid-inline-pad\)/);
+    expect(dayHeadingRule).toMatch(/width:\s*var\(--coffee-grid-cell-size\)/);
+    expect(dayHeadingRule).toMatch(/flex:\s*0 0 var\(--coffee-grid-cell-size\)/);
+    expect(rowRule).toMatch(/gap:\s*var\(--coffee-grid-col-gap\)/);
+    expect(cellRule).toMatch(/width:\s*var\(--coffee-grid-cell-size\)/);
+    expect(cellRule).toMatch(/flex:\s*0 0 var\(--coffee-grid-cell-size\)/);
+    expect(gridBodyRule).toMatch(/padding:\s*0\.65rem var\(--coffee-grid-inline-pad\)/);
     expect(receiptRule).toMatch(/border:\s*4px solid #111827/);
     expect(receiptRule).toMatch(/background-image:[\s\S]*receipt-paper-texture\.webp/);
     expect(feedRule).toMatch(/border:\s*4px solid #111827/);

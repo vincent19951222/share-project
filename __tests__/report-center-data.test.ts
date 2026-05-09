@@ -82,6 +82,7 @@ describe("buildReportData", () => {
     );
 
     expect(report.title).toBe("4月牛马战报");
+    expect(report.monthNumber).toBe(4);
     expect(report.summary).toBe("本月打卡 7 次，全勤 1 天，团队节奏还有上升空间。");
     expect(report.teamVault).toEqual({ current: 1450, helper: "减脂挑战 · 3/5" });
     expect(report.metrics.map((metric) => [metric.label, metric.value])).toEqual([

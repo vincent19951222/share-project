@@ -1,7 +1,17 @@
 import { getShanghaiDayKey } from "@/lib/economy";
 import type { BoardState, CoffeeSnapshot } from "@/lib/types";
 
+export const REPORT_METRIC_IDS = {
+  completionRate: "completion-rate",
+  totalPunches: "total-punches",
+  perfectDays: "perfect-days",
+  monthlyHighlight: "monthly-highlight",
+} as const;
+
+export type ReportMetricId = (typeof REPORT_METRIC_IDS)[keyof typeof REPORT_METRIC_IDS];
+
 export interface ReportMetric {
+  id: ReportMetricId;
   label: string;
   value: string;
   helper: string;
@@ -41,6 +51,7 @@ export interface ReportDaySummary {
 
 export interface ReportData {
   title: string;
+  monthNumber: number;
   summary: string;
   teamVault: {
     current: number;
@@ -99,6 +110,10 @@ function getLongestStreak(state: BoardState, elapsedDays: number): StreakSummary
 function getDashboardTitle(now: Date) {
   const month = now.toLocaleString("en-US", { month: "numeric", timeZone: "Asia/Shanghai" });
   return `${month}月牛马战报`;
+}
+
+function getDashboardMonthNumber(now: Date) {
+  return Number(now.toLocaleString("en-US", { month: "numeric", timeZone: "Asia/Shanghai" }));
 }
 
 function getSummary(totalPunches: number, fullAttendanceDays: number, completionRate: number) {
@@ -248,6 +263,7 @@ export function buildReportData(
 
   return {
     title: getDashboardTitle(now),
+    monthNumber: getDashboardMonthNumber(now),
     summary: getSummary(totalPunches, fullAttendanceDays, completionRate),
     teamVault: {
       current: teamVaultTotal,
@@ -257,24 +273,28 @@ export function buildReportData(
     },
     metrics: [
       {
+        id: REPORT_METRIC_IDS.completionRate,
         label: "团队完成率",
         value: `${completionRate}%`,
         helper: getCompletionHelper(completionRate),
         tone: completionRate >= 75 ? "good" : "plain",
       },
       {
+        id: REPORT_METRIC_IDS.totalPunches,
         label: "总打卡次数",
         value: totalPunches.toLocaleString("zh-CN"),
         helper: `${memberCount} 人 · ${elapsedDays} 天`,
         tone: "plain",
       },
       {
+        id: REPORT_METRIC_IDS.perfectDays,
         label: "全勤日",
         value: fullAttendanceDays.toLocaleString("zh-CN"),
         helper: fullAttendanceDays > 0 ? "全员亮灯的日子。" : "还没有全员亮灯。",
         tone: "good",
       },
       {
+        id: REPORT_METRIC_IDS.monthlyHighlight,
         label: "本月高光",
         value: mostConsistentMember ? `最稳：${mostConsistentMember.name}` : "暂无高光",
         helper: mostConsistentMember

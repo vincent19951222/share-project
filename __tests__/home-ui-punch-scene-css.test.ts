@@ -110,7 +110,9 @@ describe("home punch scene CSS", () => {
     expect(railRule).toMatch(/background:\s*#fef3c7/);
     expect(rulerRule).toMatch(/background:\s*#111827/);
     expect(rulerRule).toMatch(/color:\s*#f8fafc/);
-    expect(trackRule).toMatch(/background-image:[\s\S]*linear-gradient\(90deg,\s*rgba\(17,\s*24,\s*39,\s*0\.08\)/);
+    expect(trackRule).toMatch(/background-color:\s*rgba\(255,\s*255,\s*255,\s*0\.58\)/);
+    expect(trackRule).not.toMatch(/background-image/);
+    expect(trackRule).not.toMatch(/background-size/);
     expect(todayCellRule).toMatch(/background:\s*#fef08a/);
     expect(todayCellRule).toMatch(/border-color:\s*#fde047/);
     expect(todayButtonRule).toMatch(/background:\s*#111827/);

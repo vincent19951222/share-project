@@ -154,6 +154,7 @@ body {
 .coffee-scene {
   position: relative;
   isolation: isolate;
+  height: 100%;
   min-height: 100%;
   overflow: hidden;
   border-radius: 1.65rem;
@@ -195,17 +196,18 @@ body {
 .coffee-scene-content {
   position: relative;
   z-index: 2;
-  min-height: 0;
   height: 100%;
-  padding-inline: clamp(7.25rem, 9vw, 11.5rem);
+  min-height: 0;
+  box-sizing: border-box;
+  padding-inline: clamp(7.5rem, 10vw, 12.5rem);
 }
 
 .coffee-counter-layout {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(320px, 0.95fr) minmax(520px, 1.9fr);
-  gap: clamp(1rem, 1.6vw, 1.35rem);
+  grid-template-columns: minmax(280px, 0.82fr) minmax(480px, 1.6fr);
+  gap: clamp(0.8rem, 1.35vw, 1.1rem);
 }
 
 .coffee-scene-prop {
@@ -346,30 +348,47 @@ body {
   flex-direction: column;
 }
 
+.coffee-receipt-ticket {
+  height: 100%;
+}
+
 .coffee-receipt-header {
   border-bottom: 3px dashed rgba(63, 42, 29, 0.55);
-  padding: clamp(1.1rem, 2vw, 1.65rem);
+  padding: clamp(0.75rem, 1.35vw, 1rem);
   text-align: center;
 }
 
 .coffee-receipt-header h1 {
+  margin-top: 0.35rem;
+  font-size: clamp(1.65rem, 2.4vw, 2.05rem);
+  line-height: 0.95;
   white-space: nowrap;
+}
+
+.coffee-receipt-header > div:last-child {
+  margin-top: 0.65rem;
+  gap: 0.4rem;
+}
+
+.coffee-receipt-header > div:last-child span {
+  padding: 0.18rem 0.58rem;
+  font-size: 0.68rem;
 }
 
 .coffee-receipt-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0.55rem;
   border-bottom: 3px dashed rgba(63, 42, 29, 0.3);
-  padding: 1rem;
+  padding: 0.7rem;
 }
 
 .coffee-stat-tile {
-  min-height: 6rem;
+  min-height: 4.6rem;
   border: 2px solid rgba(17, 24, 39, 0.45);
   border-radius: 0.45rem;
   background: rgba(255, 255, 255, 0.72);
-  padding: 0.85rem;
+  padding: 0.65rem;
 }
 
 .coffee-stat-mint {
@@ -391,62 +410,66 @@ body {
 .coffee-stat-label {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
   color: #3f250c;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 900;
+  line-height: 1.1;
 }
 
 .coffee-stat-label span {
   display: inline-grid;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
   place-items: center;
   border-radius: 999px;
   background: #111827;
   color: #fff7ed;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
 }
 
 .coffee-stat-value {
-  margin-top: 0.55rem;
+  margin-top: 0.45rem;
   color: #111827;
-  font-size: clamp(1.75rem, 2.4vw, 2.6rem);
+  font-size: clamp(1.35rem, 1.8vw, 1.9rem);
   font-weight: 900;
   line-height: 1;
 }
 
 .coffee-receipt-body {
   display: grid;
+  flex: 1;
   min-height: 0;
-  gap: 0.9rem;
-  padding: 1rem 1rem 1.35rem;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  padding: 0.7rem 0.85rem 0.95rem;
 }
 
 .coffee-today-panel {
   border: 3px solid #111827;
   border-radius: 0.65rem;
   background: rgba(255, 247, 237, 0.8);
-  padding: 1rem;
+  padding: 0.75rem;
 }
 
 .coffee-today-controls {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
 }
 
 .coffee-cup-action {
-  min-height: 3.45rem;
-  border: 3px solid #111827;
+  min-height: 2.75rem;
+  border: 2px solid #111827;
   border-radius: 0.55rem;
   background: #ffffff;
-  padding-inline: 1rem;
+  padding-inline: 0.7rem;
   color: #111827;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 900;
-  box-shadow: 0 4px 0 0 #111827;
+  box-shadow: 0 3px 0 0 #111827;
 }
 
 .coffee-cup-action:last-child {
@@ -459,15 +482,18 @@ body {
   min-width: 0;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.55rem;
   border: 3px solid #111827;
+  border-width: 2px;
   border-radius: 0.65rem;
   background: #ffffff;
-  padding: 0.75rem 0.9rem;
+  padding: 0.55rem 0.65rem;
 }
 
 .coffee-activity-ticket {
-  min-height: 11rem;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
   box-shadow: 6px 6px 0 0 rgba(63, 42, 29, 0.76);
 }
 
@@ -475,19 +501,21 @@ body {
   display: flex;
   justify-content: space-between;
   border-bottom: 2px solid rgba(63, 42, 29, 0.18);
-  padding: 0.65rem 0.9rem;
+  padding: 0.5rem 0.75rem;
   color: #3f250c;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 
 .coffee-activity-list {
   display: flex;
-  max-height: 12rem;
+  flex: 1;
+  min-height: 0;
+  max-height: none;
   flex-direction: column;
   overflow-y: auto;
-  padding: 0.85rem 0.95rem 1.2rem;
+  padding: 0.55rem 0.75rem 0.85rem;
 }
 
 .coffee-activity-row {
@@ -496,7 +524,7 @@ body {
   align-items: flex-start;
   gap: 0.5rem;
   border-bottom: 1px dashed rgba(63, 42, 29, 0.22);
-  padding-block: 0.45rem;
+  padding-block: 0.32rem;
 }
 
 .coffee-activity-empty {
@@ -511,6 +539,7 @@ body {
 
 .coffee-calendar-paper {
   display: flex;
+  height: 100%;
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
@@ -527,14 +556,20 @@ body {
   display: none;
 }
 
+.coffee-grid-desktop-shell {
+  --coffee-grid-cell-size: 2.75rem;
+  --coffee-grid-col-gap: 0.5rem;
+  --coffee-grid-inline-pad: 0.8rem;
+}
+
 .coffee-calendar-header {
   display: flex;
-  min-height: 5.25rem;
+  min-height: 4rem;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 4px solid #111827;
-  padding: 1rem 1.35rem;
+  gap: 0.75rem;
+  border-bottom: 3px solid #111827;
+  padding: 0.65rem 1rem;
 }
 
 .coffee-calendar-eyebrow {
@@ -546,20 +581,25 @@ body {
 }
 
 .coffee-calendar-title {
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
   color: #111827;
-  font-size: clamp(1.75rem, 2.3vw, 2.35rem);
+  font-size: clamp(1.35rem, 1.8vw, 1.75rem);
   font-weight: 900;
   line-height: 1;
 }
 
 .coffee-calendar-header-icon {
   display: grid;
-  width: 4rem;
-  height: 4rem;
+  width: 3rem;
+  height: 3rem;
   place-items: center;
   border-radius: 999px;
   color: #111827;
+}
+
+.coffee-calendar-header-icon img {
+  width: 2rem;
+  height: 2rem;
 }
 
 .coffee-member-rail {
@@ -583,14 +623,14 @@ body {
 
 .coffee-day-heading {
   display: grid;
-  width: 3.7rem;
-  height: 3.1rem;
-  flex: 0 0 3.7rem;
+  width: var(--coffee-grid-cell-size);
+  height: 2.45rem;
+  flex: 0 0 var(--coffee-grid-cell-size);
   place-items: center;
   align-content: center;
   border-radius: 0.6rem;
   color: #3f250c;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 900;
   line-height: 1.15;
 }
@@ -604,12 +644,47 @@ body {
 
 .coffee-calendar-cell {
   display: grid;
-  width: 3.25rem;
-  height: 3.25rem;
-  flex: 0 0 3.25rem;
+  width: var(--coffee-grid-cell-size);
+  height: var(--coffee-grid-cell-size);
+  flex: 0 0 var(--coffee-grid-cell-size);
   place-items: center;
   border-radius: 0.55rem;
   font-weight: 900;
+}
+
+.coffee-member-heading,
+.coffee-days-header {
+  height: 2.5rem;
+}
+
+.coffee-days-header {
+  gap: var(--coffee-grid-col-gap);
+  padding-inline: var(--coffee-grid-inline-pad);
+}
+
+.coffee-member-list {
+  gap: 0.45rem;
+  padding: 0.65rem;
+}
+
+.coffee-member-row,
+.coffee-calendar-row {
+  height: 3rem;
+}
+
+.coffee-calendar-row {
+  gap: var(--coffee-grid-col-gap);
+}
+
+.coffee-member-avatar {
+  width: 2rem;
+  height: 2rem;
+}
+
+.coffee-grid-body {
+  gap: 0.45rem;
+  overflow-y: auto;
+  padding: 0.65rem var(--coffee-grid-inline-pad);
 }
 
 .coffee-calendar-cell-filled,
@@ -649,7 +724,7 @@ body {
 }
 
 .coffee-cell-plus {
-  font-size: 1.45rem;
+  font-size: 1.2rem;
   line-height: 1;
 }
 
@@ -734,10 +809,6 @@ body {
 
 .heatmap-grid-track {
   background-color: rgba(255, 255, 255, 0.58);
-  background-image:
-    linear-gradient(90deg, rgba(17, 24, 39, 0.08) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(17, 24, 39, 0.05) 1px, transparent 1px);
-  background-size: 3.75rem 3.75rem;
 }
 
 .heatmap-day-today {
@@ -2459,9 +2530,15 @@ body {
   }
 }
 
+.calendar-board-viewport {
+  height: 100%;
+  overflow: hidden;
+}
+
 .calendar-scene {
   position: relative;
   isolation: isolate;
+  height: 100%;
   min-height: 100%;
   overflow: hidden;
   border-radius: 1.65rem;
@@ -2475,6 +2552,7 @@ body {
   inset: 0;
   overflow: hidden;
   border-radius: inherit;
+  clip-path: inset(0 round 1.65rem);
 }
 
 .calendar-scene-background {
@@ -2493,8 +2571,11 @@ body {
 .calendar-scene-content {
   position: relative;
   z-index: 2;
-  min-height: 100%;
-  padding: clamp(1rem, 2.2vw, 2rem);
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  padding-block: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding-inline: clamp(7.5rem, 10vw, 12.5rem);
 }
 
 .calendar-prop {
@@ -2555,8 +2636,10 @@ body {
 
 .calendar-binder-shell {
   position: relative;
+  display: flex;
+  height: 100%;
   width: min(100%, 82rem);
-  min-height: calc(100vh - 8rem);
+  min-height: 0;
   margin: 0 auto;
   padding: 0.45rem 0.65rem 0.75rem 0.9rem;
   border-radius: 1.4rem;
@@ -2567,18 +2650,22 @@ body {
 
 .calendar-paper-surface {
   position: relative;
-  min-height: calc(100vh - 9.5rem);
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 1.7vw, 1.35rem);
-  padding: clamp(1.35rem, 2.7vw, 2.8rem);
-  padding-left: clamp(2.2rem, 4vw, 3.5rem);
+  gap: clamp(0.65rem, 1.1vw, 0.95rem);
+  padding: clamp(0.95rem, 1.7vw, 1.45rem);
+  padding-left: clamp(1.75rem, 3vw, 2.55rem);
   border: 4px solid #111827;
   border-radius: 1.2rem;
   background-color: rgba(255, 255, 255, 0.94);
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
     url("/assets/home-scenes/calendar/binder-paper-texture.webp");
+  background-clip: padding-box;
   background-size: cover;
   background-position: center;
   box-shadow: inset 0 0 0 2px rgba(17, 24, 39, 0.08);
@@ -2620,7 +2707,7 @@ body {
 .calendar-header-title {
   margin: 0;
   color: #030712;
-  font-size: clamp(2.35rem, 5vw, 4rem);
+  font-size: clamp(1.9rem, 3.7vw, 3rem);
   font-weight: 950;
   line-height: 0.95;
   letter-spacing: 0;
@@ -2628,7 +2715,7 @@ body {
 
 .calendar-header-divider {
   width: 2px;
-  height: clamp(2.1rem, 3.4vw, 3.1rem);
+  height: clamp(1.8rem, 2.8vw, 2.55rem);
   background: #111827;
 }
 
@@ -2636,7 +2723,7 @@ body {
   position: relative;
   margin: 0;
   color: #030712;
-  font-size: clamp(1.8rem, 3.6vw, 3rem);
+  font-size: clamp(1.45rem, 2.8vw, 2.35rem);
   font-weight: 950;
   line-height: 1;
 }
@@ -2663,10 +2750,10 @@ body {
 
 .calendar-prev-btn,
 .calendar-return-btn {
-  min-height: 2.9rem;
+  min-height: 2.55rem;
   border: 3px solid #111827;
   border-radius: 0.55rem;
-  padding: 0.48rem 1.35rem;
+  padding: 0.4rem 1rem;
   color: #030712;
   font-size: 1rem;
   font-weight: 950;
@@ -2718,7 +2805,7 @@ body {
 .calendar-summary-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.8rem, 1.6vw, 1.25rem);
+  gap: clamp(0.65rem, 1.1vw, 0.9rem);
   max-width: 45rem;
 }
 
@@ -2727,11 +2814,11 @@ body {
   grid-template-columns: auto auto minmax(2.5rem, auto) auto;
   align-items: center;
   justify-content: start;
-  gap: 0.65rem;
-  min-height: 4.25rem;
+  gap: 0.5rem;
+  min-height: 3.45rem;
   border: 3px solid #111827;
   border-radius: 0.85rem;
-  padding: 0.7rem 1rem;
+  padding: 0.55rem 0.85rem;
   color: #111827;
   box-shadow: 0 4px 0 #111827;
 }
@@ -2746,8 +2833,8 @@ body {
 
 .calendar-summary-icon {
   display: grid;
-  width: 2.7rem;
-  height: 2.7rem;
+  width: 2.25rem;
+  height: 2.25rem;
   place-items: center;
   border: 2px solid currentColor;
   border-radius: 9999px;
@@ -2755,8 +2842,8 @@ body {
 }
 
 .calendar-summary-icon img {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.45rem;
+  height: 1.45rem;
   image-rendering: pixelated;
 }
 
@@ -2768,7 +2855,7 @@ body {
 
 .calendar-summary-value {
   color: #4d7c0f;
-  font-size: clamp(2rem, 3.2vw, 3.2rem);
+  font-size: clamp(1.55rem, 2.35vw, 2.25rem);
   font-weight: 950;
   line-height: 1;
 }
@@ -2778,11 +2865,16 @@ body {
 }
 
 .calendar-grid-section {
+  overflow: hidden;
   min-height: 0;
   flex: 1;
 }
 
 .calendar-month-table {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
   overflow: hidden;
   border: 2px solid #d1d5db;
   border-radius: 0.65rem;
@@ -2795,8 +2887,18 @@ body {
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
+.calendar-weekday-row {
+  flex: 0 0 auto;
+}
+
+.calendar-month-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .calendar-weekday {
-  min-height: 3.1rem;
+  min-height: 2.45rem;
   display: grid;
   place-items: center;
   border-right: 1px solid #d1d5db;
@@ -2813,7 +2915,7 @@ body {
 .calendar-day-cell,
 .calendar-neighbor-cell {
   position: relative;
-  min-height: clamp(5rem, 8vw, 7.4rem);
+  min-height: clamp(3.75rem, 6.2vh, 5.6rem);
   border-top: 0;
   border-right: 1px solid #d1d5db;
   border-bottom: 1px solid #d1d5db;
@@ -2975,6 +3077,11 @@ body {
 
   .calendar-scene {
     border-radius: 1.15rem;
+  }
+
+  .calendar-scene-background,
+  .calendar-scene-props {
+    clip-path: inset(0 round 1.15rem);
   }
 
   .calendar-scene-props .calendar-prop-clip,
@@ -3418,8 +3525,9 @@ body {
 .shared-board-scene {
   position: relative;
   isolation: isolate;
+  height: 100%;
   min-height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
   border-radius: 1.65rem;
   background-color: #f8f4e9;
 }
@@ -3442,20 +3550,27 @@ body {
 .shared-board-content {
   position: relative;
   z-index: 2;
-  min-height: 100%;
-  padding: 3.15rem clamp(6.4rem, 9vw, 11rem) 3rem;
+  height: 100%;
+  min-height: 0;
+  padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(7.5rem, 10vw, 12.5rem) clamp(0.9rem, 1.6vw, 1.35rem);
 }
 .shared-board-wall-set {
   position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
   width: min(100%, 90rem);
   margin-inline: auto;
 }
 .shared-board-cork {
   position: relative;
   z-index: 2;
-  min-height: 38.5rem;
-  margin-top: -0.9rem;
-  border: 6px solid #111827;
+  flex: 1;
+  min-height: 0;
+  margin-top: -0.45rem;
+  overflow-y: auto;
+  border: 5px solid #111827;
   border-radius: 1.35rem;
   background-color: #b9834f;
   background-image:
@@ -3463,12 +3578,13 @@ body {
     url("/assets/home-scenes/shared-board/cork-board-bg.webp");
   background-size: cover;
   background-position: center;
-  box-shadow: 0 1.25rem 0 rgba(17, 24, 39, 0.85), 0 2rem 2.5rem rgba(15, 23, 42, 0.24);
-  padding: 3.15rem clamp(1.65rem, 2.4vw, 2.35rem) 2.5rem;
+  box-shadow: 0 0.85rem 0 rgba(17, 24, 39, 0.85), 0 1.35rem 1.8rem rgba(15, 23, 42, 0.22);
+  padding: clamp(1.15rem, 1.8vw, 1.65rem);
 }
 .shared-board-composer-wrap {
   position: relative;
   z-index: 6;
+  flex: 0 0 auto;
   width: min(100%, 82rem);
   margin: 0 auto;
 }
@@ -3480,18 +3596,18 @@ body {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 251, 235, 0.94)),
     repeating-linear-gradient(0deg, transparent 0 2.15rem, rgba(148, 163, 184, 0.16) 2.15rem 2.22rem);
-  box-shadow: 0 0.55rem 0 #111827;
-  padding: 2.2rem 1.55rem 1.35rem;
+  box-shadow: 0 0.4rem 0 #111827;
+  padding: 1.35rem 1.2rem 1rem;
 }
 .shared-board-composer-grid {
   display: grid;
-  grid-template-columns: 4.1rem minmax(25rem, 1fr) minmax(24rem, 0.78fr);
+  grid-template-columns: 3.4rem minmax(20rem, 1fr) minmax(18rem, 0.72fr);
   align-items: center;
-  gap: 1.35rem;
+  gap: 1rem;
 }
 .shared-board-composer-avatar {
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 3rem;
+  height: 3rem;
   border-color: #fde047;
   border-width: 3px;
   box-shadow: 0 0.18rem 0 #111827;
@@ -3504,29 +3620,29 @@ body {
 }
 .shared-board-controls-panel {
   display: grid;
-  min-height: 8.6rem;
+  min-height: 6.25rem;
   grid-template-columns: 1fr auto;
   align-items: end;
-  gap: 1.35rem;
+  gap: 0.9rem;
   border-left: 2px dashed rgba(100, 116, 139, 0.5);
-  padding-left: 1.35rem;
+  padding-left: 1rem;
 }
 .shared-board-control-stack {
   display: grid;
-  gap: 1.15rem;
+  gap: 0.8rem;
   align-self: center;
 }
 .shared-board-control-row {
   display: grid;
-  grid-template-columns: 3.25rem auto;
+  grid-template-columns: 2.85rem auto;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.65rem;
 }
 .shared-board-publish-btn {
-  min-height: 3rem;
+  min-height: 2.5rem;
   align-self: end;
   border-radius: 0.5rem;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 .shared-board-inline-error {
   min-height: 1rem;
@@ -3578,12 +3694,12 @@ body {
   box-shadow: 0 0.18rem 0 #111827;
 }
 .shared-board-type-toggle button {
-  min-height: 2.2rem;
-  padding-inline: 0.65rem;
+  min-height: 1.9rem;
+  padding-inline: 0.55rem;
   border: 0;
   background: transparent;
   color: #475569;
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   font-weight: 900;
   cursor: pointer;
 }
@@ -3603,8 +3719,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border: 3px solid #111827;
   border-radius: 0.2rem;
   box-shadow: 0 0.18rem 0 #111827;
@@ -3676,13 +3792,13 @@ body {
   transform: rotate(-18deg);
 }
 .shared-board-note-wall {
-  margin-top: 0.8rem;
+  margin-top: 0.55rem;
   column-count: 4;
-  column-gap: 1.55rem;
+  column-gap: 1rem;
 }
 .note-masonry {
   column-count: 4;
-  column-gap: 1.55rem;
+  column-gap: 1rem;
 }
 @media (max-width: 1400px) {
   .shared-board-note-wall,
@@ -3714,13 +3830,13 @@ body {
   break-inside: avoid;
   display: inline-block;
   width: 100%;
-  min-height: 14.35rem;
-  margin-bottom: 1.55rem;
+  min-height: 10.75rem;
+  margin-bottom: 1rem;
   position: relative;
-  border: 4px solid #111827;
+  border: 3px solid #111827;
   border-radius: 0.35rem;
-  padding: 2.35rem 1.15rem 1.15rem;
-  box-shadow: 0.45rem 0.45rem 0 rgba(17, 24, 39, 0.86);
+  padding: 1.85rem 0.95rem 0.95rem;
+  box-shadow: 0.35rem 0.35rem 0 rgba(17, 24, 39, 0.86);
   transform: rotate(var(--note-rotate));
   transform-origin: 50% 1.2rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -3935,21 +4051,21 @@ body {
 }
 @media (max-width: 1200px) {
   .shared-board-content {
-    padding: 3rem clamp(4rem, 7vw, 7rem) 3rem;
+    padding: clamp(0.75rem, 1.5vw, 1.1rem) clamp(4.5rem, 7vw, 7.5rem) clamp(0.9rem, 1.6vw, 1.25rem);
   }
   .shared-board-cork {
-    padding-inline: 1.25rem;
+    padding-inline: 1.1rem;
   }
   .shared-board-composer-wrap {
     width: min(100%, 74rem);
   }
   .shared-board-composer-grid {
-    grid-template-columns: 3.6rem minmax(20rem, 1fr) minmax(20rem, 0.8fr);
-    gap: 1rem;
+    grid-template-columns: 3.2rem minmax(18rem, 1fr) minmax(17rem, 0.78fr);
+    gap: 0.85rem;
   }
   .shared-board-controls-panel {
-    gap: 1rem;
-    padding-left: 1rem;
+    gap: 0.8rem;
+    padding-left: 0.85rem;
   }
   .shared-board-poster-left,
   .shared-board-poster-right {
@@ -3969,10 +4085,18 @@ body {
   }
 }
 @media (max-width: 900px) {
+  .shared-board-scene {
+    overflow-y: auto;
+  }
   .shared-board-content {
+    height: auto;
     padding: 1rem 0.75rem 2rem;
   }
+  .shared-board-wall-set {
+    height: auto;
+  }
   .shared-board-cork {
+    flex: none;
     min-height: auto;
     border-width: 4px;
     border-radius: 1rem;
@@ -4107,35 +4231,16 @@ body {
 
 /* Report Center */
 .report-board {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98)),
-    radial-gradient(circle at top left, rgba(250, 204, 21, 0.12), transparent 30%);
-  border: 6px solid #f1f5f9;
-  border-radius: 1.75rem;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-}
-
-.report-hero {
   position: relative;
-  max-width: 42rem;
-  padding: 1.25rem 1.25rem 1rem;
-  background: linear-gradient(180deg, #fffdf5, #fff9db);
-  border: 3px solid #e2e8f0;
-  border-radius: 1.5rem;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
-}
-
-.report-vault-card {
-  padding: 1.25rem 1.25rem 1rem;
-  background: linear-gradient(180deg, #ffffff, #f8fafc);
-  border: 3px solid #e2e8f0;
-  border-radius: 1.5rem;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
-}
-
-.report-mobile-kpis,
-.report-mobile-season {
-  display: none;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
 }
 
 .report-chip {
@@ -4156,41 +4261,6 @@ body {
   color: #475569;
 }
 
-.report-metric-card {
-  border: 3px solid #e2e8f0;
-  border-radius: 1.5rem;
-  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
-}
-
-.report-metric-label {
-  width: fit-content;
-  padding: 0.25rem 0.75rem;
-  border: 2px solid #dbe4ee;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.92);
-  color: #334155;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.report-chart-card {
-  background: linear-gradient(180deg, #ffffff, #f8fafc);
-  border: 3px solid #e2e8f0;
-  border-radius: 1.5rem;
-  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
-}
-
-.report-chart-frame {
-  border: 2px solid #e2e8f0;
-  border-radius: 1rem;
-  background:
-    linear-gradient(180deg, #ffffff, #f8fafc),
-    radial-gradient(#cbd5e1 1px, transparent 1px);
-  background-size: auto, 16px 16px;
-  background-position: 0 0, 0 0;
-}
-
 .report-chart-badge {
   width: fit-content;
   border: 2px solid #dbe4ee;
@@ -4209,164 +4279,11 @@ body {
   box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
 }
 
-.report-highlight-card {
-  border: 3px solid #e2e8f0;
-  border-radius: 1.5rem;
-  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
-}
-
-.report-highlight-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #dbe4ee;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.65);
-  padding: 0.45rem;
-}
-
 @media (max-width: 760px) {
-  .report-board {
-    position: relative;
-    inset: auto;
-    gap: 0.8rem;
-    overflow: visible;
-    border-width: 4px;
-    border-radius: 1.25rem;
-    min-height: auto;
-    padding: 0.75rem;
-  }
-
-  .report-hero {
-    border-width: 3px;
-    border-radius: 1.15rem;
-    padding: 0.9rem;
-  }
-
-  .report-hero .report-chip {
-    padding: 0.22rem 0.65rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.04em;
-  }
-
-  .report-hero h1 {
-    margin-top: 0.65rem;
-    font-size: 1.8rem;
-    line-height: 1;
-  }
-
-  .report-hero p {
-    margin-top: 0.45rem;
-    align-items: flex-start;
-    font-size: 0.86rem;
-    line-height: 1.45;
-  }
-
-  .report-mobile-kpis {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.45rem;
-  }
-
-  .report-mobile-kpi {
-    min-width: 0;
-    border: 2px solid #e2e8f0;
-    border-radius: 0.85rem;
-    background: rgba(255, 255, 255, 0.82);
-    padding: 0.5rem 0.45rem;
-  }
-
-  .report-mobile-kpi span {
-    display: block;
-    overflow: hidden;
-    color: #64748b;
-    font-size: 0.62rem;
-    font-weight: 900;
-    line-height: 1;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .report-mobile-kpi strong {
-    display: block;
-    margin-top: 0.28rem;
-    color: #0f172a;
-    font-size: 1.08rem;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .report-mobile-kpis .report-mobile-kpi:first-child strong {
-    color: #eab308;
-  }
-
-  .report-mobile-season {
-    display: block;
-    overflow: hidden;
-    color: #64748b;
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .report-vault-card,
-  .report-metric-card-primary {
-    display: none;
-  }
-
-  .report-metric-card {
-    min-height: 6.25rem;
-    border-width: 2px;
-    border-radius: 1rem;
-    padding: 0.85rem;
-  }
-
-  .report-metric-label {
-    padding: 0.22rem 0.58rem;
-    border-width: 2px;
-    font-size: 0.64rem;
-    letter-spacing: 0.04em;
-  }
-
-  .report-metric-card > div:nth-child(2) {
-    margin-top: 0.65rem;
-    font-size: 1.55rem;
-    line-height: 1.05;
-  }
-
-  .report-metric-card p {
-    margin-top: 0.55rem;
-    font-size: 0.78rem;
-    line-height: 1.35;
-  }
-
-  .report-chart-card {
-    border-width: 2px;
-    border-radius: 1.1rem;
-    padding: 0.9rem;
-  }
-
-  .report-chart-card .report-chip {
-    padding: 0.22rem 0.6rem;
-    font-size: 0.64rem;
-  }
-
-  .report-chart-card h2 {
-    margin-top: 0.55rem;
-    font-size: 1.45rem;
-    line-height: 1.1;
-  }
-
   .report-chart-badge {
     padding: 0.28rem 0.55rem;
     border-width: 2px;
     font-size: 0.66rem;
-  }
-
-  .report-chart-frame {
-    margin-top: 0.3rem;
-    border-radius: 0.9rem;
   }
 
   .report-chart-canvas {
@@ -4376,11 +4293,6 @@ body {
   .report-chart-canvas svg {
     height: 10.5rem;
     width: 100%;
-  }
-
-  .report-chart-canvas .pointer-events-none.rounded-full {
-    padding: 0.18rem 0.45rem;
-    font-size: 0.62rem;
   }
 
   .report-stat-chip {
@@ -4590,6 +4502,450 @@ body {
   font-weight: 900;
 }
 
+.report-scene {
+  position: relative;
+  isolation: isolate;
+  height: auto;
+  min-height: 100%;
+  overflow: hidden;
+  border-radius: 1.65rem;
+  background-color: #f7f3e8;
+}
+
+.report-scene-background,
+.report-scene-props {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  clip-path: inset(0 round 1.65rem);
+}
+
+.report-scene-background {
+  z-index: 0;
+}
+
+.report-scene-props {
+  pointer-events: none;
+  z-index: 1;
+}
+
+.report-scene-props img {
+  filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.16));
+}
+
+.report-scene-content {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.55rem, 0.9vw, 0.8rem);
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  padding: clamp(0.55rem, 1vw, 0.8rem) clamp(7.5rem, 10vw, 12.5rem) clamp(0.65rem, 1.1vw, 0.9rem);
+  padding-inline: clamp(7.5rem, 10vw, 12.5rem);
+}
+
+.report-scene-header,
+.report-scene-metrics,
+.report-scene-bottom,
+.report-scene-admin {
+  flex: 0 0 auto;
+}
+
+.report-scene-analysis {
+  display: grid;
+  grid-template-columns: minmax(0, 1.62fr) minmax(280px, 0.88fr);
+  gap: clamp(0.55rem, 0.9vw, 0.8rem);
+  min-height: auto;
+  align-items: stretch;
+  overflow: visible;
+}
+
+.report-scene-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.55rem, 0.9vw, 0.8rem);
+}
+
+.report-scene-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(0.55rem, 0.9vw, 0.8rem);
+  min-height: auto;
+  overflow: visible;
+}
+
+.report-scene-bottom,
+.report-scene-admin,
+.report-analysis-paper,
+.game-weekly-report-desk,
+.weekly-report-admin-sheet {
+  min-height: 0;
+}
+
+.report-scene-admin {
+  min-height: auto;
+  width: min(100%, 56rem);
+}
+
+.report-header-strip,
+.report-analysis-editorial-frame,
+.coffee-report-inset-shell,
+.game-weekly-report-paper,
+.game-weekly-report-highlights-rail,
+.weekly-report-admin-sheet,
+.weekly-report-admin-proof-sheet {
+  backdrop-filter: blur(2px);
+}
+
+.report-header-strip {
+  border: 4px solid #111827;
+  min-height: clamp(7.4rem, 14.5vh, 8.8rem);
+  padding: clamp(0.45rem, 0.75vw, 0.65rem) clamp(0.9rem, 1.45vw, 1.2rem) !important;
+  box-shadow: 6px 6px 0 #1f2937;
+}
+
+.report-header-strip > .relative.grid {
+  height: 100%;
+  gap: clamp(0.8rem, 1.2vw, 1.25rem) !important;
+}
+
+.report-header-strip h1 {
+  margin-top: clamp(0.25rem, 0.45vw, 0.4rem) !important;
+  font-size: clamp(1.8rem, 2.9vw, 2.45rem) !important;
+  line-height: 0.95 !important;
+  letter-spacing: 0 !important;
+}
+
+.report-header-copy {
+  position: relative;
+  gap: clamp(0.45rem, 0.65vw, 0.6rem) !important;
+  justify-content: flex-start !important;
+  padding-bottom: clamp(2.45rem, 3.8vw, 3.1rem);
+}
+
+.report-header-copy p {
+  margin-top: 0.32rem !important;
+  font-size: clamp(0.7rem, 0.8vw, 0.8rem) !important;
+  line-height: 1.2 !important;
+}
+
+.report-header-decor-row {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  gap: clamp(0.55rem, 0.85vw, 0.8rem) !important;
+}
+
+.report-header-stamp {
+  height: clamp(2.2rem, 3.6vw, 2.9rem) !important;
+}
+
+.report-header-mini-chart {
+  height: clamp(2.6rem, 4.2vw, 3.3rem) !important;
+}
+
+.report-header-vault {
+  min-height: 0 !important;
+  padding: clamp(0.5rem, 0.8vw, 0.7rem) !important;
+}
+
+.report-header-vault img {
+  height: clamp(2.75rem, 4.2vw, 3.6rem) !important;
+}
+
+.report-header-vault .text-4xl,
+.report-header-vault .sm\:text-5xl {
+  font-size: clamp(1.95rem, 3vw, 2.45rem) !important;
+  line-height: 0.95 !important;
+}
+
+.report-header-pill {
+  padding: 0.42rem 0.68rem !important;
+  border-radius: 0.9rem !important;
+  font-size: clamp(0.68rem, 0.75vw, 0.78rem) !important;
+}
+
+.report-metric-tile {
+  border: 4px solid #111827;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 6px 6px 0 #1f2937;
+  min-height: clamp(4.3rem, 6.4vh, 4.95rem) !important;
+  border-radius: 1rem !important;
+}
+
+.report-metric-accent {
+  flex: 0 0 clamp(3.4rem, 4.2vw, 4rem);
+}
+
+.report-metric-icon {
+  box-shadow: inset 0 -2px 0 rgba(17, 24, 39, 0.14);
+}
+
+.report-metric-body {
+  gap: 0.22rem !important;
+  padding: clamp(0.42rem, 0.65vw, 0.55rem) !important;
+}
+
+.report-metric-body .text-4xl {
+  font-size: clamp(1.45rem, 1.9vw, 2rem) !important;
+  line-height: 0.95 !important;
+}
+
+.report-metric-body p {
+  font-size: clamp(0.72rem, 0.82vw, 0.85rem) !important;
+  line-height: 1.25 !important;
+}
+
+.report-analysis-paper {
+  padding: 0;
+  min-height: clamp(30rem, 58vh, 36rem);
+  border: 4px solid #111827;
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, rgba(255, 250, 240, 0.98), rgba(247, 241, 225, 0.96));
+  box-shadow: 6px 6px 0 #1f2937;
+}
+
+.report-analysis-editorial-frame {
+  height: auto;
+  min-height: 100%;
+  gap: clamp(0.5rem, 0.8vw, 0.75rem) !important;
+  padding: clamp(0.7rem, 1.05vw, 0.95rem) !important;
+}
+
+.report-analysis-editorial-frame > div:first-child {
+  padding-bottom: clamp(0.55rem, 0.8vw, 0.75rem) !important;
+}
+
+.report-analysis-title {
+  font-size: clamp(1.6rem, 2.2vw, 2rem) !important;
+}
+
+.report-analysis-title + p {
+  margin-top: 0.45rem !important;
+  font-size: clamp(0.72rem, 0.84vw, 0.82rem) !important;
+  line-height: 1.35 !important;
+}
+
+.report-analysis-body-grid {
+  flex: 1;
+  min-height: 18rem;
+  gap: clamp(0.5rem, 0.75vw, 0.65rem) !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.report-chart-frame {
+  display: flex;
+  flex: 1;
+  min-height: 18rem;
+  flex-direction: column;
+  box-shadow: inset 0 0 0 2px rgba(17, 24, 39, 0.08);
+}
+
+.report-chart-canvas {
+  min-height: 0 !important;
+  flex: 1;
+}
+
+.report-chart-canvas svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.report-chart-annotation-layer text {
+  letter-spacing: 0;
+}
+
+.report-prototype-today-marker {
+  fill: #fde047;
+  fill-opacity: 0.58;
+  stroke: #f59e0b;
+  stroke-width: 2;
+}
+
+.report-analysis-ruler {
+  flex: 0 0 auto;
+  padding-block: 0.42rem !important;
+}
+
+.coffee-report-inset-shell {
+  height: auto;
+  min-height: clamp(30rem, 58vh, 36rem);
+  border: 4px solid #b45309;
+  padding: clamp(0.65rem, 1vw, 0.85rem) !important;
+  box-shadow: 6px 6px 0 rgba(120, 53, 15, 0.18);
+}
+
+.coffee-report-inset-shell .coffee-report-title {
+  font-size: clamp(1.35rem, 1.85vw, 1.7rem) !important;
+}
+
+.coffee-report-inset-shell .coffee-report-appendix-head {
+  padding-bottom: 0.55rem !important;
+}
+
+.coffee-report-inset-shell .coffee-report-appendix-head p {
+  margin-top: 0.35rem !important;
+  font-size: clamp(0.7rem, 0.82vw, 0.8rem) !important;
+  line-height: 1.35 !important;
+}
+
+.coffee-report-appendix-head .report-chip {
+  border-color: rgba(120, 53, 15, 0.2);
+}
+
+.coffee-report-visual-center,
+.coffee-report-scene {
+  flex: 1;
+  min-height: 0;
+}
+
+.coffee-report-bars {
+  box-shadow: 0 4px 0 0 rgba(120, 53, 15, 0.12);
+  margin-top: 0.55rem !important;
+  padding: 0.65rem !important;
+}
+
+.game-weekly-report-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.game-weekly-report-metric-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem !important;
+  margin-top: 0.55rem !important;
+}
+
+.game-weekly-report-paper {
+  border: 3px solid #111827;
+  padding: clamp(0.65rem, 1vw, 0.9rem) !important;
+}
+
+.game-weekly-report-highlights-rail {
+  border: 4px solid #111827;
+  padding: clamp(0.65rem, 1vw, 0.85rem) !important;
+}
+
+.game-weekly-report-highlight-note {
+  min-height: clamp(5rem, 8vh, 6.2rem);
+  padding: 0.65rem !important;
+}
+
+.game-weekly-report-desk {
+  padding: clamp(0.55rem, 0.9vw, 0.75rem) !important;
+  height: auto;
+  overflow: visible;
+}
+
+.game-weekly-report__header {
+  padding-bottom: 0.55rem !important;
+}
+
+.game-weekly-report__summaries {
+  margin-top: 0.55rem !important;
+}
+
+.game-weekly-card,
+.game-weekly-summary {
+  padding: 0.65rem !important;
+  border-radius: 0.9rem !important;
+}
+
+.game-weekly-card strong {
+  font-size: clamp(1.45rem, 1.8vw, 2rem) !important;
+}
+
+.weekly-report-admin-sheet {
+  min-height: auto;
+  padding: clamp(0.55rem, 0.9vw, 0.75rem) !important;
+}
+
+.weekly-report-admin-sheet {
+  border: 4px solid #111827;
+  box-shadow: 6px 6px 0 #1f2937;
+}
+
+.weekly-report-admin-proof-sheet {
+  min-height: 0;
+}
+
+@media (max-width: 760px) {
+  .report-board {
+    position: relative;
+    inset: auto;
+    height: auto;
+    overflow: visible;
+    padding: 0.75rem;
+  }
+
+  .report-scene {
+    height: auto;
+    min-height: auto;
+    border-radius: 1.25rem;
+  }
+
+  .report-scene-background,
+  .report-scene-props {
+    clip-path: inset(0 round 1.25rem);
+  }
+
+  .report-scene-props {
+    opacity: 0.45;
+  }
+
+  .report-scene-content {
+    display: flex;
+    flex-direction: column;
+    grid-template-rows: none;
+    height: auto;
+    min-height: 0;
+    gap: 0.8rem;
+    overflow: visible;
+    padding: 0.75rem;
+  }
+
+  .report-scene-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-scene-analysis,
+  .report-scene-bottom {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .report-scene-admin {
+    width: 100%;
+  }
+
+  .game-weekly-report-metric-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coffee-report-inset-shell {
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-scene *,
+  .report-scene *::before,
+  .report-scene *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media (max-width: 980px) {
   .coffee-scene {
     border-radius: 1.2rem;
@@ -4622,6 +4978,7 @@ body {
   }
 
   .coffee-receipt-ticket {
+    height: auto;
     min-height: max-content;
     overflow: visible;
   }

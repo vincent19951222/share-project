@@ -48,6 +48,14 @@ describe("CoffeeReportPanel", () => {
       );
     });
 
+    expect(container.querySelector(".coffee-report-panel")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-inset-shell")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-appendix-head")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-visual-center")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-bars")).not.toBeNull();
+    expect(container.querySelector("img[src='/assets/report-center/coffee-cup-label.png']")).not.toBeNull();
+    expect(container.querySelector("img[src='/assets/report-center/coffee-receipt.png']")).not.toBeNull();
+
     const zeroCupBar = container.querySelector('[title="18 日 0 杯"]');
 
     expect(zeroCupBar).not.toBeNull();

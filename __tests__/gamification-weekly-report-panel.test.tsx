@@ -7,7 +7,9 @@ import type { GamificationWeeklyReportSnapshot } from "@/lib/types";
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
 
-function snapshot(): GamificationWeeklyReportSnapshot {
+function snapshot(
+  overrides: Partial<GamificationWeeklyReportSnapshot> = {},
+): GamificationWeeklyReportSnapshot {
   return {
     teamId: "team_1",
     weekStartDayKey: "2026-04-20",
@@ -72,6 +74,7 @@ function snapshot(): GamificationWeeklyReportSnapshot {
         occurredAt: "2026-04-23T04:00:00.000Z",
       },
     ],
+    ...overrides,
   };
 }
 
@@ -113,14 +116,49 @@ describe("GamificationWeeklyReportPanel", () => {
     expect(container.textContent).toContain("抽奖机播报");
     expect(container.textContent).toContain("li 抽中了瑞幸咖啡券");
     expect(container.textContent).not.toContain("发布到团队动态");
+    expect(container.querySelector(".game-weekly-report-desk")).not.toBeNull();
+    expect(container.querySelector(".game-weekly-prototype-strip")).not.toBeNull();
+    expect(container.querySelector(".game-weekly-report-main-paper")).not.toBeNull();
+    expect(container.querySelector(".game-weekly-report-paper")).not.toBeNull();
+    expect(container.querySelector(".game-weekly-report-title-block .game-weekly-report__status")).not.toBeNull();
+    expect(container.querySelector(".game-weekly-report-metric-strip")?.className).toContain("xl:grid-cols-4");
+    expect(container.querySelectorAll(".game-weekly-prototype-metric")).toHaveLength(4);
+    expect(container.querySelector(".game-weekly-report-highlights-rail")).not.toBeNull();
+    expect(container.querySelector(".game-weekly-report-highlights-label")?.textContent).toContain("本周高光");
+    expect(container.querySelector(".game-weekly-report-highlight-note")).not.toBeNull();
   });
 
   it("shows publish actions for admins", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ snapshot: snapshot() }),
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        if (String(input) === "/api/gamification/reports/weekly/publish" && init?.method === "POST") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              result: {
+                snapshot: {
+                  ...snapshot(),
+                  published: true,
+                  publishedDynamicId: "dynamic_1",
+                },
+                teamDynamic: {
+                  status: "EXISTING",
+                  id: "dynamic_1",
+                },
+                wechat: {
+                  status: "FAILED",
+                  failureReason: "企业微信网关超时",
+                },
+              },
+            }),
+          });
+        }
+
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ snapshot: snapshot() }),
+        });
       }),
     );
 
@@ -131,6 +169,79 @@ describe("GamificationWeeklyReportPanel", () => {
 
     expect(container.textContent).toContain("发布到团队动态");
     expect(container.textContent).toContain("发布并发送企业微信");
+    expect(container.querySelector(".game-weekly-report-admin-actions")).not.toBeNull();
+
+    const publishWithWechatButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("发布并发送企业微信"),
+    );
+
+    await act(async () => {
+      publishWithWechatButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("周报已发布，但企业微信发送失败");
+    expect(container.textContent).toContain("企业微信网关超时");
+  });
+
+  it("clips the highlights rail to three notes even when more highlights exist", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () =>
+          ({
+            snapshot: snapshot({
+              highlights: [
+                {
+                  id: "dynamic_1",
+                  title: "高光 1",
+                  summary: "摘要 1",
+                  sourceType: "team_dynamic",
+                  sourceId: "dynamic_1",
+                  occurredAt: "2026-04-23T04:00:00.000Z",
+                },
+                {
+                  id: "dynamic_2",
+                  title: "高光 2",
+                  summary: "摘要 2",
+                  sourceType: "team_dynamic",
+                  sourceId: "dynamic_2",
+                  occurredAt: "2026-04-24T04:00:00.000Z",
+                },
+                {
+                  id: "dynamic_3",
+                  title: "高光 3",
+                  summary: "摘要 3",
+                  sourceType: "team_dynamic",
+                  sourceId: "dynamic_3",
+                  occurredAt: "2026-04-25T04:00:00.000Z",
+                },
+                {
+                  id: "dynamic_4",
+                  title: "高光 4",
+                  summary: "摘要 4",
+                  sourceType: "team_dynamic",
+                  sourceId: "dynamic_4",
+                  occurredAt: "2026-04-26T04:00:00.000Z",
+                },
+              ],
+            }),
+          }),
+      }),
+    );
+
+    await act(async () => {
+      root.render(<GamificationWeeklyReportPanel isAdmin={false} />);
+      await Promise.resolve();
+    });
+
+    const notes = container.querySelectorAll(".game-weekly-report-highlight-note");
+
+    expect(notes).toHaveLength(3);
+    expect(container.textContent).toContain("高光 1");
+    expect(container.textContent).toContain("高光 2");
+    expect(container.textContent).toContain("高光 3");
+    expect(container.textContent).not.toContain("高光 4");
   });
 
   it("shows local error state when loading fails", async () => {

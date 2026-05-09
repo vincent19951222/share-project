@@ -73,10 +73,12 @@ describe("home calendar scene CSS", () => {
     expect(sceneRule).toMatch(/border-radius:\s*1\.65rem/);
     expect(backgroundRule).toMatch(/calendar-desk-bg\.webp/);
     expect(backgroundRule).toMatch(/z-index:\s*0/);
+    expect(backgroundRule).toMatch(/clip-path:\s*inset\(0 round 1\.65rem\)/);
     expect(propsRule).toMatch(/pointer-events:\s*none/);
     expect(propsRule).toMatch(/z-index:\s*1/);
     expect(contentRule).toMatch(/position:\s*relative/);
     expect(contentRule).toMatch(/z-index:\s*2/);
+    expect(contentRule).toMatch(/padding-inline:\s*clamp\(7\.5rem,\s*10vw,\s*12\.5rem\)/);
   });
 
   it("styles the paper surface, summary chips, table grid, and day states", () => {
@@ -89,6 +91,8 @@ describe("home calendar scene CSS", () => {
 
     expect(paperRule).toMatch(/border:\s*4px solid #111827/);
     expect(paperRule).toMatch(/binder-paper-texture\.webp/);
+    expect(paperRule).toMatch(/overflow:\s*hidden/);
+    expect(paperRule).toMatch(/background-clip:\s*padding-box/);
     expect(summaryRule).toMatch(/border:\s*3px solid #111827/);
     expect(tableRule).toMatch(/border:\s*2px solid #d1d5db/);
     expect(todayRule).toMatch(/background:\s*#fef3c7/);
