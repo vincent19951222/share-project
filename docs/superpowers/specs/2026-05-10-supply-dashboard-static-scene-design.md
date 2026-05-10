@@ -71,19 +71,122 @@
   - 团队公告。
   - 帮助中心、意见反馈、设置等视觉入口。
 
-### Props 与图像
+### Current UI and Media Audit
 
-第一阶段允许优先使用现有原型图中的视觉方向来做 CSS/HTML 近似，但代码实现不能依赖一张整图背景完成页面。
+静态复刻开始前必须先审核当前可用 UI 和媒体资产，不能直接进入 JSX 搭页面。
 
-需要评估的资源类型：
+审核对象：
+
+- 目标原型：`design/ui-assets/dashboard-new.png`
+- 当前正式页面：`components/gamification/SupplyStation.tsx`
+- 当前全局视觉资产：
+  - `public/logo.png`
+  - `public/avatars/*`
+  - `public/assets/icons/*`
+  - `public/assets/home-scenes/punch/*`
+  - `public/assets/task-cards/raw/*`
+  - `public/gamification/rewards/icons/*`
+
+审核问题：
+
+- 哪些内容能用 CSS/HTML 直接复刻。
+- 哪些内容可以复用现有项目资产。
+- 哪些内容必须生成新的位图资产。
+- 哪些内容先用占位资产也不影响第一阶段判断。
+- 哪些图片是背景类，哪些是 props，哪些是业务图标或任务卡主体。
+
+当前初步判断：
 
 - 健身房背景。
+  - 可先评估复用 `public/assets/home-scenes/punch/gym-wall-bg.webp`、`gym-floor-strip.webp`，但 Dashboard 原型里的背景更完整，可能需要新生成一张 dashboard 背景。
 - 牛马角色图。
+  - 当前 `public/logo.png` 和头像不能替代主角色。需要新生成角色主体图。
 - 任务卡插图。
+  - 可优先复用 `public/assets/task-cards/raw/*` 的任务图，避免第一阶段重复生成。
 - 道具图标：金币、体力、券、水瓶、鞋、心、经验。
+  - 金币和部分奖励可复用 `public/gamification/rewards/icons/*`。
+  - 体力、券、水瓶、鞋、心、EXP 徽章需要逐项确认是否已有可用素材，不足时生成或用 CSS 临时绘制。
 - 背包、补给机、任务记录等入口图标。
+  - 当前没有完整 Dashboard dock 图标体系。背包、补给机、任务记录入口需要生成或先用 CSS/现有 SVG 占位。
 
-如果没有拆分素材，第一阶段可以用 CSS、emoji 或现有资产占位，但必须在实现记录中标明哪些是占位资源，后续静态页面族阶段再统一资源治理。
+## Media Asset Checklist
+
+所有新增最终资产进入：
+
+```text
+public/assets/home-scenes/supply/dashboard/
+```
+
+raw 生成图和中间处理文件不得进入 `public/`。建议放在临时目录，处理后只把最终压缩版入库。
+
+### A. 必需资产
+
+| 文件名 | 类型 | 用途 | 来源策略 | 建议尺寸 | 体积预算 |
+| --- | --- | --- | --- | --- | --- |
+| `dashboard-gym-bg.webp` | 背景 | 主场景健身房背景 | 先审核 punch 背景，若不贴合则用 imagegen 生成 | `1920 x 1080` 或更低可用尺寸 | `<= 450 KB` |
+| `niuma-hero.webp` | 主体 props | 中央牛马健身角色 | 用 imagegen 生成，透明或可抠图背景 | 高约 `720 px` | `<= 260 KB` |
+| `quest-hydration.webp` | 任务图 | 喝水任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
+| `quest-movement.webp` | 任务图 | 运动任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
+| `quest-social.webp` | 任务图 | 社交任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
+| `quest-learning.webp` | 任务图 | 学习/记录任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
+| `dock-backpack.webp` | props/icon | 背包入口 | 用 imagegen 生成或复用后续背包页资产 | `220 x 220` | `<= 90 KB` |
+| `dock-supply-machine.webp` | props/icon | 补给机入口 | 用 imagegen 生成 | `260 x 220` | `<= 120 KB` |
+| `dock-task-record.webp` | props/icon | 任务记录入口 | 用 imagegen 生成或 CSS 图标占位 | `220 x 220` | `<= 90 KB` |
+
+### B. 优先复用或 CSS 构造的资产
+
+| 内容 | 策略 |
+| --- | --- |
+| 顶部首页、团队目标、排行榜、补给商店、任务记录 icon | 优先使用 lucide 或现有 SVG，避免为简单 UI 符号生成位图 |
+| 金币、奖励券、补给券 | 优先复用 `public/gamification/rewards/icons/*` |
+| 头像 | 复用 `public/avatars/*` |
+| 经验、心、鞋、水瓶等小图标 | 如果现有素材不适配，可先用 CSS/emoji 占位，再决定是否生成 |
+| 面板边框、像素卡框、进度条、勾选章、按钮 | CSS 实现，不生图 |
+| 对话气泡、标签、倒计时、奖励栏 | CSS 实现，不生图 |
+
+### C. 可延后资产
+
+这些不阻塞第一阶段 Dashboard 判断，可以在后续静态页面族阶段补齐：
+
+- 完整抽卡动画或奖励揭示图。
+- 背包页完整道具格子图。
+- 排行榜奖杯和成员徽章体系。
+- 团队目标页专属场景 props。
+- 任务记录页完整票据、夹板、历史勋章资产。
+
+## Media Production Workflow
+
+新增媒体必须遵循以下顺序：
+
+1. **审核缺口**
+   - 先对照当前 `public/` 和 `design/ui-assets/`，确认是否已有可复用资产。
+   - 可复用资产优先，不重复生成。
+   - 简单 UI 符号优先用 SVG、lucide 或 CSS，不用位图。
+
+2. **按 checklist 逐个生成**
+   - 需要新位图时，使用 `imagegen` skill。
+   - 一次只生成一个明确资产，避免一张图里混多个用途。
+   - 对透明 props，优先按 imagegen skill 的 chroma-key 流程生成，再本地去背景。
+   - 每个生成任务必须记录最终 prompt、用途、文件名和是否为占位版。
+
+3. **本地处理**
+   - 背景图压缩为不透明 WebP。
+   - props 和角色图优先保存为支持 alpha 的 WebP；如果边缘质量不稳定，可以保留 PNG，但必须说明原因。
+   - 按实际最大展示尺寸的 1.5x 到 2x 输出，不把超大原图直接入库。
+   - 处理后检查清晰度、边缘、透明背景、颜色污染和文字可读性。
+
+4. **入库**
+   - 只有最终压缩文件进入 `public/assets/home-scenes/supply/dashboard/`。
+   - 文件名描述用途，不使用随机名。
+   - 不覆盖已有文件；如果替换，使用明确版本名或在 review 中说明。
+   - 代码只能引用最终 public 路径，不引用 raw 或临时路径。
+
+5. **验证**
+   - 资源文件存在。
+   - 文件大小不超过 checklist 预算。
+   - 页面引用路径正确。
+   - 浏览器中图片无拉伸、模糊、黑边、白边或透明残留。
+   - 桌面和移动端都检查一次。
 
 ## 页面结构
 
