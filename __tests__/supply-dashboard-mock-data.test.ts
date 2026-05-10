@@ -14,14 +14,9 @@ describe("supply dashboard mock data", () => {
   });
 
   it("reuses existing raw task-card assets instead of new generated quest images", () => {
-    expect(Object.values(supplyDashboardAssetPaths.taskCards)).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining("/assets/task-cards/raw/"),
-        expect.stringContaining("/assets/task-cards/raw/"),
-        expect.stringContaining("/assets/task-cards/raw/"),
-        expect.stringContaining("/assets/task-cards/raw/"),
-      ]),
-    );
-    expect(Object.values(supplyDashboardAssetPaths.taskCards).join("\n")).not.toContain("/assets/home-scenes/supply/dashboard/quest-");
+    const taskCardPaths = Object.values(supplyDashboardAssetPaths.taskCards);
+
+    expect(taskCardPaths.every((path) => path.includes("/assets/task-cards/raw/"))).toBe(true);
+    expect(taskCardPaths.join("\n")).not.toContain("/assets/home-scenes/supply/dashboard/quest-");
   });
 });
