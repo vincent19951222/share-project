@@ -102,7 +102,9 @@
 - 牛马角色图。
   - 当前 `public/logo.png` 和头像不能替代主角色。需要新生成角色主体图。
 - 任务卡插图。
-  - 可优先复用 `public/assets/task-cards/raw/*` 的任务图，避免第一阶段重复生成。
+  - 本 spec 不新增任务卡图片，不使用 imagegen 生成任务卡。
+  - 直接从 `public/assets/task-cards/raw/*` 选择已有 movement、hydration、social、learning 预设图作为静态复刻素材。
+  - task-card 的固定格式和统一生成规则留到后续专项处理，本阶段只保证 Dashboard 任务区结构成立。
 - 道具图标：金币、体力、券、水瓶、鞋、心、经验。
   - 金币和部分奖励可复用 `public/gamification/rewards/icons/*`。
   - 体力、券、水瓶、鞋、心、EXP 徽章需要逐项确认是否已有可用素材，不足时生成或用 CSS 临时绘制。
@@ -125,10 +127,6 @@ raw 生成图和中间处理文件不得进入 `public/`。建议放在临时目
 | --- | --- | --- | --- | --- | --- |
 | `dashboard-gym-bg.webp` | 背景 | 主场景健身房背景 | 先审核 punch 背景，若不贴合则用 imagegen 生成 | `1920 x 1080` 或更低可用尺寸 | `<= 450 KB` |
 | `niuma-hero.webp` | 主体 props | 中央牛马健身角色 | 用 imagegen 生成，透明或可抠图背景 | 高约 `720 px` | `<= 260 KB` |
-| `quest-hydration.webp` | 任务图 | 喝水任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
-| `quest-movement.webp` | 任务图 | 运动任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
-| `quest-social.webp` | 任务图 | 社交任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
-| `quest-learning.webp` | 任务图 | 学习/记录任务卡图 | 优先复用 task card raw，不足再生成 | `360 x 260` | `<= 120 KB` |
 | `dock-backpack.webp` | props/icon | 背包入口 | 用 imagegen 生成或复用后续背包页资产 | `220 x 220` | `<= 90 KB` |
 | `dock-supply-machine.webp` | props/icon | 补给机入口 | 用 imagegen 生成 | `260 x 220` | `<= 120 KB` |
 | `dock-task-record.webp` | props/icon | 任务记录入口 | 用 imagegen 生成或 CSS 图标占位 | `220 x 220` | `<= 90 KB` |
@@ -140,6 +138,7 @@ raw 生成图和中间处理文件不得进入 `public/`。建议放在临时目
 | 顶部首页、团队目标、排行榜、补给商店、任务记录 icon | 优先使用 lucide 或现有 SVG，避免为简单 UI 符号生成位图 |
 | 金币、奖励券、补给券 | 优先复用 `public/gamification/rewards/icons/*` |
 | 头像 | 复用 `public/avatars/*` |
+| 任务卡图片 | 只复用 `public/assets/task-cards/raw/*`；本 spec 不生成、不压缩、不重做 task-card 资产 |
 | 经验、心、鞋、水瓶等小图标 | 如果现有素材不适配，可先用 CSS/emoji 占位，再决定是否生成 |
 | 面板边框、像素卡框、进度条、勾选章、按钮 | CSS 实现，不生图 |
 | 对话气泡、标签、倒计时、奖励栏 | CSS 实现，不生图 |
@@ -153,6 +152,7 @@ raw 生成图和中间处理文件不得进入 `public/`。建议放在临时目
 - 排行榜奖杯和成员徽章体系。
 - 团队目标页专属场景 props。
 - 任务记录页完整票据、夹板、历史勋章资产。
+- task-card 固定格式和统一生成素材。
 
 ## Media Production Workflow
 
