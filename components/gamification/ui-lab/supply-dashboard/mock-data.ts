@@ -1,0 +1,195 @@
+import type { SupplyDashboardPreview } from "./types";
+
+export const supplyDashboardAssetPaths = {
+  background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
+  hero: "/assets/home-scenes/supply/dashboard/niuma-hero.webp",
+  dockBackpack: "/assets/home-scenes/supply/dashboard/dock-backpack.webp",
+  dockSupplyMachine: "/assets/home-scenes/supply/dashboard/dock-supply-machine.webp",
+  dockTaskRecord: "/assets/home-scenes/supply/dashboard/dock-task-record.webp",
+  fallbackLogo: "/logo.png",
+  taskCards: {
+    hydration: "/assets/task-cards/raw/hydration_003%C2%A0%E6%9D%AF%E5%AD%90%E8%A7%81%E5%BA%95.png",
+    movement: "/assets/task-cards/raw/movement_004%C2%A0%E7%AA%97%E8%BE%B9%E5%9B%9E%E8%A1%80.png",
+    social: "/assets/task-cards/raw/social_001%C2%A0%E5%BA%9F%E8%AF%9D%20KPI.png",
+    learning: "/assets/task-cards/raw/learning_005%C2%A0%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%AC%94%E8%AE%B0.png",
+  },
+  rewardIcons: {
+    coin: "/gamification/rewards/icons/coins_020.png",
+    ticket: "/gamification/rewards/icons/task_reroll_coupon.png",
+    boost: "/gamification/rewards/icons/small_boost_coupon.png",
+  },
+} as const;
+
+export const supplyDashboardMock: SupplyDashboardPreview = {
+  profile: {
+    username: "Vincent",
+    avatar: "/avatars/male1.png",
+    title: "自律牛马",
+    level: 28,
+    exp: 720,
+    nextLevelExp: 1000,
+    streakDays: 18,
+  },
+  motto: "不是在健身，就是在去健身的路上！",
+  resources: [
+    {
+      id: "coins",
+      label: "银子",
+      value: 2450,
+      icon: "🪙",
+    },
+    {
+      id: "energy",
+      label: "体力",
+      value: 18,
+      maxValue: 100,
+      icon: "⚡",
+    },
+    {
+      id: "ticket",
+      label: "补给券",
+      value: 18,
+      icon: "🎟",
+    },
+  ],
+  activeEffects: [
+    {
+      id: "exp",
+      icon: "EXP",
+      label: "经验获取",
+      value: "+20%",
+      expiresIn: "02:35:18",
+    },
+    {
+      id: "hp",
+      icon: "❤",
+      label: "体力上限",
+      value: "+10",
+      expiresIn: "02:35:18",
+    },
+    {
+      id: "steps",
+      icon: "👟",
+      label: "步数加成",
+      value: "+15%",
+      expiresIn: "02:35:18",
+    },
+  ],
+  dailyQuests: [
+    {
+      id: "hydration",
+      dimension: "hydration",
+      title: "杯子见底",
+      subtitle: "喝完今天的第二杯水",
+      image: supplyDashboardAssetPaths.taskCards.hydration,
+      difficulty: "轻",
+      tags: ["补水", "办公室"],
+      durationLabel: "2 分钟",
+      completed: true,
+      reward: {
+        icon: supplyDashboardAssetPaths.rewardIcons.coin,
+        label: "银子",
+        amount: 20,
+      },
+    },
+    {
+      id: "movement",
+      dimension: "movement",
+      title: "窗边回血",
+      subtitle: "离开工位做一组拉伸",
+      image: supplyDashboardAssetPaths.taskCards.movement,
+      difficulty: "中",
+      tags: ["拉伸", "恢复"],
+      durationLabel: "5 分钟",
+      completed: true,
+      reward: {
+        icon: supplyDashboardAssetPaths.rewardIcons.boost,
+        label: "小加成券",
+        amount: 1,
+      },
+    },
+    {
+      id: "social",
+      dimension: "social",
+      title: "废话 KPI",
+      subtitle: "给队友发一句训练鼓励",
+      image: supplyDashboardAssetPaths.taskCards.social,
+      difficulty: "轻",
+      tags: ["团队", "互动"],
+      durationLabel: "1 分钟",
+      completed: true,
+      reward: {
+        icon: supplyDashboardAssetPaths.rewardIcons.coin,
+        label: "银子",
+        amount: 15,
+      },
+    },
+    {
+      id: "learning",
+      dimension: "learning",
+      title: "一句话笔记",
+      subtitle: "记录一个今天学到的健康知识",
+      image: supplyDashboardAssetPaths.taskCards.learning,
+      difficulty: "中",
+      tags: ["知识", "复盘"],
+      durationLabel: "3 分钟",
+      completed: false,
+      reward: {
+        icon: supplyDashboardAssetPaths.rewardIcons.ticket,
+        label: "补给券",
+        amount: 1,
+      },
+    },
+  ],
+  inventoryPreview: {
+    usedSlots: 18,
+    totalSlots: 40,
+    items: [
+      {
+        id: "water",
+        name: "水壶",
+        icon: "💧",
+        quantity: 3,
+      },
+      {
+        id: "shoe",
+        name: "跑鞋",
+        icon: "👟",
+        quantity: 1,
+      },
+      {
+        id: "heart",
+        name: "回血包",
+        icon: "❤",
+        quantity: 2,
+      },
+    ],
+  },
+  supplyPreview: {
+    remainingDraws: 999,
+    maxDraws: 999,
+    featuredRewards: [
+      {
+        id: "ticket",
+        name: "补给券",
+        icon: supplyDashboardAssetPaths.rewardIcons.ticket,
+        quantity: 1,
+      },
+      {
+        id: "water",
+        name: "运动水",
+        icon: "💧",
+        quantity: 3,
+      },
+      {
+        id: "exp",
+        name: "经验加成",
+        icon: supplyDashboardAssetPaths.rewardIcons.boost,
+        quantity: 1,
+      },
+    ],
+  },
+  announcement: {
+    message: "团队公告：周六早上 8 点公园团练，记得来哦！",
+  },
+};
