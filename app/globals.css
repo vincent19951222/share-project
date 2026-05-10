@@ -5467,8 +5467,18 @@ body {
 }
 
 @media (max-width: 1100px) {
+  .supply-dashboard-scene {
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .supply-dashboard-content {
+    min-height: 100vh;
+  }
+
   .supply-dashboard-main {
-    grid-template-columns: minmax(15rem, 0.78fr) minmax(20rem, 1fr) minmax(19rem, 1fr);
+    grid-template-columns: 1fr;
+    overflow-y: auto;
   }
 
   .supply-dashboard-topbar {
@@ -5477,6 +5487,14 @@ body {
 
   .supply-dashboard-resource-list {
     justify-content: flex-start;
+  }
+
+  .supply-dashboard-hero-stage {
+    min-height: 30rem;
+  }
+
+  .supply-dashboard-quest-list {
+    grid-template-rows: none;
   }
 }
 

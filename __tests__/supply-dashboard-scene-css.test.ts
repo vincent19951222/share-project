@@ -44,6 +44,12 @@ function extractRuleBody(css: string, selector: string) {
   return css.slice(blockStart + 1, cursor - 1);
 }
 
+function extractNestedRuleBody(blocks: string[], selector: string) {
+  const block = blocks.find((candidate) => candidate.includes(selector));
+  expect(block).toBeDefined();
+  return extractRuleBody(block ?? "", selector);
+}
+
 describe("supply dashboard scene CSS", () => {
   it("defines a layered Dashboard scene shell", () => {
     const css = normalizeCss(readFileSync("app/globals.css", "utf8"));
@@ -66,13 +72,20 @@ describe("supply dashboard scene CSS", () => {
 
   it("includes responsive and reduced-motion coverage", () => {
     const css = normalizeCss(readFileSync("app/globals.css", "utf8"));
-    const mobileCss = extractBlocks(css, "@media (max-width: 760px)").join("\n");
+    const tabletBlocks = extractBlocks(css, "@media (max-width: 1100px)");
+    const mobileBlocks = extractBlocks(css, "@media (max-width: 760px)");
     const reducedMotionCss = extractBlocks(css, "@media (prefers-reduced-motion: reduce)").join("\n");
+    const tabletScene = extractNestedRuleBody(tabletBlocks, ".supply-dashboard-scene");
+    const tabletMain = extractNestedRuleBody(tabletBlocks, ".supply-dashboard-main");
+    const mobileScene = extractNestedRuleBody(mobileBlocks, ".supply-dashboard-scene");
+    const mobileMain = extractNestedRuleBody(mobileBlocks, ".supply-dashboard-main");
 
-    expect(mobileCss).toContain(".supply-dashboard-scene");
-    expect(mobileCss).toContain(".supply-dashboard-main");
-    expect(mobileCss).toMatch(/grid-template-columns:\s*1fr/);
-    expect(mobileCss).toMatch(/overflow-y:\s*auto/);
+    expect(tabletScene).toMatch(/overflow-y:\s*auto/);
+    expect(tabletMain).toMatch(/grid-template-columns:\s*1fr/);
+    expect(tabletMain).toMatch(/overflow-y:\s*auto/);
+    expect(mobileScene).toMatch(/overflow-y:\s*auto/);
+    expect(mobileMain).toMatch(/grid-template-columns:\s*1fr/);
+    expect(mobileMain).toMatch(/overflow-y:\s*auto/);
     expect(reducedMotionCss).toContain(".supply-dashboard-scene *");
     expect(reducedMotionCss).toMatch(/transition-duration:\s*0\.01ms/);
   });
