@@ -81,9 +81,11 @@ describe("supply dashboard scene CSS", () => {
     const mobileMain = extractNestedRuleBody(mobileBlocks, ".supply-dashboard-main");
 
     expect(tabletScene).toMatch(/overflow-y:\s*auto/);
+    expect(tabletScene).toMatch(/(?:height|max-height):\s*100svh/);
     expect(tabletMain).toMatch(/grid-template-columns:\s*1fr/);
     expect(tabletMain).toMatch(/overflow-y:\s*auto/);
     expect(mobileScene).toMatch(/overflow-y:\s*auto/);
+    expect(mobileScene).toMatch(/(?:height|max-height):\s*100svh/);
     expect(mobileMain).toMatch(/grid-template-columns:\s*1fr/);
     expect(mobileMain).toMatch(/overflow-y:\s*auto/);
     expect(reducedMotionCss).toContain(".supply-dashboard-scene *");

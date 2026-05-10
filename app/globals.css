@@ -5468,6 +5468,7 @@ body {
 
 @media (max-width: 1100px) {
   .supply-dashboard-scene {
+    height: 100svh;
     min-height: 100vh;
     overflow-y: auto;
   }
@@ -5500,6 +5501,7 @@ body {
 
 @media (max-width: 760px) {
   .supply-dashboard-scene {
+    height: 100svh;
     min-height: 100vh;
     overflow-y: auto;
   }
