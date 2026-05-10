@@ -4986,9 +4986,10 @@ body {
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
-  gap: clamp(0.8rem, 1.4vw, 1.2rem);
+  gap: clamp(0.6rem, 1vw, 0.9rem);
+  height: 100vh;
   min-height: 100vh;
-  padding: clamp(0.9rem, 1.7vw, 1.4rem);
+  padding: clamp(0.65rem, 1.2vw, 1rem);
 }
 
 .supply-dashboard-topbar {
@@ -5000,7 +5001,7 @@ body {
   border-radius: 1rem;
   background: #fde047;
   box-shadow: 8px 8px 0 #111827;
-  padding: clamp(0.7rem, 1.1vw, 0.95rem);
+  padding: clamp(0.55rem, 0.9vw, 0.8rem);
 }
 
 .supply-dashboard-brand {
@@ -5292,7 +5293,7 @@ body {
 .supply-dashboard-hero-image {
   width: min(82%, 28rem);
   height: auto;
-  max-height: min(64vh, 40rem);
+  max-height: min(58vh, 36rem);
   object-fit: contain;
   filter: drop-shadow(0 18px 0 rgba(17, 24, 39, 0.16));
 }
@@ -5400,7 +5401,7 @@ body {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
-  min-height: 5.25rem;
+  min-height: 4.7rem;
   border: 4px solid #111827;
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.94);
@@ -5474,12 +5475,14 @@ body {
   }
 
   .supply-dashboard-content {
-    min-height: 100vh;
+    height: auto;
+    min-height: 100svh;
   }
 
   .supply-dashboard-main {
     grid-template-columns: 1fr;
-    overflow-y: auto;
+    align-items: start;
+    overflow: visible;
   }
 
   .supply-dashboard-topbar {
@@ -5507,13 +5510,15 @@ body {
   }
 
   .supply-dashboard-content {
-    min-height: 100vh;
+    height: auto;
+    min-height: 100svh;
     padding: 0.75rem;
   }
 
   .supply-dashboard-main {
     grid-template-columns: 1fr;
-    overflow-y: auto;
+    align-items: start;
+    overflow: visible;
   }
 
   .supply-dashboard-status-panel,

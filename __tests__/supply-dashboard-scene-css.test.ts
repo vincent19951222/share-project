@@ -85,13 +85,13 @@ describe("supply dashboard scene CSS", () => {
     expect(tabletScene).toMatch(/min-height:\s*(?:100svh|0)/);
     expect(tabletScene).not.toMatch(/min-height:\s*100vh/);
     expect(tabletMain).toMatch(/grid-template-columns:\s*1fr/);
-    expect(tabletMain).toMatch(/overflow-y:\s*auto/);
+    expect(tabletMain).toMatch(/overflow:\s*visible/);
     expect(mobileScene).toMatch(/overflow-y:\s*auto/);
     expect(mobileScene).toMatch(/(?:height|max-height):\s*100svh/);
     expect(mobileScene).toMatch(/min-height:\s*(?:100svh|0)/);
     expect(mobileScene).not.toMatch(/min-height:\s*100vh/);
     expect(mobileMain).toMatch(/grid-template-columns:\s*1fr/);
-    expect(mobileMain).toMatch(/overflow-y:\s*auto/);
+    expect(mobileMain).toMatch(/overflow:\s*visible/);
     expect(reducedMotionCss).toContain(".supply-dashboard-scene *");
     expect(reducedMotionCss).toMatch(/transition-duration:\s*0\.01ms/);
   });
