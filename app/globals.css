@@ -5683,3 +5683,868 @@ body {
     transition-duration: 0.01ms;
   }
 }
+
+.supply-team-goal-scene {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #fff7db;
+  color: #111827;
+}
+
+.supply-team-goal-background {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 219, 0.9)),
+    radial-gradient(circle at 12% 18%, rgba(250, 204, 21, 0.28), transparent 24rem),
+    radial-gradient(circle at 88% 22%, rgba(74, 222, 128, 0.18), transparent 22rem),
+    #fff7db;
+}
+
+.supply-team-goal-content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(12.5rem, 0.64fr) minmax(17rem, 1fr) auto;
+  gap: clamp(0.38rem, 0.65vw, 0.6rem);
+  min-height: 100vh;
+  padding: clamp(0.35rem, 0.7vw, 0.55rem);
+}
+
+.supply-team-goal-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.7rem, 1vw, 1rem);
+  min-height: 4rem;
+  border: 4px solid #111827;
+  border-radius: 0.55rem;
+  background: #facc15;
+  box-shadow: 0 5px 0 #111827;
+  padding: 0.35rem 0.6rem;
+}
+
+.supply-team-goal-brand,
+.supply-team-goal-nav-items,
+.supply-team-goal-resources,
+.supply-team-goal-resource,
+.supply-team-goal-announcement,
+.supply-team-goal-announcement nav {
+  display: flex;
+  align-items: center;
+}
+
+.supply-team-goal-brand {
+  gap: 0.45rem;
+  min-width: max-content;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-team-goal-brand-icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 3px solid #111827;
+  border-radius: 0.55rem;
+  background: #fff7db;
+  font-size: 1.55rem;
+  box-shadow: 3px 3px 0 rgba(17, 24, 39, 0.22);
+}
+
+.supply-team-goal-nav-items {
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.supply-team-goal-nav-items button,
+.supply-team-goal-resource,
+.supply-team-goal-back-button,
+.supply-team-goal-team-card button,
+.supply-team-goal-vault button,
+.supply-team-goal-task button,
+.supply-team-goal-rewards header button,
+.supply-team-goal-claim button {
+  border: 3px solid #111827;
+  background: #fff7d6;
+  box-shadow: 0 3px 0 #111827;
+  color: #111827;
+  font-weight: 950;
+}
+
+.supply-team-goal-nav-items button {
+  min-height: 2.7rem;
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.82rem;
+  white-space: nowrap;
+}
+
+.supply-team-goal-nav-items button.is-active {
+  background: #facc15;
+  transform: translateY(2px);
+  box-shadow: 0 5px 0 #111827;
+}
+
+.supply-team-goal-resources {
+  justify-content: flex-end;
+  gap: 0.45rem;
+  min-width: max-content;
+}
+
+.supply-team-goal-resource {
+  gap: 0.42rem;
+  min-height: 2.55rem;
+  border-radius: 0.5rem;
+  padding: 0.28rem 0.45rem;
+  background: #ffe36b;
+}
+
+.supply-team-goal-resource > span:first-child,
+.supply-team-goal-resource-plus {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border: 2px solid #111827;
+  border-radius: 0.35rem;
+  background: #fff8d5;
+  font-size: 0.82rem;
+  font-weight: 1000;
+}
+
+.supply-team-goal-resource strong {
+  min-width: 2ch;
+  font-size: 1rem;
+  font-weight: 1000;
+}
+
+.supply-team-goal-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 3px solid #111827;
+  border-radius: 0.4rem;
+  background: #fff7db;
+  object-fit: cover;
+}
+
+.supply-team-goal-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.supply-team-goal-header h1 {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-team-goal-back-button {
+  min-height: 2.4rem;
+  border-radius: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: #fffdf4;
+}
+
+.supply-team-goal-raid-panel,
+.supply-team-goal-tasks,
+.supply-team-goal-rewards {
+  min-width: 0;
+  border: 4px solid #111827;
+  border-radius: 0.75rem;
+  background: rgba(255, 250, 240, 0.96);
+  box-shadow: 0 4px 0 #111827;
+}
+
+.supply-team-goal-raid-panel {
+  display: grid;
+  grid-template-columns: 1.12fr 1.36fr 1.05fr 1.34fr;
+  align-items: stretch;
+  gap: 0.9rem;
+  padding: 0.8rem 0.95rem;
+}
+
+.supply-team-goal-team-card,
+.supply-team-goal-season-summary,
+.supply-team-goal-vault,
+.supply-team-goal-season-rewards {
+  min-width: 0;
+}
+
+.supply-team-goal-team-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+}
+
+.supply-team-goal-team-card h2 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: clamp(1.05rem, 1.25vw, 1.4rem);
+  font-weight: 1000;
+}
+
+.supply-team-goal-crest {
+  grid-row: span 3;
+  width: clamp(6rem, 10vw, 9.2rem);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 0 rgba(17, 24, 39, 0.25));
+}
+
+.supply-team-goal-team-card h3,
+.supply-team-goal-team-card p,
+.supply-team-goal-season-summary p,
+.supply-team-goal-vault p,
+.supply-team-goal-season-rewards p {
+  margin: 0;
+}
+
+.supply-team-goal-team-card h3 {
+  font-size: clamp(1.2rem, 1.6vw, 1.7rem);
+  font-weight: 1000;
+}
+
+.supply-team-goal-team-card p {
+  margin-top: 0.25rem;
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  font-weight: 900;
+}
+
+.supply-team-goal-team-card button,
+.supply-team-goal-vault button {
+  width: fit-content;
+  border-radius: 0.35rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.supply-team-goal-season-summary {
+  display: grid;
+  align-content: center;
+  border-left: 2px dashed #d6c5a5;
+  padding-left: 0.8rem;
+}
+
+.supply-team-goal-season-summary p {
+  font-size: clamp(1rem, 1.35vw, 1.35rem);
+  font-weight: 1000;
+}
+
+.supply-team-goal-season-summary > span {
+  width: fit-content;
+  margin-top: 0.5rem;
+  border: 2px solid #d6c5a5;
+  border-radius: 0.35rem;
+  background: #fffdf7;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.supply-team-goal-season-summary h2 {
+  margin: 0.8rem 0 0.45rem;
+  font-size: clamp(2rem, 2.6vw, 3rem);
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-team-goal-season-summary small {
+  font-size: 0.58em;
+}
+
+.supply-team-goal-progress,
+.supply-team-goal-task-progress {
+  overflow: hidden;
+  border: 2px solid #111827;
+  background: #e7ddc9;
+}
+
+.supply-team-goal-progress {
+  height: 1rem;
+  width: min(100%, 20.5rem);
+}
+
+.supply-team-goal-progress span,
+.supply-team-goal-task-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #4caf34, #78d957);
+}
+
+.supply-team-goal-season-summary > strong {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 1000;
+}
+
+.supply-team-goal-vault {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  border-left: 2px dashed #d6c5a5;
+  padding-left: 0.75rem;
+  text-align: center;
+}
+
+.supply-team-goal-vault h2,
+.supply-team-goal-season-rewards h2,
+.supply-team-goal-tasks h2,
+.supply-team-goal-rewards h2,
+.supply-team-goal-reward h3,
+.supply-team-goal-task h3 {
+  margin: 0;
+  font-weight: 1000;
+  line-height: 1.1;
+}
+
+.supply-team-goal-vault img {
+  width: clamp(6.6rem, 9vw, 9.2rem);
+  height: auto;
+  margin-block: 0.2rem;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 0 rgba(17, 24, 39, 0.22));
+}
+
+.supply-team-goal-vault strong {
+  font-size: clamp(1.35rem, 1.8vw, 1.85rem);
+  font-weight: 1000;
+}
+
+.supply-team-goal-vault p {
+  color: #4b5563;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.supply-team-goal-vault button {
+  margin-top: 0.3rem;
+  background: #facc15;
+}
+
+.supply-team-goal-season-rewards {
+  display: grid;
+  align-content: center;
+  gap: 0.45rem;
+  border-left: 2px dashed #d6c5a5;
+  padding-left: 0.8rem;
+}
+
+.supply-team-goal-season-rewards p {
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.supply-team-goal-season-rewards div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.45rem;
+  align-items: center;
+  min-height: 1.8rem;
+  border: 1px solid #e5d8bf;
+  border-radius: 0.35rem;
+  background: #fffdf7;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.supply-team-goal-season-rewards div span:first-child {
+  display: grid;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border: 2px solid #111827;
+  border-radius: 0.28rem;
+  background: #dcfce7;
+  font-size: 0.66rem;
+  font-weight: 1000;
+}
+
+.supply-team-goal-road {
+  position: relative;
+  min-height: 14rem;
+  overflow: hidden;
+  border: 4px solid #111827;
+  border-radius: 0.75rem;
+  background: #a7d875;
+  box-shadow: 0 4px 0 #111827;
+}
+
+.supply-team-goal-road img {
+  z-index: 0;
+  object-fit: cover;
+}
+
+.supply-team-goal-road-line {
+  position: absolute;
+  right: 8%;
+  bottom: 4.9rem;
+  left: 8%;
+  z-index: 1;
+  height: 0.7rem;
+  border: 3px solid #111827;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4caf34 0 50%, #facc15 50% 64%, #2f2f2f 64% 100%);
+}
+
+.supply-team-goal-road-track {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  min-height: 14rem;
+  padding: 1rem clamp(2rem, 4vw, 4rem);
+}
+
+.supply-team-goal-milestone {
+  display: grid;
+  justify-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  text-align: center;
+  font-weight: 950;
+}
+
+.supply-team-goal-milestone strong,
+.supply-team-goal-milestone > span,
+.supply-team-goal-milestone em {
+  border: 2px solid #111827;
+  background: #fffdf7;
+  box-shadow: 0 2px 0 rgba(17, 24, 39, 0.28);
+}
+
+.supply-team-goal-milestone strong {
+  border-radius: 0.35rem;
+  padding: 0.32rem 0.7rem;
+  font-size: clamp(0.78rem, 0.95vw, 1rem);
+}
+
+.supply-team-goal-milestone > span {
+  border-top: 0;
+  border-radius: 0 0 0.35rem 0.35rem;
+  padding: 0.22rem 0.65rem;
+  font-size: clamp(0.8rem, 1vw, 1.05rem);
+}
+
+.supply-team-goal-milestone div {
+  display: grid;
+  width: clamp(2.6rem, 4vw, 4.2rem);
+  height: clamp(2.6rem, 4vw, 4.2rem);
+  place-items: center;
+  border: 4px solid #111827;
+  border-radius: 0.8rem 0.8rem 1.5rem 1.5rem;
+  background: #4caf34;
+  color: #fff;
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  box-shadow: 0 5px 0 rgba(17, 24, 39, 0.45);
+}
+
+.supply-team-goal-milestone.is-current div {
+  background: #facc15;
+  color: #111827;
+}
+
+.supply-team-goal-milestone.is-active div,
+.supply-team-goal-milestone.is-locked div {
+  background: #374151;
+}
+
+.supply-team-goal-milestone b {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 3px solid #111827;
+  border-radius: 999px;
+  background: #7dd957;
+  font-size: 1rem;
+  font-weight: 1000;
+}
+
+.supply-team-goal-milestone.is-current b {
+  background: #facc15;
+}
+
+.supply-team-goal-milestone.is-active b,
+.supply-team-goal-milestone.is-locked b {
+  background: #4b5563;
+  color: #fff;
+}
+
+.supply-team-goal-milestone em {
+  border-radius: 0.28rem;
+  padding: 0.22rem 0.55rem;
+  font-size: 0.72rem;
+  font-style: normal;
+}
+
+.supply-team-goal-milestone.is-current em {
+  background: #facc15;
+}
+
+.supply-team-goal-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 0.6rem;
+  min-height: 0;
+}
+
+.supply-team-goal-tasks,
+.supply-team-goal-rewards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem;
+}
+
+.supply-team-goal-tasks header,
+.supply-team-goal-rewards header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.supply-team-goal-tasks header span {
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.supply-team-goal-rewards header button {
+  border-color: #d7c6a8;
+  border-width: 2px;
+  border-radius: 0.35rem;
+  background: #fffdf7;
+  padding: 0.25rem 0.55rem;
+  box-shadow: none;
+}
+
+.supply-team-goal-task {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.4fr) auto minmax(5rem, 7rem) auto auto;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 3.1rem;
+  border: 2px solid #d8c9ad;
+  border-radius: 0.45rem;
+  background: #fffdf7;
+  padding: 0.42rem 0.5rem;
+}
+
+.supply-team-goal-task-icon {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 2px solid #111827;
+  border-radius: 0.38rem;
+  background: #fef3c7;
+  font-size: 1.25rem;
+}
+
+.supply-team-goal-task h3,
+.supply-team-goal-task p {
+  margin: 0;
+}
+
+.supply-team-goal-task h3 {
+  font-size: clamp(0.85rem, 1vw, 1rem);
+}
+
+.supply-team-goal-task p {
+  color: #374151;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.supply-team-goal-task > strong {
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.supply-team-goal-task-progress {
+  height: 0.55rem;
+  border-radius: 999px;
+}
+
+.supply-team-goal-task button {
+  border-width: 2px;
+  border-radius: 0.35rem;
+  background: #dbeafe;
+  padding: 0.25rem 0.55rem;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.supply-team-goal-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  min-height: 0;
+}
+
+.supply-team-goal-reward {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  min-height: 9.5rem;
+  border: 3px solid #8b5cf6;
+  border-radius: 0.45rem;
+  background: #faf5ff;
+  padding: 0.55rem;
+  text-align: center;
+}
+
+.supply-team-goal-reward.is-orange {
+  border-color: #fb923c;
+  background: #fff7ed;
+}
+
+.supply-team-goal-reward.is-blue {
+  border-color: #60a5fa;
+  background: #eff6ff;
+}
+
+.supply-team-goal-reward.is-violet {
+  border-color: #c084fc;
+  background: #faf5ff;
+}
+
+.supply-team-goal-reward h3 {
+  font-size: clamp(0.82rem, 1vw, 1rem);
+}
+
+.supply-team-goal-reward img {
+  width: clamp(4.6rem, 6.5vw, 6rem);
+  height: auto;
+  object-fit: contain;
+}
+
+.supply-team-goal-reward > strong {
+  display: grid;
+  min-height: 4.8rem;
+  place-items: center;
+  color: #111827;
+  font-size: clamp(1.15rem, 1.7vw, 1.75rem);
+  font-weight: 1000;
+}
+
+.supply-team-goal-reward p {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.supply-team-goal-claim {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: auto;
+}
+
+.supply-team-goal-claim button {
+  min-height: 3.05rem;
+  border-radius: 0.35rem;
+  background: #facc15;
+  font-size: clamp(1rem, 1.3vw, 1.3rem);
+}
+
+.supply-team-goal-claim span,
+.supply-team-goal-claim strong {
+  font-weight: 900;
+}
+
+.supply-team-goal-claim strong {
+  white-space: nowrap;
+}
+
+.supply-team-goal-announcement {
+  gap: 0.55rem;
+  min-height: 3rem;
+  border: 4px solid #111827;
+  border-radius: 0.55rem;
+  background: #facc15;
+  box-shadow: 0 4px 0 #111827;
+  padding: 0.35rem 0.7rem;
+  font-weight: 900;
+}
+
+.supply-team-goal-announcement-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 2px solid #111827;
+  border-radius: 0.35rem;
+  background: #fffdf7;
+}
+
+.supply-team-goal-announcement > span:not(.supply-team-goal-announcement-icon) {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.supply-team-goal-announcement nav {
+  gap: 0.7rem;
+  margin-left: auto;
+}
+
+.supply-team-goal-announcement a {
+  color: #111827;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .supply-team-goal-content {
+    grid-template-rows: auto;
+  }
+
+  .supply-team-goal-topbar,
+  .supply-team-goal-raid-panel,
+  .supply-team-goal-lower-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .supply-team-goal-nav-items,
+  .supply-team-goal-resources {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+  }
+
+  .supply-team-goal-team-card,
+  .supply-team-goal-season-summary,
+  .supply-team-goal-vault,
+  .supply-team-goal-season-rewards {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .supply-team-goal-reward-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .supply-team-goal-claim {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .supply-team-goal-content {
+    padding: 0.35rem;
+  }
+
+  .supply-team-goal-header {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .supply-team-goal-header h1 {
+    font-size: clamp(1.8rem, 10vw, 2.6rem);
+  }
+
+  .supply-team-goal-brand {
+    font-size: 1.35rem;
+  }
+
+  .supply-team-goal-road {
+    min-height: auto;
+  }
+
+  .supply-team-goal-road-line {
+    display: none;
+  }
+
+  .supply-team-goal-road-track {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 0.8rem;
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .supply-team-goal-milestone {
+    grid-template-columns: minmax(6rem, 1fr) auto auto;
+    align-items: center;
+    justify-items: start;
+    border: 3px solid #111827;
+    border-radius: 0.55rem;
+    background: rgba(255, 253, 247, 0.92);
+    padding: 0.55rem;
+  }
+
+  .supply-team-goal-milestone div {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .supply-team-goal-milestone b {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  .supply-team-goal-milestone em {
+    grid-column: 1 / -1;
+  }
+
+  .supply-team-goal-task {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.45rem;
+  }
+
+  .supply-team-goal-task-progress,
+  .supply-team-goal-task > strong,
+  .supply-team-goal-task > p,
+  .supply-team-goal-task button {
+    grid-column: 2;
+  }
+
+  .supply-team-goal-reward-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .supply-team-goal-announcement {
+    flex-wrap: wrap;
+  }
+
+  .supply-team-goal-announcement > span:not(.supply-team-goal-announcement-icon) {
+    flex-basis: 100%;
+    white-space: normal;
+  }
+
+  .supply-team-goal-announcement nav {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .supply-team-goal-scene *,
+  .supply-team-goal-scene *::before,
+  .supply-team-goal-scene *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
