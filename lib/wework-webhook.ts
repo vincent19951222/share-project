@@ -9,6 +9,8 @@ export type WeWorkPushResult =
   | { status: "skipped"; reason: "missing-webhook" | "already-published" }
   | { status: "failed"; reason: string };
 
+export const DAILY_WEWORK_REMINDER_CONTENT = "记得每日健身打卡和咖啡打卡";
+
 const MAX_MARKDOWN_LENGTH = 3800;
 
 function resolveWebhookUrl(webhookUrl?: string): string {
@@ -101,6 +103,44 @@ async function readWeWorkError(response: Response): Promise<string> {
     return `企业微信 webhook 返回错误：${errcode ?? response.status} ${errmsg}`;
   } catch {
     return `企业微信 webhook 返回 HTTP ${response.status}`;
+  }
+}
+
+export async function pushDailyReminderToWeWork(input: {
+  webhookUrl?: string;
+  fetchImpl?: FetchImpl;
+} = {}): Promise<WeWorkPushResult> {
+  const webhookUrl = resolveWebhookUrl(input.webhookUrl);
+
+  if (!webhookUrl) {
+    return { status: "skipped", reason: "missing-webhook" };
+  }
+
+  const fetchImpl = input.fetchImpl ?? fetch;
+
+  try {
+    const response = await fetchImpl(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        msgtype: "text",
+        text: {
+          content: DAILY_WEWORK_REMINDER_CONTENT,
+        },
+      }),
+    });
+    const error = await readWeWorkError(response);
+
+    if (!response.ok || error) {
+      return { status: "failed", reason: error || `企业微信 webhook 返回 HTTP ${response.status}` };
+    }
+
+    return { status: "sent" };
+  } catch (error) {
+    return {
+      status: "failed",
+      reason: error instanceof Error ? error.message : "企业微信 webhook 推送失败",
+    };
   }
 }
 
