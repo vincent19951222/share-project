@@ -17,6 +17,13 @@ class MakeupNotAllowedError extends Error {
   }
 }
 
+class DuplicatePunchError extends Error {
+  constructor() {
+    super("duplicate-punch");
+    this.name = "DuplicatePunchError";
+  }
+}
+
 function isPunchConflictError(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return error.code === "P2002" || error.code === "P2034";
@@ -49,7 +56,7 @@ async function buildSnapshotResponse(userId: string, now: Date) {
   const snapshot = await buildBoardSnapshotForUser(userId, now);
 
   if (!snapshot) {
-    return NextResponse.json({ error: "snapshot-build-failed" }, { status: 500 });
+    return NextResponse.json({ error: "server-error" }, { status: 500 });
   }
 
   return NextResponse.json({ snapshot });
@@ -125,7 +132,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (yesterdayPunch) {
-          throw new MakeupNotAllowedError();
+          throw new DuplicatePunchError();
         }
 
         const todayPunch = await tx.punchRecord.findUnique({
@@ -309,6 +316,10 @@ export async function POST(request: NextRequest) {
       });
     } catch (error) {
       if (error instanceof MakeupNotAllowedError) {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
+
+      if (error instanceof DuplicatePunchError) {
         return NextResponse.json({ error: error.message }, { status: 409 });
       }
 

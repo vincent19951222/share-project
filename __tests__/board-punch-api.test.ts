@@ -470,6 +470,7 @@ describe("/api/board/punch", () => {
 
     const response = await POST_MAKEUP_YESTERDAY(makeupRequest(userId));
     expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({ error: "duplicate-punch" });
 
     const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
     const records = await prisma.punchRecord.findMany({
