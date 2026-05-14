@@ -80,16 +80,8 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const today = getCurrentBoardDay(now);
     const todayDayKey = getShanghaiDayKey(now);
-    const nextStreak = getNextPunchStreak(
-      user.currentStreak,
-      user.lastPunchDayKey,
-      todayDayKey,
-    );
-    const reward = getNextPunchRewardPreview(
-      user.currentStreak,
-      user.lastPunchDayKey,
-      todayDayKey,
-    );
+    let nextStreak = 0;
+    let reward = 0;
     const activeSeason = user.team.seasons[0] ?? null;
     const memberOrder = Math.max(
       user.team.users.findIndex((member) => member.id === user.id),
@@ -102,6 +94,46 @@ export async function POST(request: NextRequest) {
 
     try {
       await prisma.$transaction(async (tx) => {
+        const latestUserLedger = await tx.user.update({
+          where: { id: user.id },
+          data: {
+            coins: {
+              increment: 0,
+            },
+          },
+          select: {
+            currentStreak: true,
+            lastPunchDayKey: true,
+          },
+        });
+        const previousPunch = await tx.punchRecord.findFirst({
+          where: {
+            userId: user.id,
+            dayKey: {
+              lt: todayDayKey,
+            },
+            punched: true,
+          },
+          orderBy: [{ dayKey: "desc" }, { createdAt: "desc" }],
+          select: {
+            dayKey: true,
+            streakAfterPunch: true,
+          },
+        });
+        const currentStreak = previousPunch?.streakAfterPunch ?? latestUserLedger.currentStreak;
+        const lastPunchDayKey = previousPunch?.dayKey ?? latestUserLedger.lastPunchDayKey;
+
+        nextStreak = getNextPunchStreak(
+          currentStreak,
+          lastPunchDayKey,
+          todayDayKey,
+        );
+        reward = getNextPunchRewardPreview(
+          currentStreak,
+          lastPunchDayKey,
+          todayDayKey,
+        );
+
         let countsForSeasonSlot = false;
 
         if (activeSeason) {

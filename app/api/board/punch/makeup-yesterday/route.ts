@@ -121,6 +121,25 @@ export async function POST(request: NextRequest) {
 
     try {
       await prisma.$transaction(async (tx) => {
+        const seasonForLedger = await tx.season.findUnique({
+          where: { id: activeSeason.id },
+          select: {
+            id: true,
+            status: true,
+            monthKey: true,
+            targetSlots: true,
+            filledSlots: true,
+          },
+        });
+
+        if (
+          !seasonForLedger ||
+          seasonForLedger.status !== "ACTIVE" ||
+          seasonForLedger.monthKey !== yesterdayMonthKey
+        ) {
+          throw new MakeupNotAllowedError();
+        }
+
         const yesterdayPunch = await tx.punchRecord.findUnique({
           where: {
             userId_dayKey: {
@@ -134,21 +153,6 @@ export async function POST(request: NextRequest) {
         if (yesterdayPunch) {
           throw new DuplicatePunchError();
         }
-
-        const todayPunch = await tx.punchRecord.findUnique({
-          where: {
-            userId_dayKey: {
-              userId: user.id,
-              dayKey: todayDayKey,
-            },
-          },
-          select: {
-            id: true,
-            seasonId: true,
-            assetAwarded: true,
-            countedForSeasonSlot: true,
-          },
-        });
 
         const previousPunch = await tx.punchRecord.findFirst({
           where: {
@@ -178,20 +182,38 @@ export async function POST(request: NextRequest) {
 
         const seasonUpdate = await tx.season.updateMany({
           where: {
-            id: activeSeason.id,
+            id: seasonForLedger.id,
             status: "ACTIVE",
-            filledSlots: { lt: activeSeason.targetSlots },
+            filledSlots: { lt: seasonForLedger.targetSlots },
           },
           data: {
             filledSlots: { increment: 1 },
           },
         });
-        const countsForSeasonSlot = seasonUpdate.count === 1;
+        let countsForSeasonSlot = seasonUpdate.count === 1;
+
+        if (!countsForSeasonSlot && seasonForLedger.filledSlots < seasonForLedger.targetSlots) {
+          const currentSeason = await tx.season.findUnique({
+            where: { id: seasonForLedger.id },
+            select: {
+              status: true,
+              monthKey: true,
+            },
+          });
+
+          if (
+            !currentSeason ||
+            currentSeason.status !== "ACTIVE" ||
+            currentSeason.monthKey !== yesterdayMonthKey
+          ) {
+            throw new MakeupNotAllowedError();
+          }
+        }
 
         await tx.punchRecord.create({
           data: {
             userId: user.id,
-            seasonId: activeSeason.id,
+            seasonId: seasonForLedger.id,
             dayIndex: yesterdayDayIndex,
             dayKey: yesterdayDayKey,
             punched: true,
@@ -205,7 +227,7 @@ export async function POST(request: NextRequest) {
         const existingStat = await tx.seasonMemberStat.findUnique({
           where: {
             seasonId_userId: {
-              seasonId: activeSeason.id,
+              seasonId: seasonForLedger.id,
               userId: user.id,
             },
           },
@@ -218,7 +240,7 @@ export async function POST(request: NextRequest) {
           await tx.seasonMemberStat.update({
             where: {
               seasonId_userId: {
-                seasonId: activeSeason.id,
+                seasonId: seasonForLedger.id,
                 userId: user.id,
               },
             },
@@ -235,7 +257,7 @@ export async function POST(request: NextRequest) {
         } else {
           await tx.seasonMemberStat.create({
             data: {
-              seasonId: activeSeason.id,
+              seasonId: seasonForLedger.id,
               userId: user.id,
               seasonIncome: yesterdayReward,
               slotContribution: countsForSeasonSlot ? 1 : 0,
@@ -249,6 +271,21 @@ export async function POST(request: NextRequest) {
         let userCoinDelta = yesterdayReward;
         let nextCurrentStreak = yesterdayStreak;
         let nextLastPunchDayKey = yesterdayDayKey;
+
+        const todayPunch = await tx.punchRecord.findUnique({
+          where: {
+            userId_dayKey: {
+              userId: user.id,
+              dayKey: todayDayKey,
+            },
+          },
+          select: {
+            id: true,
+            seasonId: true,
+            assetAwarded: true,
+            countedForSeasonSlot: true,
+          },
+        });
 
         if (todayPunch) {
           const repairedTodayStreak = getNextPunchStreak(
@@ -273,11 +310,11 @@ export async function POST(request: NextRequest) {
 
           const seasonIncomeDelta = signedIntUpdate(todayRewardDelta);
 
-          if (todayPunch.seasonId === activeSeason.id && seasonIncomeDelta) {
+          if (todayPunch.seasonId === seasonForLedger.id && seasonIncomeDelta) {
             await tx.seasonMemberStat.update({
               where: {
                 seasonId_userId: {
-                  seasonId: activeSeason.id,
+                  seasonId: seasonForLedger.id,
                   userId: user.id,
                 },
               },

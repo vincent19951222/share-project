@@ -258,6 +258,74 @@ describe("/api/board/punch", () => {
     }
   });
 
+  it("computes today's punch reward from the latest user state inside the transaction", async () => {
+    await resetState();
+    await prisma.punchRecord.create({
+      data: {
+        userId,
+        dayIndex: yesterday,
+        dayKey: yesterdayDayKey,
+        punched: true,
+        punchType: "makeup-yesterday",
+        streakAfterPunch: 1,
+        assetAwarded: 10,
+      },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        currentStreak: 1,
+        lastPunchDayKey: yesterdayDayKey,
+      },
+    });
+    const staleUser = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: {
+        team: {
+          include: {
+            users: {
+              select: {
+                id: true,
+                createdAt: true,
+              },
+              orderBy: { createdAt: "asc" },
+            },
+            seasons: {
+              where: { status: "ACTIVE" },
+              orderBy: { startedAt: "desc" },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+    const findUniqueSpy = vi.spyOn(prisma.user, "findUnique");
+
+    findUniqueSpy.mockResolvedValueOnce({
+      ...staleUser,
+      currentStreak: 0,
+      lastPunchDayKey: null,
+    } as never);
+
+    try {
+      const response = await POST(request("POST", userId));
+      expect(response.status).toBe(200);
+    } finally {
+      findUniqueSpy.mockRestore();
+    }
+
+    const record = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(record.assetAwarded).toBe(20);
+    expect(record.streakAfterPunch).toBe(2);
+    expect(after.coins).toBe(30);
+    expect(after.currentStreak).toBe(2);
+    expect(after.lastPunchDayKey).toBe(todayDayKey);
+  });
+
   it("adds a season slot and season income when an active season exists", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 0, targetSlots: 5 });
