@@ -106,6 +106,23 @@ function validateTargetSlots(targetSlots: unknown): number {
   return targetSlots;
 }
 
+function validateMonthKey(monthKey: unknown, fallbackMonthKey: string): string {
+  if (monthKey === undefined) {
+    return fallbackMonthKey;
+  }
+
+  if (typeof monthKey !== "string") {
+    throw new SeasonValidationError("赛季月份格式必须是 YYYY-MM");
+  }
+
+  const trimmed = monthKey.trim();
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(trimmed)) {
+    throw new SeasonValidationError("赛季月份格式必须是 YYYY-MM");
+  }
+
+  return trimmed;
+}
+
 export async function listSeasonsForTeam(teamId: string): Promise<SeasonListItem[]> {
   const seasons = await prisma.season.findMany({
     where: { teamId },
@@ -117,12 +134,12 @@ export async function listSeasonsForTeam(teamId: string): Promise<SeasonListItem
 
 export async function createSeasonForTeam(
   teamId: string,
-  input: { goalName: unknown; targetSlots: unknown },
+  input: { goalName: unknown; targetSlots: unknown; monthKey?: unknown },
   now: Date = new Date(),
 ): Promise<SeasonListItem> {
   const goalName = validateGoalName(input.goalName);
   const targetSlots = validateTargetSlots(input.targetSlots);
-  const monthKey = getCurrentSeasonMonthKey(now);
+  const monthKey = validateMonthKey(input.monthKey, getCurrentSeasonMonthKey(now));
   const seasonId = randomUUID();
   const insertedCount = await prisma.$executeRaw`
     INSERT INTO "Season" ("id", "teamId", "monthKey", "goalName", "status", "targetSlots", "filledSlots", "startedAt")

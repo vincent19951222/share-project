@@ -52,12 +52,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
-    const { goalName, targetSlots } = body as {
+    const { goalName, targetSlots, monthKey } = body as {
       goalName?: unknown;
       targetSlots?: unknown;
+      monthKey?: unknown;
     };
 
-    const season = await createSeasonForTeam(user.teamId, { goalName, targetSlots });
+    const season = await createSeasonForTeam(user.teamId, { goalName, targetSlots, monthKey });
     return NextResponse.json({ season }, { status: 201 });
   } catch (error) {
     if (error instanceof SeasonServiceError) {
