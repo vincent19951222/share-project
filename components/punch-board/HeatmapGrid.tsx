@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
-import { deleteTodayPunch, submitTodayPunch } from "@/lib/api";
+import { deleteTodayPunch, submitTodayPunch, submitYesterdayMakeupPunch } from "@/lib/api";
 import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
@@ -160,13 +160,83 @@ export function HeatmapGrid() {
     }
   }
 
+  async function handleMakeupYesterday() {
+    setSubmitting(true);
+    setError(null);
+    const punchEpoch = reservePunchEpoch();
+    dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
+
+    try {
+      const snapshot = await submitYesterdayMakeupPunch();
+
+      dispatch({
+        type: "SYNC_REMOTE_STATE",
+        snapshot,
+        source: "punch",
+        punchEpoch,
+      });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `makeup-punch-${Date.now()}`,
+          text: "<b>你</b> 已补签昨天健身打卡，服务器状态已同步。",
+          type: "success",
+          timestamp: new Date(),
+        },
+      });
+      window.dispatchEvent(new Event("activity-events:refresh"));
+      dispatchCalendarRefresh();
+      return true;
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "补签失败";
+      setError(message);
+      dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `makeup-punch-error-${Date.now()}`,
+          text: `补签失败：${message}`,
+          type: "alert",
+          timestamp: new Date(),
+        },
+      });
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   function renderPunchCell(rowIndex: number, index: number) {
     const day = index + 1;
     const status = state.gridData[rowIndex][index];
     const isCurrentUser = rowIndex === currentUserIndex;
 
     if (day < state.today) {
-      return <div key={day} className={`cell ${status ? "cell-punched" : "cell-missed"}`}>{status ? "✓" : ""}</div>;
+      const isYesterday = day === state.today - 1;
+
+      if (isYesterday && status === false && isCurrentUser) {
+        return (
+          <PunchPopup
+            key={day}
+            busy={submitting}
+            error={error}
+            onConfirm={handleMakeupYesterday}
+            triggerContent="补"
+            triggerClassName="cell cell-missed cursor-pointer text-xs font-black text-slate-800 disabled:opacity-50"
+            title="补昨天打卡"
+            description="确认补签昨天的健身打卡吗？"
+            helperText="补签会补发银子，并修正连续打卡和赛季进度。"
+            confirmLabel="确认补签"
+            busyLabel="补签中..."
+          />
+        );
+      }
+
+      return (
+        <div key={day} className={`cell ${status ? "cell-punched" : "cell-missed"}`}>
+          {status ? "✓" : ""}
+        </div>
+      );
     }
 
     if (day === state.today && !status && isCurrentUser) {
