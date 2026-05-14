@@ -384,4 +384,128 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterResponse.logs[0].text).toContain("已撤销今日健身打卡");
     expect(container.textContent).toContain("+");
   });
+
+  it("shows a makeup entry on the current user's missed yesterday cell", async () => {
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[false, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    const makeupButtons = Array.from(container.querySelectorAll("button")).filter(
+      (button) => button.textContent?.trim() === "补",
+    );
+
+    expect(makeupButtons).toHaveLength(2);
+  });
+
+  it("does not show makeup entry when the current user's yesterday cell is already punched", async () => {
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[true, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    expect(container.textContent).not.toContain("补");
+  });
+
+  it("waits for the server snapshot before applying yesterday makeup", async () => {
+    const request = deferred<{
+      ok: boolean;
+      json: () => Promise<{ snapshot: BoardSnapshot }>;
+    }>();
+    const fetchMock = vi.fn().mockReturnValue(request.promise);
+    vi.stubGlobal("fetch", fetchMock);
+
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[false, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const makeupButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "补",
+    );
+    expect(makeupButton).toBeDefined();
+
+    await act(async () => {
+      makeupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("补昨天打卡");
+
+    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认补签"),
+    );
+    expect(confirmButton).toBeDefined();
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/board/punch/makeup-yesterday",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(readState(container).gridData[0][0]).toBe(false);
+
+    await act(async () => {
+      request.resolve({
+        ok: true,
+        json: async () => ({
+          snapshot: createSnapshot({
+            gridData: [[true, false, null], [false, false, null]],
+            today: 2,
+            totalDays: 3,
+            teamVaultTotal: 10,
+            currentUser: {
+              assetBalance: 10,
+              currentStreak: 1,
+              nextReward: 20,
+              seasonIncome: 10,
+              isAdmin: false,
+            },
+          }),
+        }),
+      });
+      await request.promise;
+      await Promise.resolve();
+    });
+
+    const stateAfterResponse = readState(container);
+
+    expect(stateAfterResponse.gridData[0][0]).toBe(true);
+    expect(stateAfterResponse.logs).toHaveLength(1);
+    expect(stateAfterResponse.logs[0].type).toBe("success");
+    expect(stateAfterResponse.logs[0].text).toContain("补签");
+  });
 });
