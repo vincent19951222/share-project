@@ -60,7 +60,7 @@ export async function buildBoardSnapshotForUser(
             orderBy: { createdAt: "asc" },
           },
           seasons: {
-            where: { status: "ACTIVE" },
+            where: { status: "ACTIVE", monthKey: currentMonthKey },
             orderBy: { startedAt: "desc" },
             take: 1,
             include: {

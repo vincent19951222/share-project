@@ -426,7 +426,7 @@ describe("HeatmapGrid punch flow", () => {
       (button) => button.textContent?.trim() === "补",
     );
 
-    expect(makeupButtons.length).toBeGreaterThanOrEqual(1);
+    expect(makeupButtons).toHaveLength(2);
   });
 
   it("does not show makeup entry when the current user's yesterday cell is already punched", async () => {

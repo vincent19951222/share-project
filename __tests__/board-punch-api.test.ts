@@ -364,6 +364,52 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.currentUser.nextReward).toBe(20);
   });
 
+  it("awards today's punch without season ledger writes when the only active season is for a past month", async () => {
+    await resetState();
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const staleSeason = await prisma.season.create({
+      data: {
+        teamId: user.teamId,
+        monthKey: "2026-03",
+        goalName: "March sprint",
+        status: "ACTIVE",
+        targetSlots: 5,
+        filledSlots: 0,
+        startedAt: new Date("2026-03-01T00:00:00+08:00"),
+      },
+    });
+    const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    const response = await POST(request("POST", userId));
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    const record = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    const afterSeason = await prisma.season.findUniqueOrThrow({
+      where: { id: staleSeason.id },
+    });
+    const stat = await prisma.seasonMemberStat.findUnique({
+      where: {
+        seasonId_userId: {
+          seasonId: staleSeason.id,
+          userId,
+        },
+      },
+    });
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(record.seasonId).toBeNull();
+    expect(record.countedForSeasonSlot).toBe(false);
+    expect(record.assetAwarded).toBe(10);
+    expect(after.coins).toBe(before.coins + 10);
+    expect(afterSeason.filledSlots).toBe(0);
+    expect(stat).toBeNull();
+    expect(body.snapshot.activeSeason).toBeNull();
+    expect(body.snapshot.currentUser.seasonIncome).toBe(0);
+  });
+
   it("keeps filled slots capped and skips slot contribution when the season is already full", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 1, targetSlots: 1 });

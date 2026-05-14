@@ -51,6 +51,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     }
 
+    const now = new Date();
+    const today = getCurrentBoardDay(now);
+    const todayDayKey = getShanghaiDayKey(now);
+    const currentMonthKey = todayDayKey.slice(0, 7);
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -64,7 +69,7 @@ export async function POST(request: NextRequest) {
               orderBy: { createdAt: "asc" },
             },
             seasons: {
-              where: { status: "ACTIVE" },
+              where: { status: "ACTIVE", monthKey: currentMonthKey },
               orderBy: { startedAt: "desc" },
               take: 1,
             },
@@ -77,9 +82,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "user-not-found" }, { status: 401 });
     }
 
-    const now = new Date();
-    const today = getCurrentBoardDay(now);
-    const todayDayKey = getShanghaiDayKey(now);
     let nextStreak = 0;
     let reward = 0;
     const activeSeason = user.team.seasons[0] ?? null;
@@ -131,7 +133,10 @@ export async function POST(request: NextRequest) {
             })
           : null;
 
-        if (seasonForLedger?.status !== "ACTIVE") {
+        if (
+          seasonForLedger?.status !== "ACTIVE" ||
+          seasonForLedger.monthKey !== currentMonthKey
+        ) {
           seasonForLedger = null;
         }
 
@@ -142,6 +147,7 @@ export async function POST(request: NextRequest) {
             where: {
               id: seasonForLedger.id,
               status: "ACTIVE",
+              monthKey: currentMonthKey,
               filledSlots: {
                 lt: seasonForLedger.targetSlots,
               },
@@ -160,10 +166,14 @@ export async function POST(request: NextRequest) {
               where: { id: seasonForLedger.id },
               select: {
                 status: true,
+                monthKey: true,
               },
             });
 
-            if (currentSeason?.status !== "ACTIVE") {
+            if (
+              currentSeason?.status !== "ACTIVE" ||
+              currentSeason.monthKey !== currentMonthKey
+            ) {
               seasonForLedger = null;
             }
           }
