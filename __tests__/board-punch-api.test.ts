@@ -398,6 +398,71 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.activeSeason?.filledSlots).toBe(1);
   });
 
+  it("awards today's punch without season ledger writes when a pre-read active season has ended", async () => {
+    await resetState();
+    const season = await createActiveSeason({ filledSlots: 0, targetSlots: 5 });
+    const staleUser = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: {
+        team: {
+          include: {
+            users: {
+              select: {
+                id: true,
+                createdAt: true,
+              },
+              orderBy: { createdAt: "asc" },
+            },
+            seasons: {
+              where: { status: "ACTIVE" },
+              orderBy: { startedAt: "desc" },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+    await prisma.season.update({
+      where: { id: season.id },
+      data: { status: "ENDED" },
+    });
+    const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const findUniqueSpy = vi.spyOn(prisma.user, "findUnique");
+
+    findUniqueSpy.mockResolvedValueOnce(staleUser as never);
+
+    try {
+      const response = await POST(request("POST", userId));
+      expect(response.status).toBe(200);
+    } finally {
+      findUniqueSpy.mockRestore();
+    }
+
+    const record = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const afterSeason = await prisma.season.findUniqueOrThrow({
+      where: { id: season.id },
+    });
+    const stat = await prisma.seasonMemberStat.findUnique({
+      where: {
+        seasonId_userId: {
+          seasonId: season.id,
+          userId,
+        },
+      },
+    });
+
+    expect(record.seasonId).toBeNull();
+    expect(record.countedForSeasonSlot).toBe(false);
+    expect(record.assetAwarded).toBe(10);
+    expect(after.coins).toBe(before.coins + 10);
+    expect(after.currentStreak).toBe(1);
+    expect(afterSeason.filledSlots).toBe(0);
+    expect(stat).toBeNull();
+  });
+
   it("makes up yesterday when today is not punched and repairs rewards, streak, and season progress", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 0, targetSlots: 5 });

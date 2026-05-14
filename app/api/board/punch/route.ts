@@ -118,15 +118,32 @@ export async function POST(request: NextRequest) {
           todayDayKey,
         );
 
+        let seasonForLedger = activeSeason
+          ? await tx.season.findUnique({
+              where: { id: activeSeason.id },
+              select: {
+                id: true,
+                status: true,
+                monthKey: true,
+                targetSlots: true,
+                filledSlots: true,
+              },
+            })
+          : null;
+
+        if (seasonForLedger?.status !== "ACTIVE") {
+          seasonForLedger = null;
+        }
+
         let countsForSeasonSlot = false;
 
-        if (activeSeason) {
+        if (seasonForLedger) {
           const seasonUpdate = await tx.season.updateMany({
             where: {
-              id: activeSeason.id,
+              id: seasonForLedger.id,
               status: "ACTIVE",
               filledSlots: {
-                lt: activeSeason.targetSlots,
+                lt: seasonForLedger.targetSlots,
               },
             },
             data: {
@@ -137,23 +154,39 @@ export async function POST(request: NextRequest) {
           });
 
           countsForSeasonSlot = seasonUpdate.count === 1;
-          recordCountedForSeasonSlot = countsForSeasonSlot;
-          nextFilledSlots = countsForSeasonSlot
-            ? Math.min(activeSeason.filledSlots + 1, activeSeason.targetSlots)
-            : activeSeason.filledSlots;
+
+          if (!countsForSeasonSlot && seasonForLedger.filledSlots < seasonForLedger.targetSlots) {
+            const currentSeason = await tx.season.findUnique({
+              where: { id: seasonForLedger.id },
+              select: {
+                status: true,
+              },
+            });
+
+            if (currentSeason?.status !== "ACTIVE") {
+              seasonForLedger = null;
+            }
+          }
+
+          recordCountedForSeasonSlot = Boolean(seasonForLedger && countsForSeasonSlot);
+          nextFilledSlots = seasonForLedger
+            ? countsForSeasonSlot
+              ? Math.min(seasonForLedger.filledSlots + 1, seasonForLedger.targetSlots)
+              : seasonForLedger.filledSlots
+            : nextFilledSlots;
         }
 
         await tx.punchRecord.create({
           data: {
             userId: user.id,
-            seasonId: activeSeason?.id ?? null,
+            seasonId: seasonForLedger?.id ?? null,
             dayIndex: today,
             dayKey: todayDayKey,
             punched: true,
             punchType: "default",
             streakAfterPunch: nextStreak,
             assetAwarded: reward,
-            countedForSeasonSlot: countsForSeasonSlot,
+            countedForSeasonSlot: Boolean(seasonForLedger && countsForSeasonSlot),
           },
         });
 
@@ -179,11 +212,11 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        if (activeSeason) {
+        if (seasonForLedger) {
           const existingStat = await tx.seasonMemberStat.findUnique({
             where: {
               seasonId_userId: {
-                seasonId: activeSeason.id,
+                seasonId: seasonForLedger.id,
                 userId: user.id,
               },
             },
@@ -196,7 +229,7 @@ export async function POST(request: NextRequest) {
             await tx.seasonMemberStat.update({
               where: {
                 seasonId_userId: {
-                  seasonId: activeSeason.id,
+                  seasonId: seasonForLedger.id,
                   userId: user.id,
                 },
               },
@@ -217,7 +250,7 @@ export async function POST(request: NextRequest) {
           } else {
             await tx.seasonMemberStat.create({
               data: {
-                seasonId: activeSeason.id,
+                seasonId: seasonForLedger.id,
                 userId: user.id,
                 seasonIncome: reward,
                 slotContribution: countsForSeasonSlot ? 1 : 0,
