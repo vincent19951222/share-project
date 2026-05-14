@@ -267,8 +267,8 @@ describe("/api/board/punch", () => {
         dayKey: yesterdayDayKey,
         punched: true,
         punchType: "makeup-yesterday",
-        streakAfterPunch: 1,
-        assetAwarded: 10,
+        streakAfterPunch: 5,
+        assetAwarded: 50,
       },
     });
     await prisma.user.update({

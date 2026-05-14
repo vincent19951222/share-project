@@ -106,31 +106,15 @@ export async function POST(request: NextRequest) {
             lastPunchDayKey: true,
           },
         });
-        const previousPunch = await tx.punchRecord.findFirst({
-          where: {
-            userId: user.id,
-            dayKey: {
-              lt: todayDayKey,
-            },
-            punched: true,
-          },
-          orderBy: [{ dayKey: "desc" }, { createdAt: "desc" }],
-          select: {
-            dayKey: true,
-            streakAfterPunch: true,
-          },
-        });
-        const currentStreak = previousPunch?.streakAfterPunch ?? latestUserLedger.currentStreak;
-        const lastPunchDayKey = previousPunch?.dayKey ?? latestUserLedger.lastPunchDayKey;
 
         nextStreak = getNextPunchStreak(
-          currentStreak,
-          lastPunchDayKey,
+          latestUserLedger.currentStreak,
+          latestUserLedger.lastPunchDayKey,
           todayDayKey,
         );
         reward = getNextPunchRewardPreview(
-          currentStreak,
-          lastPunchDayKey,
+          latestUserLedger.currentStreak,
+          latestUserLedger.lastPunchDayKey,
           todayDayKey,
         );
 
