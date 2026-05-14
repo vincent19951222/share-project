@@ -7,10 +7,17 @@ import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
 
+type PunchActionErrors = {
+  punch?: string | null;
+  undo?: string | null;
+  makeup?: string | null;
+};
+
 export function HeatmapGrid() {
   const { state, dispatch } = useBoard();
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<PunchActionErrors>({});
+  const submittingRef = useRef(false);
   const desktopScrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const currentUserIndex = state.members.findIndex((member) => member.id === state.currentUserId);
@@ -69,8 +76,13 @@ export function HeatmapGrid() {
   }, [state.today]);
 
   async function handlePunchConfirm() {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
-    setError(null);
+    setErrors((current) => ({ ...current, punch: null }));
     const punchEpoch = reservePunchEpoch();
     dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
 
@@ -97,7 +109,7 @@ export function HeatmapGrid() {
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "打卡失败";
-      setError(message);
+      setErrors((current) => ({ ...current, punch: message }));
       dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
       dispatch({
         type: "ADD_LOG",
@@ -111,12 +123,18 @@ export function HeatmapGrid() {
       return false;
     } finally {
       setSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
   async function handlePunchUndo() {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
-    setError(null);
+    setErrors((current) => ({ ...current, undo: null }));
     const punchEpoch = reservePunchEpoch();
     dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
 
@@ -143,7 +161,7 @@ export function HeatmapGrid() {
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "撤销失败";
-      setError(message);
+      setErrors((current) => ({ ...current, undo: message }));
       dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
       dispatch({
         type: "ADD_LOG",
@@ -157,12 +175,18 @@ export function HeatmapGrid() {
       return false;
     } finally {
       setSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
   async function handleMakeupYesterday() {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
-    setError(null);
+    setErrors((current) => ({ ...current, makeup: null }));
     const punchEpoch = reservePunchEpoch();
     dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
 
@@ -189,7 +213,7 @@ export function HeatmapGrid() {
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "补签失败";
-      setError(message);
+      setErrors((current) => ({ ...current, makeup: message }));
       dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
       dispatch({
         type: "ADD_LOG",
@@ -203,6 +227,7 @@ export function HeatmapGrid() {
       return false;
     } finally {
       setSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
@@ -219,7 +244,7 @@ export function HeatmapGrid() {
           <PunchPopup
             key={day}
             busy={submitting}
-            error={error}
+            error={errors.makeup ?? null}
             onConfirm={handleMakeupYesterday}
             triggerContent="补"
             triggerClassName="cell cell-missed cursor-pointer text-xs font-black text-slate-800 disabled:opacity-50"
@@ -244,7 +269,7 @@ export function HeatmapGrid() {
         <PunchPopup
           key={day}
           busy={submitting}
-          error={error}
+          error={errors.punch ?? null}
           onConfirm={handlePunchConfirm}
         />
       );
@@ -255,7 +280,7 @@ export function HeatmapGrid() {
         <PunchPopup
           key={day}
           busy={submitting}
-          error={error}
+          error={errors.undo ?? null}
           onConfirm={handlePunchUndo}
           triggerContent="✓"
           triggerClassName="cell cell-punched cursor-pointer disabled:opacity-50"
