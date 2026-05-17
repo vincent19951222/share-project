@@ -6099,6 +6099,7 @@ body {
   width: 100vw;
   height: 100svh;
   min-height: 100svh;
+  --supply-ui-lab-topbar-height: clamp(4.35rem, 5.08vw, 4.875rem);
   overflow: auto;
   background: #111827;
   color: #111827;
@@ -6140,7 +6141,7 @@ body {
   min-height: 100svh;
   margin: 0;
   box-sizing: border-box;
-  padding: 0;
+  padding: var(--supply-ui-lab-topbar-height) 0 0;
 }
 
 .supply-dashboard-stage {
@@ -6148,6 +6149,23 @@ body {
   width: 100%;
   aspect-ratio: 1536 / 946;
   min-height: 0;
+}
+
+@media (min-width: 1181px) {
+  .supply-dashboard-content {
+    height: 100svh;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .supply-dashboard-stage {
+    width: min(
+      100vw,
+      calc((100svh - var(--supply-ui-lab-topbar-height) - clamp(0.7rem, 0.8vw, 1rem)) * 1536 / 946)
+    );
+    aspect-ratio: 1536 / 946;
+    margin-inline: auto;
+  }
 }
 
 .supply-dashboard-status-panel,
@@ -6473,11 +6491,14 @@ body {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem 0.9rem;
+  width: auto;
   border: 4px solid #111827;
+  border-radius: 0;
   background: #1f2937;
   color: #fff;
   padding: 0.65rem 0.85rem;
   box-shadow: 5px 5px 0 rgba(17, 24, 39, 0.36);
+  transform: none;
 }
 
 .supply-dashboard-hero-status strong {
@@ -6488,6 +6509,12 @@ body {
 
 .supply-dashboard-hero-progress {
   position: relative;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .supply-dashboard-hero-progress .supply-ui-lab-progress {
@@ -7178,10 +7205,14 @@ body {
 }
 
 .supply-team-goal-scene {
-  position: relative;
+  position: fixed;
+  inset: 0;
   isolation: isolate;
-  min-height: 100vh;
-  overflow-x: hidden;
+  width: 100vw;
+  height: 100svh;
+  min-height: 100svh;
+  --supply-ui-lab-topbar-height: clamp(4.35rem, 5.08vw, 4.875rem);
+  overflow: auto;
   background: #fff7db;
   color: #111827;
 }
@@ -7205,8 +7236,10 @@ body {
   display: grid;
   grid-template-rows: auto auto auto minmax(12.5rem, 0.64fr) minmax(17rem, 1fr) auto;
   gap: clamp(0.38rem, 0.65vw, 0.6rem);
-  min-height: 100vh;
-  padding: clamp(0.35rem, 0.7vw, 0.55rem);
+  width: 100vw;
+  min-width: 1280px;
+  min-height: 100svh;
+  padding: calc(var(--supply-ui-lab-topbar-height) + clamp(0.35rem, 0.7vw, 0.55rem)) clamp(0.35rem, 0.7vw, 0.55rem) clamp(0.35rem, 0.7vw, 0.55rem);
 }
 
 .supply-team-goal-topbar {
@@ -7837,7 +7870,7 @@ body {
 
 @media (max-width: 768px) {
   .supply-team-goal-content {
-    padding: 0.35rem;
+    padding: calc(var(--supply-ui-lab-topbar-height) + 0.35rem) 0.35rem 0.35rem;
   }
 
   .supply-team-goal-header {
@@ -7936,11 +7969,11 @@ body {
 .supply-ui-lab-topbar {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(16rem, 18.6%) minmax(34rem, 1fr) auto;
+  grid-template-columns: minmax(14.5rem, 18.6%) minmax(31rem, 1fr) clamp(29.7rem, 37.1vw, 31rem);
   align-items: center;
   gap: clamp(0.45rem, 0.9vw, 0.9rem);
   width: 100%;
-  aspect-ratio: 1536 / 78;
+  height: var(--supply-ui-lab-topbar-height, clamp(4.35rem, 5.08vw, 4.875rem));
   min-height: 4.35rem;
   padding: clamp(0.32rem, 0.58vw, 0.58rem) clamp(0.45rem, 0.75vw, 0.7rem);
   border: 0;
@@ -7954,6 +7987,14 @@ body {
     inset 0 -3px 0 rgba(157, 111, 0, 0.3),
     0 7px 0 rgba(0, 0, 0, 0.7);
   box-sizing: border-box;
+}
+
+.supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: max(100vw, 1280px);
 }
 
 .supply-ui-lab-brand,
@@ -8001,6 +8042,9 @@ body {
 
 .supply-ui-lab-topbar-tab {
   position: relative;
+  box-sizing: border-box;
+  justify-content: center;
+  min-width: clamp(6.85rem, 7.85vw, 8rem);
   min-height: clamp(2.25rem, 3vw, 3rem);
   gap: clamp(0.25rem, 0.45vw, 0.45rem);
   border: 3px solid transparent;
@@ -8030,6 +8074,10 @@ body {
   box-shadow:
     inset 0 0 0 2px rgba(255, 255, 255, 0.38),
     0 5px 0 #111827;
+}
+
+.supply-ui-lab-topbar-tab[aria-selected="true"] {
+  border-color: #111827;
 }
 
 .supply-ui-lab-topbar-tab[aria-current="page"]::before,
@@ -8154,7 +8202,7 @@ body {
 
 .supply-ui-lab-topbar--breadcrumb {
   grid-template-columns: minmax(28rem, 1fr) auto;
-  aspect-ratio: 1536 / 84;
+  height: clamp(4.75rem, 5.47vw, 5.25rem);
   min-height: 4.75rem;
   padding: clamp(0.38rem, 0.62vw, 0.62rem) clamp(0.5rem, 0.8vw, 0.82rem);
 }
@@ -8255,14 +8303,52 @@ body {
 }
 
 @media (max-width: 1180px) {
-  .supply-ui-lab-topbar {
+  .supply-dashboard-scene,
+  .supply-team-goal-scene,
+  .supply-shop-scene,
+  .supply-task-record-scene {
+    --supply-ui-lab-topbar-height: 9.45rem !important;
+  }
+
+  .supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 0.35rem;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-brand strong {
+    font-size: clamp(1.55rem, 8vw, 2.15rem);
+  }
+
+  .supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-tabs {
+    justify-content: space-between;
+    gap: 0.2rem;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-topbar-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 0.2rem;
+    font-size: clamp(0.66rem, 3.15vw, 0.82rem);
+  }
+
+  .supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-statusbar {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+  }
+
+  .supply-ui-lab-topbar--breadcrumb {
     grid-template-columns: minmax(0, 1fr);
     aspect-ratio: auto;
     overflow-x: hidden;
   }
 
-  .supply-ui-lab-tabs,
-  .supply-ui-lab-statusbar {
+  .supply-ui-lab-topbar--breadcrumb .supply-ui-lab-statusbar {
     justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 0.15rem;
@@ -8278,6 +8364,11 @@ body {
   background: #fff8e8;
   box-shadow: 8px 8px 0 rgba(17, 24, 39, 0.92);
   color: #111827;
+}
+
+.supply-ui-lab-panel.supply-dashboard-status-panel,
+.supply-ui-lab-panel.supply-dashboard-quest-panel {
+  position: absolute;
 }
 
 .supply-ui-lab-panel--yellow {
@@ -8412,6 +8503,7 @@ body {
   width: 100vw;
   height: 100svh;
   min-height: 100svh;
+  --supply-ui-lab-topbar-height: clamp(4.35rem, 5.08vw, 4.875rem);
   overflow: auto;
   background: #111827;
   color: #111827;
@@ -8448,7 +8540,7 @@ body {
   min-height: 100svh;
   margin: 0;
   box-sizing: border-box;
-  padding: clamp(0.7rem, 1.15vw, 1rem);
+  padding: calc(var(--supply-ui-lab-topbar-height) + clamp(0.7rem, 1.15vw, 1rem)) clamp(0.7rem, 1.15vw, 1rem) clamp(0.7rem, 1.15vw, 1rem);
 }
 
 .supply-shop-shell {
@@ -8865,6 +8957,7 @@ body {
   width: 100vw;
   height: 100svh;
   min-height: 100svh;
+  --supply-ui-lab-topbar-height: clamp(4.35rem, 5.08vw, 4.875rem);
   overflow: auto;
   background: #111827;
   color: #111827;
@@ -8901,7 +8994,7 @@ body {
   min-height: 100svh;
   margin: 0;
   box-sizing: border-box;
-  padding: clamp(0.75rem, 1.2vw, 1rem);
+  padding: calc(var(--supply-ui-lab-topbar-height) + clamp(0.75rem, 1.2vw, 1rem)) clamp(0.75rem, 1.2vw, 1rem) clamp(0.75rem, 1.2vw, 1rem);
 }
 
 .supply-task-record-shell {
