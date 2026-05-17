@@ -31,8 +31,15 @@ describe("supply team goal mock data", () => {
   });
 
   it("keeps image asset paths under the team-goal public folder", () => {
-    expect(supplyTeamGoalAssetPaths.roadBackground).toBe("/assets/home-scenes/supply/team-goal/team-goal-road-bg.webp");
-    expect(supplyTeamGoalAssetPaths.crest).toBe("/assets/home-scenes/supply/team-goal/team-goal-crest.webp");
-    expect(supplyTeamGoalAssetPaths.vaultChest).toBe("/assets/home-scenes/supply/team-goal/team-goal-vault-chest.webp");
+    expect(supplyTeamGoalAssetPaths.topbarLogo).toBe("/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png");
+    expect(supplyTeamGoalAssetPaths.media).toEqual({
+      roadBackground: "/assets/home-scenes/supply/team-goal/team-goal-road-bg.webp",
+      crest: "/assets/home-scenes/supply/team-goal/team-goal-crest.webp",
+      vaultChest: "/assets/home-scenes/supply/team-goal/team-goal-vault-chest.webp",
+    });
+    expect(JSON.stringify(supplyTeamGoalAssetPaths)).not.toContain("panelImages");
+    expect(JSON.stringify(supplyTeamGoalMock)).not.toMatch(
+      /team-goal-(raid|road|tasks|rewards|announcement)-panel\.(png|webp|jpe?g)/,
+    );
   });
 });

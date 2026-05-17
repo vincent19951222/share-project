@@ -1,9 +1,12 @@
 import type { SupplyTeamGoalPreview } from "./types";
 
 export const supplyTeamGoalAssetPaths = {
-  roadBackground: "/assets/home-scenes/supply/team-goal/team-goal-road-bg.webp",
-  crest: "/assets/home-scenes/supply/team-goal/team-goal-crest.webp",
-  vaultChest: "/assets/home-scenes/supply/team-goal/team-goal-vault-chest.webp",
+  topbarLogo: "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
+  media: {
+    roadBackground: "/assets/home-scenes/supply/team-goal/team-goal-road-bg.webp",
+    crest: "/assets/home-scenes/supply/team-goal/team-goal-crest.webp",
+    vaultChest: "/assets/home-scenes/supply/team-goal/team-goal-vault-chest.webp",
+  },
   fallbackLogo: "/logo.png",
   profileAvatar: "/avatars/male1.png",
   rewardIcons: {
@@ -15,6 +18,7 @@ export const supplyTeamGoalAssetPaths = {
 } as const;
 
 export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
+  media: supplyTeamGoalAssetPaths.media,
   topBar: {
     resources: [
       { id: "coins", label: "银子", value: "2,450", icon: "◎" },
@@ -31,7 +35,6 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
     level: 12,
     memberCount: 28,
     memberLimit: 30,
-    crestImage: supplyTeamGoalAssetPaths.crest,
   },
   season: {
     label: "赛季目标 S3",
@@ -46,7 +49,6 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
   },
   vault: {
     amount: 5680,
-    image: supplyTeamGoalAssetPaths.vaultChest,
     helper: "通过团队目标获得",
   },
   seasonRewards: [
@@ -113,7 +115,7 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
       id: "team-chest",
       title: "团队宝箱",
       subtitle: "达成后解锁丰厚随机奖励",
-      image: supplyTeamGoalAssetPaths.vaultChest,
+      image: supplyTeamGoalAssetPaths.media.vaultChest,
       icon: "🎁",
       tone: "purple",
     },

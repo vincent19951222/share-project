@@ -68,7 +68,7 @@ Assets:
 - Modify: `__tests__/supply-dashboard-scene-css.test.ts`
 - Modify: route/page tests if they assert tab counts
 
-- [ ] **Step 1: Write the failing topbar test**
+- [x] **Step 1: Write the failing topbar test**
 
 Update the Dashboard scene render test to assert the shared tab labels do not include Ranking:
 
@@ -82,7 +82,7 @@ expect(container.textContent).not.toContain("排行榜");
 expect(container.querySelector('a[href="#"]')).toBeNull();
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -92,7 +92,7 @@ npm test -- __tests__/supply-dashboard-scene.test.tsx
 
 Expected: FAIL because `排行榜` is still rendered by `SupplyUiLabTopBar`.
 
-- [ ] **Step 3: Remove Ranking from both tab lists**
+- [x] **Step 3: Remove Ranking from both tab lists**
 
 In `SupplyUiLabTopBar.tsx`, change `supplyUiLabTabs` to:
 
@@ -107,7 +107,7 @@ const supplyUiLabTabs = [
 
 In `SupplyDashboardTopTabs.tsx`, remove the Ranking entry so legacy tests or imports cannot reintroduce it.
 
-- [ ] **Step 4: Remove Ranking-specific CSS selectors**
+- [x] **Step 4: Remove Ranking-specific CSS selectors**
 
 In `app/globals.css`, delete rules that only target:
 
@@ -119,7 +119,7 @@ In `app/globals.css`, delete rules that only target:
 
 Keep shared tab styling that applies to the remaining tabs.
 
-- [ ] **Step 5: Run focused tests**
+- [x] **Step 5: Run focused tests**
 
 Run:
 
@@ -148,7 +148,7 @@ git commit -m "fix: remove ranking from supply ui lab tabs"
 - Modify: `app/globals.css`
 - Create or modify: `__tests__/supply-ui-lab-primitives.test.tsx`
 
-- [ ] **Step 1: Write the failing primitive render test**
+- [x] **Step 1: Write the failing primitive render test**
 
 Create `__tests__/supply-ui-lab-primitives.test.tsx`:
 
@@ -189,7 +189,7 @@ describe("Supply UI Lab shared primitives", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -199,7 +199,7 @@ npm test -- __tests__/supply-ui-lab-primitives.test.tsx
 
 Expected: FAIL because `SupplyUiLabPrimitives.tsx` does not exist.
 
-- [ ] **Step 3: Implement shared primitives**
+- [x] **Step 3: Implement shared primitives**
 
 Create `SupplyUiLabPrimitives.tsx` with these exports:
 
@@ -302,7 +302,7 @@ export function SupplyUiLabFilterBar({
 }
 ```
 
-- [ ] **Step 4: Add CSS for primitives**
+- [x] **Step 4: Add CSS for primitives**
 
 Append one shared CSS block before page-specific Supply UI Lab rules in `app/globals.css`:
 
@@ -438,7 +438,7 @@ Append one shared CSS block before page-specific Supply UI Lab rules in `app/glo
 }
 ```
 
-- [ ] **Step 5: Run primitive tests**
+- [x] **Step 5: Run primitive tests**
 
 Run:
 
@@ -470,7 +470,7 @@ git commit -m "feat: add supply ui lab primitives"
 - Modify: `__tests__/supply-dashboard-scene-css.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Tighten tests around atomic media only**
+- [x] **Step 1: Tighten tests around atomic media only**
 
 In `__tests__/supply-dashboard-mock-data.test.ts`, keep the assertion that dashboard mock data does not contain:
 
@@ -492,7 +492,7 @@ expect(supplyDashboardMock.shortcutLinks.map((link) => link.href)).toEqual([
 
 If `shortcutLinks` does not exist yet, add it in Step 3.
 
-- [ ] **Step 2: Run Dashboard tests and verify the link contract fails if needed**
+- [x] **Step 2: Run Dashboard tests and verify the link contract fails if needed**
 
 Run:
 
@@ -502,7 +502,7 @@ npm test -- __tests__/supply-dashboard-mock-data.test.ts __tests__/supply-dashbo
 
 Expected: FAIL only if `shortcutLinks` is not modeled separately yet.
 
-- [ ] **Step 3: Move Dashboard shortcut metadata into mock data**
+- [x] **Step 3: Move Dashboard shortcut metadata into mock data**
 
 In `mock-data.ts`, add:
 
@@ -545,7 +545,7 @@ shortcutLinks: [
 
 Update `types.ts` with a matching `shortcutLinks` property.
 
-- [ ] **Step 4: Use shared primitives in Dashboard panels**
+- [x] **Step 4: Use shared primitives in Dashboard panels**
 
 Import:
 
@@ -568,7 +568,7 @@ Replace hand-built panel shells for status and quest panels with `SupplyUiLabPix
 
 Use `SupplyUiLabProgress` for the hero EXP progress and quest progress where it does not disrupt the prototype layout.
 
-- [ ] **Step 5: Remove unused dashboard panel crop CSS and assets references**
+- [x] **Step 5: Remove unused dashboard panel crop CSS and assets references**
 
 In `app/globals.css`, remove rules for:
 
@@ -580,7 +580,7 @@ In `app/globals.css`, remove rules for:
 
 Do not delete physical `dashboard-*-panel.webp` files until the final asset cleanup task.
 
-- [ ] **Step 6: Run Dashboard focused tests**
+- [x] **Step 6: Run Dashboard focused tests**
 
 Run:
 
@@ -614,7 +614,7 @@ git commit -m "refactor: rebaseline supply dashboard ui lab"
 - Modify: `__tests__/supply-backpack-assets.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Rewrite tests to reject panel image fields**
+- [x] **Step 1: Rewrite tests to reject panel image fields**
 
 In `__tests__/supply-backpack-mock-data.test.ts`, add:
 
@@ -640,7 +640,7 @@ it("renders backpack surfaces as semantic UI instead of panel crops", async () =
 });
 ```
 
-- [ ] **Step 2: Run Backpack tests and verify failure**
+- [x] **Step 2: Run Backpack tests and verify failure**
 
 Run:
 
@@ -650,7 +650,7 @@ npm test -- __tests__/supply-backpack-mock-data.test.ts __tests__/supply-backpac
 
 Expected: FAIL because `panelImages` and `.supply-backpack-panel-image` still exist.
 
-- [ ] **Step 3: Remove panel image fields from Backpack types and mock data**
+- [x] **Step 3: Remove panel image fields from Backpack types and mock data**
 
 Delete `panelImages` from `SupplyBackpackPreview`.
 
@@ -668,7 +668,7 @@ hint: ...
 
 Ensure every item slot keeps `image`, `rarity`, `quantity`, and `selected`.
 
-- [ ] **Step 4: Rebuild BackpackSidebar with real UI**
+- [x] **Step 4: Rebuild BackpackSidebar with real UI**
 
 Remove the background `<Image>` and use:
 
@@ -689,7 +689,7 @@ Remove the background `<Image>` and use:
 </SupplyUiLabPixelPanel>
 ```
 
-- [ ] **Step 5: Render item images in inventory slots**
+- [x] **Step 5: Render item images in inventory slots**
 
 Update `InventoryItemCard` to display atomic media:
 
@@ -701,11 +701,11 @@ Update `InventoryItemCard` to display atomic media:
 
 Keep the `role="gridcell"` and `aria-selected` attributes.
 
-- [ ] **Step 6: Rebuild detail panel with real content**
+- [x] **Step 6: Rebuild detail panel with real content**
 
 Use `SupplyUiLabPixelPanel`, `SupplyUiLabStatusBadge`, and `SupplyUiLabActionButton` for the detail panel. Render detail image, rarity, title, description, effect, timing, restrictions, and actions as visible content.
 
-- [ ] **Step 7: Replace Backpack CSS**
+- [x] **Step 7: Replace Backpack CSS**
 
 In `app/globals.css`, remove `.supply-backpack-panel-image` and hotspot-only rules that are no longer used. Keep:
 
@@ -723,7 +723,7 @@ In `app/globals.css`, remove `.supply-backpack-panel-image` and hotspot-only rul
 
 Style these selectors as real UI surfaces using the shared primitive visual language.
 
-- [ ] **Step 8: Run Backpack focused tests**
+- [x] **Step 8: Run Backpack focused tests**
 
 Run:
 
@@ -757,7 +757,7 @@ git commit -m "refactor: componentize supply backpack ui lab"
 - Modify: `__tests__/supply-shop-assets.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Rewrite tests to reject shop panel crops**
+- [x] **Step 1: Rewrite tests to reject shop panel crops**
 
 In `__tests__/supply-shop-mock-data.test.ts`, assert:
 
@@ -779,7 +779,7 @@ expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).t
 expect(container.querySelector(".supply-shop-detail")?.textContent).toContain(supplyShopMock.selectedProductDetail.effect);
 ```
 
-- [ ] **Step 2: Run Shop tests and verify failure**
+- [x] **Step 2: Run Shop tests and verify failure**
 
 Run:
 
@@ -789,7 +789,7 @@ npm test -- __tests__/supply-shop-mock-data.test.ts __tests__/supply-shop-scene.
 
 Expected: FAIL because `panelImages` and `.supply-shop-panel-image` still exist.
 
-- [ ] **Step 3: Remove `panelImages` from Shop data contract**
+- [x] **Step 3: Remove `panelImages` from Shop data contract**
 
 Delete `SupplyShopPanelImages` and `panelImages` from `SupplyShopPreview`.
 
@@ -808,7 +808,7 @@ products: Array<{
 }>;
 ```
 
-- [ ] **Step 4: Rebuild ShopSidebar**
+- [x] **Step 4: Rebuild ShopSidebar**
 
 Use `SupplyUiLabPixelPanel` and visible resource rows:
 
@@ -820,7 +820,7 @@ Use `SupplyUiLabPixelPanel` and visible resource rows:
 </SupplyUiLabPixelPanel>
 ```
 
-- [ ] **Step 5: Rebuild ShopCatalog**
+- [x] **Step 5: Rebuild ShopCatalog**
 
 Use `SupplyUiLabFilterBar`, a real `select`, and visible product cards:
 
@@ -834,7 +834,7 @@ Use `SupplyUiLabFilterBar`, a real `select`, and visible product cards:
 </article>
 ```
 
-- [ ] **Step 6: Rebuild ShopDetail**
+- [x] **Step 6: Rebuild ShopDetail**
 
 Render selected product image, name, owned quantity, description, effect, timing, purchase limit, cost, and disabled redeem button. Keep disabled state driven by mock data:
 
@@ -846,7 +846,7 @@ selectedProductDetail: {
 }
 ```
 
-- [ ] **Step 7: Update Shop CSS**
+- [x] **Step 7: Update Shop CSS**
 
 Remove image-layer/hotspot rules:
 
@@ -859,7 +859,7 @@ Remove image-layer/hotspot rules:
 
 Add real grid/card/detail styling for `.supply-shop-product-card`, `.supply-shop-detail`, and `.supply-shop-sidebar`.
 
-- [ ] **Step 8: Run Shop focused tests**
+- [x] **Step 8: Run Shop focused tests**
 
 Run:
 
@@ -893,7 +893,7 @@ git commit -m "refactor: componentize supply shop ui lab"
 - Modify: `__tests__/supply-task-record-assets.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Rewrite tests to reject task-record panel crops**
+- [x] **Step 1: Rewrite tests to reject task-record panel crops**
 
 In mock-data tests:
 
@@ -919,7 +919,7 @@ expect(container.querySelectorAll("[data-testid='task-record-radar-invite']")).t
 );
 ```
 
-- [ ] **Step 2: Run Task Record tests and verify failure**
+- [x] **Step 2: Run Task Record tests and verify failure**
 
 Run:
 
@@ -929,7 +929,7 @@ npm test -- __tests__/supply-task-record-mock-data.test.ts __tests__/supply-task
 
 Expected: FAIL because panel image fields are still used.
 
-- [ ] **Step 3: Remove panel image fields from types and mock data**
+- [x] **Step 3: Remove panel image fields from types and mock data**
 
 Delete:
 
@@ -943,7 +943,7 @@ redemptions.panelImage
 
 Keep structured data for menu items, filters, timeline records, radar tabs, invites, and redemption items.
 
-- [ ] **Step 4: Rebuild TaskRecordSidebar**
+- [x] **Step 4: Rebuild TaskRecordSidebar**
 
 Use visible nav buttons:
 
@@ -961,19 +961,19 @@ Use visible nav buttons:
 </SupplyUiLabPixelPanel>
 ```
 
-- [ ] **Step 5: Rebuild TimelinePanel**
+- [x] **Step 5: Rebuild TimelinePanel**
 
 Use `SupplyUiLabFilterBar` for filters and real timeline articles for records. Keep existing `TimelineItem` shape, but move it out of `sr-only`.
 
-- [ ] **Step 6: Rebuild Radar and Redemption panels**
+- [x] **Step 6: Rebuild Radar and Redemption panels**
 
 Use `SupplyUiLabPixelPanel` for each side panel. Render invite avatars, status labels, response/ignore buttons, redemption icons, and status badges visibly.
 
-- [ ] **Step 7: Update CSS**
+- [x] **Step 7: Update CSS**
 
 Remove `.supply-task-record-panel-image` and hotspot-only selectors. Keep layout selectors and style real content with compact cards and a stable right rail.
 
-- [ ] **Step 8: Run Task Record focused tests**
+- [x] **Step 8: Run Task Record focused tests**
 
 Run:
 
@@ -1007,7 +1007,7 @@ git commit -m "refactor: componentize supply task record ui lab"
 - Modify: `__tests__/supply-team-goal-assets.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Rewrite tests to reject team-goal panel crops**
+- [x] **Step 1: Rewrite tests to reject team-goal panel crops**
 
 In mock-data tests:
 
@@ -1032,7 +1032,7 @@ expect(container.querySelectorAll("[data-testid='team-goal-milestone']")).toHave
 expect(container.querySelectorAll("[data-testid='team-goal-task']")).toHaveLength(supplyTeamGoalMock.tasks.length);
 ```
 
-- [ ] **Step 2: Run Team Goal tests and verify failure**
+- [x] **Step 2: Run Team Goal tests and verify failure**
 
 Run:
 
@@ -1042,7 +1042,7 @@ npm test -- __tests__/supply-team-goal-mock-data.test.ts __tests__/supply-team-g
 
 Expected: FAIL because `panelImages` still exist.
 
-- [ ] **Step 3: Remove panelImages from types and mock data**
+- [x] **Step 3: Remove panelImages from types and mock data**
 
 Delete `panelImages` from `SupplyTeamGoalPreview`.
 
@@ -1064,11 +1064,11 @@ media: {
 }
 ```
 
-- [ ] **Step 4: Rebuild RaidPanel**
+- [x] **Step 4: Rebuild RaidPanel**
 
 Use a real multi-column TSX structure with `SupplyUiLabPixelPanel`, `SupplyUiLabProgress`, and `SupplyUiLabActionButton`. Render team card, season summary, vault, and season rewards as visible content.
 
-- [ ] **Step 5: Rebuild MilestoneRoad**
+- [x] **Step 5: Rebuild MilestoneRoad**
 
 Use `roadBackground` as optional decorative background only. Render each milestone as a visible article:
 
@@ -1080,15 +1080,15 @@ Use `roadBackground` as optional decorative background only. Render each milesto
 </article>
 ```
 
-- [ ] **Step 6: Rebuild Tasks, Rewards, and Announcement**
+- [x] **Step 6: Rebuild Tasks, Rewards, and Announcement**
 
 Use real cards and buttons. Render rewards with visible icon/title/subtitle and claim button. Render announcement as a real footer with links.
 
-- [ ] **Step 7: Update CSS**
+- [x] **Step 7: Update CSS**
 
 Remove `.supply-team-goal-panel-image` and hotspot-only selectors. Keep the 1536-wide stage proportions and compressed lower grid.
 
-- [ ] **Step 8: Run Team Goal focused tests**
+- [x] **Step 8: Run Team Goal focused tests**
 
 Run:
 
@@ -1122,7 +1122,7 @@ git commit -m "refactor: componentize supply team goal ui lab"
 - Modify: `__tests__/supply-draw-pool-assets.test.ts`
 - Modify: `app/globals.css`
 
-- [ ] **Step 1: Rewrite tests to allow only machine/background atomic media**
+- [x] **Step 1: Rewrite tests to allow only machine/background atomic media**
 
 In mock-data tests:
 
@@ -1150,7 +1150,7 @@ expect(container.querySelector("button[aria-label*='单抽']")).not.toBeNull();
 expect(container.querySelector("button[aria-label*='十连']")).not.toBeNull();
 ```
 
-- [ ] **Step 2: Run Draw Pool tests and verify failure**
+- [x] **Step 2: Run Draw Pool tests and verify failure**
 
 Run:
 
@@ -1160,7 +1160,7 @@ npm test -- __tests__/supply-draw-pool-mock-data.test.ts __tests__/supply-draw-p
 
 Expected: FAIL because panel fields and image-layer topbar/wallet still exist.
 
-- [ ] **Step 3: Restructure Draw Pool media data**
+- [x] **Step 3: Restructure Draw Pool media data**
 
 Keep:
 
@@ -1177,15 +1177,15 @@ media: {
 
 Remove panel fields for topbar, wallet, guide, rates, probability, pity, rules, and recent.
 
-- [ ] **Step 4: Replace DrawPoolTopBar**
+- [x] **Step 4: Replace DrawPoolTopBar**
 
 Use `SupplyUiLabTopBar` if the visual parity remains acceptable. If the draw-pool needs a close-button variant, implement it as semantic TSX, not a topbar screenshot.
 
-- [ ] **Step 5: Rebuild side panels**
+- [x] **Step 5: Rebuild side panels**
 
 Use `SupplyUiLabPixelPanel` for wallet, guide, rates, probability, pity, rules, and recent drops. Render pool rates and recent drops as visible lists with atomic icons.
 
-- [ ] **Step 6: Keep machine as atomic media with real controls**
+- [x] **Step 6: Keep machine as atomic media with real controls**
 
 In `DrawMachineStage`, keep:
 
@@ -1200,7 +1200,7 @@ Render buttons as visible `SupplyUiLabActionButton` elements, not transparent ho
 <SupplyUiLabActionButton tone="primary">十连 x10</SupplyUiLabActionButton>
 ```
 
-- [ ] **Step 7: Update Draw Pool CSS**
+- [x] **Step 7: Update Draw Pool CSS**
 
 Remove hotspot-only selectors:
 
@@ -1214,7 +1214,7 @@ Remove hotspot-only selectors:
 
 Keep the three-column desktop layout and responsive stacking rules.
 
-- [ ] **Step 8: Run Draw Pool focused tests**
+- [x] **Step 8: Run Draw Pool focused tests**
 
 Run:
 
@@ -1244,7 +1244,7 @@ git commit -m "refactor: componentize supply draw pool ui lab"
 - Modify: all `__tests__/supply-*-assets.test.ts`
 - Delete unused `public/assets/home-scenes/supply/**/**-panel.*` files only after confirming no references remain
 
-- [ ] **Step 1: Search for remaining panel references**
+- [x] **Step 1: Search for remaining panel references**
 
 Run:
 
@@ -1254,7 +1254,7 @@ rg -n "panelImage|panelImages|topbarPanel|sidebarPanel|catalogPanel|detailPanel|
 
 Expected: No matches except explanatory test names that assert absence. If explanatory test names create noisy matches, rename them to use "image crop" wording without exact deleted field names.
 
-- [ ] **Step 2: Delete unused panel crop assets**
+- [x] **Step 2: Delete unused panel crop assets**
 
 After Step 1 has no runtime references, delete obsolete panel crop files with `git rm`, for example:
 
@@ -1264,7 +1264,7 @@ git rm public/assets/home-scenes/supply/shop/shop-sidebar-panel.png public/asset
 
 Repeat for obsolete backpack, task-record, team-goal, draw-pool, and dashboard panel crops only when no references remain.
 
-- [ ] **Step 3: Update asset tests to check atomic media**
+- [x] **Step 3: Update asset tests to check atomic media**
 
 Asset tests should assert kept images exist and stay within budgets, for example:
 
@@ -1281,7 +1281,7 @@ for (const asset of atomicAssets) {
 }
 ```
 
-- [ ] **Step 4: Verify CSS has one active Supply UI Lab block per page**
+- [x] **Step 4: Verify CSS has one active Supply UI Lab block per page**
 
 Run:
 
@@ -1291,7 +1291,7 @@ rg -n "/\\* Supply .* UI Lab|\\.supply-(dashboard|team-goal|shop|task-record|dra
 
 Expected: One clear shared block and one clear page block for each page family.
 
-- [ ] **Step 5: Run all Supply UI Lab focused tests**
+- [x] **Step 5: Run all Supply UI Lab focused tests**
 
 Run:
 
@@ -1319,7 +1319,7 @@ git commit -m "chore: clean supply ui lab panel assets"
 - No source changes unless QA finds a concrete layout bug.
 - Possible generated screenshots under `tmp/visual-qa/` should remain untracked unless the project already tracks them intentionally.
 
-- [ ] **Step 1: Start the dev server**
+- [x] **Step 1: Start the dev server**
 
 Run:
 
@@ -1329,7 +1329,7 @@ npm run dev
 
 Expected: Next.js dev server starts at `http://localhost:3000`.
 
-- [ ] **Step 2: Check 6 routes in browser**
+- [x] **Step 2: Check 6 routes in browser**
 
 Open:
 
@@ -1352,7 +1352,7 @@ Expected:
 - Text does not overlap at desktop width.
 - Mobile width still allows reading and interaction through scrolling or stacking.
 
-- [ ] **Step 3: Run lint**
+- [x] **Step 3: Run lint**
 
 Run:
 
@@ -1362,7 +1362,7 @@ npm run lint
 
 Expected: PASS, including `tsc --noEmit` if lint script runs it.
 
-- [ ] **Step 4: Run production build**
+- [x] **Step 4: Run production build**
 
 Run:
 
@@ -1372,7 +1372,7 @@ npm run build
 
 Expected: PASS.
 
-- [ ] **Step 5: Check git status**
+- [x] **Step 5: Check git status**
 
 Run:
 

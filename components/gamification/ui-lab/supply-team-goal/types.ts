@@ -51,6 +51,11 @@ export type TeamGoalRewardPreview = {
 };
 
 export type SupplyTeamGoalPreview = {
+  media: {
+    roadBackground: string;
+    crest: string;
+    vaultChest: string;
+  };
   topBar: {
     resources: TeamGoalResource[];
     profile: {
@@ -63,7 +68,6 @@ export type SupplyTeamGoalPreview = {
     level: number;
     memberCount: number;
     memberLimit: number;
-    crestImage: string;
   };
   season: {
     label: string;
@@ -78,7 +82,6 @@ export type SupplyTeamGoalPreview = {
   };
   vault: {
     amount: number;
-    image: string;
     helper: string;
   };
   seasonRewards: TeamGoalSeasonReward[];

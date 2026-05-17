@@ -38,6 +38,15 @@ export type SupplyDashboardInventoryItem = {
   quantity: number;
 };
 
+export type SupplyDashboardShortcutLink = {
+  id: "home" | "backpack" | "draw-pool" | "task-record";
+  href: string;
+  title: string;
+  subtitle: string;
+  badge: string;
+  image: string | null;
+};
+
 export type SupplyDashboardPreview = {
   profile: {
     username: string;
@@ -52,6 +61,7 @@ export type SupplyDashboardPreview = {
   resources: SupplyDashboardResource[];
   activeEffects: SupplyDashboardEffect[];
   dailyQuests: SupplyDashboardQuest[];
+  shortcutLinks: SupplyDashboardShortcutLink[];
   inventoryPreview: {
     usedSlots: number;
     totalSlots: number;

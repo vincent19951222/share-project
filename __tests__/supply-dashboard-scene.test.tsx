@@ -29,19 +29,53 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-background")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-content")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-topbar")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-stage")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-topbar")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-tabs")).not.toBeNull();
+    const tabs = Array.from(container.querySelectorAll(".supply-ui-lab-topbar-tab")).map((tab) =>
+      tab.textContent?.trim(),
+    );
+
+    expect(tabs).toEqual(["⌂我的状态", "◎团队目标", "▤补给商店", "▣任务记录"]);
+    expect(container.textContent).not.toContain("排行榜");
+    expect(container.querySelector('a[href="#"]')).toBeNull();
+    expect(
+      container.querySelector(".supply-ui-lab-tabs a[aria-selected='true']")?.textContent,
+    ).toContain("我的状态");
+    expect(
+      container
+        .querySelector(".supply-ui-lab-tabs a[href='/ui-lab/supply-dashboard/team-goal']")
+        ?.textContent,
+    ).toContain("团队目标");
+    expect(container.querySelector(".supply-ui-lab-user-menu")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-resource--energy")?.textContent).toContain("18/100");
     expect(container.querySelector(".supply-dashboard-status-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-status-panel.supply-ui-lab-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-title-card")).not.toBeNull();
+    expect(container.querySelectorAll(".supply-dashboard-effect-card")).toHaveLength(3);
+    expect(container.querySelector(".supply-dashboard-streak-card")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-hero-image")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-hero-status")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-hero-progress [role='progressbar']")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-quest-panel.supply-ui-lab-panel")).not.toBeNull();
     expect(container.querySelectorAll(".supply-dashboard-quest-card")).toHaveLength(4);
+    expect(container.querySelector(".supply-dashboard-quest-progress")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-quest-footer")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-quest-footer .supply-ui-lab-action")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-shortcut-dock")).not.toBeNull();
+    expect(container.querySelectorAll(".supply-dashboard-shortcut-card")).toHaveLength(4);
+    expect(container.querySelector(".supply-dashboard-panel-image")).toBeNull();
     expect(container.textContent).toContain("牛马补给站");
+    expect(container.textContent).toContain("我的状态");
+    expect(container.textContent).toContain("补给商店");
     expect(container.textContent).toContain("角色状态");
     expect(container.textContent).toContain("今日主线");
     expect(container.textContent).toContain("任务记录");
   });
 
-  it("uses final media assets plus existing raw task-card images", async () => {
+  it("uses atomic art assets plus the shared topbar logo", async () => {
     await act(async () => {
       root.render(<SupplyDashboardScene data={supplyDashboardMock} />);
     });
@@ -50,6 +84,7 @@ describe("supply dashboard static scene", () => {
 
     expect(imageSources).toEqual(
       expect.arrayContaining([
+        supplyDashboardAssetPaths.background,
         supplyDashboardAssetPaths.hero,
         supplyDashboardAssetPaths.dockBackpack,
         supplyDashboardAssetPaths.dockSupplyMachine,
@@ -58,7 +93,9 @@ describe("supply dashboard static scene", () => {
         supplyDashboardAssetPaths.taskCards.movement,
         supplyDashboardAssetPaths.taskCards.social,
         supplyDashboardAssetPaths.taskCards.learning,
+        "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
       ]),
     );
+    expect(imageSources.join("\n")).not.toMatch(/dashboard-(status|hero|quests|shortcut|announcement)-panel/);
   });
 });

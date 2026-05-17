@@ -13,6 +13,24 @@ describe("supply dashboard mock data", () => {
     expect(supplyDashboardMock.activeEffects.every((effect) => effect.expiresIn.length > 0)).toBe(true);
   });
 
+  it("uses atomic art assets instead of cropped UI panel screenshots", () => {
+    const serializedAssets = JSON.stringify(supplyDashboardAssetPaths);
+    const serializedMock = JSON.stringify(supplyDashboardMock);
+
+    expect(serializedAssets).not.toMatch(/dashboard-(status|hero|quests|shortcut|announcement)-panel/);
+    expect(serializedMock).not.toMatch(/panelImages/);
+    expect(supplyDashboardMock.shortcutLinks.map((link) => link.href)).toEqual([
+      "/ui-lab/supply-dashboard",
+      "/ui-lab/supply-dashboard/backpack",
+      "/ui-lab/supply-dashboard/draw-pool",
+      "/ui-lab/supply-dashboard/task-record",
+    ]);
+    expect(supplyDashboardAssetPaths.hero).toBe("/assets/home-scenes/supply/dashboard/niuma-hero.webp");
+    expect(supplyDashboardAssetPaths.dockBackpack).toBe("/assets/home-scenes/supply/dashboard/dock-backpack.webp");
+    expect(supplyDashboardAssetPaths.dockSupplyMachine).toBe("/assets/home-scenes/supply/dashboard/dock-supply-machine.webp");
+    expect(supplyDashboardAssetPaths.dockTaskRecord).toBe("/assets/home-scenes/supply/dashboard/dock-task-record.webp");
+  });
+
   it("reuses existing raw task-card assets instead of new generated quest images", () => {
     const taskCardPaths = Object.values(supplyDashboardAssetPaths.taskCards);
 

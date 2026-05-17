@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 
 const assets = [
   {
+    path: "public/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
+    maxBytes: 16 * 1024,
+  },
+  {
     path: "public/assets/home-scenes/supply/team-goal/team-goal-road-bg.webp",
     maxBytes: 260 * 1024,
   },

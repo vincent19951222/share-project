@@ -1,6 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { supplyDashboardAssetPaths } from "./mock-data";
+import {
+  SupplyUiLabActionButton,
+  SupplyUiLabPixelPanel,
+  SupplyUiLabProgress,
+} from "./SupplyUiLabPrimitives";
+import { SupplyUiLabTopBar, type SupplyUiLabResource } from "./SupplyUiLabTopBar";
 import type {
   SupplyDashboardPreview,
   SupplyDashboardQuest,
@@ -16,88 +23,68 @@ function formatResource(value: number, maxValue?: number) {
   return `${current}/${new Intl.NumberFormat("zh-CN").format(maxValue)}`;
 }
 
-function GameTopBar({ data }: { data: SupplyDashboardPreview }) {
-  return (
-    <header className="supply-dashboard-topbar">
-      <div className="supply-dashboard-brand">
-        <span className="supply-dashboard-brand-mark" aria-hidden="true">
-          NS
-        </span>
-        <div>
-          <p className="supply-dashboard-kicker">Dashboard UI Lab</p>
-          <h1>牛马补给站</h1>
-        </div>
-      </div>
-
-      <div className="supply-dashboard-resource-list" aria-label="资源状态">
-        {data.resources.map((resource) => (
-          <div className="supply-dashboard-resource-pill" key={resource.id}>
-            <span aria-hidden="true">{resource.icon}</span>
-            <span>{resource.label}</span>
-            <strong>{formatResource(resource.value, resource.maxValue)}</strong>
-          </div>
-        ))}
-      </div>
-    </header>
-  );
+function getTopBarResources(data: SupplyDashboardPreview): SupplyUiLabResource[] {
+  return data.resources.map((resource) => ({
+    id: resource.id,
+    label: resource.label,
+    value: formatResource(resource.value, resource.maxValue),
+    icon: resource.icon,
+  }));
 }
 
 function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
-  const progress = Math.round((data.profile.exp / data.profile.nextLevelExp) * 100);
-
   return (
-    <aside className="supply-dashboard-status-panel" aria-label="角色状态">
+    <SupplyUiLabPixelPanel className="supply-dashboard-status-panel" ariaLabel="角色状态">
       <div className="supply-dashboard-section-heading">
-        <p>角色状态</p>
-        <strong>Lv.{data.profile.level}</strong>
-      </div>
-
-      <div className="supply-dashboard-profile-card">
-        <Image
-          alt={`${data.profile.username} 的头像`}
-          className="supply-dashboard-avatar"
-          height={72}
-          src={data.profile.avatar}
-          unoptimized
-          width={72}
-        />
         <div>
-          <h2>{data.profile.username}</h2>
-          <p>{data.profile.title}</p>
-          <span>{data.profile.streakDays} 天连续打卡</span>
+          <span aria-hidden="true">✚</span>
+          <h2>角色状态</h2>
         </div>
+        <button type="button" aria-label="更多角色状态操作">•••</button>
       </div>
 
-      <div className="supply-dashboard-exp-block">
-        <div>
-          <span>经验</span>
-          <strong>
-            {data.profile.exp}/{data.profile.nextLevelExp}
-          </strong>
-        </div>
-        <div className="supply-dashboard-progress-track">
-          <span style={{ width: `${progress}%` }} />
-        </div>
+      <div className="supply-dashboard-title-card">
+        <span>称号</span>
+        <strong>
+          {data.profile.title}
+          <b aria-hidden="true">◎</b>
+        </strong>
       </div>
 
-      <div className="supply-dashboard-effect-list">
-        {data.activeEffects.map((effect) => (
-          <article className="supply-dashboard-effect-card" key={effect.id}>
-            <span aria-hidden="true">{effect.icon}</span>
-            <div>
-              <strong>
-                {effect.label} {effect.value}
-              </strong>
-              <p>{effect.expiresIn}</p>
-            </div>
-          </article>
-        ))}
+      <div className="supply-dashboard-status-divider" />
+
+      <section className="supply-dashboard-effect-panel" aria-label="今日效果">
+        <h3>今日效果</h3>
+        <div className="supply-dashboard-effect-list">
+          {data.activeEffects.map((effect) => (
+            <article className="supply-dashboard-effect-card" data-effect={effect.id} key={effect.id}>
+              <span aria-hidden="true">{effect.icon}</span>
+              <div>
+                <strong>
+                  {effect.label} {effect.value}
+                </strong>
+                <time>{effect.expiresIn}</time>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <div className="supply-dashboard-streak-card">
+        <span>连续打卡</span>
+        <strong>
+          <em aria-hidden="true">🔥</em>
+          {data.profile.streakDays}
+          <small>天</small>
+        </strong>
       </div>
-    </aside>
+    </SupplyUiLabPixelPanel>
   );
 }
 
 function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
+  const remainingExp = data.profile.nextLevelExp - data.profile.exp;
+
   return (
     <section className="supply-dashboard-hero-stage" aria-label="补给站主视觉">
       <div className="supply-dashboard-hero-copy">
@@ -105,110 +92,119 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
         <h2>{data.motto}</h2>
       </div>
       <Image
-        alt="脱脂牛马角色站在补给站前"
+        alt="脱脂牛马角色站在健身房里举哑铃"
         className="supply-dashboard-hero-image"
-        height={680}
+        height={832}
         priority
         src={supplyDashboardAssetPaths.hero}
         unoptimized
-        width={520}
+        width={594}
       />
+      <div className="supply-dashboard-hero-status" aria-label="等级经验">
+        <strong>Lv.{data.profile.level}</strong>
+        <div className="supply-dashboard-hero-progress">
+          <SupplyUiLabProgress current={data.profile.exp} label="等级经验" max={data.profile.nextLevelExp} />
+        </div>
+        <p>距离升级还差 {remainingExp} EXP</p>
+        <b aria-hidden="true">◎</b>
+      </div>
     </section>
   );
 }
 
-function QuestCard({ quest }: { quest: SupplyDashboardQuest }) {
+function QuestCard({ quest, index }: { quest: SupplyDashboardQuest; index: number }) {
   return (
-    <article className="supply-dashboard-quest-card">
-      <Image
-        alt={quest.title}
-        className="supply-dashboard-quest-image"
-        height={128}
-        src={quest.image}
-        unoptimized
-        width={128}
-      />
-      <div className="supply-dashboard-quest-body">
-        <div className="supply-dashboard-quest-meta">
-          <span>{quest.difficulty}</span>
-          <span>{quest.durationLabel}</span>
-          {quest.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-        <h3>{quest.title}</h3>
-        <p>{quest.subtitle}</p>
-        <div className="supply-dashboard-quest-reward">
-          <span aria-hidden="true">{quest.reward.icon}</span>
-          <strong>
-            +{quest.reward.amount} {quest.reward.label}
-          </strong>
-          <em>{quest.completed ? "已完成" : "进行中"}</em>
-        </div>
+    <article
+      className={`supply-dashboard-quest-card supply-dashboard-quest-card--${index + 1}`}
+      aria-label={`${quest.title}，${quest.completed ? "已完成" : "进行中"}`}
+    >
+      <div className="supply-dashboard-quest-ribbon">
+        <span aria-hidden="true">◎</span>
+        <strong>{quest.subtitle}</strong>
       </div>
+      <h3>{quest.title}</h3>
+      <div className="supply-dashboard-quest-art">
+        <Image alt="" height={180} src={quest.image} unoptimized width={240} />
+      </div>
+      <div className="supply-dashboard-quest-meta">
+        <span data-level={quest.difficulty}>{quest.difficulty}</span>
+        {quest.tags.map((tag) => (
+          <span key={tag}>{tag}</span>
+        ))}
+        <span>{quest.durationLabel}</span>
+      </div>
+      <button className="supply-dashboard-quest-reroll" type="button" aria-label={`更换任务：${quest.title}`}>
+        换
+      </button>
+      <span className="supply-dashboard-quest-state" data-complete={quest.completed}>
+        {quest.completed ? "✓" : "进行中"}
+      </span>
     </article>
   );
 }
 
 function DailyQuestPanel({ quests }: { quests: SupplyDashboardQuest[] }) {
+  const completedCount = quests.filter((quest) => quest.completed).length;
+
   return (
-    <section className="supply-dashboard-quest-panel" aria-label="任务记录">
-      <div className="supply-dashboard-section-heading">
-        <p>任务记录</p>
-        <strong>{quests.filter((quest) => quest.completed).length}/{quests.length}</strong>
+    <SupplyUiLabPixelPanel className="supply-dashboard-quest-panel" ariaLabel="今日主线">
+      <div className="supply-dashboard-quest-heading">
+        <div>
+          <span aria-hidden="true">⚑</span>
+          <h2>今日主线</h2>
+          <i aria-hidden="true">i</i>
+        </div>
+        <div className="supply-dashboard-quest-progress" aria-label={`任务进度 ${completedCount}/${quests.length}`}>
+          <strong>进度：{completedCount}/{quests.length}</strong>
+          <ol>
+            {quests.map((quest) => (
+              <li className={quest.completed ? "is-complete" : undefined} key={quest.id} />
+            ))}
+          </ol>
+        </div>
       </div>
       <div className="supply-dashboard-quest-list">
-        {quests.map((quest) => (
-          <QuestCard key={quest.id} quest={quest} />
+        {quests.map((quest, index) => (
+          <QuestCard index={index} key={quest.id} quest={quest} />
         ))}
       </div>
-    </section>
+      <div className="supply-dashboard-quest-footer">
+        <p>
+          完成全部任务可获得
+          <span>EXP 200</span>
+          <span>◎ 100</span>
+          <span>券 1</span>
+        </p>
+        <SupplyUiLabActionButton tone="primary">已领取</SupplyUiLabActionButton>
+      </div>
+    </SupplyUiLabPixelPanel>
   );
 }
 
 function DashboardShortcutDock({ data }: { data: SupplyDashboardPreview }) {
   return (
     <nav className="supply-dashboard-shortcut-dock" aria-label="快捷入口">
-      <a href="#inventory">
-        <Image
-          alt=""
-          aria-hidden="true"
-          height={112}
-          src={supplyDashboardAssetPaths.dockBackpack}
-          unoptimized
-          width={112}
-        />
-        <span>背包</span>
-        <strong>
-          {data.inventoryPreview.usedSlots}/{data.inventoryPreview.totalSlots}
-        </strong>
-      </a>
-      <a href="#supply">
-        <Image
-          alt=""
-          aria-hidden="true"
-          height={112}
-          src={supplyDashboardAssetPaths.dockSupplyMachine}
-          unoptimized
-          width={112}
-        />
-        <span>补给机</span>
-        <strong>
-          {data.supplyPreview.remainingDraws}/{data.supplyPreview.maxDraws}
-        </strong>
-      </a>
-      <a href="#quests">
-        <Image
-          alt=""
-          aria-hidden="true"
-          height={112}
-          src={supplyDashboardAssetPaths.dockTaskRecord}
-          unoptimized
-          width={112}
-        />
-        <span>任务记录</span>
-        <strong>{data.dailyQuests.length}</strong>
-      </a>
+      {data.shortcutLinks.map((shortcut) => (
+        <Link
+          className={`supply-dashboard-shortcut-card supply-dashboard-shortcut-card--${shortcut.id}`}
+          href={shortcut.href}
+          key={shortcut.id}
+        >
+          <span className="supply-dashboard-shortcut-icon" aria-hidden="true">
+            {shortcut.image ? (
+              <Image alt="" height={112} src={shortcut.image} unoptimized width={112} />
+            ) : (
+              <b>⌂</b>
+            )}
+          </span>
+          <span className="supply-dashboard-shortcut-copy">
+            <strong>{shortcut.title}</strong>
+            <small>{shortcut.subtitle}</small>
+          </span>
+          {shortcut.badge ? <em>{shortcut.badge}</em> : null}
+          <i aria-hidden="true">→</i>
+        </Link>
+      ))}
     </nav>
   );
 }
@@ -216,8 +212,13 @@ function DashboardShortcutDock({ data }: { data: SupplyDashboardPreview }) {
 function TeamAnnouncementBar({ message }: { message: string }) {
   return (
     <aside className="supply-dashboard-announcement" aria-label="团队公告">
-      <span aria-hidden="true">!</span>
+      <span aria-hidden="true">📣</span>
       <p>{message}</p>
+      <nav aria-label="补给站帮助入口">
+        <a href="#help">帮助中心</a>
+        <a href="#feedback">意见反馈</a>
+        <button type="button" aria-label="打开设置">⚙</button>
+      </nav>
     </aside>
   );
 }
@@ -241,14 +242,21 @@ export function SupplyDashboardScene({
       </div>
 
       <div className="supply-dashboard-content">
-        <GameTopBar data={data} />
-        <div className="supply-dashboard-main">
+        <SupplyUiLabTopBar
+          activeLabel="我的状态"
+          profile={{
+            username: data.profile.username,
+            avatar: data.profile.avatar,
+          }}
+          resources={getTopBarResources(data)}
+        />
+        <section className="supply-dashboard-stage" aria-label="我的状态原型舞台">
           <CharacterStatusPanel data={data} />
           <HeroCharacterStage data={data} />
           <DailyQuestPanel quests={data.dailyQuests} />
-        </div>
-        <DashboardShortcutDock data={data} />
-        <TeamAnnouncementBar message={data.announcement.message} />
+          <DashboardShortcutDock data={data} />
+          <TeamAnnouncementBar message={data.announcement.message} />
+        </section>
       </div>
     </main>
   );
