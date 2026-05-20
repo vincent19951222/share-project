@@ -10751,8 +10751,9 @@ body {
 .supply-draw-pool-wallet,
 .supply-draw-pool-guide,
 .supply-draw-pool-rates,
-.supply-draw-pool-pity,
+.supply-draw-pool-guarantee,
 .supply-draw-pool-rules,
+.supply-draw-pool-result,
 .supply-draw-pool-recent {
   min-height: 0;
   border-radius: 0;
@@ -10850,8 +10851,9 @@ body {
 
 .supply-draw-pool-guide .supply-ui-lab-panel-title,
 .supply-draw-pool-rates .supply-ui-lab-panel-title,
-.supply-draw-pool-pity .supply-ui-lab-panel-title,
-.supply-draw-pool-rules .supply-ui-lab-panel-title {
+.supply-draw-pool-guarantee .supply-ui-lab-panel-title,
+.supply-draw-pool-rules .supply-ui-lab-panel-title,
+.supply-draw-pool-result .supply-ui-lab-panel-title {
   grid-column: 1 / -1;
   font-size: clamp(0.9rem, 1.12vw, 1.08rem);
 }
@@ -11224,6 +11226,30 @@ body {
   background-image: url("/assets/home-scenes/supply/draw-pool/generated/draw-button-ten.png");
 }
 
+.supply-draw-pool-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+}
+
+.supply-draw-pool-ticket-shortage {
+  position: absolute;
+  left: 50%;
+  bottom: 5.9%;
+  z-index: 6;
+  transform: translateX(-50%);
+  width: fit-content;
+  margin: 0;
+  border: 2px solid #111827;
+  border-radius: 999px;
+  background: #fff7ed;
+  padding: 0.28rem 0.75rem;
+  color: #9a3412;
+  font-size: 0.8rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .supply-draw-pool-skip-toggle {
   position: absolute;
   left: 50%;
@@ -11262,49 +11288,41 @@ body {
   text-decoration: none;
 }
 
-.supply-draw-pool-pity,
+.supply-draw-pool-guarantee,
 .supply-draw-pool-rules {
   display: grid;
   align-content: start;
   gap: 0.44rem;
+  border-color: #111827;
   background: #fffef8;
   overflow: hidden;
 }
 
-.supply-draw-pool-pity p {
+.supply-draw-pool-guarantee p {
   margin: 0;
-  padding: 0.36rem;
-  border: 2px dashed rgba(17, 24, 39, 0.18);
-  text-align: center;
+  color: #1f2937;
   font-size: 0.86rem;
   font-weight: 900;
+  line-height: 1.55;
 }
 
-.supply-draw-pool-pity p strong {
-  font-size: 1.22rem;
+.supply-draw-pool-guarantee ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.36rem 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.supply-draw-pool-pity p span {
-  display: block;
-}
-
-.supply-draw-pool-pity img {
-  justify-self: center;
-  width: clamp(2.8rem, 4.5vw, 3.6rem);
-  height: clamp(2.8rem, 4.5vw, 3.6rem);
-  object-fit: contain;
-}
-
-.supply-draw-pool-pity .supply-ui-lab-progress {
-  gap: 0.22rem;
-}
-
-.supply-draw-pool-pity .supply-ui-lab-progress-label {
-  font-size: 0.72rem;
-}
-
-.supply-draw-pool-pity .supply-ui-lab-progress [role="progressbar"] {
-  height: 0.58rem;
+.supply-draw-pool-guarantee li {
+  border: 2px solid #111827;
+  border-radius: 999px;
+  background: #fde047;
+  padding: 0.22rem 0.55rem;
+  color: #111827;
+  font-size: 0.78rem;
+  font-weight: 900;
 }
 
 .supply-draw-pool-rules ol {
@@ -11354,6 +11372,41 @@ body {
   color: #111827;
   font-weight: 900;
   text-decoration: none;
+}
+
+.supply-draw-pool-result {
+  display: grid;
+  gap: 0.62rem;
+  background: #fffef8;
+}
+
+.supply-draw-pool-result > p {
+  margin: 0;
+  color: #1f2937;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.supply-draw-pool-result .supply-draw-pool-drop-list {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+
+.supply-draw-pool-result .supply-draw-pool-drop {
+  min-height: 4.4rem;
+}
+
+.supply-draw-pool-result .supply-draw-pool-drop img {
+  width: min(2.7rem, 62%);
+}
+
+.supply-draw-pool-result .supply-draw-pool-drop strong {
+  right: 0.2rem;
+  bottom: 1.42rem;
+  font-size: 0.76rem;
+}
+
+.supply-draw-pool-result .supply-draw-pool-drop p {
+  font-size: 0.62rem;
 }
 
 .supply-draw-pool-drop-list {

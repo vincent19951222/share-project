@@ -1,4 +1,11 @@
-import type { SupplyDrawPoolPreview } from "./types";
+import {
+  SUPPLY_UI_LAB_COIN_REWARD_ROWS,
+  supplyUiLabCatalog,
+  supplyUiLabCatalogBySourceItemId,
+} from "../supply-data/catalog";
+import { supplyUiLabResources } from "../supply-data/resources";
+import type { SupplyUiLabCatalogItem, SupplyUiLabCoinRewardRow } from "../supply-data/types";
+import type { SupplyDrawPoolPreview, SupplyDrawPoolRewardRow } from "./types";
 
 export const supplyDrawPoolAssetPaths = {
   logo: "/logo.png",
@@ -20,6 +27,28 @@ export const supplyDrawPoolAssetPaths = {
   },
 } as const;
 
+const coinRewardToDrawRow = (row: SupplyUiLabCoinRewardRow): SupplyDrawPoolRewardRow => ({
+  id: row.rewardId,
+  tier: "coin",
+  rarity: "N",
+  name: row.name,
+  quantityLabel: `银子 x${row.amount}`,
+  image: row.image,
+});
+
+const catalogItemToDrawRow = (item: SupplyUiLabCatalogItem): SupplyDrawPoolRewardRow => ({
+  id: item.sourceItemId,
+  tier: item.drawPool.tier,
+  rarity: item.rarity,
+  name: item.name,
+  quantityLabel: "x1",
+  image: item.media.image,
+});
+
+const coinRows = SUPPLY_UI_LAB_COIN_REWARD_ROWS.map(coinRewardToDrawRow);
+const catalogRows = supplyUiLabCatalog.map(catalogItemToDrawRow);
+const catalogRowById = Object.fromEntries(catalogRows.map((row) => [row.id, row])) as Record<string, SupplyDrawPoolRewardRow>;
+
 export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
   media: {
     background: supplyDrawPoolAssetPaths.background,
@@ -30,10 +59,7 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
     runningShoe: supplyDrawPoolAssetPaths.drawPool.runningShoe,
   },
   topBar: {
-    resources: [
-      { id: "ticket", label: "抽奖券", value: "18", icon: "券" },
-      { id: "coins", label: "银子", value: "2,450", icon: "◎" },
-    ],
+    resources: supplyUiLabResources.drawPool,
     closeHref: "/ui-lab/supply-dashboard",
   },
   wallet: {
@@ -41,7 +67,7 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
     ticketBalance: 18,
     dailyEarned: 18,
     dailyLimit: 30,
-    helper: "今日获取上限：18/30 张",
+    helper: "今日获取上限：18/30 张抽奖券",
     actions: [
       { id: "more-tickets", label: "获取更多抽奖券", tone: "primary" },
       { id: "tasks", label: "前往任务", tone: "secondary" },
@@ -49,43 +75,56 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
   },
   guide: {
     mascotImage: supplyDrawPoolAssetPaths.drawPool.guideMascot,
-    message: "完成任务拿抽奖券，抽道具、效果和补给券！",
+    message: "完成任务拿抽奖券，抽银子、道具和福利奖励！",
     actionLabel: "去完成",
   },
   poolRates: [
-    { rarity: "SSR", percent: 3, tone: "ssr" },
-    { rarity: "SR", percent: 17, tone: "sr" },
-    { rarity: "R", percent: 35, tone: "r" },
-    { rarity: "N", percent: 45, tone: "n" },
+    { tier: "coin", rarity: "银子", percent: 45, tone: "n" },
+    { tier: "utility", rarity: "实用", percent: 27, tone: "r" },
+    { tier: "social", rarity: "社交", percent: 24, tone: "sr" },
+    { tier: "rare", rarity: "稀有", percent: 4, tone: "ssr" },
   ],
   machine: {
     title: "补给抽卡机",
     emblemImage: supplyDrawPoolAssetPaths.cowLogo,
     skipAnimation: false,
     actions: [
-      { id: "single", label: "单抽", drawCount: 1, costTicket: 1, tone: "single" },
-      { id: "ten", label: "十连", drawCount: 10, costTicket: 10, tone: "ten", guaranteeLabel: "必出 SR 或以上" },
+      { id: "single", label: "单抽", drawCount: 1, costTicket: 1, tone: "single", guaranteeLabel: "单抽无保底" },
+      { id: "ten", label: "十连", drawCount: 10, costTicket: 10, tone: "ten", guaranteeLabel: "十连批次保底" },
     ],
   },
-  pity: {
-    remainingDraws: 22,
-    guaranteeLabel: "SR 或以上",
-    current: 48,
-    target: 70,
-    rewardImage: supplyDrawPoolAssetPaths.rewardIcons.ticket,
+  guarantee: {
+    title: "十连保底说明",
+    description: "单抽没有保底；十连批次如果自然结果没有实用、社交或稀有奖励，则补 1 个合格奖励。",
+    eligibleTiers: ["utility", "social", "rare"],
+    eligibleTierLabels: ["实用", "社交", "稀有"],
   },
   recentDrops: [
-    { id: "coins-200", rarity: "SSR", name: "银子", quantityLabel: "x200", image: supplyDrawPoolAssetPaths.rewardIcons.coins },
-    { id: "wristband", rarity: "SR", name: "运动护腕", quantityLabel: "x6", image: supplyDrawPoolAssetPaths.drawPool.wristband },
-    { id: "exp-card", rarity: "R", name: "经验加成券", quantityLabel: "x2", image: supplyDrawPoolAssetPaths.rewardIcons.exp },
-    { id: "coffee", rarity: "R", name: "咖啡兑换券", quantityLabel: "x1", image: supplyDrawPoolAssetPaths.rewardIcons.coffee },
-    { id: "running-shoe", rarity: "SR", name: "疾风跑鞋", quantityLabel: "x1", image: supplyDrawPoolAssetPaths.drawPool.runningShoe },
-    { id: "social", rarity: "R", name: "社交互动券", quantityLabel: "x1", image: supplyDrawPoolAssetPaths.rewardIcons.social },
+    coinRewardToDrawRow(SUPPLY_UI_LAB_COIN_REWARD_ROWS[5]),
+    catalogRowById.double_niuma_coupon,
+    catalogRowById.team_broadcast_coupon,
+    coinRewardToDrawRow(SUPPLY_UI_LAB_COIN_REWARD_ROWS[2]),
+    catalogRowById.luckin_coffee_coupon,
+    catalogRowById.drink_water_ping,
   ],
+  singleDrawResult: [coinRewardToDrawRow(SUPPLY_UI_LAB_COIN_REWARD_ROWS[2])],
+  tenDrawResult: [
+    coinRows[0],
+    coinRows[1],
+    catalogItemToDrawRow(supplyUiLabCatalogBySourceItemId.drink_water_ping),
+    coinRows[2],
+    catalogItemToDrawRow(supplyUiLabCatalogBySourceItemId.walk_ping),
+    coinRows[3],
+    catalogItemToDrawRow(supplyUiLabCatalogBySourceItemId.task_reroll_coupon),
+    catalogItemToDrawRow(supplyUiLabCatalogBySourceItemId.team_broadcast_coupon),
+    coinRows[4],
+    catalogItemToDrawRow(supplyUiLabCatalogBySourceItemId.luckin_coffee_coupon),
+  ],
+  emptyDrawMessage: "抽奖券不足，先完成任务获取更多抽奖券。",
   rules: [
-    "消耗抽奖券进行抽取，随机获得道具、效果或补给券。",
-    "十连抽必出 SR 或以上奖励。",
-    "抽奖券可通过完成任务获得。",
+    "消耗抽奖券进行抽取，随机获得银子、实用道具、社交道具或稀有奖励。",
+    "单抽没有保底。",
+    "十连批次如果自然十连没有实用、社交或稀有奖励，则补 1 个合格奖励。",
   ],
   probabilityHref: "/docs?tab=rules#supply-station-probability",
   recordsHref: "/ui-lab/supply-dashboard/task-record",

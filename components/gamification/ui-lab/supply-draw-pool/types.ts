@@ -1,13 +1,12 @@
-export type SupplyDrawPoolResourceId = "ticket" | "coins";
-export type SupplyDrawPoolActionId = "single" | "ten";
-export type SupplyDrawPoolRarity = "SSR" | "SR" | "R" | "N";
+import type {
+  SupplyUiLabCatalogRarity,
+  SupplyUiLabDrawTier,
+  SupplyUiLabResource,
+} from "../supply-data/types";
 
-export type SupplyDrawPoolResource = {
-  id: SupplyDrawPoolResourceId;
-  label: string;
-  value: string;
-  icon: string;
-};
+export type SupplyDrawPoolActionId = "single" | "ten";
+export type SupplyDrawPoolRateTier = "coin" | SupplyUiLabDrawTier;
+export type SupplyDrawPoolRarity = SupplyUiLabCatalogRarity;
 
 export type SupplyDrawPoolWalletAction = {
   id: "more-tickets" | "tasks";
@@ -31,7 +30,8 @@ export type SupplyDrawPoolGuide = {
 };
 
 export type SupplyDrawPoolRate = {
-  rarity: SupplyDrawPoolRarity;
+  tier: SupplyDrawPoolRateTier;
+  rarity: "银子" | "实用" | "社交" | "稀有";
   percent: number;
   tone: "ssr" | "sr" | "r" | "n";
 };
@@ -42,7 +42,7 @@ export type SupplyDrawPoolMachineAction = {
   drawCount: number;
   costTicket: number;
   tone: "single" | "ten";
-  guaranteeLabel?: string;
+  guaranteeLabel: "单抽无保底" | "十连批次保底";
 };
 
 export type SupplyDrawPoolMachine = {
@@ -52,16 +52,16 @@ export type SupplyDrawPoolMachine = {
   actions: SupplyDrawPoolMachineAction[];
 };
 
-export type SupplyDrawPoolPity = {
-  remainingDraws: number;
-  guaranteeLabel: string;
-  current: number;
-  target: number;
-  rewardImage: string;
+export type SupplyDrawPoolGuarantee = {
+  title: "十连保底说明";
+  description: string;
+  eligibleTiers: SupplyUiLabDrawTier[];
+  eligibleTierLabels: Array<"实用" | "社交" | "稀有">;
 };
 
-export type SupplyDrawPoolRecentDrop = {
+export type SupplyDrawPoolRewardRow = {
   id: string;
+  tier: SupplyDrawPoolRateTier;
   rarity: SupplyDrawPoolRarity;
   name: string;
   quantityLabel: string;
@@ -78,15 +78,18 @@ export type SupplyDrawPoolPreview = {
     runningShoe: string;
   };
   topBar: {
-    resources: SupplyDrawPoolResource[];
+    resources: SupplyUiLabResource[];
     closeHref: string;
   };
   wallet: SupplyDrawPoolWallet;
   guide: SupplyDrawPoolGuide;
   poolRates: SupplyDrawPoolRate[];
   machine: SupplyDrawPoolMachine;
-  pity: SupplyDrawPoolPity;
-  recentDrops: SupplyDrawPoolRecentDrop[];
+  guarantee: SupplyDrawPoolGuarantee;
+  recentDrops: SupplyDrawPoolRewardRow[];
+  singleDrawResult: SupplyDrawPoolRewardRow[];
+  tenDrawResult: SupplyDrawPoolRewardRow[];
+  emptyDrawMessage: string;
   rules: string[];
   probabilityHref: string;
   recordsHref: string;

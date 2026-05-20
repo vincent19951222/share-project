@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, statSync } from "fs";
 import { describe, expect, it } from "vitest";
-import { supplyDrawPoolAssetPaths } from "@/components/gamification/ui-lab/supply-draw-pool/mock-data";
+import { supplyDrawPoolAssetPaths, supplyDrawPoolMock } from "@/components/gamification/ui-lab/supply-draw-pool/mock-data";
 
 const requiredDrawPoolAssets = [
   ["draw-pool-machine.png", 1600 * 1024],
@@ -42,6 +42,18 @@ describe("supply draw pool static assets", () => {
     expect(existsSync(publicPath(supplyDrawPoolAssetPaths.cowLogo))).toBe(true);
 
     for (const src of Object.values(supplyDrawPoolAssetPaths.rewardIcons)) {
+      expect(existsSync(publicPath(src)), `${src} should exist`).toBe(true);
+    }
+  });
+
+  it("references existing assets for recent drops and local draw results", () => {
+    const resultSources = [
+      ...supplyDrawPoolMock.recentDrops.map((drop) => drop.image),
+      ...supplyDrawPoolMock.singleDrawResult.map((result) => result.image),
+      ...supplyDrawPoolMock.tenDrawResult.map((result) => result.image),
+    ];
+
+    for (const src of resultSources) {
       expect(existsSync(publicPath(src)), `${src} should exist`).toBe(true);
     }
   });
