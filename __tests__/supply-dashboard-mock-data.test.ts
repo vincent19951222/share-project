@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { supplyUiLabActiveEffects } from "@/components/gamification/ui-lab/supply-data/effects";
 import { supplyDashboardAssetPaths, supplyDashboardMock } from "@/components/gamification/ui-lab/supply-dashboard/mock-data";
 
 describe("supply dashboard mock data", () => {
@@ -6,11 +7,21 @@ describe("supply dashboard mock data", () => {
     expect(supplyDashboardMock.dailyQuests).toHaveLength(4);
     expect(supplyDashboardMock.dailyQuests.filter((quest) => quest.completed)).toHaveLength(3);
     expect(supplyDashboardMock.dailyQuests.some((quest) => !quest.completed)).toBe(true);
-    expect(supplyDashboardMock.resources.some((resource) => resource.maxValue !== undefined)).toBe(true);
+    expect(supplyDashboardMock.resources.map((resource) => resource.label)).toEqual(["银子", "抽奖券", "背包"]);
+    expect(supplyDashboardMock.resources.map((resource) => resource.id)).toEqual(["coins", "ticket", "backpack"]);
     expect(supplyDashboardMock.inventoryPreview.usedSlots).toBe(18);
-    expect(supplyDashboardMock.inventoryPreview.totalSlots).toBe(40);
+    expect(supplyDashboardMock.inventoryPreview.totalSlots).toBe(60);
     expect(supplyDashboardMock.supplyPreview.remainingDraws).toBe(999);
-    expect(supplyDashboardMock.activeEffects.every((effect) => effect.expiresIn.length > 0)).toBe(true);
+    expect(supplyDashboardMock.profile.totalExp).toBe(27_720);
+    expect(supplyDashboardMock.profile.level).toBe(28);
+    expect(supplyDashboardMock.profile.currentLevelExp).toBe(720);
+    expect(supplyDashboardMock.profile.nextLevelExp).toBe(1000);
+    expect(supplyDashboardMock.activeEffects).toBe(supplyUiLabActiveEffects);
+    expect(supplyDashboardMock.activeEffects).toHaveLength(2);
+    expect(supplyDashboardMock.activeEffects.every((effect) => effect.endsAtLabel === "今日 23:59")).toBe(true);
+    expect(JSON.stringify(supplyDashboardMock)).not.toContain("补给券");
+    expect(JSON.stringify(supplyDashboardMock)).not.toContain("生命票");
+    expect(JSON.stringify(supplyDashboardMock)).not.toContain("体力");
   });
 
   it("uses atomic art assets instead of cropped UI panel screenshots", () => {

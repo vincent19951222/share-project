@@ -76,7 +76,7 @@ describe("supply dashboard scene CSS", () => {
     expect(content).toMatch(/position:\s*relative/);
     expect(content).toMatch(/z-index:\s*1/);
     expect(content).toMatch(/min-width:\s*1280px/);
-    expect(content).toMatch(/padding:\s*0/);
+    expect(content).toMatch(/padding:\s*var\(--supply-ui-lab-topbar-height\)\s*0\s*0/);
     expect(stage).toMatch(/position:\s*relative/);
     expect(stage).toMatch(/aspect-ratio:\s*1536\s*\/\s*946/);
     expect(dashboardCss).toMatch(/\.supply-dashboard-status-panel\s*{[\s\S]*left:\s*0\.52%/);

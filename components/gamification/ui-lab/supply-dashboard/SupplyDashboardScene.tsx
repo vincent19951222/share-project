@@ -1,9 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 import { supplyDashboardAssetPaths } from "./mock-data";
 import {
-  SupplyUiLabActionButton,
   SupplyUiLabPixelPanel,
   SupplyUiLabProgress,
 } from "./SupplyUiLabPrimitives";
@@ -44,10 +46,10 @@ function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
       </div>
 
       <div className="supply-dashboard-title-card">
-        <span>称号</span>
+        <span>称号 / 牛马等级</span>
         <strong>
           {data.profile.title}
-          <b aria-hidden="true">◎</b>
+          <b>Lv.{data.profile.level}</b>
         </strong>
       </div>
 
@@ -58,12 +60,14 @@ function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
         <div className="supply-dashboard-effect-list">
           {data.activeEffects.map((effect) => (
             <article className="supply-dashboard-effect-card" data-effect={effect.id} key={effect.id}>
-              <span aria-hidden="true">{effect.icon}</span>
+              <span aria-hidden="true">效</span>
               <div>
-                <strong>
-                  {effect.label} {effect.value}
-                </strong>
-                <time>{effect.expiresIn}</time>
+                <strong>{effect.label}</strong>
+                <small>{effect.businessSource}</small>
+                <p>{effect.effectSummary}</p>
+                <time>
+                  {effect.statusLabel} · {effect.endsAtLabel}
+                </time>
               </div>
             </article>
           ))}
@@ -83,7 +87,7 @@ function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
 }
 
 function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
-  const remainingExp = data.profile.nextLevelExp - data.profile.exp;
+  const remainingExp = data.profile.nextLevelExp - data.profile.currentLevelExp;
 
   return (
     <section className="supply-dashboard-hero-stage" aria-label="补给站主视觉">
@@ -103,7 +107,7 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
       <div className="supply-dashboard-hero-status" aria-label="等级经验">
         <strong>Lv.{data.profile.level}</strong>
         <div className="supply-dashboard-hero-progress">
-          <SupplyUiLabProgress current={data.profile.exp} label="等级经验" max={data.profile.nextLevelExp} />
+          <SupplyUiLabProgress current={data.profile.currentLevelExp} label="等级经验" max={data.profile.nextLevelExp} />
         </div>
         <p>距离升级还差 {remainingExp} EXP</p>
         <b aria-hidden="true">◎</b>
@@ -112,7 +116,15 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
   );
 }
 
-function QuestCard({ quest, index }: { quest: SupplyDashboardQuest; index: number }) {
+function QuestCard({
+  index,
+  onReroll,
+  quest,
+}: {
+  index: number;
+  onReroll: (questTitle: string) => void;
+  quest: SupplyDashboardQuest;
+}) {
   return (
     <article
       className={`supply-dashboard-quest-card supply-dashboard-quest-card--${index + 1}`}
@@ -133,7 +145,12 @@ function QuestCard({ quest, index }: { quest: SupplyDashboardQuest; index: numbe
         ))}
         <span>{quest.durationLabel}</span>
       </div>
-      <button className="supply-dashboard-quest-reroll" type="button" aria-label={`更换任务：${quest.title}`}>
+      <button
+        className="supply-dashboard-quest-reroll"
+        onClick={() => onReroll(quest.title)}
+        type="button"
+        aria-label={`更换任务：${quest.title}`}
+      >
         换
       </button>
       <span className="supply-dashboard-quest-state" data-complete={quest.completed}>
@@ -143,7 +160,15 @@ function QuestCard({ quest, index }: { quest: SupplyDashboardQuest; index: numbe
   );
 }
 
-function DailyQuestPanel({ quests }: { quests: SupplyDashboardQuest[] }) {
+function DailyQuestPanel({
+  onClaimRewards,
+  onRerollQuest,
+  quests,
+}: {
+  onClaimRewards: () => void;
+  onRerollQuest: (questTitle: string) => void;
+  quests: SupplyDashboardQuest[];
+}) {
   const completedCount = quests.filter((quest) => quest.completed).length;
 
   return (
@@ -165,7 +190,7 @@ function DailyQuestPanel({ quests }: { quests: SupplyDashboardQuest[] }) {
       </div>
       <div className="supply-dashboard-quest-list">
         {quests.map((quest, index) => (
-          <QuestCard index={index} key={quest.id} quest={quest} />
+          <QuestCard index={index} key={quest.id} onReroll={onRerollQuest} quest={quest} />
         ))}
       </div>
       <div className="supply-dashboard-quest-footer">
@@ -173,9 +198,15 @@ function DailyQuestPanel({ quests }: { quests: SupplyDashboardQuest[] }) {
           完成全部任务可获得
           <span>EXP 200</span>
           <span>◎ 100</span>
-          <span>券 1</span>
+          <span>抽奖券 1</span>
         </p>
-        <SupplyUiLabActionButton tone="primary">已领取</SupplyUiLabActionButton>
+        <button
+          className="supply-ui-lab-action supply-ui-lab-action--primary"
+          onClick={onClaimRewards}
+          type="button"
+        >
+          领取奖励
+        </button>
       </div>
     </SupplyUiLabPixelPanel>
   );
@@ -214,11 +245,6 @@ function TeamAnnouncementBar({ message }: { message: string }) {
     <aside className="supply-dashboard-announcement" aria-label="团队公告">
       <span aria-hidden="true">📣</span>
       <p>{message}</p>
-      <nav aria-label="补给站帮助入口">
-        <a href="#help">帮助中心</a>
-        <a href="#feedback">意见反馈</a>
-        <button type="button" aria-label="打开设置">⚙</button>
-      </nav>
     </aside>
   );
 }
@@ -228,6 +254,16 @@ export function SupplyDashboardScene({
 }: {
   data: SupplyDashboardPreview;
 }) {
+  const [feedbackMessage, setFeedbackMessage] = useState("本地预览：任务换班和奖励领取不会写入后端。");
+
+  function handleRerollQuest(questTitle: string) {
+    setFeedbackMessage(`已触发换班预览：${questTitle}。mock 数据保持不变。`);
+  }
+
+  function handleClaimRewards() {
+    setFeedbackMessage("奖励领取预览：EXP、银子和抽奖券只展示反馈，不写入后端。");
+  }
+
   return (
     <main className="supply-dashboard-scene" aria-label="牛马补给站 Dashboard UI Lab">
       <div className="supply-dashboard-background" aria-hidden="true">
@@ -253,7 +289,14 @@ export function SupplyDashboardScene({
         <section className="supply-dashboard-stage" aria-label="我的状态原型舞台">
           <CharacterStatusPanel data={data} />
           <HeroCharacterStage data={data} />
-          <DailyQuestPanel quests={data.dailyQuests} />
+          <DailyQuestPanel
+            onClaimRewards={handleClaimRewards}
+            onRerollQuest={handleRerollQuest}
+            quests={data.dailyQuests}
+          />
+          <p aria-live="polite" className="supply-dashboard-local-feedback" data-dashboard-feedback>
+            {feedbackMessage}
+          </p>
           <DashboardShortcutDock data={data} />
           <TeamAnnouncementBar message={data.announcement.message} />
         </section>

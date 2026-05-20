@@ -1,13 +1,16 @@
-export type SupplyShopCurrency = "coins" | "ticket";
-export type SupplyShopRarity = "common" | "rare" | "sr" | "ssr";
-export type SupplyShopCategoryId = "featured" | "boost" | "task" | "social" | "real" | "cosmetic";
+import type {
+  SupplyUiLabCatalogCategory,
+  SupplyUiLabCatalogRarity,
+  SupplyUiLabResource,
+  SupplyUiLabUseTiming,
+} from "../supply-data/types";
 
-export type SupplyShopResource = {
-  id: "coins" | "ticket" | "backpack";
-  label: string;
-  value: string;
-  icon: string;
-};
+export type SupplyShopCurrency = "coins";
+export type SupplyShopRarity = SupplyUiLabCatalogRarity;
+export type SupplyShopCategoryId = "all" | SupplyUiLabCatalogCategory;
+export type SupplyShopFilterId = "all" | "redeemable" | "owned" | "admin";
+
+export type SupplyShopResource = SupplyUiLabResource;
 
 export type SupplyShopCategory = {
   id: SupplyShopCategoryId;
@@ -17,7 +20,7 @@ export type SupplyShopCategory = {
 };
 
 export type SupplyShopFilter = {
-  id: "all" | "redeemable" | "owned";
+  id: SupplyShopFilterId;
   label: string;
   active: boolean;
 };
@@ -26,7 +29,8 @@ export type SupplyShopProduct = {
   id: string;
   name: string;
   subtitle: string;
-  categoryId: SupplyShopCategoryId;
+  categoryId: Exclude<SupplyShopCategoryId, "all">;
+  categoryLabel: string;
   image: string;
   rarity: SupplyShopRarity;
   tags: string[];
@@ -35,16 +39,8 @@ export type SupplyShopProduct = {
     amount: number;
   };
   ownedQuantity: number;
-  stock?: {
-    label: string;
-    remaining: number;
-    total: number;
-  };
-  dailyLimit?: {
-    label: string;
-    used: number;
-    total: number;
-  };
+  sourceLabel: string;
+  limitLabel: string;
   requiresAdminConfirmation: boolean;
   selected: boolean;
 };
@@ -54,11 +50,15 @@ export type SupplyShopProductDetail = {
   description: string;
   effect: string;
   useTiming: string;
+  useTimingId: SupplyUiLabUseTiming;
   purchaseLimit: string;
   costLabel: string;
+  sourceLabel: string;
+  ownedLabel: string;
+  adminConfirmationLabel: string | null;
   footnote: string;
-  redeemDisabled: boolean;
-  redeemDisabledReason: string;
+  redeemLabel: string;
+  redeemFeedback: string;
 };
 
 export type SupplyShopPreview = {
@@ -77,6 +77,9 @@ export type SupplyShopPreview = {
   sortOptions: string[];
   selectedSort: string;
   products: SupplyShopProduct[];
+  productDetails: SupplyShopProductDetail[];
   selectedProductDetail: SupplyShopProductDetail;
   notice: string;
+  rules: string[];
+  initialFeedback: string;
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import type { PropsWithChildren, ReactNode } from "react";
 
 export type SupplyUiLabPanelTone = "paper" | "yellow" | "dark";
@@ -31,12 +33,14 @@ export function SupplyUiLabActionButton({
   children,
   className = "",
   disabled = false,
+  onClick,
   tone = "primary",
   type = "button",
 }: PropsWithChildren<{
   ariaLabel?: string;
   className?: string;
   disabled?: boolean;
+  onClick?: () => void;
   tone?: "primary" | "secondary" | "ghost" | "danger";
   type?: "button" | "submit" | "reset";
 }>) {
@@ -45,6 +49,7 @@ export function SupplyUiLabActionButton({
       aria-label={ariaLabel}
       className={`supply-ui-lab-action supply-ui-lab-action--${tone} ${className}`.trim()}
       disabled={disabled}
+      onClick={onClick}
       type={type}
     >
       {children}

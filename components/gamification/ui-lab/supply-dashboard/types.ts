@@ -1,18 +1,17 @@
+import type {
+  SupplyUiLabActiveEffect,
+  SupplyUiLabResourceId,
+} from "../supply-data/types";
+
 export type SupplyDashboardResource = {
-  id: "coins" | "energy" | "ticket";
+  id: SupplyUiLabResourceId;
   label: string;
   value: number;
   maxValue?: number;
   icon: string;
 };
 
-export type SupplyDashboardEffect = {
-  id: string;
-  icon: string;
-  label: string;
-  value: string;
-  expiresIn: string;
-};
+export type SupplyDashboardActiveEffect = SupplyUiLabActiveEffect;
 
 export type SupplyDashboardQuest = {
   id: string;
@@ -53,13 +52,14 @@ export type SupplyDashboardPreview = {
     avatar: string;
     title: string;
     level: number;
-    exp: number;
+    totalExp: number;
+    currentLevelExp: number;
     nextLevelExp: number;
     streakDays: number;
   };
   motto: string;
   resources: SupplyDashboardResource[];
-  activeEffects: SupplyDashboardEffect[];
+  activeEffects: SupplyDashboardActiveEffect[];
   dailyQuests: SupplyDashboardQuest[];
   shortcutLinks: SupplyDashboardShortcutLink[];
   inventoryPreview: {

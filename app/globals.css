@@ -9176,8 +9176,9 @@ body {
 
 .supply-shop-notice {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
+  flex-direction: column;
   gap: 0.75rem;
   border: 2px solid #e2c98e;
   background: #fff3cd;
@@ -9191,10 +9192,37 @@ body {
   font-weight: 900;
 }
 
-.supply-shop-notice a {
-  flex: 0 0 auto;
-  color: #111827;
-  font-weight: 1000;
+.supply-shop-catalog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.supply-shop-rules-toggle,
+.supply-shop-inline-redeem {
+  border: 2px solid #1f2937;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  box-shadow: 2px 2px 0 #1f2937;
+  color: #1f2937;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 0.45rem 0.7rem;
+}
+
+.supply-shop-inline-redeem {
+  background: #fde047;
+}
+
+.supply-shop-rules-panel {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: rgba(31, 41, 55, 0.82);
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .supply-shop-detail-card {
@@ -9258,6 +9286,24 @@ body {
   font-size: 0.9rem;
   font-weight: 850;
   line-height: 1.45;
+}
+
+.supply-shop-admin-note,
+.supply-shop-action-feedback {
+  margin: 0;
+  border: 2px solid rgba(31, 41, 55, 0.9);
+  border-radius: 0.6rem;
+  background: #fef3c7;
+  box-shadow: 2px 2px 0 rgba(31, 41, 55, 0.9);
+  color: #1f2937;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1.45;
+  padding: 0.65rem 0.75rem;
+}
+
+.supply-shop-action-feedback {
+  background: #dcfce7;
 }
 
 .supply-shop-detail-rules {

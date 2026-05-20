@@ -1,4 +1,6 @@
-import type { SupplyDashboardPreview } from "./types";
+import { supplyUiLabActiveEffects } from "../supply-data/effects";
+import { supplyUiLabResources } from "../supply-data/resources";
+import type { SupplyDashboardPreview, SupplyDashboardResource } from "./types";
 
 export const supplyDashboardAssetPaths = {
   background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
@@ -20,61 +22,32 @@ export const supplyDashboardAssetPaths = {
   },
 } as const;
 
+function toDashboardResource(resource: { id: string; label: string; value: string; icon: string }): SupplyDashboardResource {
+  const [currentValue, maxValue] = resource.value.split("/");
+
+  return {
+    id: resource.id as SupplyDashboardResource["id"],
+    label: resource.label,
+    value: Number(currentValue.replace(/,/g, "")),
+    maxValue: maxValue === undefined ? undefined : Number(maxValue.replace(/,/g, "")),
+    icon: resource.icon,
+  };
+}
+
 export const supplyDashboardMock: SupplyDashboardPreview = {
   profile: {
     username: "Vincent",
     avatar: "/avatars/male1.png",
     title: "自律牛马",
     level: 28,
-    exp: 720,
+    totalExp: 27720,
+    currentLevelExp: 720,
     nextLevelExp: 1000,
     streakDays: 18,
   },
   motto: "不是在健身，就是在去健身的路上！",
-  resources: [
-    {
-      id: "coins",
-      label: "银子",
-      value: 2450,
-      icon: "🪙",
-    },
-    {
-      id: "energy",
-      label: "体力",
-      value: 18,
-      maxValue: 100,
-      icon: "⚡",
-    },
-    {
-      id: "ticket",
-      label: "补给券",
-      value: 18,
-      icon: "🎟",
-    },
-  ],
-  activeEffects: [
-    {
-      id: "exp",
-      icon: "EXP",
-      label: "经验获取",
-      value: "+20%",
-      expiresIn: "02:35:18",
-    },
-    {
-      id: "hp",
-      icon: "❤",
-      label: "体力上限",
-      value: "+10",
-      expiresIn: "02:35:18",
-    },
-    {
-      id: "steps",
-      icon: "👟",
-      label: "步数加成",
-      value: "+15%",
-      expiresIn: "02:35:18",
-    },
-  ],
+  resources: supplyUiLabResources.dashboard.map(toDashboardResource),
+  activeEffects: supplyUiLabActiveEffects,
   dailyQuests: [
     {
       id: "hydration",
@@ -119,8 +92,8 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
       durationLabel: "3天",
       completed: true,
       reward: {
-        icon: "🎟",
-        label: "券",
+        icon: "券",
+        label: "抽奖券",
         amount: 1,
       },
     },
@@ -155,14 +128,14 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
       href: "/ui-lab/supply-dashboard/backpack",
       title: "背包",
       subtitle: "查看全部道具",
-      badge: "18/40",
+      badge: "18/60",
       image: supplyDashboardAssetPaths.dockBackpack,
     },
     {
       id: "draw-pool",
       href: "/ui-lab/supply-dashboard/draw-pool",
       title: "补给站",
-      subtitle: "随机获取道具，效果或补给券！",
+      subtitle: "随机获取道具、银子或真实福利！",
       badge: "999/999",
       image: supplyDashboardAssetPaths.dockSupplyMachine,
     },
@@ -177,7 +150,7 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
   ],
   inventoryPreview: {
     usedSlots: 18,
-    totalSlots: 40,
+    totalSlots: 60,
     items: [
       {
         id: "water",
@@ -205,8 +178,8 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
     featuredRewards: [
       {
         id: "ticket",
-        name: "补给券",
-        icon: "🎟",
+        name: "抽奖券",
+        icon: "券",
         quantity: 1,
       },
       {

@@ -48,11 +48,25 @@ describe("supply dashboard static scene", () => {
         ?.textContent,
     ).toContain("团队目标");
     expect(container.querySelector(".supply-ui-lab-user-menu")).not.toBeNull();
-    expect(container.querySelector(".supply-ui-lab-resource--energy")?.textContent).toContain("18/100");
+    expect(container.querySelector(".supply-ui-lab-resource--coins")?.textContent).toContain("银子");
+    expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
+    expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
     expect(container.querySelector(".supply-dashboard-status-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-status-panel.supply-ui-lab-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-title-card")).not.toBeNull();
-    expect(container.querySelectorAll(".supply-dashboard-effect-card")).toHaveLength(3);
+    expect(container.querySelectorAll(".supply-dashboard-effect-card")).toHaveLength(2);
+    expect(container.textContent).toContain("牛马等级");
+    expect(container.textContent).toContain("今日待生效");
+    expect(container.textContent).toContain("今日已生效");
+    expect(container.textContent).toContain("今日 23:59");
+    expect(container.textContent).not.toContain("补给券");
+    expect(container.textContent).not.toContain("生命票");
+    expect(container.textContent).not.toContain("体力");
+    expect(container.textContent).not.toContain("帮助中心");
+    expect(container.textContent).not.toContain("意见反馈");
+    expect(container.textContent).not.toContain("设置");
+    expect(container.querySelector('a[href="#help"]')).toBeNull();
+    expect(container.querySelector('a[href="#feedback"]')).toBeNull();
     expect(container.querySelector(".supply-dashboard-streak-card")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-image")).not.toBeNull();
@@ -97,5 +111,34 @@ describe("supply dashboard static scene", () => {
       ]),
     );
     expect(imageSources.join("\n")).not.toMatch(/dashboard-(status|hero|quests|shortcut|announcement)-panel/);
+  });
+
+  it("shows local mock feedback for reroll and reward claim actions", async () => {
+    await act(async () => {
+      root.render(<SupplyDashboardScene data={supplyDashboardMock} />);
+    });
+
+    const feedback = container.querySelector("[data-dashboard-feedback]");
+    expect(feedback?.textContent).toContain("本地预览");
+
+    const rerollButton = container.querySelector<HTMLButtonElement>(".supply-dashboard-quest-reroll");
+    expect(rerollButton).not.toBeNull();
+
+    await act(async () => {
+      rerollButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("已触发换班预览");
+
+    const claimButton = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find((button) =>
+      button.textContent?.includes("领取奖励"),
+    );
+    expect(claimButton).toBeDefined();
+
+    await act(async () => {
+      claimButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("奖励领取预览");
   });
 });

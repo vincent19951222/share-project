@@ -1,224 +1,161 @@
-import type { SupplyShopPreview } from "./types";
+import { supplyUiLabCatalog } from "../supply-data/catalog";
+import { supplyUiLabResources } from "../supply-data/resources";
+import type { SupplyUiLabCatalogCategory, SupplyUiLabUseTiming } from "../supply-data/types";
+import type {
+  SupplyShopCategory,
+  SupplyShopCategoryId,
+  SupplyShopFilter,
+  SupplyShopPreview,
+  SupplyShopProduct,
+  SupplyShopProductDetail,
+  SupplyShopRarity,
+} from "./types";
 
 export const supplyShopAssetPaths = {
   profileAvatar: "/avatars/male1.png",
-  rewardIcons: {
-    coins: "/gamification/rewards/icons/coins_020.png",
-    taskReroll: "/gamification/rewards/icons/task_reroll_coupon.png",
-    boost: "/gamification/rewards/icons/small_boost_coupon.png",
-    social: "/gamification/rewards/icons/team_broadcast_coupon.png",
-    coffee: "/gamification/rewards/icons/luckin_coffee_coupon.png",
-  },
-  shopItems: {
-    learningPass: "/assets/home-scenes/supply/shop/shop-learning-pass.webp",
-    energyBottle: "/assets/home-scenes/supply/shop/shop-energy-bottle.webp",
-    trainingLog: "/assets/home-scenes/supply/shop/shop-training-log.webp",
-    lightMeal: "/assets/home-scenes/supply/shop/shop-light-meal.webp",
-    avatarFrame: "/assets/home-scenes/supply/shop/shop-avatar-frame.webp",
-    titleBadge: "/assets/home-scenes/supply/shop/shop-title-badge.webp",
-    fitnessOutfit: "/assets/home-scenes/supply/shop/shop-fitness-outfit.webp",
-  },
 } as const;
+
+const categoryMeta: Record<SupplyShopCategoryId, { label: string; icon: string }> = {
+  all: { label: "全部商品", icon: "▦" },
+  boost: { label: "增益道具", icon: "▲" },
+  protection: { label: "防护道具", icon: "◆" },
+  social: { label: "社交道具", icon: "✦" },
+  task: { label: "任务道具", icon: "▣" },
+  real_world: { label: "真实福利", icon: "★" },
+};
+
+const categoryOrder: SupplyShopCategoryId[] = ["all", "boost", "protection", "task", "social", "real_world"];
+
+const categoryTagLabel: Record<SupplyUiLabCatalogCategory, string> = {
+  boost: "增益",
+  protection: "防护",
+  social: "社交",
+  task: "任务",
+  real_world: "真实福利",
+};
+
+const rarityTagLabel: Record<SupplyShopRarity, string> = {
+  N: "N",
+  R: "R",
+  SR: "SR",
+  SSR: "SSR",
+};
+
+const useTimingLabel: Record<SupplyUiLabUseTiming, string> = {
+  today: "今日生效，可在当天结算前使用",
+  instant: "立即生效，兑换后进入背包预览",
+  manual_redemption: "提交申请后等待管理员确认",
+};
+
+function formatLimit(item: (typeof supplyUiLabCatalog)[number]) {
+  if (item.shop.dailyLimit !== undefined) {
+    return `每日限购 ${item.shop.dailyLimit} 次`;
+  }
+
+  if (item.shop.weeklyLimit !== undefined) {
+    return `每周限购 ${item.shop.weeklyLimit} 次`;
+  }
+
+  return "不限购";
+}
+
+function buildProduct(item: (typeof supplyUiLabCatalog)[number], index: number): SupplyShopProduct {
+  const categoryLabel = categoryTagLabel[item.category];
+  const limitLabel = formatLimit(item);
+
+  return {
+    id: item.sourceItemId,
+    name: item.name,
+    subtitle: item.effectSummary,
+    categoryId: item.category,
+    categoryLabel,
+    image: item.media.image,
+    rarity: item.rarity,
+    tags: [
+      rarityTagLabel[item.rarity],
+      categoryLabel,
+      limitLabel,
+      ...(item.shop.requiresAdminConfirmation ? ["需要管理员确认"] : []),
+    ],
+    price: {
+      currency: "coins",
+      amount: item.shop.priceCoins,
+    },
+    ownedQuantity: item.inventory.quantity,
+    sourceLabel: "来源：抽卡池 / 商店",
+    limitLabel,
+    requiresAdminConfirmation: item.shop.requiresAdminConfirmation,
+    selected: index === 0,
+  };
+}
+
+function buildProductDetail(item: (typeof supplyUiLabCatalog)[number]): SupplyShopProductDetail {
+  const adminConfirmationLabel = item.shop.requiresAdminConfirmation
+    ? "真实福利：兑换后进入管理员确认流程"
+    : null;
+
+  return {
+    productId: item.sourceItemId,
+    description: item.description,
+    effect: item.effectSummary,
+    useTiming: useTimingLabel[item.useTiming],
+    useTimingId: item.useTiming,
+    purchaseLimit: formatLimit(item),
+    costLabel: `银子 ${item.shop.priceCoins}`,
+    sourceLabel: "来源：抽卡池 / 商店",
+    ownedLabel: `持有 ${item.inventory.quantity}`,
+    adminConfirmationLabel,
+    footnote: item.shop.requiresAdminConfirmation
+      ? "真实福利不会直接发放到背包，本页只展示提交后的本地状态。"
+      : "虚拟道具兑换后会展示本地加入背包反馈，刷新后不会保留。",
+    redeemLabel: item.shop.requiresAdminConfirmation ? "申请兑换" : `兑换 ${item.name}`,
+    redeemFeedback: item.shop.requiresAdminConfirmation
+      ? "兑换中：已提交管理员确认"
+      : `已加入背包：${item.name}`,
+  };
+}
+
+const buyableCatalogItems = supplyUiLabCatalog.filter((item) => item.shop.buyable);
+const products = buyableCatalogItems.map(buildProduct);
+const productDetails = buyableCatalogItems.map(buildProductDetail);
+
+const categories: SupplyShopCategory[] = categoryOrder.map((categoryId, index) => ({
+  id: categoryId,
+  label: categoryMeta[categoryId].label,
+  icon: categoryMeta[categoryId].icon,
+  active: index === 0,
+}));
+
+const filters: SupplyShopFilter[] = [
+  { id: "all", label: "全部", active: true },
+  { id: "redeemable", label: "可兑换", active: false },
+  { id: "owned", label: "已拥有", active: false },
+  { id: "admin", label: "需确认", active: false },
+];
 
 export const supplyShopMock: SupplyShopPreview = {
   topBar: {
-    resources: [
-      { id: "coins", label: "银子", value: "3,850", icon: "◎" },
-      { id: "ticket", label: "补给券", value: "18", icon: "券" },
-      { id: "backpack", label: "背包", value: "68/120", icon: "包" },
-    ],
+    resources: supplyUiLabResources.shop,
     profile: {
       username: "Vincent",
       avatar: supplyShopAssetPaths.profileAvatar,
     },
   },
   sidebar: {
-    categories: [
-      { id: "featured", label: "今日推荐", icon: "👍", active: true },
-      { id: "boost", label: "增益道具", icon: "🧴", active: false },
-      { id: "task", label: "任务道具", icon: "📝", active: false },
-      { id: "social", label: "社交道具", icon: "💬", active: false },
-      { id: "real", label: "真实福利", icon: "🎁", active: false },
-      { id: "cosmetic", label: "装饰称号", icon: "🏅", active: false },
-    ],
-    resources: [
-      { id: "coins", label: "银子", value: "3,850", icon: "◎" },
-      { id: "ticket", label: "补给券", value: "18", icon: "券" },
-    ],
+    categories,
+    resources: supplyUiLabResources.shop,
   },
-  filters: [
-    { id: "all", label: "全部", active: true },
-    { id: "redeemable", label: "可兑换", active: false },
-    { id: "owned", label: "已拥有", active: false },
-  ],
+  filters,
   sortOptions: ["默认排序", "价格从低到高", "价格从高到低"],
   selectedSort: "默认排序",
-  products: [
-    {
-      id: "task-reroll",
-      name: "任务重置券",
-      subtitle: "重置1个未完成主线任务",
-      categoryId: "task",
-      image: supplyShopAssetPaths.rewardIcons.taskReroll,
-      rarity: "common",
-      tags: ["推荐"],
-      price: { currency: "coins", amount: 150 },
-      ownedQuantity: 0,
-      dailyLimit: { label: "每日限购 1/1", used: 1, total: 1 },
-      requiresAdminConfirmation: false,
-      selected: true,
-    },
-    {
-      id: "small-boost",
-      name: "小幅加成券",
-      subtitle: "本日步数加成 +10%",
-      categoryId: "boost",
-      image: supplyShopAssetPaths.rewardIcons.boost,
-      rarity: "common",
-      tags: ["推荐"],
-      price: { currency: "coins", amount: 80 },
-      ownedQuantity: 0,
-      dailyLimit: { label: "每日限购 2/2", used: 2, total: 2 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "social-coupon",
-      name: "社交互动券",
-      subtitle: "用来发起1次队友互动",
-      categoryId: "social",
-      image: supplyShopAssetPaths.rewardIcons.social,
-      rarity: "common",
-      tags: ["推荐"],
-      price: { currency: "coins", amount: 100 },
-      ownedQuantity: 0,
-      dailyLimit: { label: "每日限购 1/1", used: 1, total: 1 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "coffee-medium",
-      name: "咖啡兑换券（中杯）",
-      subtitle: "兑换指定咖啡饮品（价值约￥20）",
-      categoryId: "real",
-      image: supplyShopAssetPaths.rewardIcons.coffee,
-      rarity: "rare",
-      tags: ["限量"],
-      price: { currency: "coins", amount: 500 },
-      ownedQuantity: 0,
-      dailyLimit: { label: "每日限购 1/1", used: 1, total: 1 },
-      requiresAdminConfirmation: true,
-      selected: false,
-    },
-    {
-      id: "learning-pass",
-      name: "学习时长券",
-      subtitle: "增加学习时长15分钟",
-      categoryId: "boost",
-      image: supplyShopAssetPaths.shopItems.learningPass,
-      rarity: "common",
-      tags: ["剩余 5"],
-      price: { currency: "coins", amount: 60 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 5", remaining: 5, total: 5 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "energy-bottle",
-      name: "体力恢复剂",
-      subtitle: "恢复30点体力",
-      categoryId: "boost",
-      image: supplyShopAssetPaths.shopItems.energyBottle,
-      rarity: "common",
-      tags: ["剩余 3"],
-      price: { currency: "coins", amount: 60 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 3", remaining: 3, total: 3 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "training-log",
-      name: "训练记录本",
-      subtitle: "增加1次训练记录次数",
-      categoryId: "task",
-      image: supplyShopAssetPaths.shopItems.trainingLog,
-      rarity: "common",
-      tags: ["剩余 3"],
-      price: { currency: "coins", amount: 40 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 3", remaining: 3, total: 3 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "light-meal",
-      name: "轻食便当兑换券",
-      subtitle: "兑换轻食/沙拉套餐（需管理员确认）",
-      categoryId: "real",
-      image: supplyShopAssetPaths.shopItems.lightMeal,
-      rarity: "rare",
-      tags: ["需要管理员确认", "剩余 2"],
-      price: { currency: "coins", amount: 800 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 2", remaining: 2, total: 2 },
-      requiresAdminConfirmation: true,
-      selected: false,
-    },
-    {
-      id: "avatar-frame",
-      name: "头像框·奋斗牛",
-      subtitle: "限时头像框（30天）",
-      categoryId: "cosmetic",
-      image: supplyShopAssetPaths.shopItems.avatarFrame,
-      rarity: "sr",
-      tags: ["SR", "限量", "剩余 1"],
-      price: { currency: "coins", amount: 300 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 1", remaining: 1, total: 1 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "title-self-discipline",
-      name: "称号·自律牛马",
-      subtitle: "专属称号（30天）",
-      categoryId: "cosmetic",
-      image: supplyShopAssetPaths.shopItems.titleBadge,
-      rarity: "ssr",
-      tags: ["SSR", "限量", "剩余 1"],
-      price: { currency: "coins", amount: 500 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 1", remaining: 1, total: 1 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
-    {
-      id: "fitness-outfit",
-      name: "健身牛马装扮",
-      subtitle: "大厅角色包装扮（30天）",
-      categoryId: "cosmetic",
-      image: supplyShopAssetPaths.shopItems.fitnessOutfit,
-      rarity: "sr",
-      tags: ["SR", "限量", "剩余 1"],
-      price: { currency: "coins", amount: 600 },
-      ownedQuantity: 0,
-      stock: { label: "剩余 1", remaining: 1, total: 1 },
-      requiresAdminConfirmation: false,
-      selected: false,
-    },
+  products,
+  productDetails,
+  selectedProductDetail: productDetails[0],
+  notice: "商店商品与抽卡池 active 道具保持一致，当前页面仅做本地兑换预览。",
+  rules: [
+    "商品来源统一为共享 catalog，银子奖励不会作为商品出售。",
+    "虚拟道具点击兑换后只展示已加入背包的本地反馈。",
+    "真实福利类商品会进入管理员确认，本页只展示兑换中的本地状态。",
   ],
-  selectedProductDetail: {
-    productId: "task-reroll",
-    description: "可以重置1个未完成的主线任务的进度，重置后该任务可重新完成以获取奖励。",
-    effect: "重置1个未完成的主线任务",
-    useTiming: "可在任务进行中使用",
-    purchaseLimit: "每日限购 1 次",
-    costLabel: "银子 150",
-    footnote: "该商品为虚拟道具，兑换后将直接发放至背包",
-    redeemDisabled: true,
-    redeemDisabledReason: "今日已达限购",
-  },
-  notice: "“真实福利”类商品需管理员确认后发放，请耐心等待通知 ~",
+  initialFeedback: "本地预览：兑换不会写入后端。",
 };

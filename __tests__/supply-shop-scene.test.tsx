@@ -21,52 +21,144 @@ describe("SupplyShopScene", () => {
     container.remove();
   });
 
-  it("renders semantic shop panels with visible product controls", async () => {
+  it("renders a catalog-backed shop with Phase 2 resources and no dead rules anchor", async () => {
     await act(async () => {
       root.render(<SupplyShopScene data={supplyShopMock} />);
     });
 
     expect(container.querySelector(".supply-shop-scene")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-topbar")).not.toBeNull();
-    expect(container.querySelector(".supply-ui-lab-topbar a[aria-current='page']")?.textContent).toContain("补给商店");
-    expect(container.querySelector("a.supply-ui-lab-topbar-tab--shop")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard/shop",
+    expect(container.querySelector(".supply-ui-lab-resource--coins")?.textContent).toContain("银子");
+    expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
+    expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
+    expect(container.querySelector("a.supply-shop-back-link")?.getAttribute("href")).toBe(
+      "/ui-lab/supply-dashboard",
     );
-    expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("68/120");
-    expect(container.querySelector("a.supply-shop-back-link")?.getAttribute("href")).toBe("/ui-lab/supply-dashboard");
-    expect(container.querySelector(".supply-shop-sidebar")).not.toBeNull();
-    expect(container.querySelector(".supply-shop-catalog")).not.toBeNull();
-    expect(container.querySelector(".supply-shop-detail")).not.toBeNull();
-    expect(container.querySelector(".supply-shop-panel-image")).toBeNull();
     expect(container.querySelectorAll(".supply-shop-category-list button")).toHaveLength(6);
-    expect(container.querySelector(".supply-shop-category-list button[aria-current='page']")?.textContent).toContain("今日推荐");
-    expect(container.querySelector(".supply-ui-lab-filterbar [role='tab'][aria-selected='true']")?.textContent).toBe("全部");
-    expect((container.querySelector("select[aria-label='商品排序']") as HTMLSelectElement | null)?.value).toBe(
-      "默认排序",
+    expect(container.querySelector(".supply-shop-category-list button[aria-current='page']")?.textContent).toContain(
+      "全部商品",
     );
-    expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).toHaveLength(11);
+    expect(container.querySelector(".supply-ui-lab-filterbar [role='tab'][aria-selected='true']")?.textContent).toBe(
+      "全部",
+    );
+    expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).toHaveLength(12);
     expect(container.querySelector("[data-testid='supply-shop-product-card'][aria-selected='true']")?.textContent).toContain(
-      "任务重置券",
+      "任务换班券",
     );
     expect(container.querySelectorAll("[data-testid='supply-shop-product-card'] img").length).toBeGreaterThan(0);
-    expect(container.textContent).toContain("任务重置券");
+    expect(container.querySelector('a[href="#rules"]')).toBeNull();
+    expect(container.textContent).toContain("本页规则");
+    expect(container.textContent).toContain("来源：抽卡池 / 商店");
+    expect(container.textContent).toContain("持有 2");
     expect(container.textContent).toContain("银子 150");
-    expect(container.textContent).toContain("持有 0");
-    expect(container.textContent).toContain("可在任务进行中使用");
-    expect(container.textContent).toContain("今日已达限购");
-    const redeemButton = container.querySelector(".supply-shop-redeem-button") as HTMLButtonElement | null;
-    expect(redeemButton?.disabled).toBe(supplyShopMock.selectedProductDetail.redeemDisabled);
-    expect(redeemButton?.textContent).toBe(supplyShopMock.selectedProductDetail.redeemDisabledReason);
-    expect(container.textContent).toContain("“真实福利”类商品需管理员确认后发放");
+    expect(container.textContent).toContain("本地预览：兑换不会写入后端");
+    expect(container.textContent).not.toContain("补给券");
+    expect(container.textContent).not.toContain("体力");
+    expect(container.textContent).not.toContain("生命票");
   });
 
-  it("does not render cropped shop panel assets", async () => {
+  it("switches selected product details locally", async () => {
     await act(async () => {
       root.render(<SupplyShopScene data={supplyShopMock} />);
     });
 
-    const imageSources = Array.from(container.querySelectorAll("img")).map((image) => image.getAttribute("src"));
+    const coffeeCard = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-testid='supply-shop-product-card']"),
+    ).find((card) => card.textContent?.includes("瑞幸咖啡券"));
 
-    expect(imageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/shop\/.*-panel\.png/);
+    expect(coffeeCard).toBeDefined();
+
+    await act(async () => {
+      coffeeCard?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(coffeeCard?.getAttribute("aria-selected")).toBe("true");
+    expect(container.querySelector(".supply-shop-detail")?.getAttribute("aria-label")).toContain("瑞幸咖啡券");
+    expect(container.textContent).toContain("管理员确认后兑换 1 杯瑞幸咖啡");
+    expect(container.textContent).toContain("真实福利：兑换后进入管理员确认流程");
+    expect(container.querySelector(".supply-shop-redeem-button")?.textContent).toBe("申请兑换");
+  });
+
+  it("switches category and filter buttons through local state", async () => {
+    await act(async () => {
+      root.render(<SupplyShopScene data={supplyShopMock} />);
+    });
+
+    const realWorldCategory = Array.from(
+      container.querySelectorAll<HTMLButtonElement>(".supply-shop-category-list button"),
+    ).find((button) => button.textContent?.includes("真实福利"));
+
+    expect(realWorldCategory).toBeDefined();
+
+    await act(async () => {
+      realWorldCategory?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(realWorldCategory?.getAttribute("aria-current")).toBe("page");
+    expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).toHaveLength(1);
+    expect(container.querySelector("[data-testid='supply-shop-product-card']")?.textContent).toContain("瑞幸咖啡券");
+
+    const adminFilter = Array.from(
+      container.querySelectorAll<HTMLButtonElement>(".supply-ui-lab-filterbar [role='tab']"),
+    ).find((button) => button.textContent === "需确认");
+
+    expect(adminFilter).toBeDefined();
+
+    await act(async () => {
+      adminFilter?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(adminFilter?.getAttribute("aria-selected")).toBe("true");
+    expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).toHaveLength(1);
+    expect(container.querySelector("[data-testid='supply-shop-product-card']")?.textContent).toContain("瑞幸咖啡券");
+  });
+
+  it("shows local redemption feedback for virtual items and real-world rewards", async () => {
+    await act(async () => {
+      root.render(<SupplyShopScene data={supplyShopMock} />);
+    });
+
+    const redeemButton = container.querySelector<HTMLButtonElement>(".supply-shop-redeem-button");
+
+    await act(async () => {
+      redeemButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[data-shop-feedback]")?.textContent).toContain("已加入背包：任务换班券");
+
+    const coffeeCard = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-testid='supply-shop-product-card']"),
+    ).find((card) => card.textContent?.includes("瑞幸咖啡券"));
+
+    await act(async () => {
+      coffeeCard?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const coffeeRedeemButton = container.querySelector<HTMLButtonElement>(".supply-shop-redeem-button");
+
+    await act(async () => {
+      coffeeRedeemButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[data-shop-feedback]")?.textContent).toContain("兑换中：已提交管理员确认");
+  });
+
+  it("expands rules on the page without navigating to a hash target", async () => {
+    await act(async () => {
+      root.render(<SupplyShopScene data={supplyShopMock} />);
+    });
+
+    const rulesButton = container.querySelector<HTMLButtonElement>(".supply-shop-rules-toggle");
+
+    expect(rulesButton?.getAttribute("aria-expanded")).toBe("false");
+    expect(container.querySelector(".supply-shop-rules-panel")).toBeNull();
+
+    await act(async () => {
+      rulesButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(rulesButton?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector(".supply-shop-rules-panel")?.textContent).toContain("真实福利类商品会进入管理员确认");
+    expect(container.querySelector('a[href="#rules"]')).toBeNull();
   });
 });
