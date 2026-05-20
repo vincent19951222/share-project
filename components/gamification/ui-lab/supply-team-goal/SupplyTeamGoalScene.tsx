@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 import {
   SupplyUiLabActionButton,
@@ -11,6 +14,7 @@ import { SupplyUiLabTopBar } from "@/components/gamification/ui-lab/supply-dashb
 import type {
   SupplyTeamGoalPreview,
   TeamGoalMilestone,
+  TeamGoalMilestoneReward,
   TeamGoalRewardPreview,
   TeamGoalTask,
   TeamGoalTaskStatus,
@@ -136,6 +140,11 @@ function MilestoneRoad({ data }: { data: SupplyTeamGoalPreview }) {
           <MilestoneCard key={milestone.id} milestone={milestone} />
         ))}
       </div>
+      <div className="supply-team-goal-milestone-rewards" aria-label="里程碑奖励">
+        {data.milestoneRewards.map((reward) => (
+          <MilestoneRewardCard key={reward.percent} reward={reward} />
+        ))}
+      </div>
     </section>
   );
 }
@@ -148,6 +157,19 @@ function MilestoneCard({ milestone }: { milestone: TeamGoalMilestone }) {
       <div aria-hidden="true">★</div>
       <b>{milestone.order}</b>
       <em>{milestone.rewardLabel}</em>
+    </article>
+  );
+}
+
+function MilestoneRewardCard({ reward }: { reward: TeamGoalMilestoneReward }) {
+  return (
+    <article
+      className={`supply-team-goal-milestone-reward is-${reward.status}`}
+      data-testid="team-goal-milestone-reward"
+    >
+      <strong>{reward.percent}%</strong>
+      <span>{reward.title}</span>
+      <p>{reward.rewardLabel}</p>
     </article>
   );
 }
@@ -177,6 +199,7 @@ function TaskRow({ task }: { task: TeamGoalTask }) {
       <div>
         <h3>{task.title}</h3>
         <p>{task.subtitle}</p>
+        <small className="supply-team-goal-metric-source">{task.metricSource}</small>
       </div>
       <strong>
         {task.current}/{task.target} {task.unit}
@@ -191,20 +214,34 @@ function TaskRow({ task }: { task: TeamGoalTask }) {
 }
 
 function RewardPreview({ data }: { data: SupplyTeamGoalPreview }) {
+  const [claimFeedback, setClaimFeedback] = useState("达成所有阶段即可领取全部奖励");
+
   return (
     <SupplyUiLabPixelPanel ariaLabel="奖励预览" className="supply-team-goal-rewards">
       <header>
         <h2>奖励预览</h2>
         <SupplyUiLabActionButton tone="ghost">全部奖励</SupplyUiLabActionButton>
       </header>
+      <section className="supply-team-goal-completion-reward" aria-label={data.completionReward.title}>
+        <h3>{data.completionReward.title}</h3>
+        <div className="supply-team-goal-completion-list">
+          {data.completionReward.memberRewards.map((reward) => (
+            <span key={reward}>{reward}</span>
+          ))}
+          <span>{data.completionReward.teamReward}</span>
+          <span>{data.completionReward.reportReward}</span>
+        </div>
+      </section>
       <div className="supply-team-goal-reward-grid">
         {data.rewardPreview.map((reward) => (
           <RewardCard key={reward.id} reward={reward} />
         ))}
       </div>
       <div className="supply-team-goal-claim">
-        <SupplyUiLabActionButton tone="primary">领取团队奖励</SupplyUiLabActionButton>
-        <span>达成所有阶段即可领取全部奖励</span>
+        <SupplyUiLabActionButton tone="primary" onClick={() => setClaimFeedback("本地预览：奖励已加入领取反馈")}>
+          领取团队奖励
+        </SupplyUiLabActionButton>
+        <span>{claimFeedback}</span>
         <strong>
           当前阶段：{data.season.currentStage}/{data.season.totalStages}
         </strong>
@@ -234,11 +271,6 @@ function AnnouncementPanel({ data }: { data: SupplyTeamGoalPreview }) {
         !
       </span>
       <span>{data.announcement.message}</span>
-      <nav aria-label="团队目标辅助入口">
-        <a href="#help">帮助中心</a>
-        <a href="#feedback">意见反馈</a>
-        <a href="#settings">设置</a>
-      </nav>
     </footer>
   );
 }

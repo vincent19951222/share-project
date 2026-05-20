@@ -1,3 +1,4 @@
+import { supplyUiLabResources } from "@/components/gamification/ui-lab/supply-data/resources";
 import type { SupplyTeamGoalPreview } from "./types";
 
 export const supplyTeamGoalAssetPaths = {
@@ -20,11 +21,7 @@ export const supplyTeamGoalAssetPaths = {
 export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
   media: supplyTeamGoalAssetPaths.media,
   topBar: {
-    resources: [
-      { id: "coins", label: "银子", value: "2,450", icon: "◎" },
-      { id: "ticket", label: "补给券", value: "18", icon: "券" },
-      { id: "backpack", label: "背包", value: "68/120", icon: "包" },
-    ],
+    resources: supplyUiLabResources.dashboard,
     profile: {
       username: "Vincent",
       avatar: supplyTeamGoalAssetPaths.profileAvatar,
@@ -53,10 +50,16 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
   },
   seasonRewards: [
     { id: "team-exp", icon: "EXP", label: "团队经验", value: "+30%" },
-    { id: "ticket-boost", icon: "券", label: "补给券获取", value: "+20%" },
+    { id: "ticket-boost", icon: "券", label: "抽奖券获取", value: "+20%" },
     { id: "team-title", icon: "盾", label: "团队称号", value: "全力以赴" },
     { id: "avatar-frame", icon: "框", label: "专属头像框", value: "30天" },
   ],
+  completionReward: {
+    title: "赛季达成奖励",
+    memberRewards: ["银子 x100", "抽奖券 x3"],
+    teamReward: "团队称号 30天",
+    reportReward: "赛季达成高光",
+  },
   milestones: [
     { id: "start", order: 1, title: "启程之路", targetPoints: 20000, status: "completed", rewardLabel: "已完成" },
     { id: "front", order: 2, title: "并肩前行", targetPoints: 50000, status: "completed", rewardLabel: "已完成" },
@@ -64,12 +67,20 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
     { id: "limit", order: 4, title: "突破极限", targetPoints: 100000, status: "active", rewardLabel: "进行中" },
     { id: "glory", order: 5, title: "荣耀时刻", targetPoints: 120000, status: "locked", rewardLabel: "未解锁" },
   ],
+  milestoneRewards: [
+    { percent: 20, title: "公告点亮", rewardLabel: "团队公告高光", status: "completed" },
+    { percent: 40, title: "全员小补给", rewardLabel: "每人 抽奖券 x1", status: "completed" },
+    { percent: 65, title: "称号预览", rewardLabel: "团队称号预览", status: "current" },
+    { percent: 85, title: "银子加班费", rewardLabel: "每人 银子 x50", status: "active" },
+    { percent: 100, title: "赛季达成", rewardLabel: "触发赛季达成奖励", status: "locked" },
+  ],
   tasks: [
     {
       id: "team-workout",
       icon: "👟",
       title: "全队运动打卡",
       subtitle: "全队累计运动打卡",
+      metricSource: "今日有效健身打卡人数",
       current: 20,
       target: 30,
       unit: "人",
@@ -81,10 +92,11 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
       icon: "📖",
       title: "四维任务完成",
       subtitle: "运动/喝水/社交/学习任务",
+      metricSource: "今日四维任务完成份数",
       current: 28,
       target: 40,
       unit: "份",
-      reward: { icon: "券", label: "补给券", value: "+2" },
+      reward: { icon: "券", label: "抽奖券", value: "+2" },
       status: "active",
     },
     {
@@ -92,6 +104,7 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
       icon: "💬",
       title: "社交互动响应",
       subtitle: "回复队友互动消息",
+      metricSource: "今日弱社交已回应次数",
       current: 12,
       target: 15,
       unit: "次",
@@ -99,14 +112,15 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
       status: "active",
     },
     {
-      id: "ticket-usage",
+      id: "draw-usage",
       icon: "🎟",
-      title: "补给券活跃使用",
-      subtitle: "全队使用补给券",
+      title: "全队抽卡活跃",
+      subtitle: "全队消耗抽奖券抽卡",
+      metricSource: "今日全队抽卡次数",
       current: 18,
       target: 25,
-      unit: "张",
-      reward: { icon: "券", label: "补给券", value: "+2" },
+      unit: "次",
+      reward: { icon: "券", label: "抽奖券", value: "+2" },
       status: "active",
     },
   ],
@@ -122,7 +136,7 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
     {
       id: "team-boost",
       title: "团队加成（7天）",
-      subtitle: "经验 +30% / 补给 +20%",
+      subtitle: "经验 +30% / 抽奖券 +20%",
       image: null,
       icon: "EXP",
       tone: "orange",
@@ -138,7 +152,7 @@ export const supplyTeamGoalMock: SupplyTeamGoalPreview = {
     {
       id: "weekly-highlight",
       title: "周报高光",
-      subtitle: "每周高光展示专属时刻",
+      subtitle: "赛季达成高光展示专属时刻",
       image: null,
       icon: "📈",
       tone: "violet",

@@ -1,19 +1,23 @@
+import type { SupplyUiLabResource } from "@/components/gamification/ui-lab/supply-data/types";
+
 export type TeamGoalMilestoneStatus = "completed" | "current" | "active" | "locked";
 export type TeamGoalTaskStatus = "active" | "completed" | "locked";
 export type TeamGoalRewardTone = "purple" | "orange" | "blue" | "violet";
 
-export type TeamGoalResource = {
-  id: "coins" | "ticket" | "backpack";
-  label: string;
-  value: string;
-  icon: string;
-};
+export type TeamGoalResource = SupplyUiLabResource;
 
 export type TeamGoalSeasonReward = {
   id: string;
   icon: string;
   label: string;
   value: string;
+};
+
+export type TeamGoalCompletionReward = {
+  title: string;
+  memberRewards: string[];
+  teamReward: string;
+  reportReward: string;
 };
 
 export type TeamGoalMilestone = {
@@ -25,11 +29,19 @@ export type TeamGoalMilestone = {
   rewardLabel: string;
 };
 
+export type TeamGoalMilestoneReward = {
+  percent: 20 | 40 | 65 | 85 | 100;
+  title: string;
+  rewardLabel: string;
+  status: TeamGoalMilestoneStatus;
+};
+
 export type TeamGoalTask = {
   id: string;
   icon: string;
   title: string;
   subtitle: string;
+  metricSource: string;
   current: number;
   target: number;
   unit: string;
@@ -85,7 +97,9 @@ export type SupplyTeamGoalPreview = {
     helper: string;
   };
   seasonRewards: TeamGoalSeasonReward[];
+  completionReward: TeamGoalCompletionReward;
   milestones: TeamGoalMilestone[];
+  milestoneRewards: TeamGoalMilestoneReward[];
   tasks: TeamGoalTask[];
   rewardPreview: TeamGoalRewardPreview[];
   announcement: {

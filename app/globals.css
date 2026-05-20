@@ -7260,8 +7260,7 @@ body {
   min-width: 0;
 }
 
-.supply-team-goal-announcement,
-.supply-team-goal-announcement nav {
+.supply-team-goal-announcement {
   display: flex;
   align-items: center;
 }
@@ -7559,6 +7558,71 @@ body {
   padding: clamp(0.45rem, 0.7vw, 0.72rem) clamp(1.4rem, 3.4vw, 3.2rem) clamp(1rem, 1.35vw, 1.35rem);
 }
 
+.supply-team-goal-milestone-rewards {
+  position: absolute;
+  right: clamp(0.7rem, 1.4vw, 1.2rem);
+  bottom: clamp(0.42rem, 0.72vw, 0.7rem);
+  left: clamp(0.7rem, 1.4vw, 1.2rem);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.42rem;
+}
+
+.supply-team-goal-milestone-reward {
+  min-width: 0;
+  border: 2px solid #111827;
+  border-radius: 0.42rem;
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow: 3px 3px 0 rgba(17, 24, 39, 0.28);
+  padding: 0.26rem 0.38rem;
+  color: #111827;
+}
+
+.supply-team-goal-milestone-reward strong,
+.supply-team-goal-milestone-reward span,
+.supply-team-goal-milestone-reward p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.supply-team-goal-milestone-reward strong {
+  font-size: 0.74rem;
+  font-weight: 1000;
+}
+
+.supply-team-goal-milestone-reward span {
+  margin-top: 0.12rem;
+  font-size: 0.66rem;
+  font-weight: 950;
+}
+
+.supply-team-goal-milestone-reward p {
+  margin: 0.12rem 0 0;
+  color: #4b5563;
+  font-size: 0.6rem;
+  font-weight: 850;
+}
+
+.supply-team-goal-milestone-reward.is-completed {
+  background: rgba(220, 252, 231, 0.95);
+}
+
+.supply-team-goal-milestone-reward.is-current {
+  background: rgba(254, 240, 138, 0.95);
+}
+
+.supply-team-goal-milestone-reward.is-active {
+  background: rgba(219, 234, 254, 0.95);
+}
+
+.supply-team-goal-milestone-reward.is-locked {
+  background: rgba(243, 244, 246, 0.95);
+  color: #6b7280;
+}
+
 .supply-team-goal-milestone {
   display: grid;
   justify-items: center;
@@ -7738,6 +7802,15 @@ body {
   font-weight: 800;
 }
 
+.supply-team-goal-metric-source {
+  display: block;
+  margin-top: 0.14rem;
+  color: #6b7280;
+  font-size: 0.64rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
 .supply-team-goal-task > strong {
   white-space: nowrap;
   font-size: 0.9rem;
@@ -7768,6 +7841,42 @@ body {
   overscroll-behavior: contain;
   padding-right: 0.16rem;
   scrollbar-width: thin;
+}
+
+.supply-team-goal-completion-reward {
+  border: 2px solid #111827;
+  border-radius: 0.45rem;
+  background: #fef3c7;
+  box-shadow: 3px 3px 0 rgba(17, 24, 39, 0.18);
+  padding: 0.5rem;
+}
+
+.supply-team-goal-completion-reward h3 {
+  margin: 0 0 0.42rem;
+  color: #111827;
+  font-size: 0.88rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-team-goal-completion-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.36rem;
+}
+
+.supply-team-goal-completion-list span {
+  overflow: hidden;
+  border: 2px solid #111827;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.68rem;
+  font-weight: 950;
+  padding: 0.24rem 0.36rem;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .supply-team-goal-reward {
@@ -7874,17 +7983,6 @@ body {
   min-width: 0;
 }
 
-.supply-team-goal-announcement nav {
-  gap: 0.7rem;
-  margin-left: auto;
-}
-
-.supply-team-goal-announcement a {
-  color: #111827;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
 @media (max-width: 1180px) {
   .supply-team-goal-content {
     grid-template-rows: auto;
@@ -7942,6 +8040,15 @@ body {
     padding: 1rem;
   }
 
+  .supply-team-goal-milestone-rewards {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0 1rem 1rem;
+  }
+
   .supply-team-goal-milestone {
     grid-template-columns: minmax(6rem, 1fr) auto auto;
     align-items: center;
@@ -7982,6 +8089,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .supply-team-goal-completion-list {
+    grid-template-columns: 1fr;
+  }
+
   .supply-team-goal-announcement {
     flex-wrap: wrap;
   }
@@ -7991,11 +8102,6 @@ body {
     white-space: normal;
   }
 
-  .supply-team-goal-announcement nav {
-    width: 100%;
-    margin-left: 0;
-    justify-content: space-between;
-  }
 }
 
 @media (max-width: 1180px) {
@@ -8100,6 +8206,16 @@ body {
     align-items: center;
     min-height: 100%;
     padding: 0.62rem clamp(1.5rem, 3vw, 2.4rem) 1rem;
+  }
+
+  .supply-team-goal-milestone-rewards {
+    position: absolute;
+    right: 0.62rem;
+    bottom: 0.46rem;
+    left: 0.62rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.32rem;
+    margin: 0;
   }
 
   .supply-team-goal-milestone {
@@ -8211,6 +8327,24 @@ body {
     gap: 0.45rem;
   }
 
+  .supply-team-goal-completion-reward {
+    padding: 0.42rem;
+  }
+
+  .supply-team-goal-completion-reward h3 {
+    font-size: 0.74rem;
+  }
+
+  .supply-team-goal-completion-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.28rem;
+  }
+
+  .supply-team-goal-completion-list span {
+    font-size: 0.6rem;
+    padding: 0.18rem 0.28rem;
+  }
+
   .supply-team-goal-reward {
     min-height: 0;
     gap: 0.22rem;
@@ -8261,11 +8395,6 @@ body {
     white-space: nowrap;
   }
 
-  .supply-team-goal-announcement nav {
-    width: auto;
-    margin-left: auto;
-    justify-content: flex-end;
-  }
 }
 
 @media (max-width: 768px) {

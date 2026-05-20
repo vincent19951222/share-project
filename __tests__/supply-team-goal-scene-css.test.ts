@@ -17,12 +17,17 @@ describe("supply team goal scene css", () => {
       ".supply-team-goal-raid-panel",
       ".supply-team-goal-road",
       ".supply-team-goal-milestone",
+      ".supply-team-goal-milestone-rewards",
       ".supply-team-goal-lower-grid",
       ".supply-team-goal-task",
+      ".supply-team-goal-metric-source",
       ".supply-team-goal-reward",
+      ".supply-team-goal-completion-reward",
+      ".supply-team-goal-completion-list",
       ".supply-team-goal-announcement",
     ].forEach(expectRule);
 
+    expect(css).not.toContain(".supply-team-goal-announcement nav");
     expect(css).not.toContain(".supply-team-goal-panel-image");
     expect(css).not.toContain(".supply-team-goal-hotspot");
     expect(css).not.toMatch(/team-goal-(raid|road|tasks|rewards|announcement)-panel\.(png|webp|jpe?g)/);
