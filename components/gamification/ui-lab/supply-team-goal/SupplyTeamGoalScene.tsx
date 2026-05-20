@@ -159,9 +159,11 @@ function TeamTasks({ data }: { data: SupplyTeamGoalPreview }) {
         <h2>今日团队任务</h2>
         <span>明日 05:18:22 后刷新</span>
       </header>
-      {data.tasks.map((task) => (
-        <TaskRow key={task.id} task={task} />
-      ))}
+      <div className="supply-team-goal-task-list">
+        {data.tasks.map((task) => (
+          <TaskRow key={task.id} task={task} />
+        ))}
+      </div>
     </SupplyUiLabPixelPanel>
   );
 }

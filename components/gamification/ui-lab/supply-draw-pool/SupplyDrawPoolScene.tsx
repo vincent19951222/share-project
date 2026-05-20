@@ -27,7 +27,7 @@ function DrawPoolTopBar({ data }: { data: SupplyDrawPoolPreview }) {
         ))}
       </div>
       <Link className="supply-draw-pool-close" href={data.topBar.closeHref} aria-label="返回大厅">
-        x
+        ×
       </Link>
     </header>
   );
@@ -59,10 +59,12 @@ function TicketWalletPanel({ data }: { data: SupplyDrawPoolPreview }) {
 function DrawGuidePanel({ data }: { data: SupplyDrawPoolPreview }) {
   return (
     <SupplyUiLabPixelPanel ariaLabel="抽卡提示" className="supply-draw-pool-guide" title="补给提示">
-      <Image alt="" height={96} src={data.guide.mascotImage} unoptimized width={96} />
+      <Image alt="健身牛马助手" height={96} src={data.guide.mascotImage} unoptimized width={96} />
       <div>
         <p>{data.guide.message}</p>
-        <SupplyUiLabActionButton tone="secondary">{data.guide.actionLabel}</SupplyUiLabActionButton>
+        <SupplyUiLabActionButton ariaLabel={data.guide.actionLabel} tone="secondary">
+          {data.guide.actionLabel}
+        </SupplyUiLabActionButton>
       </div>
     </SupplyUiLabPixelPanel>
   );
@@ -71,9 +73,14 @@ function DrawGuidePanel({ data }: { data: SupplyDrawPoolPreview }) {
 function PoolPreviewPanel({ data }: { data: SupplyDrawPoolPreview }) {
   return (
     <SupplyUiLabPixelPanel ariaLabel="奖池预览" className="supply-draw-pool-rates" tone="dark" title="奖池预览">
+      <p className="supply-draw-pool-rates-note">掉落概率分布</p>
       <ol>
         {data.poolRates.map((rate) => (
-          <li className={`supply-draw-pool-rate supply-draw-pool-rate--${rate.tone}`} key={rate.rarity}>
+          <li
+            aria-label={`${rate.rarity} 掉落概率 ${rate.percent}%`}
+            className={`supply-draw-pool-rate supply-draw-pool-rate--${rate.tone}`}
+            key={rate.rarity}
+          >
             <em>{rate.rarity}</em>
             <span>
               <i style={{ width: `${rate.percent}%` }} />
@@ -89,19 +96,26 @@ function PoolPreviewPanel({ data }: { data: SupplyDrawPoolPreview }) {
 function DrawMachineStage({ data }: { data: SupplyDrawPoolPreview }) {
   return (
     <section className="supply-draw-pool-machine" aria-label="补给抽卡机">
-      <div className="supply-draw-pool-machine-title">
-        <Image alt="" height={64} src={data.machine.emblemImage} unoptimized width={64} />
-        <h1>{data.machine.title}</h1>
-      </div>
       <div className="supply-draw-pool-machine-stage">
         <Image
           alt="补给抽卡机"
           className="supply-draw-pool-machine-image"
-          height={590}
+          height={992}
           priority
           src={data.media.machine}
           unoptimized
-          width={948}
+          width={1586}
+        />
+        <div className="supply-draw-pool-machine-title">
+          <h1>{data.machine.title}</h1>
+        </div>
+        <Image
+          alt=""
+          className="supply-draw-pool-window-emblem"
+          height={128}
+          src={data.machine.emblemImage}
+          unoptimized
+          width={128}
         />
         <Image
           alt=""
@@ -111,26 +125,28 @@ function DrawMachineStage({ data }: { data: SupplyDrawPoolPreview }) {
           unoptimized
           width={640}
         />
+        <div className="supply-draw-pool-machine-controls">
+          {data.machine.actions.map((action) => (
+            <SupplyUiLabActionButton
+              ariaLabel={`${action.label} x${action.drawCount}，消耗抽奖券 x${action.costTicket}${
+                action.guaranteeLabel ? `，${action.guaranteeLabel}` : ""
+              }`}
+              className={`supply-draw-pool-action supply-draw-pool-action--${action.tone}`}
+              key={action.id}
+            >
+              <strong>
+                {action.label} x{action.drawCount}
+              </strong>
+              <em>x{action.costTicket}</em>
+              {action.guaranteeLabel ? <span>{action.guaranteeLabel}</span> : null}
+            </SupplyUiLabActionButton>
+          ))}
+        </div>
+        <label className="supply-draw-pool-skip-toggle">
+          <input checked={data.machine.skipAnimation} readOnly type="checkbox" />
+          跳过抽奖动画
+        </label>
       </div>
-      <div className="supply-draw-pool-machine-controls">
-        {data.machine.actions.map((action) => (
-          <SupplyUiLabActionButton
-            ariaLabel={`${action.label}，消耗抽奖券 x${action.costTicket}${
-              action.guaranteeLabel ? `，${action.guaranteeLabel}` : ""
-            }`}
-            className={`supply-draw-pool-action supply-draw-pool-action--${action.tone}`}
-            key={action.id}
-          >
-            <strong>{action.label}</strong>
-            <em>券 x{action.costTicket}</em>
-            {action.guaranteeLabel ? <span>{action.guaranteeLabel}</span> : null}
-          </SupplyUiLabActionButton>
-        ))}
-      </div>
-      <label className="supply-draw-pool-skip-toggle">
-        <input checked={data.machine.skipAnimation} readOnly type="checkbox" />
-        跳过抽奖动画
-      </label>
     </section>
   );
 }

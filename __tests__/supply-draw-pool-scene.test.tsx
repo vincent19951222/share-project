@@ -66,6 +66,7 @@ describe("SupplyDrawPoolScene", () => {
         supplyDrawPoolAssetPaths.drawPool.machine,
         supplyDrawPoolAssetPaths.drawPool.capsuleBed,
         supplyDrawPoolAssetPaths.drawPool.guideMascot,
+        supplyDrawPoolAssetPaths.cowLogo,
         supplyDrawPoolAssetPaths.drawPool.wristband,
         supplyDrawPoolAssetPaths.drawPool.runningShoe,
       ]),
@@ -86,7 +87,7 @@ describe("SupplyDrawPoolScene", () => {
     expect(container.querySelector(".supply-draw-pool-probability")?.textContent).toContain("概率公示");
     expect(container.querySelector(".supply-draw-pool-rules a[aria-label='查看规则']")).not.toBeNull();
     expect(container.querySelector(".supply-draw-pool-recent a[aria-label='全部记录']")).not.toBeNull();
-    expect(container.textContent).toContain("完成任务获取抽奖券，抽取道具、效果或补给券！");
+    expect(container.textContent).toContain("完成任务拿抽奖券，抽道具、效果和补给券！");
     expect(container.textContent).toContain("消耗抽奖券进行抽取");
   });
 });

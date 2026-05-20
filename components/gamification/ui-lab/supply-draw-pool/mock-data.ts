@@ -2,6 +2,7 @@ import type { SupplyDrawPoolPreview } from "./types";
 
 export const supplyDrawPoolAssetPaths = {
   logo: "/logo.png",
+  cowLogo: "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
   background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
   drawPool: {
     machine: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.png",
@@ -48,7 +49,7 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
   },
   guide: {
     mascotImage: supplyDrawPoolAssetPaths.drawPool.guideMascot,
-    message: "完成任务获取抽奖券，抽取道具、效果或补给券！",
+    message: "完成任务拿抽奖券，抽道具、效果和补给券！",
     actionLabel: "去完成",
   },
   poolRates: [
@@ -59,11 +60,11 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
   ],
   machine: {
     title: "补给抽卡机",
-    emblemImage: supplyDrawPoolAssetPaths.logo,
+    emblemImage: supplyDrawPoolAssetPaths.cowLogo,
     skipAnimation: false,
     actions: [
-      { id: "single", label: "单抽 x1", drawCount: 1, costTicket: 1, tone: "single" },
-      { id: "ten", label: "十连 x10", drawCount: 10, costTicket: 10, tone: "ten", guaranteeLabel: "必出 SR 或以上" },
+      { id: "single", label: "单抽", drawCount: 1, costTicket: 1, tone: "single" },
+      { id: "ten", label: "十连", drawCount: 10, costTicket: 10, tone: "ten", guaranteeLabel: "必出 SR 或以上" },
     ],
   },
   pity: {

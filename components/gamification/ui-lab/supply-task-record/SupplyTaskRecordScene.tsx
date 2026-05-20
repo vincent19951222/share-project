@@ -72,7 +72,13 @@ function TaskRecordSidebar({ data }: { data: SupplyTaskRecordPreview }) {
             </button>
           ))}
         </nav>
-        <div className="supply-task-record-sidebar-mascot" aria-label="补给大厅引导">
+        <div
+          className="supply-task-record-sidebar-mascot"
+          aria-label="补给大厅引导"
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(8, 13, 20, 0.18), rgba(8, 13, 20, 0.82)), url(${data.sidebar.mascot.background})`,
+          }}
+        >
           <Image alt="" height={124} src={data.sidebar.mascot.hero} unoptimized width={124} />
           <p>记录每次脱脂成果，把银子花在刀刃上。</p>
         </div>

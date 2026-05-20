@@ -10,6 +10,11 @@ const requiredDrawPoolAssets = [
   ["draw-pool-running-shoe.webp", 90 * 1024],
 ] as const;
 
+const generatedDrawPoolAssets = [
+  ["draw-button-single.png", 360 * 1024],
+  ["draw-button-ten.png", 360 * 1024],
+] as const;
+
 function publicPath(src: string) {
   return `public${src}`;
 }
@@ -34,9 +39,18 @@ describe("supply draw pool static assets", () => {
   it("references existing reusable dashboard and reward assets", () => {
     expect(existsSync(publicPath(supplyDrawPoolAssetPaths.background))).toBe(true);
     expect(existsSync(publicPath(supplyDrawPoolAssetPaths.logo))).toBe(true);
+    expect(existsSync(publicPath(supplyDrawPoolAssetPaths.cowLogo))).toBe(true);
 
     for (const src of Object.values(supplyDrawPoolAssetPaths.rewardIcons)) {
       expect(existsSync(publicPath(src)), `${src} should exist`).toBe(true);
+    }
+  });
+
+  it("ships generated draw button art within size budgets", () => {
+    for (const [fileName, maxBytes] of generatedDrawPoolAssets) {
+      const path = `public/assets/home-scenes/supply/draw-pool/generated/${fileName}`;
+      expect(existsSync(path), `${path} should exist`).toBe(true);
+      expect(statSync(path).size, `${path} should fit budget`).toBeLessThanOrEqual(maxBytes);
     }
   });
 });

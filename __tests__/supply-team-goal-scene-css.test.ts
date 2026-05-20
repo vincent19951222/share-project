@@ -32,7 +32,8 @@ describe("supply team goal scene css", () => {
     expect(css).toContain("@media (max-width: 768px)");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");
     expect(css).toContain(".supply-team-goal-road-track");
-    expect(css).toContain(".supply-ui-lab-tabs,\n  .supply-ui-lab-statusbar");
+    expect(css).toContain(".supply-ui-lab-tabs");
+    expect(css).toContain(".supply-ui-lab-statusbar");
     expect(css).not.toContain(".supply-team-goal-topbar .supply-dashboard-top-tabs");
     expect(css).not.toContain(".supply-team-goal-topbar .supply-dashboard-resource-list");
   });

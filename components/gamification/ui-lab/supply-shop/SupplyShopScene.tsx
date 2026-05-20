@@ -68,6 +68,7 @@ function ShopSidebar({ data }: { data: SupplyShopPreview }) {
 
 function ShopProductCard({ product }: { product: SupplyShopProduct }) {
   const limitLabel = product.dailyLimit?.label ?? product.stock?.label;
+  const shouldShowLimitLabel = limitLabel !== undefined && !product.tags.includes(limitLabel);
 
   return (
     <button
@@ -90,7 +91,7 @@ function ShopProductCard({ product }: { product: SupplyShopProduct }) {
             <span key={tag}>{tag}</span>
           ))}
         </span>
-        {limitLabel ? <small>{limitLabel}</small> : null}
+        {shouldShowLimitLabel ? <small>{limitLabel}</small> : null}
       </span>
       <span className="supply-shop-product-price">{formatPrice(product)}</span>
     </button>

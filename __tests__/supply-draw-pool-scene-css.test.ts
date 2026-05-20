@@ -19,6 +19,9 @@ describe("supply draw pool scene css", () => {
     expect(css).not.toContain(".supply-draw-pool-probability-image");
     expect(css).toContain(".supply-draw-pool-machine");
     expect(css).toContain(".supply-draw-pool-machine-stage");
+    expect(css).toContain(".supply-draw-pool-window-emblem");
+    expect(css).toContain("draw-button-single.png");
+    expect(css).toContain("draw-button-ten.png");
     expect(css).not.toContain(".supply-draw-pool-machine-hotspot");
     expect(css).toContain(".supply-draw-pool-right-rail");
     expect(css).not.toContain(".supply-draw-pool-pity-image");
