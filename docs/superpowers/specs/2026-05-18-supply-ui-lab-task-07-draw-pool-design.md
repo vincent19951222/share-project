@@ -1,24 +1,24 @@
-# Supply UI Lab Task 07 Draw Pool Design
+# Supply UI Lab 任务 07：补给抽卡机设计
 
-> Phase 2 task-level spec for the Draw Pool page. This task corresponds to Task 7 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义补给抽卡机页面的查漏补缺范围。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 7。
 
-## Goal
+## 目标
 
-Make the draw pool explain and simulate the current lottery rules with shared catalog prizes, local ticket balance, and local draw result feedback.
+让补给抽卡机用共享 catalog 奖品、本地抽奖券余额和本地抽卡结果反馈，解释并模拟当前抽奖规则。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Ticket naming is consistently `抽奖券`.
-- Long-term pity progress is removed.
-- The right-side guarantee panel becomes `十连保底说明`.
-- The page explains that single draw has no guarantee.
-- The page explains ten-draw batch guarantee: one utility, social, or rare reward if the natural ten draw misses all eligible tiers.
-- Single draw and ten draw buttons update local ticket balance and show static results.
-- Prize preview and recent drops use shared catalog items and coin reward rows.
+- 券名称统一为 `抽奖券`。
+- 移除长期累计保底进度。
+- 右侧保底面板改为 `十连保底说明`。
+- 页面说明单抽没有保底。
+- 页面说明十连批次保底：如果自然十连没有实用、社交或稀有奖励，则补 1 个合格奖励。
+- 单抽和十连按钮会更新本地抽奖券余额，并展示静态结果。
+- 奖池预览和最近掉落使用共享 catalog 道具和银子奖励行。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Modify:
+修改：
 
 - `components/gamification/ui-lab/supply-draw-pool/types.ts`
 - `components/gamification/ui-lab/supply-draw-pool/mock-data.ts`
@@ -26,31 +26,31 @@ Modify:
 - `__tests__/supply-draw-pool-mock-data.test.ts`
 - `__tests__/supply-draw-pool-scene.test.tsx`
 
-Draw Pool uses:
+补给抽卡机使用：
 
-- shared resources;
-- shared catalog;
-- coin reward rows;
-- local result state.
+- 共享 resources；
+- 共享 catalog；
+- 银子奖励行；
+- 本地结果状态。
 
-## Non-Goals
+## 非目标
 
-- Do not call the real lottery API.
-- Do not persist ticket balance.
-- Do not implement long-term cumulative pity.
-- Do not build animation or reveal sequences.
+- 不调用真实抽奖 API。
+- 不持久化抽奖券余额。
+- 不实现长期累计保底。
+- 不制作抽奖动画或揭示流程。
 
-## Acceptance Criteria
+## 验收标准
 
-- Pool rates are `coin 45 / utility 27 / social 24 / rare 4`.
-- No `保底进度` or `48/70` long-term pity remains.
-- Single draw click shows result and decrements local balance by 1.
-- Ten draw click shows ten-draw result and decrements local balance by 10.
-- Buttons disable or show explanation when ticket balance is insufficient.
-- No `补给券` remains.
+- 奖池概率为 `coin 45 / utility 27 / social 24 / rare 4`。
+- 不再出现 `保底进度` 或 `48/70` 这类长期保底展示。
+- 点击单抽后展示结果，并让本地余额减少 1。
+- 点击十连后展示十连结果，并让本地余额减少 10。
+- 抽奖券不足时按钮禁用或展示解释。
+- 不再出现 `补给券`。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 7 of:
+具体实现步骤见以下总计划的任务 7：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

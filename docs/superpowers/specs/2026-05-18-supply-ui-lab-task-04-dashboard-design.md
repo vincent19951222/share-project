@@ -1,24 +1,24 @@
-# Supply UI Lab Task 04 Dashboard Design
+# Supply UI Lab 任务 04：Dashboard 设计
 
-> Phase 2 task-level spec for the `我的状态` Dashboard page. This task corresponds to Task 4 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义 `我的状态` Dashboard 页面的查漏补缺范围。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 4。
 
-## Goal
+## 目标
 
-Make the Dashboard page match Phase 2 business vocabulary and become the clean entry point for the UI Lab page family.
+让 Dashboard 页面符合第二阶段统一业务术语，并成为 UI Lab 页面族干净、稳定的入口。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Top bar shows `银子 / 抽奖券 / 背包`.
-- `体力` is removed from the top bar and today effects.
-- `补给券` and `生命票` are replaced with `抽奖券`.
-- Help center, feedback, and settings links are removed.
-- Character status explains `牛马等级`.
-- Today's effects show item source, effect summary, status, and end time.
-- Quest reroll and reward claim controls provide local mock feedback.
+- 顶部资源栏展示 `银子 / 抽奖券 / 背包`。
+- 顶部资源栏和今日效果里移除 `体力`。
+- `补给券` 和 `生命票` 统一替换为 `抽奖券`。
+- 移除帮助中心、意见反馈和设置入口。
+- 角色状态区解释 `牛马等级`。
+- 今日效果展示道具来源、效果摘要、状态和结束时间。
+- 任务换班和奖励领取按钮提供本地 mock 反馈。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Modify:
+修改：
 
 - `components/gamification/ui-lab/supply-dashboard/types.ts`
 - `components/gamification/ui-lab/supply-dashboard/mock-data.ts`
@@ -26,12 +26,12 @@ Modify:
 - `__tests__/supply-dashboard-mock-data.test.ts`
 - `__tests__/supply-dashboard-scene.test.tsx`
 
-Dashboard uses:
+Dashboard 使用：
 
 - `supplyUiLabResources.dashboard`
 - `supplyUiLabActiveEffects`
 
-The level formula is mock-only:
+等级公式仅用于 mock 展示：
 
 ```text
 level = floor(totalExp / 1000) + 1
@@ -39,23 +39,23 @@ currentLevelExp = totalExp % 1000
 nextLevelExp = 1000
 ```
 
-## Non-Goals
+## 非目标
 
-- Do not persist level or EXP.
-- Do not connect quest buttons to real task APIs.
-- Do not reintroduce help, feedback, or settings.
-- Do not add a production navigation entry.
+- 不持久化等级或 EXP。
+- 不把任务按钮接到真实任务 API。
+- 不重新引入帮助、反馈或设置入口。
+- 不新增生产导航入口。
 
-## Acceptance Criteria
+## 验收标准
 
-- Dashboard tests confirm top resources are `银子 / 抽奖券 / 背包`.
-- Rendered Dashboard contains `牛马等级`.
-- Rendered Dashboard contains no banned old terms.
-- Inventory preview uses capacity `60`.
-- Dashboard and Backpack share the same active effects fixture.
+- Dashboard 测试确认顶部资源为 `银子 / 抽奖券 / 背包`。
+- 渲染后的 Dashboard 包含 `牛马等级`。
+- 渲染后的 Dashboard 不包含旧的禁用术语。
+- 背包预览容量使用 `60`。
+- Dashboard 和背包共用同一份 active effects fixture。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 4 of:
+具体实现步骤见以下总计划的任务 4：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

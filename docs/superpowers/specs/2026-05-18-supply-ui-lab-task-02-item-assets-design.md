@@ -1,25 +1,25 @@
-# Supply UI Lab Task 02 Item Assets Design
+# Supply UI Lab 任务 02：道具素材设计
 
-> Phase 2 task-level spec for atomic item art used by the shared catalog. This task corresponds to Task 2 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义共享 catalog 使用的原子道具素材。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 2。
 
-## Goal
+## 目标
 
-Give every visible catalog item a real atomic media asset so Shop, Backpack, Draw Pool, and Task Record can render items without cropped prototype panels or mismatched placeholder icons.
+为每一个可见 catalog 道具补齐真实的原子媒体素材，让补给商店、背包、补给抽卡机和任务记录可以渲染同一套道具图，不再依赖原型裁图面板或不匹配的临时图标。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Every shop product has a distinct item image.
-- Backpack item slots use the same item images as the shop.
-- Draw Pool prize previews and recent drops can reuse the same catalog art.
-- Items that used to be text-only or borrowed from unrelated art become visually recognizable.
+- 每个商店商品都有独立、可识别的道具图片。
+- 背包格子使用和商店一致的道具图片。
+- 补给抽卡机的奖池预览和最近掉落可以复用同一套 catalog 素材。
+- 原本只有文字或借用无关图片的道具，会变成视觉上能区分的道具。
 
-## Asset Changes
+## 素材变化
 
-Create generated transparent WebP item icons under:
+在以下目录新增透明背景 WebP 道具图标：
 
 `public/assets/home-scenes/supply/items/`
 
-Required generated assets:
+需要生成的素材：
 
 - `fitness-leave-coupon.webp`
 - `drink-water-ping.webp`
@@ -30,30 +30,30 @@ Required generated assets:
 - `double-niuma-coupon.webp`
 - `season-sprint-coupon.webp`
 
-Existing assets can still be reused for:
+以下已有素材可以继续复用：
 
 - `task_reroll_coupon`
 - `small_boost_coupon`
 - `team_broadcast_coupon`
 - `luckin_coffee_coupon`
-- coin rewards
+- 银子奖励
 
-## Non-Goals
+## 非目标
 
-- Do not generate full UI panels.
-- Do not crop images from prototype screenshots.
-- Do not redesign the page layout.
-- Do not add animation sprites.
+- 不生成完整 UI 面板。
+- 不从原型截图里裁道具图。
+- 不重做页面布局。
+- 不新增动画 sprites。
 
-## Acceptance Criteria
+## 验收标准
 
-- Every `assetStatus: "needs_generated"` catalog item has a committed file.
-- Each generated item asset stays under the agreed size budget.
-- Asset tests verify paths exist and no panel screenshot assets are used.
-- Item assets are transparent or isolated enough to work in grid, card, and reward contexts.
+- 每个 `assetStatus: "needs_generated"` 的 catalog item 都有对应已提交文件。
+- 每个生成素材都符合约定体积预算。
+- 素材测试能验证文件存在，并确认没有使用面板截图素材。
+- 道具素材有透明背景或足够独立，能同时用于背包格子、商品卡和奖励展示。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 2 of:
+具体实现步骤见以下总计划的任务 2：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

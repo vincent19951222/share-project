@@ -1,40 +1,40 @@
-# Supply UI Lab Task 09 Team Goal Design
+# Supply UI Lab 任务 09：团队目标设计
 
-> Phase 2 task-level spec for the Team Goal page. This task corresponds to Task 9 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义团队目标页面的查漏补缺范围。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 9。
 
-## Goal
+## 目标
 
-Make Team Goal explain season rewards, milestone rewards, and today's team task metrics using Phase 2 vocabulary and local mock state.
+让团队目标页面用第二阶段统一术语和本地 mock 状态，解释赛季奖励、里程碑奖励和今日团队任务指标。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Season completion reward is visible.
-- Milestone reward list is visible.
-- Today team tasks explain what each metric counts.
-- `补给券` becomes `抽奖券`.
-- Help center, feedback, and settings links are removed.
-- Reward claim button shows local feedback.
+- 页面展示赛季完成奖励。
+- 页面展示里程碑奖励列表。
+- 今日团队任务说明每个指标统计什么。
+- `补给券` 替换为 `抽奖券`。
+- 移除帮助中心、意见反馈和设置入口。
+- 奖励领取按钮展示本地反馈。
 
-## Reward Rules
+## 奖励规则
 
-Season completion reward:
+赛季完成奖励：
 
-- Each member mock receives `银子 x100`.
-- Each member mock receives `抽奖券 x3`.
-- Team receives `团队称号 30天`.
-- Weekly report receives `赛季达成高光`.
+- 每名成员 mock 获得 `银子 x100`。
+- 每名成员 mock 获得 `抽奖券 x3`。
+- 团队获得 `团队称号 30天`。
+- 周报获得 `赛季达成高光`。
 
-Milestone rewards:
+里程碑奖励：
 
-- 20%: team announcement highlight.
-- 40%: each member receives `抽奖券 x1`.
-- 65%: team title preview.
-- 85%: each member receives `银子 x50`.
-- 100%: season completion reward.
+- 20%：团队公告高光。
+- 40%：每人获得 `抽奖券 x1`。
+- 65%：团队称号预览。
+- 85%：每人获得 `银子 x50`。
+- 100%：触发赛季完成奖励。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Modify:
+修改：
 
 - `components/gamification/ui-lab/supply-team-goal/types.ts`
 - `components/gamification/ui-lab/supply-team-goal/mock-data.ts`
@@ -42,29 +42,29 @@ Modify:
 - `__tests__/supply-team-goal-mock-data.test.ts`
 - `__tests__/supply-team-goal-scene.test.tsx`
 
-Add task metric source labels:
+新增任务指标来源文案：
 
 - `今日有效健身打卡人数`
 - `今日四维任务完成份数`
 - `今日弱社交已回应次数`
 - `今日全队抽卡次数`
 
-## Non-Goals
+## 非目标
 
-- Do not grant real season rewards.
-- Do not connect to real season service.
-- Do not write team dynamics.
-- Do not add settings or helper links.
+- 不发放真实赛季奖励。
+- 不接入真实 season service。
+- 不写入团队动态。
+- 不新增设置或帮助入口。
 
-## Acceptance Criteria
+## 验收标准
 
-- Team Goal mock data includes completion rewards and milestone rewards.
-- Rendered page shows `赛季达成奖励`, `银子 x100`, and `抽奖券 x3`.
-- Rendered page explains today's team task metric sources.
-- No `补给券`, `帮助中心`, `意见反馈`, or `设置` remains.
+- 团队目标 mock data 包含完成奖励和里程碑奖励。
+- 渲染页面展示 `赛季达成奖励`、`银子 x100` 和 `抽奖券 x3`。
+- 渲染页面解释今日团队任务的指标来源。
+- 不再出现 `补给券`、`帮助中心`、`意见反馈` 或 `设置`。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 9 of:
+具体实现步骤见以下总计划的任务 9：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

@@ -1,24 +1,24 @@
-# Supply UI Lab Task 06 Shop Design
+# Supply UI Lab 任务 06：补给商店设计
 
-> Phase 2 task-level spec for the Supply Shop page. This task corresponds to Task 6 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义补给商店页面的查漏补缺范围。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 6。
 
-## Goal
+## 目标
 
-Make the shop a catalog-driven static storefront where every active non-coin draw reward can be bought, inspected, filtered, and mock-redeemed.
+把补给商店改成 catalog 驱动的静态店面，让每个 active 的非银子抽奖奖励都能被购买、查看、筛选和 mock 兑换。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Shop products are the same items that can appear in the draw pool.
-- Product images, names, effects, prices, limits, and ownership all come from the shared catalog.
-- Clicking a product changes the detail panel.
-- Category and filter buttons switch local state.
-- Redeem button changes local feedback, such as `已加入背包` or `兑换中`.
-- `了解更多规则` dead anchor is removed and replaced with an in-page rules disclosure.
-- `补给券` is replaced by `抽奖券`.
+- 商店商品与抽卡池可出现的道具保持一致。
+- 商品图片、名称、效果、价格、限制和持有数量都来自共享 catalog。
+- 点击商品会切换右侧详情面板。
+- 分类和筛选按钮会切换本地状态。
+- 兑换按钮会更新本地反馈，例如 `已加入背包` 或 `兑换中`。
+- 移除 `了解更多规则` 死锚点，改成本页规则展开区。
+- `补给券` 替换为 `抽奖券`。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Modify:
+修改：
 
 - `components/gamification/ui-lab/supply-shop/types.ts`
 - `components/gamification/ui-lab/supply-shop/mock-data.ts`
@@ -26,27 +26,27 @@ Modify:
 - `__tests__/supply-shop-mock-data.test.ts`
 - `__tests__/supply-shop-scene.test.tsx`
 
-Shop products derive from:
+商店商品来自：
 
 - `supplyUiLabCatalog.filter((item) => item.shop.buyable)`
 
-## Non-Goals
+## 非目标
 
-- Do not perform real purchase or inventory mutation.
-- Do not call redemption APIs.
-- Do not sell coin rewards as products.
-- Do not add admin confirmation workflows beyond local mock status.
+- 不执行真实购买或库存 mutation。
+- 不调用兑换 API。
+- 不把银子奖励作为商品出售。
+- 不新增超出本地 mock 状态的管理员确认流程。
 
-## Acceptance Criteria
+## 验收标准
 
-- Product list includes all active non-coin draw reward item ids.
-- Every product has source, effect, timing, price, and limit information.
-- Clicking a product changes selected detail.
-- Real-world items show admin-confirmation language and local `兑换中` feedback.
-- No dead `href="#rules"` anchor remains.
+- 商品列表包含所有 active 非银子抽奖奖励 item id。
+- 每个商品都有来源、效果、使用时机、价格和限制信息。
+- 点击商品能切换选中详情。
+- 真实福利类商品展示管理员确认文案，并提供本地 `兑换中` 反馈。
+- 不再保留 `href="#rules"` 死锚点。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 6 of:
+具体实现步骤见以下总计划的任务 6：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

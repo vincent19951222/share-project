@@ -1,30 +1,30 @@
-# Supply UI Lab Task 08 Task Record Design
+# Supply UI Lab 任务 08：任务记录设计
 
-> Phase 2 task-level spec for the Task Record page. This task corresponds to Task 8 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义任务记录页面的查漏补缺范围。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 8。
 
-## Goal
+## 目标
 
-Turn Task Record from a static overview into a single-route local state machine with full views for records, draw history, redemptions, teammate radar, and rules.
+把任务记录从静态总览页改成单 route 的本地状态机，支持记录、抽卡历史、兑换记录、队友雷达和规则说明的完整视图。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Left sidebar modes switch the main content.
-- `今日记录` shows the timeline plus side previews.
-- `抽卡记录` shows draw history, reward details, ticket spent, and batch guarantee status.
-- `兑换记录` shows full redemption history.
-- `队友雷达` shows full invitation status lists.
-- `规则说明` shows static rules for records, draw history, radar, and redemption states.
-- Date tabs show the last 7 days and switch local records.
-- Empty dates show an empty state instead of fake records.
-- `生命票` and `补给券` are replaced by `抽奖券` or concrete item names.
+- 左侧侧栏模式可以切换主内容。
+- `今日记录` 展示时间线和右侧预览。
+- `抽卡记录` 展示抽卡历史、奖励明细、消耗抽奖券和批次保底状态。
+- `兑换记录` 展示完整兑换历史。
+- `队友雷达` 展示完整邀请状态列表。
+- `规则说明` 展示记录、抽卡历史、雷达和兑换状态的静态规则。
+- 日期 tab 展示最近 7 天，并切换本地记录。
+- 无记录日期展示空状态，而不是展示假数据。
+- `生命票` 和 `补给券` 替换为 `抽奖券` 或具体道具名。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Create:
+新增：
 
 - `components/gamification/ui-lab/supply-data/records.ts`
 
-Modify:
+修改：
 
 - `components/gamification/ui-lab/supply-task-record/types.ts`
 - `components/gamification/ui-lab/supply-task-record/mock-data.ts`
@@ -32,25 +32,25 @@ Modify:
 - `__tests__/supply-task-record-mock-data.test.ts`
 - `__tests__/supply-task-record-scene.test.tsx`
 
-The scene becomes a client component with local mode and date state.
+页面 scene 会变成 client component，并维护本地模式状态和日期状态。
 
-## Non-Goals
+## 非目标
 
-- Do not add multiple task-record routes.
-- Do not query real records.
-- Do not respond to real social invitations.
-- Do not mutate redemption state outside local mock UI.
+- 不新增多个任务记录 route。
+- 不查询真实记录。
+- 不响应真实社交邀请。
+- 不在本地 mock UI 之外修改兑换状态。
 
-## Acceptance Criteria
+## 验收标准
 
-- Sidebar mode clicks change the main panel title and content.
-- Date selection changes visible records.
-- Draw history includes single draw, ten draw, ticket spent, rewards, and guarantee status.
-- Radar and redemptions can be shown as full main views.
-- No `生命票`, `补给券`, or dead main-flow anchors remain.
+- 点击侧栏模式会改变主面板标题和内容。
+- 选择日期会改变可见记录。
+- 抽卡历史包含单抽、十连、消耗抽奖券、奖励和保底状态。
+- 队友雷达和兑换记录可以作为完整主视图展示。
+- 不再保留 `生命票`、`补给券` 或主流程死锚点。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 8 of:
+具体实现步骤见以下总计划的任务 8：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

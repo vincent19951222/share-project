@@ -1,21 +1,21 @@
-# Supply UI Lab Task 01 Shared Catalog Design
+# Supply UI Lab 任务 01：共享目录设计
 
-> Phase 2 task-level spec for the shared mock catalog, shared resource fixtures, and shared today effects. This task corresponds to Task 1 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义共享 mock catalog、共享资源 fixture 和共享今日效果。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 1。
 
-## Goal
+## 目标
 
-Create a UI Lab-only shared data layer so Dashboard, Shop, Backpack, Draw Pool, and Task Record stop defining conflicting mock resources, items, rewards, and today effects.
+建立一层仅供 UI Lab 使用的共享数据，让 Dashboard、补给商店、背包、补给抽卡机和任务记录不再各自定义互相冲突的 mock 资源、道具、奖励和今日效果。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Top bars across UI Lab pages can consistently show `银子 / 抽奖券 / 背包`.
-- Shop, Backpack, Draw Pool, and Task Record can reference the same item names and descriptions.
-- Dashboard and Backpack can show the same `今日效果` list.
-- Users no longer see different pages invent different names for the same item.
+- UI Lab 各页面顶部资源栏可以统一展示 `银子 / 抽奖券 / 背包`。
+- 补给商店、背包、补给抽卡机和任务记录可以引用同一套道具名称和说明。
+- Dashboard 和背包可以展示同一份 `今日效果` 列表。
+- 用户不会再看到不同页面给同一个道具编出不同名字。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Create:
+新增：
 
 - `components/gamification/ui-lab/supply-data/types.ts`
 - `components/gamification/ui-lab/supply-data/catalog.ts`
@@ -23,7 +23,7 @@ Create:
 - `components/gamification/ui-lab/supply-data/resources.ts`
 - `__tests__/supply-ui-lab-catalog.test.ts`
 
-The catalog contains every active non-coin draw reward:
+共享 catalog 需要包含所有 active 的非银子抽奖奖励：
 
 - `task_reroll_coupon`
 - `small_boost_coupon`
@@ -38,24 +38,24 @@ The catalog contains every active non-coin draw reward:
 - `season_sprint_coupon`
 - `luckin_coffee_coupon`
 
-Coin rewards remain draw rewards only; they do not become shop products or backpack slots.
+银子奖励只保留为抽奖奖励，不进入商店商品，也不占用背包格子。
 
-## Non-Goals
+## 非目标
 
-- Do not import Prisma, API Routes, or session state.
-- Do not replace production gamification config.
-- Do not make the catalog configurable in an admin UI.
-- Do not update page UI in this task beyond adding shared fixtures.
+- 不引入 Prisma、API Routes 或 session 状态。
+- 不替换生产游戏化配置。
+- 不把 catalog 做成后台可配置能力。
+- 本任务除新增共享 fixture 外，不改页面 UI。
 
-## Acceptance Criteria
+## 验收标准
 
-- Shared catalog test verifies all active non-coin draw rewards are visible, buyable, and inventory-backed.
-- Shared resources contain `银子 / 抽奖券 / 背包`, with no `补给券` or `体力`.
-- Shared active effects contain only business-explainable today effects.
-- All new data lives under `components/gamification/ui-lab/supply-data/`.
+- 共享 catalog 测试能验证所有 active 非银子抽奖奖励都可展示、可购买、可进入背包。
+- 共享资源只包含 `银子 / 抽奖券 / 背包`，不包含 `补给券` 或 `体力`。
+- 共享今日效果只包含有清晰业务来源的效果。
+- 所有新增共享数据都放在 `components/gamification/ui-lab/supply-data/` 下。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 1 of:
+具体实现步骤见以下总计划的任务 1：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

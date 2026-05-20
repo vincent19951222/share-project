@@ -1,26 +1,26 @@
-# Supply UI Lab Task 05 Backpack Design
+# Supply UI Lab 任务 05：背包设计
 
-> Phase 2 task-level spec for the Backpack page. This task corresponds to Task 5 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义背包页面的查漏补缺范围。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 5。
 
-## Goal
+## 目标
 
-Turn Backpack into a static but business-consistent inventory surface backed by the shared catalog, with fixed 60-slot capacity and local item interactions.
+把背包改成一个静态但业务自洽的库存界面：数据来自共享 catalog，容量固定 60 格，并支持本地道具交互。
 
-## User-Visible Changes
+## 用户可见变化
 
-- Top bar shows `银子 / 抽奖券 / 背包 18/60`.
-- Backpack capacity is fixed at 60.
-- Expansion controls are removed.
-- Locked slots are removed and replaced with empty slots.
-- Help center link is removed from the bottom hint bar.
-- Item selection changes the detail panel locally.
-- Pagination changes between static pages locally.
-- `今日使用` and `申请兑换` buttons show local feedback.
-- Today effects match the Dashboard page.
+- 顶部资源栏展示 `银子 / 抽奖券 / 背包 18/60`。
+- 背包容量固定为 60。
+- 移除扩容控件。
+- 移除锁定格，改为空格。
+- 底部提示栏移除帮助中心入口。
+- 点击道具后，本地切换详情面板。
+- 分页按钮可以在静态页之间本地切换。
+- `今日使用` 和 `申请兑换` 按钮展示本地反馈。
+- 今日效果与 Dashboard 保持一致。
 
-## Data And Component Changes
+## 数据与组件变化
 
-Modify:
+修改：
 
 - `components/gamification/ui-lab/supply-backpack/types.ts`
 - `components/gamification/ui-lab/supply-backpack/mock-data.ts`
@@ -29,29 +29,29 @@ Modify:
 - `__tests__/supply-backpack-scene.test.tsx`
 - `__tests__/supply-backpack-assets.test.ts`
 
-Backpack uses:
+背包使用：
 
-- shared catalog quantities and item detail fields;
-- shared active effects;
-- shared resources.
+- 共享 catalog 中的数量和道具详情字段；
+- 共享 active effects；
+- 共享 resources。
 
-## Non-Goals
+## 非目标
 
-- Do not implement real inventory mutation.
-- Do not implement capacity expansion.
-- Do not lock slots by level.
-- Do not connect redemption to real admin workflows.
+- 不实现真实库存 mutation。
+- 不实现背包扩容。
+- 不按等级锁定格子。
+- 不把兑换接到真实管理员流程。
 
-## Acceptance Criteria
+## 验收标准
 
-- Backpack renders 20 visible slots per page.
-- Empty slots render as empty inventory cells, not locks.
-- Capacity displays as `/60`.
-- No `扩容`, `帮助中心`, `体力`, `补给券`, or `生命票` appears.
-- Use/redeem/shop actions either update local mock state or route to UI Lab shop.
+- 背包每页渲染 20 个可见格子。
+- 空格渲染为空库存格，而不是锁定格。
+- 容量展示为 `/60`。
+- 页面不出现 `扩容`、`帮助中心`、`体力`、`补给券` 或 `生命票`。
+- 使用、兑换、去商店操作要么更新本地 mock 状态，要么跳转到 UI Lab 商店。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 5 of:
+具体实现步骤见以下总计划的任务 5：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`

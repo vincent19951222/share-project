@@ -1,43 +1,43 @@
-# Supply UI Lab Task 10 Verification Design
+# Supply UI Lab 任务 10：验证设计
 
-> Phase 2 task-level spec for final verification and browser QA. This task corresponds to Task 10 in `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`.
+> 第二阶段任务级 spec，用于定义最终验证和浏览器 QA。本文对应 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md` 中的任务 10。
 
-## Goal
+## 目标
 
-Verify that Phase 2 static mock business closure works across all six UI Lab pages, tests, TypeScript, build, and browser QA.
+验证第二阶段静态 mock 业务闭环在 6 个 UI Lab 页面、测试、TypeScript、构建和浏览器 QA 中都成立。
 
-## User-Visible Changes
+## 用户可见变化
 
-This task should not introduce new product behavior. It confirms that the previous nine tasks work together.
+本任务不应该引入新的产品行为，只验证前 9 个任务能一起工作。
 
-Users should be able to:
+用户应该能够：
 
-- open all six UI Lab pages;
-- navigate between pages;
-- click local filters, tabs, buttons, and mock actions;
-- see consistent vocabulary and item data;
-- use the pages on desktop and mobile widths without obvious overlap or overflow.
+- 打开全部 6 个 UI Lab 页面；
+- 在页面之间跳转；
+- 点击本地筛选、tab、按钮和 mock 操作；
+- 看到一致的术语和道具数据；
+- 在桌面和移动端宽度下使用页面，不出现明显重叠或溢出。
 
-## Verification Scope
+## 验证范围
 
-Run focused tests for:
+运行 focused tests，覆盖：
 
-- routes;
-- mock data;
-- assets;
-- scene rendering;
-- CSS contracts;
-- shared primitives;
-- shared catalog;
-- global Phase 2 guardrails.
+- 路由；
+- mock data；
+- 素材；
+- scene 渲染；
+- CSS 契约；
+- 共享基础组件；
+- 共享 catalog；
+- 全局第二阶段护栏。
 
-Run:
+运行：
 
 - `npm run lint`
 - `npm run build`
-- local dev server browser QA
+- 本地开发服务器浏览器 QA
 
-Browser QA routes:
+浏览器 QA 路由：
 
 - `/ui-lab/supply-dashboard`
 - `/ui-lab/supply-dashboard/team-goal`
@@ -46,26 +46,26 @@ Browser QA routes:
 - `/ui-lab/supply-dashboard/draw-pool`
 - `/ui-lab/supply-dashboard/backpack`
 
-## Non-Goals
+## 非目标
 
-- Do not add new Phase 2 features during verification.
-- Do not change production `SupplyStation`.
-- Do not accept test snapshots or brittle visual checks as substitutes for browser QA.
-- Do not fold unrelated dirty worktree changes into verification commits.
+- 不在验证阶段新增第二阶段功能。
+- 不修改生产 `SupplyStation`。
+- 不用测试快照或脆弱视觉检查替代浏览器 QA。
+- 不把无关 dirty worktree 改动混进验证提交。
 
-## Acceptance Criteria
+## 验收标准
 
-- All focused Supply UI Lab tests pass.
-- `npm run lint` passes.
-- `npm run build` passes.
-- Browser QA at `1536 x 1024` and around `390 x 844` passes.
-- No rendered banned terms remain: `补给券`, `生命票`, `体力`, `扩容`, `帮助中心`, `意见反馈`, `设置`.
-- No dead main-flow `href="#"` links remain.
-- Console has no errors on the six routes.
-- Any verification fixes are committed separately with exact file staging.
+- 所有 focused Supply UI Lab tests 通过。
+- `npm run lint` 通过。
+- `npm run build` 通过。
+- `1536 x 1024` 和约 `390 x 844` 视口的浏览器 QA 通过。
+- 渲染结果中不再有禁用术语：`补给券`、`生命票`、`体力`、`扩容`、`帮助中心`、`意见反馈`、`设置`。
+- 不再保留主流程 `href="#"` 死链接。
+- 6 个路由的 console 没有错误。
+- 如有验证修复，需要单独提交，并精确 stage 对应文件。
 
-## Plan Link
+## 关联计划
 
-Implementation details live in Task 10 of:
+具体实现步骤见以下总计划的任务 10：
 
 `docs/superpowers/plans/2026-05-18-supply-ui-lab-static-business-closure.md`
