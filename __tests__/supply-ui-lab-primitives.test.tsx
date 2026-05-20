@@ -1,6 +1,6 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   SupplyUiLabActionButton,
@@ -62,5 +62,27 @@ describe("Supply UI Lab shared primitives", () => {
     expect(container.querySelector("button")?.textContent).toContain("全部");
     expect(container.querySelector(".supply-ui-lab-action--danger")?.textContent).toBe("放弃");
     expect(container.textContent).toContain("领取");
+  });
+
+  it("supports controlled filter selection", async () => {
+    const onSelect = vi.fn();
+
+    await act(async () => {
+      root.render(
+        <SupplyUiLabFilterBar
+          ariaLabel="记录筛选"
+          filters={[
+            { id: "all", label: "全部", active: true },
+            { id: "draws", label: "抽卡", active: false },
+          ]}
+          onSelect={onSelect}
+        />,
+      );
+    });
+
+    container.querySelectorAll("button")[1]?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith("draws");
   });
 });

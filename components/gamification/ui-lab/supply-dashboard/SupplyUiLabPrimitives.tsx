@@ -82,14 +82,22 @@ export function SupplyUiLabProgress({ current, label, max }: { current: number; 
 export function SupplyUiLabFilterBar({
   ariaLabel,
   filters,
+  onSelect,
 }: {
   ariaLabel: string;
   filters: Array<{ id: string; label: string; active: boolean }>;
+  onSelect?: (id: string) => void;
 }) {
   return (
     <div className="supply-ui-lab-filterbar" role="tablist" aria-label={ariaLabel}>
       {filters.map((filter) => (
-        <button aria-selected={filter.active} key={filter.id} role="tab" type="button">
+        <button
+          aria-selected={filter.active}
+          key={filter.id}
+          onClick={() => onSelect?.(filter.id)}
+          role="tab"
+          type="button"
+        >
           {filter.label}
         </button>
       ))}
