@@ -9688,6 +9688,162 @@ body {
   padding: 0.42rem 0.72rem;
 }
 
+.supply-task-record-date-tabs {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.45rem;
+  overflow-x: auto;
+}
+
+.supply-task-record-date-tabs button {
+  display: grid;
+  gap: 0.12rem;
+  min-height: 3rem;
+  border: 2px solid #111827;
+  background: #ffffff;
+  color: #111827;
+  padding: 0.38rem 0.5rem;
+  font-weight: 1000;
+  cursor: pointer;
+}
+
+.supply-task-record-date-tabs button[aria-selected="true"] {
+  background: #fde047;
+  box-shadow: inset 0 -3px 0 rgba(17, 24, 39, 0.22);
+}
+
+.supply-task-record-date-tabs small {
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.supply-task-record-empty {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  min-height: 13rem;
+  border: 3px dashed #111827;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 1rem;
+  text-align: center;
+}
+
+.supply-task-record-empty strong {
+  color: #111827;
+  font-size: 1.15rem;
+  font-weight: 1000;
+}
+
+.supply-task-record-empty p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.supply-task-record-draw-list,
+.supply-task-record-full-list,
+.supply-task-record-rules-list {
+  display: grid;
+  align-content: start;
+  gap: 0.72rem;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.1rem 0.12rem 0.2rem 0;
+}
+
+.supply-task-record-draw {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.82fr) auto minmax(0, 1.5fr);
+  align-items: start;
+  gap: 0.72rem;
+  border: 3px solid #111827;
+  background: #ffffff;
+  box-shadow: 0 3px 0 rgba(17, 24, 39, 0.85);
+  padding: 0.82rem;
+}
+
+.supply-task-record-draw-meta {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.supply-task-record-draw-meta strong {
+  color: #111827;
+  font-size: 1.05rem;
+  font-weight: 1000;
+}
+
+.supply-task-record-draw-meta time,
+.supply-task-record-draw-meta span {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.supply-task-record-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.supply-task-record-reward-grid span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.3rem;
+  border: 2px solid #111827;
+  background: #fff8e8;
+  padding: 0.28rem 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.supply-task-record-reward-grid b {
+  display: grid;
+  min-width: 2rem;
+  min-height: 1.65rem;
+  place-items: center;
+  border: 2px solid #111827;
+  background: #fde047;
+  font-size: 0.72rem;
+  font-weight: 1000;
+}
+
+.supply-task-record-rules-list {
+  counter-reset: task-record-rule;
+  list-style: none;
+  margin: 0;
+}
+
+.supply-task-record-rules-list li {
+  counter-increment: task-record-rule;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  border: 3px solid #111827;
+  background: #ffffff;
+  box-shadow: 0 3px 0 rgba(17, 24, 39, 0.85);
+  padding: 0.82rem;
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.supply-task-record-rules-list li::before {
+  content: counter(task-record-rule);
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 2px solid #111827;
+  background: #fde047;
+  font-weight: 1000;
+}
+
 .supply-task-record-timeline {
   display: grid;
   align-content: start;
@@ -9975,6 +10131,18 @@ body {
   .supply-task-record-entry .supply-ui-lab-status {
     grid-column: 2 / -1;
     justify-self: start;
+  }
+
+  .supply-task-record-date-tabs {
+    grid-template-columns: repeat(7, minmax(5.2rem, 1fr));
+  }
+
+  .supply-task-record-draw {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .supply-task-record-reward-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

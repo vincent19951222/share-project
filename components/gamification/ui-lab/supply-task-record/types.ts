@@ -1,15 +1,11 @@
-export type SupplyTaskRecordResource = {
-  id: "coins" | "ticket" | "backpack";
-  label: string;
-  value: string;
-  icon: string;
-};
+import type { SupplyUiLabResource } from "../supply-data/types";
+
+export type SupplyTaskRecordMode = "today" | "draws" | "redemptions" | "radar" | "rules";
 
 export type SupplyTaskRecordMenuItem = {
-  id: "today" | "draws" | "redemptions" | "radar" | "rules";
+  id: SupplyTaskRecordMode;
   label: string;
   icon: string;
-  active: boolean;
 };
 
 export type SupplyTaskRecordFilter = {
@@ -20,6 +16,13 @@ export type SupplyTaskRecordFilter = {
 
 export type SupplyTaskRecordTimelineCategory = "mainline" | "social" | "reward" | "draw" | "system";
 export type SupplyTaskRecordTimelineStatus = "completed" | "claimed";
+
+export type SupplyTaskRecordDateOption = {
+  key: string;
+  label: string;
+  dateLabel: string;
+  weekday: string;
+};
 
 export type SupplyTaskRecordTimelineItem = {
   id: string;
@@ -43,8 +46,20 @@ export type SupplyTaskRecordTimelineItem = {
   statusLabel: string;
 };
 
+export type SupplyTaskRecordDrawHistoryItem = {
+  id: string;
+  drawType: "单抽" | "十连";
+  time: string;
+  ticketSpent: number;
+  guaranteeApplied: boolean;
+  guaranteeLabel: string;
+  rewards: Array<{ name: string; quantityLabel: string; rarity: string }>;
+};
+
+export type SupplyTaskRecordRadarStatus = "pending" | "responded" | "expired";
+
 export type SupplyTaskRecordRadarTab = {
-  id: "pending" | "responded" | "expired";
+  id: SupplyTaskRecordRadarStatus;
   label: string;
   active: boolean;
 };
@@ -55,6 +70,7 @@ export type SupplyTaskRecordInvite = {
   name: string;
   message: string;
   timeLabel: string;
+  status: SupplyTaskRecordRadarStatus;
   statusLabel: string;
 };
 
@@ -69,8 +85,14 @@ export type SupplyTaskRecordRedemption = {
 };
 
 export type SupplyTaskRecordPreview = {
+  activeMode: SupplyTaskRecordMode;
+  activeDateKey: string;
+  dates: SupplyTaskRecordDateOption[];
+  recordsByDate: Record<string, SupplyTaskRecordTimelineItem[]>;
+  drawHistory: SupplyTaskRecordDrawHistoryItem[];
+  rules: string[];
   topBar: {
-    resources: SupplyTaskRecordResource[];
+    resources: SupplyUiLabResource[];
     profile: {
       username: string;
       avatar: string;
@@ -85,12 +107,6 @@ export type SupplyTaskRecordPreview = {
     };
   };
   filters: SupplyTaskRecordFilter[];
-  day: {
-    label: string;
-    dateLabel: string;
-    weekday: string;
-  };
-  timelineRecords: SupplyTaskRecordTimelineItem[];
   radar: {
     tabs: SupplyTaskRecordRadarTab[];
     invites: SupplyTaskRecordInvite[];
