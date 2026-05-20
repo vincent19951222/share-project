@@ -10167,10 +10167,24 @@ body {
   font-size: 0.9rem;
 }
 
+.supply-backpack-effect-row img {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 .supply-backpack-effect-row strong,
 .supply-backpack-effect-row time {
   color: #15803d;
   font-weight: 1000;
+}
+
+.supply-backpack-effect-row small {
+  grid-column: 2 / -1;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .supply-backpack-back-link {
@@ -10264,7 +10278,7 @@ body {
 }
 
 .supply-backpack-slot.is-item {
-  cursor: default;
+  cursor: pointer;
 }
 
 .supply-backpack-slot.is-selected {
@@ -10273,15 +10287,11 @@ body {
   box-shadow: inset 0 0 0 3px #fde047, 0 4px 0 #d97706;
 }
 
-.supply-backpack-slot.is-locked {
-  grid-template-rows: 1fr auto;
-  border-color: #1f2937;
-  background: linear-gradient(135deg, #111827 0%, #374151 100%);
-  color: #e5e7eb;
-}
-
-.supply-backpack-slot.is-locked span {
-  font-size: 1.9rem;
+.supply-backpack-slot.is-empty {
+  min-height: 10.25rem;
+  border: 2px dashed rgba(31, 41, 55, 0.32);
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.32);
 }
 
 .supply-backpack-rarity {
@@ -10438,6 +10448,16 @@ body {
 .supply-backpack-actions button:last-child {
   flex: 1;
   background: #fff;
+}
+
+.supply-backpack-action-feedback {
+  margin: 0.85rem 0 0;
+  border: 2px solid #16a34a;
+  border-radius: 0.35rem;
+  background: #dcfce7;
+  padding: 0.65rem 0.8rem;
+  color: #14532d;
+  font-weight: 1000;
 }
 
 .supply-backpack-shop-cta {

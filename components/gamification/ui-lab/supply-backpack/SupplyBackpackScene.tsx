@@ -1,7 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import {
-  SupplyUiLabActionButton,
   SupplyUiLabPixelPanel,
   SupplyUiLabStatusBadge,
 } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabPrimitives";
@@ -10,6 +12,7 @@ import type {
   SupplyBackpackInventoryItem,
   SupplyBackpackPreview,
   SupplyBackpackRarity,
+  SupplyBackpackSelectedDetail,
   SupplyBackpackSlot,
 } from "./types";
 
@@ -22,6 +25,15 @@ const rarityClass: Record<SupplyBackpackRarity, string> = {
 
 export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
   const [brandLabel = "牛马补给站", activeLabel = "背包"] = data.topBar.breadcrumb;
+  const [page, setPage] = useState(data.inventory.page);
+  const [selectedItemId, setSelectedItemId] = useState(data.selectedItemDetail.itemId);
+  const [actionLabel, setActionLabel] = useState<string | null>(null);
+
+  const selectedDetail =
+    useMemo(
+      () => data.itemDetails.find((detail) => detail.itemId === selectedItemId),
+      [data.itemDetails, selectedItemId],
+    ) ?? data.selectedItemDetail;
 
   return (
     <main className="supply-backpack-scene" aria-label="牛马补给站背包静态原型">
@@ -36,8 +48,21 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
         />
         <section className="supply-backpack-shell" aria-label="背包静态复刻">
           <BackpackSidebar data={data} />
-          <BackpackInventoryPanel data={data} />
-          <BackpackDetailPanel data={data} />
+          <BackpackInventoryPanel
+            data={data}
+            page={page}
+            selectedItemId={selectedItemId}
+            onPageChange={setPage}
+            onSelectItem={(itemId) => {
+              setSelectedItemId(itemId);
+              setActionLabel(null);
+            }}
+          />
+          <BackpackDetailPanel
+            actionLabel={actionLabel}
+            detail={selectedDetail}
+            onAction={setActionLabel}
+          />
         </section>
         <BackpackHintBar hint={data.hint} />
       </div>
@@ -76,12 +101,6 @@ function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
           ))}
         </nav>
         <div className="supply-backpack-sidebar-controls" aria-label="背包操作">
-          <SupplyUiLabActionButton className="supply-backpack-expand-control" tone="primary">
-            扩容
-          </SupplyUiLabActionButton>
-          <SupplyUiLabActionButton className="supply-backpack-info-control" tone="ghost">
-            说明
-          </SupplyUiLabActionButton>
           <Link href="/ui-lab/supply-dashboard" className="supply-backpack-back-link">
             返回大厅
           </Link>
@@ -104,10 +123,11 @@ function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
         <div className="supply-backpack-effects-list">
           {data.sidebar.todayEffects.map((effect) => (
             <div className="supply-backpack-effect-row" key={effect.id}>
-              <span aria-hidden="true">{effect.icon}</span>
+              <Image alt="" height={32} src={effect.icon} unoptimized width={32} />
               <b>{effect.label}</b>
-              <strong>{effect.value}</strong>
-              <time>{effect.expiresIn}</time>
+              <strong>{effect.statusLabel}</strong>
+              <time>{effect.endsAtLabel}</time>
+              <small>{effect.effectSummary}</small>
             </div>
           ))}
         </div>
@@ -116,7 +136,22 @@ function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
   );
 }
 
-function BackpackInventoryPanel({ data }: { data: SupplyBackpackPreview }) {
+function BackpackInventoryPanel({
+  data,
+  page,
+  selectedItemId,
+  onPageChange,
+  onSelectItem,
+}: {
+  data: SupplyBackpackPreview;
+  page: number;
+  selectedItemId: string;
+  onPageChange: (page: number) => void;
+  onSelectItem: (itemId: string) => void;
+}) {
+  const startIndex = (page - 1) * data.inventory.pageSize;
+  const visibleSlots = data.inventory.slots.slice(startIndex, startIndex + data.inventory.pageSize);
+
   return (
     <section className="supply-backpack-inventory-panel" aria-label="库存面板">
       <div className="supply-backpack-inventory-toolbar">
@@ -131,18 +166,33 @@ function BackpackInventoryPanel({ data }: { data: SupplyBackpackPreview }) {
         </label>
       </div>
       <div className="supply-backpack-grid" role="grid" aria-label="背包库存">
-        {data.inventory.slots.map((slot) => (
-          <InventorySlot key={slot.type === "item" ? slot.item.id : slot.id} slot={slot} />
+        {visibleSlots.map((slot) => (
+          <InventorySlot
+            key={slot.type === "item" ? slot.item.id : slot.id}
+            selectedItemId={selectedItemId}
+            slot={slot}
+            onSelectItem={onSelectItem}
+          />
         ))}
       </div>
       <div className="supply-backpack-pagination" aria-label="背包分页">
-        <button type="button" disabled aria-label="上一页">
+        <button
+          type="button"
+          disabled={page === 1}
+          aria-label="上一页"
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+        >
           ‹
         </button>
         <span>
-          {data.inventory.page} / {data.inventory.totalPages}
+          {page} / {data.inventory.totalPages}
         </span>
-        <button type="button" aria-label="下一页">
+        <button
+          type="button"
+          disabled={page === data.inventory.totalPages}
+          aria-label="下一页"
+          onClick={() => onPageChange(Math.min(data.inventory.totalPages, page + 1))}
+        >
           ›
         </button>
       </div>
@@ -150,29 +200,47 @@ function BackpackInventoryPanel({ data }: { data: SupplyBackpackPreview }) {
   );
 }
 
-function InventorySlot({ slot }: { slot: SupplyBackpackSlot }) {
-  if (slot.type === "locked") {
-    return (
-      <div className="supply-backpack-slot is-locked" role="gridcell">
-        <span aria-hidden="true">锁</span>
-        <strong>{slot.unlockLevel}级解锁</strong>
-      </div>
-    );
+function InventorySlot({
+  slot,
+  selectedItemId,
+  onSelectItem,
+}: {
+  slot: SupplyBackpackSlot;
+  selectedItemId: string;
+  onSelectItem: (itemId: string) => void;
+}) {
+  if (slot.type === "empty") {
+    return <div className="supply-backpack-slot is-empty" role="gridcell" aria-label="空背包格" />;
   }
 
-  return <InventoryItemCard item={slot.item} />;
+  return (
+    <InventoryItemCard
+      item={slot.item}
+      selected={slot.item.id === selectedItemId}
+      onSelectItem={onSelectItem}
+    />
+  );
 }
 
-function InventoryItemCard({ item }: { item: SupplyBackpackInventoryItem }) {
+function InventoryItemCard({
+  item,
+  selected,
+  onSelectItem,
+}: {
+  item: SupplyBackpackInventoryItem;
+  selected: boolean;
+  onSelectItem: (itemId: string) => void;
+}) {
   return (
     <button
       aria-label={`${item.name}，${item.rarity}，持有 ${item.quantity}`}
-      aria-selected={item.selected}
+      aria-selected={selected}
       className={`supply-backpack-slot is-item ${rarityClass[item.rarity]} ${
-        item.selected ? "is-selected" : ""
+        selected ? "is-selected" : ""
       }`}
       role="gridcell"
       type="button"
+      onClick={() => onSelectItem(item.id)}
     >
       <span className="supply-backpack-rarity">{item.rarity}</span>
       <Image alt="" height={72} src={item.image} unoptimized width={72} />
@@ -182,9 +250,15 @@ function InventoryItemCard({ item }: { item: SupplyBackpackInventoryItem }) {
   );
 }
 
-function BackpackDetailPanel({ data }: { data: SupplyBackpackPreview }) {
-  const detail = data.selectedItemDetail;
-
+function BackpackDetailPanel({
+  detail,
+  actionLabel,
+  onAction,
+}: {
+  detail: SupplyBackpackSelectedDetail;
+  actionLabel: string | null;
+  onAction: (label: string) => void;
+}) {
   return (
     <section className="supply-backpack-detail" aria-label="道具详情">
       <div className="supply-backpack-detail-hero">
@@ -218,9 +292,27 @@ function BackpackDetailPanel({ data }: { data: SupplyBackpackPreview }) {
         </ul>
       </div>
       <div className="supply-backpack-actions">
-        <button type="button">{detail.primaryAction}</button>
-        <button type="button">{detail.secondaryAction}</button>
+        <button type="button" onClick={() => onAction(`${detail.primaryAction}已模拟`)}>
+          {detail.primaryAction}
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            onAction(
+              detail.requiresAdminConfirmation
+                ? `${detail.secondaryAction}已模拟，${detail.redemptionStateLabel ?? "等待管理员确认"}`
+                : `${detail.secondaryAction}已模拟`,
+            )
+          }
+        >
+          {detail.secondaryAction}
+        </button>
       </div>
+      {actionLabel ? (
+        <p className="supply-backpack-action-feedback" role="status">
+          {detail.name}：{actionLabel}
+        </p>
+      ) : null}
       <div className="supply-backpack-shop-cta">
         <span>{detail.shopCta.description}</span>
         <Link href={detail.shopCta.href}>{detail.shopCta.label}</Link>
@@ -232,10 +324,9 @@ function BackpackDetailPanel({ data }: { data: SupplyBackpackPreview }) {
 function BackpackHintBar({ hint }: { hint: string }) {
   return (
     <footer className="supply-backpack-hint">
-      <span aria-hidden="true">💡</span>
+      <span aria-hidden="true">i</span>
       <b>小提示：</b>
       <p>{hint}</p>
-      <Link href="/ui-lab/supply-dashboard">帮助中心</Link>
     </footer>
   );
 }

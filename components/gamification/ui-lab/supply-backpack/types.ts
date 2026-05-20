@@ -1,12 +1,14 @@
-export type SupplyBackpackRarity = "N" | "R" | "SR" | "SSR";
+import type {
+  SupplyUiLabActiveEffect,
+  SupplyUiLabCatalogCategory,
+  SupplyUiLabCatalogRarity,
+  SupplyUiLabResource,
+} from "../supply-data/types";
+
+export type SupplyBackpackRarity = SupplyUiLabCatalogRarity;
 export type SupplyBackpackCategoryId = "all" | "boost" | "task" | "social" | "real";
 
-export type SupplyBackpackResource = {
-  id: "coins" | "ticket" | "backpack";
-  label: string;
-  value: string;
-  icon: string;
-};
+export type SupplyBackpackResource = SupplyUiLabResource;
 
 export type SupplyBackpackCategory = {
   id: SupplyBackpackCategoryId;
@@ -15,13 +17,7 @@ export type SupplyBackpackCategory = {
   active: boolean;
 };
 
-export type SupplyBackpackTodayEffect = {
-  id: string;
-  icon: string;
-  label: string;
-  value: string;
-  expiresIn: string;
-};
+export type SupplyBackpackTodayEffect = SupplyUiLabActiveEffect;
 
 export type SupplyBackpackInventoryItem = {
   id: string;
@@ -39,9 +35,8 @@ export type SupplyBackpackSlot =
       item: SupplyBackpackInventoryItem;
     }
   | {
-      type: "locked";
+      type: "empty";
       id: string;
-      unlockLevel: number;
     };
 
 export type SupplyBackpackSelectedDetail = {
@@ -63,6 +58,7 @@ export type SupplyBackpackSelectedDetail = {
     description: string;
   };
   requiresAdminConfirmation: boolean;
+  redemptionStateLabel?: string;
 };
 
 export type SupplyBackpackPreview = {
@@ -79,9 +75,17 @@ export type SupplyBackpackPreview = {
   selectedSort: string;
   inventory: {
     page: number;
+    pageSize: number;
     totalPages: number;
+    totalSlots: number;
     slots: SupplyBackpackSlot[];
   };
+  itemDetails: SupplyBackpackSelectedDetail[];
   selectedItemDetail: SupplyBackpackSelectedDetail;
   hint: string;
 };
+
+export type SupplyBackpackCategoryMap = Record<
+  SupplyUiLabCatalogCategory,
+  Exclude<SupplyBackpackCategoryId, "all">
+>;

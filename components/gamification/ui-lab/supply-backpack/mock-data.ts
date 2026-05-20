@@ -1,40 +1,128 @@
-import type { SupplyBackpackPreview } from "./types";
+import { supplyUiLabCatalog } from "../supply-data/catalog";
+import { supplyUiLabActiveEffects } from "../supply-data/effects";
+import { supplyUiLabResources } from "../supply-data/resources";
+import type { SupplyUiLabCatalogItem, SupplyUiLabUseTiming } from "../supply-data/types";
+import type {
+  SupplyBackpackCategoryMap,
+  SupplyBackpackInventoryItem,
+  SupplyBackpackPreview,
+  SupplyBackpackSelectedDetail,
+  SupplyBackpackSlot,
+} from "./types";
 
-export const supplyBackpackAssetPaths = {
-  logo: "/logo.png",
-  backpackItems: {
-    sportsDrink: "/assets/home-scenes/supply/backpack/backpack-sports-drink.webp",
-    riceBall: "/assets/home-scenes/supply/backpack/backpack-rice-ball.webp",
-    speedShoes: "/assets/home-scenes/supply/backpack/backpack-speed-shoes.webp",
-    staminaRing: "/assets/home-scenes/supply/backpack/backpack-stamina-ring.webp",
-    dumbbell: "/assets/home-scenes/supply/backpack/backpack-dumbbell.webp",
-    banana: "/assets/home-scenes/supply/backpack/backpack-banana.webp",
-    studyGuide: "/assets/home-scenes/supply/backpack/backpack-study-guide.webp",
-    heart: "/assets/home-scenes/supply/backpack/backpack-heart.webp",
-    socialTicket: "/assets/home-scenes/supply/backpack/backpack-social-ticket.webp",
-    seasonMedal: "/assets/home-scenes/supply/backpack/backpack-season-medal.webp",
+const BACKPACK_TOTAL_SLOTS = 60;
+const BACKPACK_PAGE_SIZE = 20;
+
+const categoryMap: SupplyBackpackCategoryMap = {
+  boost: "boost",
+  protection: "boost",
+  social: "social",
+  task: "task",
+  real_world: "real",
+};
+
+const categoryTag = {
+  boost: "增益",
+  protection: "保护",
+  social: "社交",
+  task: "任务",
+  real_world: "真实福利",
+} satisfies Record<SupplyUiLabCatalogItem["category"], string>;
+
+const useTimingLabel = {
+  today: "今日使用，效果截止今日 23:59",
+  instant: "点击后立即展示本地预览反馈",
+  manual_redemption: "申请兑换后等待管理员确认",
+} satisfies Record<SupplyUiLabUseTiming, string>;
+
+const buildRestrictions = (item: SupplyUiLabCatalogItem) => {
+  const restrictions: string[] = [];
+
+  if (item.shop.dailyLimit) {
+    restrictions.push(`每日最多使用或兑换 ${item.shop.dailyLimit} 次`);
+  }
+
+  if (item.shop.weeklyLimit) {
+    restrictions.push(`每周最多使用或兑换 ${item.shop.weeklyLimit} 次`);
+  }
+
+  if (item.useTiming === "today") {
+    restrictions.push("仅影响今日本地预览效果");
+  }
+
+  if (item.useTiming === "instant") {
+    restrictions.push("当前静态页只展示模拟反馈，不写入库存");
+  }
+
+  if (item.shop.requiresAdminConfirmation) {
+    restrictions.push("真实福利需管理员确认后发放");
+  }
+
+  return restrictions.length > 0 ? restrictions : ["当前静态页只展示模拟反馈，不写入库存"];
+};
+
+const toInventoryItem = (item: SupplyUiLabCatalogItem): SupplyBackpackInventoryItem => ({
+  id: item.sourceItemId,
+  name: item.name,
+  image: item.media.image,
+  rarity: item.rarity,
+  categoryId: categoryMap[item.category],
+  quantity: item.inventory.quantity,
+  selected: item.inventory.selected,
+});
+
+const toDetail = (item: SupplyUiLabCatalogItem): SupplyBackpackSelectedDetail => ({
+  itemId: item.sourceItemId,
+  name: item.name,
+  rarity: item.rarity,
+  tag: categoryTag[item.category],
+  ownedQuantity: item.inventory.quantity,
+  image: item.media.image,
+  description: item.description,
+  effect: item.effectSummary,
+  useTiming: useTimingLabel[item.useTiming],
+  restrictions: buildRestrictions(item),
+  primaryAction: "今日使用",
+  secondaryAction: "申请兑换",
+  shopCta: {
+    label: "去商店",
+    href: "/ui-lab/supply-dashboard/shop",
+    description: "前往补给商店查看同源道具与兑换入口",
   },
-  reused: {
-    coffeeCoupon: "/gamification/rewards/icons/luckin_coffee_coupon.png",
-    supplyTicket: "/gamification/rewards/icons/task_reroll_coupon.png",
-    coins: "/gamification/rewards/icons/coins_020.png",
-    energyBottle: "/assets/home-scenes/supply/shop/shop-energy-bottle.webp",
-    trainingLog: "/assets/home-scenes/supply/shop/shop-training-log.webp",
-    expBadge: "/assets/home-scenes/supply/shop/shop-title-badge.webp",
-  },
-} as const;
+  requiresAdminConfirmation: item.shop.requiresAdminConfirmation,
+  redemptionStateLabel: item.shop.requiresAdminConfirmation ? "等待管理员确认" : undefined,
+});
+
+const catalogInventoryItems = supplyUiLabCatalog.filter((item) => item.inventory.quantity > 0);
+
+const itemSlots: SupplyBackpackSlot[] = catalogInventoryItems.map((item) => ({
+  type: "item",
+  item: toInventoryItem(item),
+}));
+
+const emptySlots: SupplyBackpackSlot[] = Array.from(
+  { length: BACKPACK_TOTAL_SLOTS - itemSlots.length },
+  (_, index) => ({
+    type: "empty",
+    id: `empty-${index + 1}`,
+  }),
+);
+
+const itemDetails = catalogInventoryItems.map(toDetail);
+const selectedItemDetail =
+  itemDetails.find((detail) =>
+    catalogInventoryItems.some(
+      (item) => item.sourceItemId === detail.itemId && item.inventory.selected,
+    ),
+  ) ?? itemDetails[0];
 
 export const supplyBackpackMock: SupplyBackpackPreview = {
   topBar: {
     breadcrumb: ["牛马补给站", "背包"],
-    resources: [
-      { id: "coins", label: "银子", value: "2,450", icon: "◎" },
-      { id: "ticket", label: "补给券", value: "18", icon: "券" },
-      { id: "backpack", label: "背包", value: "18/40", icon: "包" },
-    ],
+    resources: supplyUiLabResources.backpack,
   },
   sidebar: {
-    capacity: "18/40",
+    capacity: "18/60",
     categories: [
       { id: "all", label: "全部", icon: "▦", active: true },
       { id: "boost", label: "增益", icon: "✧", active: false },
@@ -42,236 +130,18 @@ export const supplyBackpackMock: SupplyBackpackPreview = {
       { id: "social", label: "社交", icon: "♟", active: false },
       { id: "real", label: "真实福利", icon: "▤", active: false },
     ],
-    todayEffects: [
-      { id: "exp", icon: "EXP", label: "经验获取", value: "+20%", expiresIn: "02:35:18" },
-      { id: "stamina", icon: "♥", label: "体力上限", value: "+10", expiresIn: "02:35:18" },
-      { id: "steps", icon: "▰", label: "步数加成", value: "+15%", expiresIn: "02:35:18" },
-      { id: "hydration", icon: "▣", label: "饮水加成", value: "+10%", expiresIn: "02:35:18" },
-    ],
+    todayEffects: supplyUiLabActiveEffects,
   },
   sortOptions: ["按稀有度", "按数量", "按获得时间"],
   selectedSort: "按稀有度",
   inventory: {
     page: 1,
-    totalPages: 2,
-    slots: [
-      {
-        type: "item",
-        item: {
-          id: "sports-drink",
-          name: "运动饮料",
-          image: supplyBackpackAssetPaths.backpackItems.sportsDrink,
-          rarity: "R",
-          categoryId: "boost",
-          quantity: 12,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "energy-potion",
-          name: "能量药剂",
-          image: supplyBackpackAssetPaths.reused.energyBottle,
-          rarity: "SR",
-          categoryId: "boost",
-          quantity: 8,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "supply-ticket",
-          name: "补给券",
-          image: supplyBackpackAssetPaths.reused.supplyTicket,
-          rarity: "R",
-          categoryId: "task",
-          quantity: 15,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "rice-ball",
-          name: "饭团",
-          image: supplyBackpackAssetPaths.backpackItems.riceBall,
-          rarity: "N",
-          categoryId: "boost",
-          quantity: 20,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "speed-shoes",
-          name: "疾风跑鞋",
-          image: supplyBackpackAssetPaths.backpackItems.speedShoes,
-          rarity: "SR",
-          categoryId: "boost",
-          quantity: 1,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "stamina-ring",
-          name: "体力护环",
-          image: supplyBackpackAssetPaths.backpackItems.staminaRing,
-          rarity: "SSR",
-          categoryId: "boost",
-          quantity: 6,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "dumbbell",
-          name: "哑铃",
-          image: supplyBackpackAssetPaths.backpackItems.dumbbell,
-          rarity: "N",
-          categoryId: "boost",
-          quantity: 19,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "banana",
-          name: "香蕉",
-          image: supplyBackpackAssetPaths.backpackItems.banana,
-          rarity: "N",
-          categoryId: "boost",
-          quantity: 14,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "training-log",
-          name: "训练记录本",
-          image: supplyBackpackAssetPaths.reused.trainingLog,
-          rarity: "N",
-          categoryId: "task",
-          quantity: 11,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "coins",
-          name: "牛马币",
-          image: supplyBackpackAssetPaths.reused.coins,
-          rarity: "R",
-          categoryId: "boost",
-          quantity: 30,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "study-guide",
-          name: "学习指南",
-          image: supplyBackpackAssetPaths.backpackItems.studyGuide,
-          rarity: "N",
-          categoryId: "task",
-          quantity: 11,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "exp-badge",
-          name: "经验徽章",
-          image: supplyBackpackAssetPaths.reused.expBadge,
-          rarity: "R",
-          categoryId: "boost",
-          quantity: 22,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "heart",
-          name: "爱心",
-          image: supplyBackpackAssetPaths.backpackItems.heart,
-          rarity: "SR",
-          categoryId: "social",
-          quantity: 6,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "coffee-coupon",
-          name: "咖啡兑换券",
-          image: supplyBackpackAssetPaths.reused.coffeeCoupon,
-          rarity: "R",
-          categoryId: "real",
-          quantity: 8,
-          selected: true,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "social-ticket",
-          name: "社交券",
-          image: supplyBackpackAssetPaths.backpackItems.socialTicket,
-          rarity: "N",
-          categoryId: "social",
-          quantity: 18,
-          selected: false,
-        },
-      },
-      {
-        type: "item",
-        item: {
-          id: "season-medal",
-          name: "赛季勋章",
-          image: supplyBackpackAssetPaths.backpackItems.seasonMedal,
-          rarity: "N",
-          categoryId: "boost",
-          quantity: 30,
-          selected: false,
-        },
-      },
-      { type: "locked", id: "locked-20", unlockLevel: 20 },
-      { type: "locked", id: "locked-25", unlockLevel: 25 },
-      { type: "locked", id: "locked-30", unlockLevel: 30 },
-      { type: "locked", id: "locked-35", unlockLevel: 35 },
-    ],
+    pageSize: BACKPACK_PAGE_SIZE,
+    totalPages: BACKPACK_TOTAL_SLOTS / BACKPACK_PAGE_SIZE,
+    totalSlots: BACKPACK_TOTAL_SLOTS,
+    slots: [...itemSlots, ...emptySlots],
   },
-  selectedItemDetail: {
-    itemId: "coffee-coupon",
-    name: "咖啡兑换券",
-    rarity: "R",
-    tag: "真实福利",
-    ownedQuantity: 8,
-    image: supplyBackpackAssetPaths.reused.coffeeCoupon,
-    description: "可在补给商店兑换指定咖啡饮品。",
-    effect: "兑换指定咖啡饮品（价值约￥20）",
-    useTiming: "随时可用（需前往补给商店兑换）",
-    restrictions: ["每日最多兑换 1 次", "仅限在补给商店可用"],
-    primaryAction: "今日使用",
-    secondaryAction: "申请兑换",
-    shopCta: {
-      label: "去商店",
-      href: "/ui-lab/supply-dashboard/shop",
-      description: "前往补给商店兑换真实福利",
-    },
-    requiresAdminConfirmation: true,
-  },
-  hint: "部分真实福利需管理员确认后发放，请耐心等待通知~",
+  itemDetails,
+  selectedItemDetail,
+  hint: "静态预览只模拟本地交互，不会消耗库存；真实福利后续接入管理员确认流程。",
 };

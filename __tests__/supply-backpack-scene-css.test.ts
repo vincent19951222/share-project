@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 describe("supply backpack scene css", () => {
   const css = readFileSync("app/globals.css", "utf8");
 
-  it("defines backpack scene layers and inventory states", () => {
+  it("defines backpack scene layers and empty inventory states", () => {
     expect(css).toContain(".supply-backpack-scene");
     expect(css).toContain(".supply-backpack-shell");
     expect(css).toContain(".supply-ui-lab-topbar--breadcrumb");
@@ -13,13 +13,18 @@ describe("supply backpack scene css", () => {
     expect(css).toContain(".supply-backpack-detail");
     expect(css).toContain(".supply-backpack-hint");
     expect(css).toContain(".supply-backpack-slot.is-selected");
-    expect(css).toContain(".supply-backpack-slot.is-locked");
+    expect(css).toContain(".supply-backpack-slot.is-empty");
+    expect(css).toContain(".supply-backpack-action-feedback");
+    expect(css).not.toContain(".supply-backpack-slot.is-locked");
   });
 
   it("keeps css scoped and includes responsive and reduced-motion rules", () => {
     const backpackBlock = css.slice(css.indexOf(".supply-backpack-scene"));
 
     expect(backpackBlock).toContain("grid-template-columns");
+    expect(backpackBlock).not.toContain("supply-backpack-expand-control");
+    expect(backpackBlock).not.toContain("supply-backpack-info-control");
+    expect(backpackBlock).not.toContain("is-locked");
     expect(backpackBlock).toContain("@media (max-width: 900px)");
     expect(backpackBlock).toContain("@media (max-width: 520px)");
     expect(backpackBlock).toContain("@media (prefers-reduced-motion: reduce)");
