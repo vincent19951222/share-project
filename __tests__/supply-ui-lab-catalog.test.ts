@@ -184,7 +184,10 @@ describe("Supply UI Lab shared catalog data", () => {
     ]);
 
     for (const effect of supplyUiLabActiveEffects) {
-      expect(supplyUiLabCatalogBySourceItemId[effect.sourceItemId], effect.sourceItemId).toBeDefined();
+      expect(
+        supplyUiLabCatalog.some((item) => item.sourceItemId === effect.sourceItemId),
+        effect.sourceItemId,
+      ).toBe(true);
       expect(effect.businessSource.length).toBeGreaterThan(0);
       expect(effect.endsAtLabel).toBe("今日 23:59");
     }
