@@ -9624,7 +9624,7 @@ body {
 
 .supply-task-record-timeline-card {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   gap: clamp(0.78rem, 1vw, 0.95rem);
   padding: clamp(0.78rem, 1.05vw, 1rem);
   background:
@@ -9924,8 +9924,8 @@ body {
 }
 
 .supply-task-record-entry-icon img {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.45rem;
+  height: 2.45rem;
   object-fit: contain;
 }
 

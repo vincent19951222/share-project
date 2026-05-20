@@ -1,5 +1,6 @@
 import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
+import { supplyUiLabTaskRecordIcons } from "@/components/gamification/ui-lab/supply-data/records";
 import { supplyTaskRecordAssetPaths } from "@/components/gamification/ui-lab/supply-task-record/mock-data";
 
 const publicPath = (assetPath: string) => `public${assetPath}`;
@@ -12,6 +13,7 @@ describe("supply task record reused assets", () => {
       supplyTaskRecordAssetPaths.rewardIcons.ticket,
       supplyTaskRecordAssetPaths.rewardIcons.coffee,
       ...Object.values(supplyTaskRecordAssetPaths.avatars),
+      ...Object.values(supplyUiLabTaskRecordIcons),
     ];
 
     for (const asset of requiredAssets) {

@@ -58,6 +58,16 @@ describe("supply task record mock data", () => {
     expect(todayRecords.map((record) => record.reward.label)).toEqual(
       expect.arrayContaining(["抽奖券", "运动饮料（R）", "银子"]),
     );
+    expect(todayRecords.every((record) => record.icon.type === "image")).toBe(true);
+    expect(todayRecords.map((record) => record.icon.value)).toEqual(
+      expect.arrayContaining([
+        "/assets/home-scenes/supply/task-record/icons/task-record-movement.webp",
+        "/assets/home-scenes/supply/task-record/icons/task-record-hydration.webp",
+        "/assets/home-scenes/supply/task-record/icons/task-record-chat.webp",
+        "/assets/home-scenes/supply/task-record/icons/task-record-learning.webp",
+        "/assets/home-scenes/supply/task-record/icons/task-record-draw.webp",
+      ]),
+    );
 
     expect(supplyTaskRecordMock.drawHistory.map((draw) => draw.drawType)).toEqual(["十连", "单抽", "十连"]);
     expect(supplyTaskRecordMock.drawHistory.map((draw) => draw.ticketSpent)).toEqual([10, 1, 10]);
