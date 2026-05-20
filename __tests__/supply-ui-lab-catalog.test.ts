@@ -1,3 +1,6 @@
+import { execFileSync } from "node:child_process";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ITEM_DEFINITIONS } from "@/content/gamification/item-definitions";
 import { REWARD_DEFINITIONS } from "@/content/gamification/reward-pool";
@@ -27,6 +30,42 @@ const activeNonCoinRewardItemIds = REWARD_DEFINITIONS.flatMap((reward) => {
 const activeCoinRewardIds = REWARD_DEFINITIONS.filter(
   (reward) => reward.enabled && reward.kind === "coins",
 ).map((reward) => reward.id);
+
+function publicPath(src: string) {
+  return join(process.cwd(), "public", src.replace(/^\//, ""));
+}
+
+function alphaFromPixel(pixel: string) {
+  const match = /s?rgba?\([^,]+,[^,]+,[^,]+(?:,([^)]+))?\)/.exec(pixel);
+
+  return match?.[1] ? Number(match[1]) : 1;
+}
+
+function identifyWebp(path: string) {
+  const output = execFileSync(
+    "magick",
+    [
+      "identify",
+      "-format",
+      "%m\n%w\n%h\n%[channels]\n%[fx:minima.a]\n%[pixel:p{0,0}]\n%[pixel:p{10,10}]\n%[fx:mean.a]",
+      path,
+    ],
+    { encoding: "utf8" },
+  );
+  const [format, width, height, channels, alphaMin, topLeft, insetTopLeft, alphaMean] =
+    output.trim().split("\n");
+
+  return {
+    format,
+    width: Number(width),
+    height: Number(height),
+    channels,
+    alphaMin: Number(alphaMin),
+    topLeft,
+    insetTopLeft,
+    alphaMean: Number(alphaMean),
+  };
+}
 
 describe("Supply UI Lab shared catalog data", () => {
   it("matches every active non-coin draw reward from the production content config", () => {
@@ -153,5 +192,56 @@ describe("Supply UI Lab shared catalog data", () => {
     expect(JSON.stringify(supplyUiLabActiveEffects)).not.toContain("体力");
     expect(JSON.stringify(supplyUiLabActiveEffects)).not.toContain("步数加成");
     expect(JSON.stringify(supplyUiLabActiveEffects)).not.toContain("经验获取");
+  });
+
+  it("ships generated atomic item art as transparent WebP files", () => {
+    const itemDirectory = join(process.cwd(), "public/assets/home-scenes/supply/items");
+    const generatedItems = supplyUiLabCatalog.filter(
+      (item) => item.media.assetStatus === "needs_generated",
+    );
+
+    expect(existsSync(itemDirectory), "supply item asset directory should exist").toBe(true);
+    expect(generatedItems.map((item) => item.sourceItemId)).toEqual(
+      SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS,
+    );
+    expect(readdirSync(itemDirectory).join("\n")).not.toMatch(
+      /(?:panel|prototype|screenshot|design|ui-assets|商店|背包|抽卡|任务记录)/,
+    );
+
+    for (const item of generatedItems) {
+      const path = publicPath(item.media.image);
+      const image = identifyWebp(path);
+
+      expect(item.media.image, item.sourceItemId).toMatch(
+        /^\/assets\/home-scenes\/supply\/items\/[a-z0-9-]+\.webp$/,
+      );
+      expect(existsSync(path), item.sourceItemId).toBe(true);
+      expect(
+        statSync(path).size,
+        `${item.sourceItemId} should stay within the item icon budget`,
+      ).toBeLessThanOrEqual(140 * 1024);
+      expect(image.format, item.sourceItemId).toBe("WEBP");
+      expect(image.width, item.sourceItemId).toBe(image.height);
+      expect(image.width, item.sourceItemId).toBeGreaterThanOrEqual(256);
+      expect(image.width, item.sourceItemId).toBeLessThanOrEqual(1024);
+      expect(image.channels, item.sourceItemId).toContain("a");
+      expect(
+        image.alphaMin,
+        `${item.sourceItemId} should contain fully transparent pixels`,
+      ).toBeLessThanOrEqual(0.05);
+      expect(
+        alphaFromPixel(image.topLeft),
+        `${item.sourceItemId} top-left corner should be transparent`,
+      ).toBeLessThanOrEqual(0.1);
+      expect(
+        alphaFromPixel(image.insetTopLeft),
+        `${item.sourceItemId} padded corner should be transparent`,
+      ).toBeLessThanOrEqual(0.1);
+      expect(image.alphaMean, `${item.sourceItemId} should not be blank`).toBeGreaterThan(0.04);
+      expect(
+        image.alphaMean,
+        `${item.sourceItemId} should remain an isolated prop, not a full panel`,
+      ).toBeLessThan(0.85);
+    }
   });
 });
