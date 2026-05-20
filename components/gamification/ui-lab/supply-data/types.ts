@@ -5,6 +5,7 @@ export type SupplyUiLabCatalogRarity = "N" | "R" | "SR" | "SSR";
 export type SupplyUiLabUseTiming = "today" | "instant" | "manual_redemption";
 export type SupplyUiLabObtainSource = "draw_pool" | "shop";
 export type SupplyUiLabDrawTier = "utility" | "social" | "rare";
+export type SupplyUiLabAssetStatus = "existing" | "needs_generated";
 export type SupplyUiLabEffectStatus = "pending" | "active" | "expired";
 
 export type SupplyUiLabResource = {
@@ -43,6 +44,7 @@ export type SupplyUiLabCatalogItem = {
   };
   media: {
     image: string;
+    assetStatus: SupplyUiLabAssetStatus;
   };
 };
 

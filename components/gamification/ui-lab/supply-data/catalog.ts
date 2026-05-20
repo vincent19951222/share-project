@@ -1,4 +1,8 @@
-import type { SupplyUiLabCatalogItem, SupplyUiLabCoinRewardRow } from "./types";
+import type {
+  SupplyUiLabAssetStatus,
+  SupplyUiLabCatalogItem,
+  SupplyUiLabCoinRewardRow,
+} from "./types";
 
 export const SUPPLY_UI_LAB_ACTIVE_NON_COIN_REWARD_ITEM_IDS = [
   "task_reroll_coupon",
@@ -19,6 +23,78 @@ export type SupplyUiLabActiveNonCoinRewardItemId =
   (typeof SUPPLY_UI_LAB_ACTIVE_NON_COIN_REWARD_ITEM_IDS)[number];
 
 const rewardIcon = (sourceItemId: string) => `/gamification/rewards/icons/${sourceItemId}.png`;
+const generatedItemAsset = (fileName: string) => `/assets/home-scenes/supply/items/${fileName}.webp`;
+
+export const SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS = [
+  "fitness_leave_coupon",
+  "drink_water_ping",
+  "walk_ping",
+  "team_standup_ping",
+  "chat_ping",
+  "share_info_ping",
+  "double_niuma_coupon",
+  "season_sprint_coupon",
+] as const;
+
+export type SupplyUiLabGeneratedItemAssetId =
+  (typeof SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS)[number];
+
+export const SUPPLY_UI_LAB_ITEM_MEDIA = {
+  task_reroll_coupon: {
+    image: rewardIcon("task_reroll_coupon"),
+    assetStatus: "existing",
+  },
+  small_boost_coupon: {
+    image: rewardIcon("small_boost_coupon"),
+    assetStatus: "existing",
+  },
+  fitness_leave_coupon: {
+    image: generatedItemAsset("fitness-leave-coupon"),
+    assetStatus: "needs_generated",
+  },
+  drink_water_ping: {
+    image: generatedItemAsset("drink-water-ping"),
+    assetStatus: "needs_generated",
+  },
+  walk_ping: {
+    image: generatedItemAsset("walk-ping"),
+    assetStatus: "needs_generated",
+  },
+  team_standup_ping: {
+    image: generatedItemAsset("team-standup-ping"),
+    assetStatus: "needs_generated",
+  },
+  chat_ping: {
+    image: generatedItemAsset("chat-ping"),
+    assetStatus: "needs_generated",
+  },
+  share_info_ping: {
+    image: generatedItemAsset("share-info-ping"),
+    assetStatus: "needs_generated",
+  },
+  team_broadcast_coupon: {
+    image: rewardIcon("team_broadcast_coupon"),
+    assetStatus: "existing",
+  },
+  double_niuma_coupon: {
+    image: generatedItemAsset("double-niuma-coupon"),
+    assetStatus: "needs_generated",
+  },
+  season_sprint_coupon: {
+    image: generatedItemAsset("season-sprint-coupon"),
+    assetStatus: "needs_generated",
+  },
+  luckin_coffee_coupon: {
+    image: rewardIcon("luckin_coffee_coupon"),
+    assetStatus: "existing",
+  },
+} satisfies Record<
+  SupplyUiLabActiveNonCoinRewardItemId,
+  {
+    image: string;
+    assetStatus: SupplyUiLabAssetStatus;
+  }
+>;
 
 export const SUPPLY_UI_LAB_COIN_REWARD_ROWS: SupplyUiLabCoinRewardRow[] = [
   {
@@ -305,9 +381,7 @@ export const supplyUiLabCatalog: SupplyUiLabCatalogItem[] =
         quantity: item.quantity,
         selected: item.selected,
       },
-      media: {
-        image: rewardIcon(sourceItemId),
-      },
+      media: SUPPLY_UI_LAB_ITEM_MEDIA[sourceItemId],
     };
   });
 

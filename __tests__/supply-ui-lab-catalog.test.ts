@@ -4,6 +4,8 @@ import { REWARD_DEFINITIONS } from "@/content/gamification/reward-pool";
 import {
   SUPPLY_UI_LAB_ACTIVE_NON_COIN_REWARD_ITEM_IDS,
   SUPPLY_UI_LAB_COIN_REWARD_ROWS,
+  SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS,
+  SUPPLY_UI_LAB_ITEM_MEDIA,
   supplyUiLabCatalog,
   supplyUiLabCatalogBySourceItemId,
 } from "@/components/gamification/ui-lab/supply-data/catalog";
@@ -42,8 +44,80 @@ describe("Supply UI Lab shared catalog data", () => {
       expect(item.shop.buyable, sourceItemId).toBe(true);
       expect(item.obtainSources, sourceItemId).toEqual(["draw_pool", "shop"]);
       expect(item.inventory.quantity, sourceItemId).toBeGreaterThanOrEqual(0);
-      expect(item.media.image, sourceItemId).toMatch(/^\/gamification\/rewards\/icons\/.+\.png$/);
+      expect(item.media.image, sourceItemId).toMatch(
+        /^\/(?:gamification\/rewards\/icons\/.+\.png|assets\/home-scenes\/supply\/items\/.+\.webp)$/,
+      );
+      expect(item.media.assetStatus, sourceItemId).toMatch(/^(existing|needs_generated)$/);
     }
+  });
+
+  it("marks only task-02 item assets as generated UI Lab media", () => {
+    expect(SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS).toEqual([
+      "fitness_leave_coupon",
+      "drink_water_ping",
+      "walk_ping",
+      "team_standup_ping",
+      "chat_ping",
+      "share_info_ping",
+      "double_niuma_coupon",
+      "season_sprint_coupon",
+    ]);
+
+    expect(
+      supplyUiLabCatalog
+        .filter((item) => item.media.assetStatus === "needs_generated")
+        .map((item) => item.sourceItemId),
+    ).toEqual(SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS);
+
+    expect(supplyUiLabCatalogBySourceItemId.task_reroll_coupon.media).toEqual({
+      image: "/gamification/rewards/icons/task_reroll_coupon.png",
+      assetStatus: "existing",
+    });
+    expect(supplyUiLabCatalogBySourceItemId.small_boost_coupon.media).toEqual({
+      image: "/gamification/rewards/icons/small_boost_coupon.png",
+      assetStatus: "existing",
+    });
+    expect(supplyUiLabCatalogBySourceItemId.team_broadcast_coupon.media).toEqual({
+      image: "/gamification/rewards/icons/team_broadcast_coupon.png",
+      assetStatus: "existing",
+    });
+    expect(supplyUiLabCatalogBySourceItemId.luckin_coffee_coupon.media).toEqual({
+      image: "/gamification/rewards/icons/luckin_coffee_coupon.png",
+      assetStatus: "existing",
+    });
+
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.fitness_leave_coupon).toEqual({
+      image: "/assets/home-scenes/supply/items/fitness-leave-coupon.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.drink_water_ping).toEqual({
+      image: "/assets/home-scenes/supply/items/drink-water-ping.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.walk_ping).toEqual({
+      image: "/assets/home-scenes/supply/items/walk-ping.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.team_standup_ping).toEqual({
+      image: "/assets/home-scenes/supply/items/team-standup-ping.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.chat_ping).toEqual({
+      image: "/assets/home-scenes/supply/items/chat-ping.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.share_info_ping).toEqual({
+      image: "/assets/home-scenes/supply/items/share-info-ping.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.double_niuma_coupon).toEqual({
+      image: "/assets/home-scenes/supply/items/double-niuma-coupon.webp",
+      assetStatus: "needs_generated",
+    });
+    expect(SUPPLY_UI_LAB_ITEM_MEDIA.season_sprint_coupon).toEqual({
+      image: "/assets/home-scenes/supply/items/season-sprint-coupon.webp",
+      assetStatus: "needs_generated",
+    });
   });
 
   it("keeps coin rewards available for draws but outside shop and backpack catalog slots", () => {
