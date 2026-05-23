@@ -75,6 +75,13 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-quest-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-panel.supply-ui-lab-panel")).not.toBeNull();
     expect(container.querySelectorAll(".supply-dashboard-quest-card")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card.supply-task-card")).toHaveLength(4);
+    expect(Array.from(container.querySelectorAll(".supply-dashboard-quest-card")).map((card) => card.getAttribute("data-card-id"))).toEqual([
+      "movement_004",
+      "hydration_003",
+      "social_001",
+      "learning_005",
+    ]);
     expect(container.querySelector(".supply-dashboard-quest-progress")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-footer")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-footer .supply-ui-lab-action")).not.toBeNull();
@@ -121,7 +128,7 @@ describe("supply dashboard static scene", () => {
     const feedback = container.querySelector("[data-dashboard-feedback]");
     expect(feedback?.textContent).toContain("本地预览");
 
-    const rerollButton = container.querySelector<HTMLButtonElement>(".supply-dashboard-quest-reroll");
+    const rerollButton = container.querySelector<HTMLButtonElement>(".supply-task-card-reroll");
     expect(rerollButton).not.toBeNull();
 
     await act(async () => {

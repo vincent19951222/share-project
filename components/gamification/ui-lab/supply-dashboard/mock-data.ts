@@ -58,8 +58,8 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
   activeEffects: supplyUiLabActiveEffects,
   dailyQuests: [
     {
-      id: "hydration",
-      dimension: "hydration",
+      id: "movement_004",
+      dimension: "movement",
       title: "窗边回血",
       subtitle: "把电充绿",
       image: supplyDashboardAssetPaths.taskCards.movement,
@@ -74,8 +74,8 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
       },
     },
     {
-      id: "movement",
-      dimension: "movement",
+      id: "hydration_003",
+      dimension: "hydration",
       title: "杯子见底",
       subtitle: "把尿喝白",
       image: supplyDashboardAssetPaths.taskCards.hydration,
@@ -90,7 +90,7 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
       },
     },
     {
-      id: "social",
+      id: "social_001",
       dimension: "social",
       title: "废话 KPI",
       subtitle: "把事办黄",
@@ -106,7 +106,7 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
       },
     },
     {
-      id: "learning",
+      id: "learning_005",
       dimension: "learning",
       title: "一句话笔记",
       subtitle: "把股看红",

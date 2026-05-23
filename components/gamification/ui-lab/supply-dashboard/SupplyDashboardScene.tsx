@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
+import { TaskCardPreview } from "@/components/gamification/ui-lab/task-cards/TaskCardPreview";
+import type { SupplyTaskCardPreviewData } from "@/components/gamification/ui-lab/task-cards/types";
 import { supplyDashboardAssetPaths } from "./mock-data";
 import {
   SupplyUiLabPixelPanel,
@@ -33,6 +35,22 @@ function getTopBarResources(data: SupplyDashboardPreview): SupplyUiLabResource[]
     icon: resource.icon,
     iconImage: resource.iconImage,
   }));
+}
+
+function toTaskCardPreviewData(quest: SupplyDashboardQuest): SupplyTaskCardPreviewData {
+  return {
+    id: quest.id,
+    dimension: quest.dimension,
+    slogan: quest.subtitle,
+    title: quest.title,
+    description: "",
+    image: quest.image,
+    difficulty: quest.difficulty,
+    sceneLabel: (quest.tags[0] ?? "通用") as SupplyTaskCardPreviewData["sceneLabel"],
+    cooldownLabel: quest.durationLabel,
+    completed: quest.completed,
+    aspectRatio: "3:4",
+  };
 }
 
 function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
@@ -147,37 +165,12 @@ function QuestCard({
   quest: SupplyDashboardQuest;
 }) {
   return (
-    <article
+    <TaskCardPreview
+      card={toTaskCardPreviewData(quest)}
       className={`supply-dashboard-quest-card supply-dashboard-quest-card--${index + 1}`}
-      aria-label={`${quest.title}，${quest.completed ? "已完成" : "进行中"}`}
-    >
-      <div className="supply-dashboard-quest-ribbon">
-        <span aria-hidden="true">◎</span>
-        <strong>{quest.subtitle}</strong>
-      </div>
-      <h3>{quest.title}</h3>
-      <div className="supply-dashboard-quest-art">
-        <Image alt="" height={180} src={quest.image} unoptimized width={240} />
-      </div>
-      <div className="supply-dashboard-quest-meta">
-        <span data-level={quest.difficulty}>{quest.difficulty}</span>
-        {quest.tags.map((tag) => (
-          <span key={tag}>{tag}</span>
-        ))}
-        <span>{quest.durationLabel}</span>
-      </div>
-      <button
-        className="supply-dashboard-quest-reroll"
-        onClick={() => onReroll(quest.title)}
-        type="button"
-        aria-label={`更换任务：${quest.title}`}
-      >
-        换
-      </button>
-      <span className="supply-dashboard-quest-state" data-complete={quest.completed}>
-        {quest.completed ? "✓" : "进行中"}
-      </span>
-    </article>
+      density="dashboard"
+      onReroll={() => onReroll(quest.title)}
+    />
   );
 }
 

@@ -94,10 +94,9 @@ describe("supply dashboard scene CSS", () => {
     const shortcutCard = extractRuleBody(dashboardCss, ".supply-dashboard-shortcut-card");
     const shortcutTitle = extractRuleBody(dashboardCss, ".supply-dashboard-shortcut-copy strong");
 
-    expect(questHotspot).toMatch(/display:\s*grid/);
-    expect(questHotspot).toMatch(/border:\s*3px solid #111827/);
-    expect(questHotspot).toMatch(/background:\s*#fff8e8\s*!important/);
-    expect(questHotspot).toMatch(/color:\s*#111827\s*!important/);
+    expect(questHotspot).toMatch(/max-height:\s*100%/);
+    expect(dashboardCss).toMatch(/\.supply-dashboard-quest-list\s*{[\s\S]*place-items:\s*center/);
+    expect(rawCss).toMatch(/\.supply-task-card\s*{[\s\S]*aspect-ratio:\s*3\s*\/\s*4/);
     expect(questCardOne).toMatch(/top:\s*auto/);
     expect(questCardOne).toMatch(/left:\s*auto/);
     expect(questCardOne).toMatch(/width:\s*auto/);

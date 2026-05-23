@@ -7,6 +7,12 @@ describe("supply dashboard mock data", () => {
     expect(supplyDashboardMock.dailyQuests).toHaveLength(4);
     expect(supplyDashboardMock.dailyQuests.filter((quest) => quest.completed)).toHaveLength(3);
     expect(supplyDashboardMock.dailyQuests.some((quest) => !quest.completed)).toBe(true);
+    expect(supplyDashboardMock.dailyQuests.map((quest) => [quest.id, quest.dimension, quest.title, quest.subtitle])).toEqual([
+      ["movement_004", "movement", "窗边回血", "把电充绿"],
+      ["hydration_003", "hydration", "杯子见底", "把尿喝白"],
+      ["social_001", "social", "废话 KPI", "把事办黄"],
+      ["learning_005", "learning", "一句话笔记", "把股看红"],
+    ]);
     expect(supplyDashboardMock.resources.map((resource) => resource.label)).toEqual(["银子", "抽奖券", "背包"]);
     expect(supplyDashboardMock.resources.map((resource) => resource.id)).toEqual(["coins", "ticket", "backpack"]);
     expect(supplyDashboardMock.inventoryPreview.usedSlots).toBe(18);
