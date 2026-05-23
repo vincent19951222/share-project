@@ -8,6 +8,386 @@ body {
   overflow: hidden;
 }
 
+/* Supply UI Lab 3:4 task-card review */
+.supply-task-card-review-scene {
+  min-height: 100svh;
+  background: #f4e6c8;
+  color: #111827;
+  padding: 1rem;
+}
+
+.supply-task-card-review-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(12rem, auto);
+  align-items: center;
+  gap: 1rem;
+  max-width: 86rem;
+  margin: 0 auto 1rem;
+  border: 4px solid #111827;
+  background: #facc15;
+  box-shadow: 5px 5px 0 #111827;
+  padding: 0.75rem 1rem;
+}
+
+.supply-task-card-review-header a {
+  border: 3px solid #111827;
+  background: #fff8e8;
+  color: #111827;
+  padding: 0.45rem 0.7rem;
+  font-weight: 1000;
+  text-decoration: none;
+}
+
+.supply-task-card-review-header p,
+.supply-task-card-review-header h1 {
+  margin: 0;
+}
+
+.supply-task-card-review-header p {
+  font-size: 0.75rem;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.supply-task-card-review-header h1 {
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+.supply-task-card-review-header > span {
+  border: 2px solid #111827;
+  background: #fff8e8;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.supply-task-card-review-panel {
+  max-width: 86rem;
+  margin: 0 auto 1rem;
+  border: 4px solid #111827;
+  background: rgba(255, 248, 232, 0.96);
+  box-shadow: 5px 5px 0 rgba(17, 24, 39, 0.92);
+  padding: 1rem;
+}
+
+.supply-task-card-review-panel-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.supply-task-card-review-panel-heading h2,
+.supply-task-card-review-panel-heading p {
+  margin: 0;
+}
+
+.supply-task-card-review-panel-heading h2 {
+  font-size: 1.2rem;
+}
+
+.supply-task-card-review-panel-heading p {
+  color: #5f5546;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.supply-task-card-review-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 18.75rem));
+  justify-content: center;
+  gap: 1rem;
+}
+
+.supply-task-card {
+  --task-card-accent: #3e9c35;
+  --task-card-accent-dark: #14532d;
+  --task-card-accent-soft: #dcfce7;
+  --task-card-ink: #0f100e;
+  position: relative;
+  display: grid;
+  grid-template-rows: 2.1rem auto minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  width: min(100%, 18.75rem);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 4px solid var(--task-card-ink);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.38), transparent 38%),
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.46), transparent 18%),
+    #f2e5c7;
+  box-shadow: 5px 5px 0 rgba(15, 16, 14, 0.9);
+  color: var(--task-card-ink);
+  padding: 0.78rem;
+}
+
+.supply-task-card--movement {
+  --task-card-accent: #3e9c35;
+  --task-card-accent-dark: #14532d;
+  --task-card-accent-soft: #dcfce7;
+}
+
+.supply-task-card--hydration {
+  --task-card-accent: #278bd6;
+  --task-card-accent-dark: #075985;
+  --task-card-accent-soft: #e0f2fe;
+}
+
+.supply-task-card--social {
+  --task-card-accent: #e1ae20;
+  --task-card-accent-dark: #92400e;
+  --task-card-accent-soft: #fef3c7;
+}
+
+.supply-task-card--learning {
+  --task-card-accent: #d9432f;
+  --task-card-accent-dark: #991b1b;
+  --task-card-accent-soft: #fee2e2;
+}
+
+.supply-task-card-corner {
+  position: absolute;
+  z-index: 2;
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 3px solid var(--task-card-ink);
+  background: var(--task-card-accent);
+}
+
+.supply-task-card-corner--tl {
+  top: 0.45rem;
+  left: 0.45rem;
+}
+
+.supply-task-card-corner--tr {
+  top: 0.45rem;
+  right: 0.45rem;
+}
+
+.supply-task-card-band {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  border: 3px solid var(--task-card-ink);
+  background: var(--task-card-accent);
+  color: #fffef5;
+  font-size: 0.82rem;
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow: 1px 1px 0 var(--task-card-ink);
+}
+
+.supply-task-card h3 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.45rem;
+  font-weight: 1000;
+  line-height: 1.05;
+}
+
+.supply-task-card-art {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border: 4px solid var(--task-card-ink);
+  background: var(--task-card-accent-soft);
+}
+
+.supply-task-card-art img {
+  object-fit: cover;
+  object-position: center top;
+  image-rendering: pixelated;
+}
+
+.supply-task-card-meta {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.36rem;
+}
+
+.supply-task-card-meta span {
+  display: grid;
+  min-height: 1.45rem;
+  place-items: center;
+  border: 2px solid var(--task-card-ink);
+  background: #fff7ed;
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-task-card-meta span[data-level="轻"] {
+  background: #22c55e;
+  color: #fff;
+}
+
+.supply-task-card-meta span[data-level="中"] {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.supply-task-card-reroll {
+  position: absolute;
+  right: 0.78rem;
+  bottom: 0.78rem;
+  border: 3px solid var(--task-card-ink);
+  background: #facc15;
+  box-shadow: 2px 2px 0 var(--task-card-ink);
+  color: #111827;
+  padding: 0.34rem 0.52rem;
+  font-size: 0.72rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-task-card-state {
+  position: absolute;
+  top: 3.28rem;
+  right: 0.78rem;
+  display: grid;
+  min-width: 3.2rem;
+  min-height: 1.45rem;
+  place-items: center;
+  border: 2px solid #fffef5;
+  outline: 3px solid var(--task-card-ink);
+  background: #3f9b2f;
+  color: #fff;
+  padding: 0 0.38rem;
+  font-size: 0.68rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.supply-task-card-state[data-complete="false"] {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.supply-task-card--dashboard {
+  width: min(100%, 12.75rem);
+  gap: 0.32rem;
+  border-width: 3px;
+  box-shadow: 3px 3px 0 rgba(15, 16, 14, 0.86);
+  padding: 0.58rem;
+}
+
+.supply-task-card--dashboard .supply-task-card-band {
+  min-height: 1.62rem;
+  font-size: 0.68rem;
+}
+
+.supply-task-card--dashboard h3 {
+  font-size: 1rem;
+}
+
+.supply-task-card--dashboard .supply-task-card-meta span,
+.supply-task-card--dashboard .supply-task-card-reroll,
+.supply-task-card--dashboard .supply-task-card-state {
+  font-size: 0.58rem;
+}
+
+.supply-task-card-dashboard-preview-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.supply-task-card-dashboard-preview {
+  display: grid;
+  gap: 0.7rem;
+  border: 4px solid #111827;
+  background: #fff8e8;
+  padding: 0.85rem;
+}
+
+.supply-task-card-dashboard-preview--compact {
+  max-width: 34.25rem;
+}
+
+.supply-task-card-dashboard-preview--card-first {
+  max-width: 42rem;
+}
+
+.supply-task-card-dashboard-preview-heading,
+.supply-task-card-dashboard-preview footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.supply-task-card-dashboard-preview-heading strong {
+  font-size: 1rem;
+  font-weight: 1000;
+}
+
+.supply-task-card-dashboard-preview-heading span {
+  border: 2px solid #111827;
+  background: #facc15;
+  padding: 0.25rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 1000;
+}
+
+.supply-task-card-dashboard-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  place-items: center;
+  gap: 0.72rem;
+}
+
+.supply-task-card-dashboard-preview footer {
+  border: 3px solid #c7b99d;
+  background: rgba(255, 251, 241, 0.9);
+  padding: 0.52rem 0.68rem;
+}
+
+.supply-task-card-dashboard-preview footer p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.supply-task-card-dashboard-preview footer span {
+  border: 2px solid #111827;
+  background: #fff7ed;
+  padding: 0.12rem 0.28rem;
+}
+
+.supply-task-card-dashboard-preview footer button {
+  border: 3px solid #111827;
+  background: #facc15;
+  box-shadow: 2px 2px 0 #111827;
+  padding: 0.35rem 0.62rem;
+  font-weight: 1000;
+}
+
+@media (max-width: 960px) {
+  .supply-task-card-review-header,
+  .supply-task-card-dashboard-preview-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .supply-task-card-review-grid {
+    grid-template-columns: repeat(2, minmax(0, 18.75rem));
+  }
+}
+
+@media (max-width: 640px) {
+  .supply-task-card-review-grid,
+  .supply-task-card-dashboard-preview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .app-top-nav {
   color: #f8fafc;
 }
