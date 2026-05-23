@@ -10,6 +10,7 @@ import {
   SupplyUiLabProgress,
   SupplyUiLabStatusBadge,
 } from "../supply-dashboard/SupplyUiLabPrimitives";
+import { supplyUiLabResourceIconPaths } from "../supply-data/resources";
 import type { SupplyDrawPoolPreview, SupplyDrawPoolRewardRow } from "./types";
 
 function DrawPoolTopBar({ data, ticketBalance }: { data: SupplyDrawPoolPreview; ticketBalance: number }) {
@@ -22,7 +23,13 @@ function DrawPoolTopBar({ data, ticketBalance }: { data: SupplyDrawPoolPreview; 
       <div className="supply-draw-pool-top-resources" aria-label="资源余额">
         {data.topBar.resources.map((resource) => (
           <div className="supply-draw-pool-resource-pill" key={resource.id}>
-            <span aria-hidden="true">{resource.icon}</span>
+            <span aria-hidden="true">
+              {resource.iconImage ? (
+                <Image alt="" height={44} src={resource.iconImage} unoptimized width={44} />
+              ) : (
+                resource.icon
+              )}
+            </span>
             <em>{resource.label}</em>
             <strong>{resource.id === "ticket" ? ticketBalance : resource.value}</strong>
             <b aria-hidden="true">+</b>
@@ -160,7 +167,10 @@ function DrawMachineStage({
                 <strong>
                   {action.label} x{action.drawCount}
                 </strong>
-                <em>x{action.costTicket}</em>
+                <em>
+                  <Image alt="" height={32} src={supplyUiLabResourceIconPaths.ticket} unoptimized width={32} />
+                  x{action.costTicket}
+                </em>
                 <span>{action.guaranteeLabel}</span>
               </SupplyUiLabActionButton>
             );

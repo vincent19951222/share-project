@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { supplyUiLabResourceIconPaths } from "@/components/gamification/ui-lab/supply-data/resources";
 import { SupplyBackpackScene } from "@/components/gamification/ui-lab/supply-backpack/SupplyBackpackScene";
 import { supplyBackpackMock } from "@/components/gamification/ui-lab/supply-backpack/mock-data";
 
@@ -39,7 +40,13 @@ describe("SupplyBackpackScene", () => {
     expect(container.querySelector(".supply-ui-lab-close")?.getAttribute("href")).toBe(
       "/ui-lab/supply-dashboard",
     );
+    expect(container.querySelector(".supply-backpack-sidebar-title-icon")?.getAttribute("src")).toBe(
+      supplyUiLabResourceIconPaths.backpack,
+    );
     expect(container.querySelector("nav[aria-label='背包分类']")).not.toBeNull();
+    expect(container.querySelectorAll(".supply-backpack-category-icon img")).toHaveLength(
+      supplyBackpackMock.sidebar.categories.length,
+    );
     expect(container.querySelector("[role='grid'][aria-label='背包库存']")).not.toBeNull();
     expect(container.querySelector(".supply-backpack-detail[aria-label='道具详情']")).not.toBeNull();
     expect(container.textContent).toContain("小提示：");
@@ -87,6 +94,37 @@ describe("SupplyBackpackScene", () => {
     expect(grid?.querySelectorAll("[role='gridcell']")).toHaveLength(20);
     expect(grid?.querySelectorAll(".supply-backpack-slot.is-empty")).toHaveLength(20);
     expect(grid?.querySelectorAll(".supply-backpack-slot.is-locked")).toHaveLength(0);
+  });
+
+  it("filters inventory locally when a sidebar category is clicked", async () => {
+    await act(async () => {
+      root.render(<SupplyBackpackScene data={supplyBackpackMock} />);
+    });
+
+    const categoryButtons = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("nav[aria-label='背包分类'] button"),
+    );
+    const socialCategory = categoryButtons.find((button) => button.textContent?.includes("社交"));
+    const allCategory = categoryButtons.find((button) => button.textContent?.includes("全部"));
+    const socialItemCount = supplyBackpackMock.inventory.slots.filter(
+      (slot) => slot.type === "item" && slot.item.categoryId === "social",
+    ).length;
+
+    await act(async () => {
+      socialCategory?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const grid = container.querySelector("[role='grid'][aria-label='背包库存']");
+    const itemCells = Array.from(grid?.querySelectorAll("[role='gridcell'][aria-label*='持有']") ?? []);
+
+    expect(socialCategory?.getAttribute("aria-current")).toBe("page");
+    expect(allCategory?.getAttribute("aria-current")).toBeNull();
+    expect(grid?.querySelectorAll("[role='gridcell']")).toHaveLength(20);
+    expect(itemCells).toHaveLength(socialItemCount);
+    expect(grid?.textContent).toContain("点名喝水令");
+    expect(grid?.textContent).not.toContain("任务换班券");
+    expect(container.querySelector(".supply-backpack-detail h2")?.textContent).toBe("点名喝水令");
+    expect(container.querySelector(".supply-backpack-pagination")?.textContent).toContain("1 / 1");
   });
 
   it("switches selected item detail locally when an inventory item is clicked", async () => {

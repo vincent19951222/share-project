@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { supplyUiLabResourceIconPaths } from "@/components/gamification/ui-lab/supply-data/resources";
 import { SupplyDrawPoolScene } from "@/components/gamification/ui-lab/supply-draw-pool/SupplyDrawPoolScene";
 import { supplyDrawPoolAssetPaths, supplyDrawPoolMock } from "@/components/gamification/ui-lab/supply-draw-pool/mock-data";
 
@@ -45,6 +46,10 @@ describe("SupplyDrawPoolScene", () => {
     expect(container.textContent).toContain("十连批次如果自然结果没有实用、社交或稀有奖励");
     expect(container.textContent).toContain("最近掉落");
     expect(container.textContent).toContain("牛马暴富");
+    expect(container.querySelectorAll(".supply-draw-pool-action em img")).toHaveLength(2);
+    expect(container.querySelector(".supply-draw-pool-action em img")?.getAttribute("src")).toBe(
+      supplyUiLabResourceIconPaths.ticket,
+    );
     expect(container.textContent).not.toContain("补给券");
     expect(container.textContent).not.toContain("保底进度");
     expect(container.textContent).not.toContain("48/70");

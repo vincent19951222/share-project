@@ -31,6 +31,7 @@ function getTopBarResources(data: SupplyDashboardPreview): SupplyUiLabResource[]
     label: resource.label,
     value: formatResource(resource.value, resource.maxValue),
     icon: resource.icon,
+    iconImage: resource.iconImage,
   }));
 }
 
@@ -60,10 +61,16 @@ function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
         <div className="supply-dashboard-effect-list">
           {data.activeEffects.map((effect) => (
             <article className="supply-dashboard-effect-card" data-effect={effect.id} key={effect.id}>
-              <span aria-hidden="true">效</span>
+              <Image
+                alt=""
+                className="supply-dashboard-effect-icon"
+                height={40}
+                src={effect.icon}
+                unoptimized
+                width={40}
+              />
               <div>
                 <strong>{effect.label}</strong>
-                <small>{effect.businessSource}</small>
                 <p>{effect.effectSummary}</p>
                 <time>
                   {effect.statusLabel} · {effect.endsAtLabel}
@@ -107,10 +114,24 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
       <div className="supply-dashboard-hero-status" aria-label="等级经验">
         <strong>Lv.{data.profile.level}</strong>
         <div className="supply-dashboard-hero-progress">
-          <SupplyUiLabProgress current={data.profile.currentLevelExp} label="等级经验" max={data.profile.nextLevelExp} />
+          <SupplyUiLabProgress
+            current={data.profile.currentLevelExp}
+            label="等级经验"
+            max={data.profile.nextLevelExp}
+            valueDisplay="tooltip"
+            showPercent
+          />
         </div>
         <p>距离升级还差 {remainingExp} EXP</p>
-        <b aria-hidden="true">◎</b>
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="supply-dashboard-level-avatar"
+          height={72}
+          src={supplyDashboardAssetPaths.levelAvatar}
+          unoptimized
+          width={72}
+        />
       </div>
     </section>
   );

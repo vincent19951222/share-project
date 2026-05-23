@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { supplyUiLabResourceIconPaths } from "@/components/gamification/ui-lab/supply-data/resources";
 import { SupplyShopScene } from "@/components/gamification/ui-lab/supply-shop/SupplyShopScene";
 import { supplyShopMock } from "@/components/gamification/ui-lab/supply-shop/mock-data";
 
@@ -31,6 +32,7 @@ describe("SupplyShopScene", () => {
     expect(container.querySelector(".supply-ui-lab-resource--coins")?.textContent).toContain("银子");
     expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
     expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
+    expect(container.querySelector(".supply-shop-resource-card")).toBeNull();
     expect(container.querySelector("a.supply-shop-back-link")?.getAttribute("href")).toBe(
       "/ui-lab/supply-dashboard",
     );
@@ -38,10 +40,16 @@ describe("SupplyShopScene", () => {
     expect(container.querySelector(".supply-shop-category-list button[aria-current='page']")?.textContent).toContain(
       "全部商品",
     );
+    expect(container.querySelectorAll(".supply-shop-category-icon img")).toHaveLength(6);
+    expect(container.querySelector(".supply-shop-category-icon")?.textContent).toBe("");
     expect(container.querySelector(".supply-ui-lab-filterbar [role='tab'][aria-selected='true']")?.textContent).toBe(
       "全部",
     );
     expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).toHaveLength(12);
+    expect(container.querySelector(".supply-shop-product-price img")?.getAttribute("src")).toBe(
+      supplyUiLabResourceIconPaths.coins,
+    );
+    expect(container.querySelector(".supply-shop-product-price")?.getAttribute("aria-label")).toMatch(/^银子 \d+$/);
     expect(container.querySelector("[data-testid='supply-shop-product-card'][aria-selected='true']")?.textContent).toContain(
       "任务换班券",
     );

@@ -13,6 +13,7 @@ export type SupplyUiLabResource = {
   label: "银子" | "抽奖券" | "背包";
   value: string;
   icon: string;
+  iconImage?: string;
 };
 
 export type SupplyUiLabCatalogItem = {

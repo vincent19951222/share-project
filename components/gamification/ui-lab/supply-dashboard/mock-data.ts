@@ -5,6 +5,7 @@ import type { SupplyDashboardPreview, SupplyDashboardResource } from "./types";
 export const supplyDashboardAssetPaths = {
   background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
   hero: "/assets/home-scenes/supply/dashboard/niuma-hero.webp",
+  levelAvatar: "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
   dockBackpack: "/assets/home-scenes/supply/dashboard/dock-backpack.webp",
   dockSupplyMachine: "/assets/home-scenes/supply/dashboard/dock-supply-machine.webp",
   dockTaskRecord: "/assets/home-scenes/supply/dashboard/dock-task-record.webp",
@@ -22,7 +23,13 @@ export const supplyDashboardAssetPaths = {
   },
 } as const;
 
-function toDashboardResource(resource: { id: string; label: string; value: string; icon: string }): SupplyDashboardResource {
+function toDashboardResource(resource: {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+  iconImage?: string;
+}): SupplyDashboardResource {
   const [currentValue, maxValue] = resource.value.split("/");
 
   return {
@@ -31,6 +38,7 @@ function toDashboardResource(resource: { id: string; label: string; value: strin
     value: Number(currentValue.replace(/,/g, "")),
     maxValue: maxValue === undefined ? undefined : Number(maxValue.replace(/,/g, "")),
     icon: resource.icon,
+    iconImage: resource.iconImage,
   };
 }
 

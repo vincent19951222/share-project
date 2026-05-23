@@ -8,7 +8,9 @@ import {
   SupplyUiLabStatusBadge,
 } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabPrimitives";
 import { SupplyUiLabTopBar } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
+import { supplyUiLabResourceIconPaths } from "../supply-data/resources";
 import type {
+  SupplyBackpackCategoryId,
   SupplyBackpackInventoryItem,
   SupplyBackpackPreview,
   SupplyBackpackRarity,
@@ -23,17 +25,51 @@ const rarityClass: Record<SupplyBackpackRarity, string> = {
   SSR: "supply-backpack-rarity-ssr",
 };
 
+function getInventoryItems(slots: SupplyBackpackSlot[]) {
+  return slots.flatMap((slot) => (slot.type === "item" ? [slot.item] : []));
+}
+
+function isCategoryMatch(item: SupplyBackpackInventoryItem, categoryId: SupplyBackpackCategoryId) {
+  return categoryId === "all" || item.categoryId === categoryId;
+}
+
 export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
   const [brandLabel = "牛马补给站", activeLabel = "背包"] = data.topBar.breadcrumb;
   const [page, setPage] = useState(data.inventory.page);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<SupplyBackpackCategoryId>(
+    data.sidebar.categories.find((category) => category.active)?.id ?? "all",
+  );
   const [selectedItemId, setSelectedItemId] = useState(data.selectedItemDetail.itemId);
   const [actionLabel, setActionLabel] = useState<string | null>(null);
+  const inventoryItems = useMemo(() => getInventoryItems(data.inventory.slots), [data.inventory.slots]);
+  const filteredInventoryItems = useMemo(
+    () => inventoryItems.filter((item) => isCategoryMatch(item, selectedCategoryId)),
+    [inventoryItems, selectedCategoryId],
+  );
+  const totalPages =
+    selectedCategoryId === "all"
+      ? data.inventory.totalPages
+      : Math.max(1, Math.ceil(filteredInventoryItems.length / data.inventory.pageSize));
+  const safePage = Math.min(page, totalPages);
 
   const selectedDetail =
     useMemo(
       () => data.itemDetails.find((detail) => detail.itemId === selectedItemId),
       [data.itemDetails, selectedItemId],
     ) ?? data.selectedItemDetail;
+
+  function handleSelectCategory(categoryId: SupplyBackpackCategoryId) {
+    const categoryItems = inventoryItems.filter((item) => isCategoryMatch(item, categoryId));
+    const selectedItemStillVisible = categoryItems.some((item) => item.id === selectedItemId);
+
+    setSelectedCategoryId(categoryId);
+    setPage(1);
+    setActionLabel(null);
+
+    if (!selectedItemStillVisible && categoryItems[0]) {
+      setSelectedItemId(categoryItems[0].id);
+    }
+  }
 
   return (
     <main className="supply-backpack-scene" aria-label="牛马补给站背包静态原型">
@@ -47,11 +83,17 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
           variant="breadcrumb"
         />
         <section className="supply-backpack-shell" aria-label="背包静态复刻">
-          <BackpackSidebar data={data} />
+          <BackpackSidebar
+            data={data}
+            selectedCategoryId={selectedCategoryId}
+            onSelectCategory={handleSelectCategory}
+          />
           <BackpackInventoryPanel
             data={data}
-            page={page}
+            inventoryItems={filteredInventoryItems}
+            page={safePage}
             selectedItemId={selectedItemId}
+            totalPages={totalPages}
             onPageChange={setPage}
             onSelectItem={(itemId) => {
               setSelectedItemId(itemId);
@@ -70,7 +112,15 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
   );
 }
 
-function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
+function BackpackSidebar({
+  data,
+  selectedCategoryId,
+  onSelectCategory,
+}: {
+  data: SupplyBackpackPreview;
+  selectedCategoryId: SupplyBackpackCategoryId;
+  onSelectCategory: (categoryId: SupplyBackpackCategoryId) => void;
+}) {
   return (
     <aside className="supply-backpack-sidebar" aria-label="背包分类与今日效果">
       <SupplyUiLabPixelPanel
@@ -79,7 +129,14 @@ function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
         title={
           <span className="supply-backpack-sidebar-title">
             <span>
-              <span aria-hidden="true">▣</span>
+              <Image
+                alt=""
+                className="supply-backpack-sidebar-title-icon"
+                height={32}
+                src={supplyUiLabResourceIconPaths.backpack}
+                unoptimized
+                width={32}
+              />
               背包
             </span>
             <SupplyUiLabStatusBadge tone="muted">容量 {data.sidebar.capacity}</SupplyUiLabStatusBadge>
@@ -87,18 +144,25 @@ function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
         }
       >
         <nav aria-label="背包分类" className="supply-backpack-categories">
-          {data.sidebar.categories.map((category) => (
-            <button
-              aria-current={category.active ? "page" : undefined}
-              className={category.active ? "is-active" : undefined}
-              key={category.id}
-              type="button"
-            >
-              <span aria-hidden="true">{category.icon}</span>
-              {category.label}
-              <span aria-hidden="true">›</span>
-            </button>
-          ))}
+          {data.sidebar.categories.map((category) => {
+            const isActive = category.id === selectedCategoryId;
+
+            return (
+              <button
+                aria-current={isActive ? "page" : undefined}
+                className={isActive ? "is-active" : undefined}
+                key={category.id}
+                onClick={() => onSelectCategory(category.id)}
+                type="button"
+              >
+                <span className="supply-backpack-category-icon" aria-hidden="true">
+                  <Image alt="" height={32} src={category.iconImage} unoptimized width={32} />
+                </span>
+                {category.label}
+                <span aria-hidden="true">›</span>
+              </button>
+            );
+          })}
         </nav>
         <div className="supply-backpack-sidebar-controls" aria-label="背包操作">
           <Link href="/ui-lab/supply-dashboard" className="supply-backpack-back-link">
@@ -138,19 +202,30 @@ function BackpackSidebar({ data }: { data: SupplyBackpackPreview }) {
 
 function BackpackInventoryPanel({
   data,
+  inventoryItems,
   page,
   selectedItemId,
+  totalPages,
   onPageChange,
   onSelectItem,
 }: {
   data: SupplyBackpackPreview;
+  inventoryItems: SupplyBackpackInventoryItem[];
   page: number;
   selectedItemId: string;
+  totalPages: number;
   onPageChange: (page: number) => void;
   onSelectItem: (itemId: string) => void;
 }) {
   const startIndex = (page - 1) * data.inventory.pageSize;
-  const visibleSlots = data.inventory.slots.slice(startIndex, startIndex + data.inventory.pageSize);
+  const visibleItems = inventoryItems.slice(startIndex, startIndex + data.inventory.pageSize);
+  const visibleSlots: SupplyBackpackSlot[] = [
+    ...visibleItems.map((item) => ({ type: "item" as const, item })),
+    ...Array.from({ length: data.inventory.pageSize - visibleItems.length }, (_, index) => ({
+      type: "empty" as const,
+      id: `category-empty-${page}-${index + 1}`,
+    })),
+  ];
 
   return (
     <section className="supply-backpack-inventory-panel" aria-label="库存面板">
@@ -185,13 +260,13 @@ function BackpackInventoryPanel({
           ‹
         </button>
         <span>
-          {page} / {data.inventory.totalPages}
+          {page} / {totalPages}
         </span>
         <button
           type="button"
-          disabled={page === data.inventory.totalPages}
+          disabled={page === totalPages}
           aria-label="下一页"
-          onClick={() => onPageChange(Math.min(data.inventory.totalPages, page + 1))}
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
         >
           ›
         </button>

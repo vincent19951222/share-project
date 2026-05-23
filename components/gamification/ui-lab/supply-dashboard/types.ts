@@ -9,6 +9,7 @@ export type SupplyDashboardResource = {
   value: number;
   maxValue?: number;
   icon: string;
+  iconImage?: string;
 };
 
 export type SupplyDashboardActiveEffect = SupplyUiLabActiveEffect;

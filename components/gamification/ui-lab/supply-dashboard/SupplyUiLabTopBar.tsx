@@ -6,6 +6,7 @@ export type SupplyUiLabResource = {
   label: string;
   value: string;
   icon: string;
+  iconImage?: string;
 };
 
 export type SupplyUiLabProfile = {
@@ -32,7 +33,6 @@ type SupplyUiLabTopBarProps = SupplyUiLabTopBarTabProps | SupplyUiLabTopBarBread
 
 const supplyUiLabTabs = [
   { id: "status", label: "我的状态", icon: "⌂", href: "/ui-lab/supply-dashboard" },
-  { id: "team-goal", label: "团队目标", icon: "◎", href: "/ui-lab/supply-dashboard/team-goal" },
   { id: "shop", label: "补给商店", icon: "▤", href: "/ui-lab/supply-dashboard/shop" },
   { id: "task-record", label: "任务记录", icon: "▣", href: "/ui-lab/supply-dashboard/task-record" },
 ] as const;
@@ -90,7 +90,13 @@ export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
       <div className="supply-ui-lab-statusbar" aria-label="资源状态">
         {resources.map((resource) => (
           <div className={`supply-ui-lab-resource supply-ui-lab-resource--${resource.id}`} key={resource.id}>
-            <span aria-hidden="true">{resource.icon}</span>
+            <span aria-hidden="true">
+              {resource.iconImage ? (
+                <Image alt="" height={44} src={resource.iconImage} unoptimized width={44} />
+              ) : (
+                resource.icon
+              )}
+            </span>
             <em>{resource.label}</em>
             <strong>{resource.value}</strong>
             {resource.id !== "backpack" ? <b aria-hidden="true">+</b> : null}

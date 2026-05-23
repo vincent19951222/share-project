@@ -11,6 +11,7 @@ import {
   SupplyUiLabStatusBadge,
 } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabPrimitives";
 import { SupplyUiLabTopBar } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
+import { supplyUiLabResourceIconPaths } from "../supply-data/resources";
 import type {
   SupplyShopCategoryId,
   SupplyShopFilterId,
@@ -35,6 +36,15 @@ const rarityClassName: Record<SupplyShopProduct["rarity"], string> = {
 
 function formatPrice(product: SupplyShopProduct) {
   return `银子 ${product.price.amount}`;
+}
+
+function ProductPrice({ product }: { product: SupplyShopProduct }) {
+  return (
+    <span className="supply-shop-product-price" aria-label={formatPrice(product)}>
+      <Image alt="" height={32} src={supplyUiLabResourceIconPaths.coins} unoptimized width={32} />
+      <strong>{product.price.amount}</strong>
+    </span>
+  );
 }
 
 function findDetail(data: SupplyShopPreview, productId: string): SupplyShopProductDetail {
@@ -94,23 +104,15 @@ function ShopSidebar({
                 onClick={() => onSelectCategory(category.id)}
                 type="button"
               >
-                <span aria-hidden="true">{category.icon}</span>
+                <span className="supply-shop-category-icon" aria-hidden="true">
+                  <Image alt="" height={32} src={category.iconImage} unoptimized width={32} />
+                </span>
                 {category.label}
                 <span aria-hidden="true">›</span>
               </button>
             );
           })}
         </nav>
-        <div className="supply-shop-resource-card" aria-label="我的资源">
-          <h3>我的资源</h3>
-          {data.sidebar.resources.map((resource) => (
-            <div className="supply-shop-resource-row" key={resource.id}>
-              <span aria-hidden="true">{resource.icon}</span>
-              <b>{resource.label}</b>
-              <strong>{resource.value}</strong>
-            </div>
-          ))}
-        </div>
         <Link className="supply-shop-back-link" href="/ui-lab/supply-dashboard">
           返回大厅
         </Link>
@@ -154,7 +156,7 @@ function ShopProductCard({
           {product.sourceLabel} · {product.limitLabel}
         </small>
       </span>
-      <span className="supply-shop-product-price">{formatPrice(product)}</span>
+      <ProductPrice product={product} />
     </button>
   );
 }
