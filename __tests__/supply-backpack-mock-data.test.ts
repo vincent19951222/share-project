@@ -21,6 +21,13 @@ describe("supply backpack mock data", () => {
     ]);
     expect(supplyBackpackMock.sidebar.capacity).toBe("18/60");
     expect(supplyBackpackMock.sidebar.todayEffects).toBe(supplyUiLabActiveEffects);
+    expect(supplyBackpackMock.sidebar.categories.map((category) => category.iconImage)).toEqual([
+      "/assets/home-scenes/supply/shop/categories/category-all.png",
+      "/assets/home-scenes/supply/shop/categories/category-boost.png",
+      "/assets/home-scenes/supply/shop/categories/category-task.png",
+      "/assets/home-scenes/supply/shop/categories/category-social.png",
+      "/assets/home-scenes/supply/shop/categories/category-real-world.png",
+    ]);
     expect(supplyBackpackMock.inventory.page).toBe(1);
     expect(supplyBackpackMock.inventory.pageSize).toBe(20);
     expect(supplyBackpackMock.inventory.totalSlots).toBe(60);

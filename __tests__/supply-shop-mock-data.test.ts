@@ -91,6 +91,11 @@ describe("supply shop mock data", () => {
     expect(supplyShopMock.products.map((product) => product.image)).toEqual(
       supplyUiLabCatalog.filter((item) => item.shop.buyable).map((item) => item.media.image),
     );
-    expect(JSON.stringify(supplyShopAssetPaths)).not.toMatch(/\/assets\/home-scenes\/supply\/shop\//);
+    expect(supplyShopMock.products.map((product) => product.image).join("\n")).not.toMatch(
+      /\/assets\/home-scenes\/supply\/shop\//,
+    );
+    expect(Object.values(supplyShopAssetPaths.categoryIcons).every((src) => src.includes("/shop/categories/"))).toBe(
+      true,
+    );
   });
 });

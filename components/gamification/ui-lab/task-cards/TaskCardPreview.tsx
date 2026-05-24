@@ -8,6 +8,7 @@ type TaskCardPreviewProps = {
   className?: string;
   density?: "review" | "dashboard";
   onReroll?: (cardId: string) => void;
+  showControls?: boolean;
 };
 
 function joinClassNames(parts: Array<string | undefined>) {
@@ -19,6 +20,7 @@ export function TaskCardPreview({
   className,
   density = "review",
   onReroll,
+  showControls = true,
 }: TaskCardPreviewProps) {
   return (
     <article
@@ -49,17 +51,21 @@ export function TaskCardPreview({
         <span>{card.sceneLabel}</span>
         <span>{card.cooldownLabel}</span>
       </div>
-      <button
-        className="supply-task-card-reroll"
-        onClick={() => onReroll?.(card.id)}
-        type="button"
-        aria-label={`更换任务：${card.title}`}
-      >
-        换一个
-      </button>
-      <span className="supply-task-card-state" data-complete={card.completed}>
-        {card.completed ? "已完成" : "进行中"}
-      </span>
+      {showControls ? (
+        <>
+          <button
+            className="supply-task-card-reroll"
+            onClick={() => onReroll?.(card.id)}
+            type="button"
+            aria-label={`更换任务：${card.title}`}
+          >
+            换一个
+          </button>
+          <span className="supply-task-card-state" data-complete={card.completed}>
+            {card.completed ? "已完成" : "进行中"}
+          </span>
+        </>
+      ) : null}
     </article>
   );
 }

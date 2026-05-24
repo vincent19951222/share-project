@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import {
-  SupplyUiLabActionButton,
   SupplyUiLabFilterBar,
   SupplyUiLabPixelPanel,
   SupplyUiLabStatusBadge,
@@ -14,6 +13,7 @@ import { SupplyUiLabTopBar } from "@/components/gamification/ui-lab/supply-dashb
 import type {
   SupplyTaskRecordDateOption,
   SupplyTaskRecordDrawHistoryItem,
+  SupplyTaskRecordFilter,
   SupplyTaskRecordInvite,
   SupplyTaskRecordMode,
   SupplyTaskRecordPreview,
@@ -47,14 +47,58 @@ const modeTitles: Record<SupplyTaskRecordMode, string> = {
   today: "今日记录",
 };
 
+function filterTimelineRecords(
+  records: SupplyTaskRecordTimelineItem[],
+  filterId: SupplyTaskRecordFilter["id"],
+) {
+  if (filterId === "all") {
+    return records;
+  }
+
+  if (filterId === "reward") {
+    return records.filter((record) => record.category === "reward" || record.category === "draw");
+  }
+
+  return records.filter((record) => record.category === filterId);
+}
+
+function getMenuBadge(data: SupplyTaskRecordPreview, mode: SupplyTaskRecordMode) {
+  if (mode === "draws") {
+    return String(data.drawHistory.length);
+  }
+
+  if (mode === "redemptions") {
+    const activeRedemptions = data.redemptions.items.filter((item) => item.status === "processing").length;
+    return activeRedemptions > 0 ? String(activeRedemptions) : null;
+  }
+
+  if (mode === "radar") {
+    const pendingInvites = data.radar.invites.filter((invite) => invite.status === "pending").length;
+    return pendingInvites > 0 ? String(pendingInvites) : null;
+  }
+
+  return null;
+}
+
 export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview }) {
   const [activeMode, setActiveMode] = useState<SupplyTaskRecordMode>(data.activeMode);
   const [activeDateKey, setActiveDateKey] = useState(data.activeDateKey);
+  const [activeFilterId, setActiveFilterId] = useState<SupplyTaskRecordFilter["id"]>(
+    data.filters.find((filter) => filter.active)?.id ?? "all",
+  );
   const selectedDate = useMemo(
     () => data.dates.find((date) => date.key === activeDateKey) ?? data.dates[0],
     [activeDateKey, data.dates],
   );
   const selectedRecords = data.recordsByDate[activeDateKey] ?? [];
+  const visibleRecords = useMemo(
+    () => filterTimelineRecords(selectedRecords, activeFilterId),
+    [activeFilterId, selectedRecords],
+  );
+  const filters = data.filters.map((filter) => ({
+    ...filter,
+    active: filter.id === activeFilterId,
+  }));
 
   return (
     <main className="supply-task-record-scene">
@@ -67,17 +111,12 @@ export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview 
             activeDateKey={activeDateKey}
             activeMode={activeMode}
             data={data}
-            records={selectedRecords}
+            filters={filters}
+            records={visibleRecords}
             selectedDate={selectedDate}
             onSelectDate={setActiveDateKey}
+            onSelectFilter={(filterId) => setActiveFilterId(filterId as SupplyTaskRecordFilter["id"])}
           />
-          <aside className="supply-task-record-aside" aria-label="任务记录侧栏">
-            <TeammateRadarPanel
-              invites={data.radar.invites.filter((invite) => invite.status === "pending")}
-              tabs={data.radar.tabs}
-            />
-            <RedemptionStatusPanel items={data.redemptions.items} />
-          </aside>
         </section>
       </div>
     </main>
@@ -108,6 +147,7 @@ function TaskRecordSidebar({
         <nav className="supply-task-record-menu" aria-label="任务记录分类">
           {data.sidebar.menuItems.map((item) => {
             const isActive = item.id === activeMode;
+            const badge = getMenuBadge(data, item.id);
 
             return (
               <button
@@ -117,8 +157,15 @@ function TaskRecordSidebar({
                 onClick={() => onSelectMode(item.id)}
                 type="button"
               >
-                <span aria-hidden="true">{item.icon}</span>
-                {item.label}
+                <span className="supply-task-record-menu-icon" aria-hidden="true">
+                  <Image alt="" height={32} src={item.iconImage} unoptimized width={32} />
+                </span>
+                <span className="supply-task-record-menu-label">{item.label}</span>
+                {badge ? (
+                  <small aria-label={`${item.label}数量 ${badge}`} className="supply-task-record-menu-badge">
+                    {badge}
+                  </small>
+                ) : null}
                 <span aria-hidden="true">›</span>
               </button>
             );
@@ -146,14 +193,18 @@ function TaskRecordMainPanel({
   activeDateKey,
   activeMode,
   data,
+  filters,
   onSelectDate,
+  onSelectFilter,
   records,
   selectedDate,
 }: {
   activeDateKey: string;
   activeMode: SupplyTaskRecordMode;
   data: SupplyTaskRecordPreview;
+  filters: SupplyTaskRecordFilter[];
   onSelectDate: (dateKey: string) => void;
+  onSelectFilter: (filterId: string) => void;
   records: SupplyTaskRecordTimelineItem[];
   selectedDate?: SupplyTaskRecordDateOption;
 }) {
@@ -174,8 +225,10 @@ function TaskRecordMainPanel({
           <TaskTimelinePanel
             activeDateKey={activeDateKey}
             data={data}
+            filters={filters}
             records={records}
             onSelectDate={onSelectDate}
+            onSelectFilter={onSelectFilter}
           />
         ) : null}
         {activeMode === "draws" ? <DrawHistoryPanel draws={data.drawHistory} /> : null}
@@ -190,14 +243,21 @@ function TaskRecordMainPanel({
 function TaskTimelinePanel({
   activeDateKey,
   data,
+  filters,
   onSelectDate,
+  onSelectFilter,
   records,
 }: {
   activeDateKey: string;
   data: SupplyTaskRecordPreview;
+  filters: SupplyTaskRecordFilter[];
   onSelectDate: (dateKey: string) => void;
+  onSelectFilter: (filterId: string) => void;
   records: SupplyTaskRecordTimelineItem[];
 }) {
+  const activeFilterId = filters.find((filter) => filter.active)?.id ?? "all";
+  const completeLabel = activeFilterId === "all" ? "已显示今日全部记录" : "已显示当前筛选全部记录";
+
   return (
     <>
       <div className="supply-task-record-date-tabs" role="tablist" aria-label="记录日期">
@@ -215,7 +275,7 @@ function TaskTimelinePanel({
         ))}
       </div>
       <div className="supply-task-record-filters">
-        <SupplyUiLabFilterBar ariaLabel="记录筛选" filters={data.filters} />
+        <SupplyUiLabFilterBar ariaLabel="记录筛选" filters={filters} onSelect={onSelectFilter} />
       </div>
       <div className="supply-task-record-timeline" aria-label="任务记录时间线">
         {records.length > 0 ? (
@@ -227,9 +287,7 @@ function TaskTimelinePanel({
           </div>
         )}
       </div>
-      <SupplyUiLabActionButton className="supply-task-record-load-more" tone="secondary">
-        加载更多记录 <span aria-hidden="true">⌄</span>
-      </SupplyUiLabActionButton>
+      {records.length > 0 ? <p className="supply-task-record-complete">{completeLabel}</p> : null}
     </>
   );
 }
@@ -358,65 +416,5 @@ function RedemptionRecord({ item }: { item: SupplyTaskRecordRedemption }) {
       </div>
       <SupplyUiLabStatusBadge tone={redemptionStatusTone[item.status]}>{item.statusLabel}</SupplyUiLabStatusBadge>
     </article>
-  );
-}
-
-function TeammateRadarPanel({
-  tabs,
-  invites,
-}: {
-  tabs: SupplyTaskRecordPreview["radar"]["tabs"];
-  invites: SupplyTaskRecordInvite[];
-}) {
-  return (
-    <section className="supply-task-record-radar" aria-labelledby="task-record-radar-title">
-      <SupplyUiLabPixelPanel
-        ariaLabel="队友雷达"
-        className="supply-task-record-radar-card"
-        title={
-          <span className="supply-task-record-side-title">
-            <span id="task-record-radar-title">队友雷达</span>
-            <button type="button">全部已读</button>
-          </span>
-        }
-      >
-        <div className="supply-task-record-radar-tabs" role="tablist" aria-label="队友雷达状态">
-          {tabs.map((tab) => (
-            <button aria-selected={tab.active} key={tab.id} role="tab" type="button">
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div className="supply-task-record-invite-list">
-          {invites.map((invite) => (
-            <InviteRecord invite={invite} key={invite.id} />
-          ))}
-        </div>
-        <SupplyUiLabActionButton className="supply-task-record-view-all" tone="ghost">
-          查看全部 <span aria-hidden="true">›</span>
-        </SupplyUiLabActionButton>
-      </SupplyUiLabPixelPanel>
-    </section>
-  );
-}
-
-function RedemptionStatusPanel({ items }: { items: SupplyTaskRecordRedemption[] }) {
-  return (
-    <section className="supply-task-record-redemptions" aria-labelledby="task-record-redemptions-title">
-      <SupplyUiLabPixelPanel
-        ariaLabel="兑换状态"
-        className="supply-task-record-redemptions-card"
-        title={<span id="task-record-redemptions-title">兑换状态</span>}
-      >
-        <div className="supply-task-record-redemption-list">
-          {items.map((item) => (
-            <RedemptionRecord item={item} key={item.id} />
-          ))}
-        </div>
-        <SupplyUiLabActionButton className="supply-task-record-view-all" tone="ghost">
-          查看全部 <span aria-hidden="true">›</span>
-        </SupplyUiLabActionButton>
-      </SupplyUiLabPixelPanel>
-    </section>
   );
 }

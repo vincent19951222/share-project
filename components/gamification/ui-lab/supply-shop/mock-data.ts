@@ -1,4 +1,5 @@
 import { supplyUiLabCatalog } from "../supply-data/catalog";
+import { supplyUiLabCategoryIcons } from "../supply-data/category-icons";
 import { supplyUiLabResources } from "../supply-data/resources";
 import type { SupplyUiLabCatalogCategory, SupplyUiLabUseTiming } from "../supply-data/types";
 import type {
@@ -13,15 +14,16 @@ import type {
 
 export const supplyShopAssetPaths = {
   profileAvatar: "/avatars/male1.png",
+  categoryIcons: supplyUiLabCategoryIcons,
 } as const;
 
-const categoryMeta: Record<SupplyShopCategoryId, { label: string; icon: string }> = {
-  all: { label: "全部商品", icon: "▦" },
-  boost: { label: "增益道具", icon: "▲" },
-  protection: { label: "防护道具", icon: "◆" },
-  social: { label: "社交道具", icon: "✦" },
-  task: { label: "任务道具", icon: "▣" },
-  real_world: { label: "真实福利", icon: "★" },
+const categoryMeta: Record<SupplyShopCategoryId, { label: string; icon: string; iconImage: string }> = {
+  all: { label: "全部商品", icon: "▦", iconImage: supplyShopAssetPaths.categoryIcons.all },
+  boost: { label: "增益道具", icon: "▲", iconImage: supplyShopAssetPaths.categoryIcons.boost },
+  protection: { label: "防护道具", icon: "◆", iconImage: supplyShopAssetPaths.categoryIcons.protection },
+  social: { label: "社交道具", icon: "✦", iconImage: supplyShopAssetPaths.categoryIcons.social },
+  task: { label: "任务道具", icon: "▣", iconImage: supplyShopAssetPaths.categoryIcons.task },
+  real_world: { label: "真实福利", icon: "★", iconImage: supplyShopAssetPaths.categoryIcons.real_world },
 };
 
 const categoryOrder: SupplyShopCategoryId[] = ["all", "boost", "protection", "task", "social", "real_world"];
@@ -123,6 +125,7 @@ const categories: SupplyShopCategory[] = categoryOrder.map((categoryId, index) =
   id: categoryId,
   label: categoryMeta[categoryId].label,
   icon: categoryMeta[categoryId].icon,
+  iconImage: categoryMeta[categoryId].iconImage,
   active: index === 0,
 }));
 

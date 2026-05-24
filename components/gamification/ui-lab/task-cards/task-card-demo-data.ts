@@ -14,10 +14,10 @@ import type {
 const reviewCardIds = ["movement_004", "hydration_003", "social_001", "learning_005"] as const;
 
 const taskCardArtById: Record<(typeof reviewCardIds)[number], string> = {
-  movement_004: "/assets/task-cards/raw/movement_004%C2%A0%E7%AA%97%E8%BE%B9%E5%9B%9E%E8%A1%80.png",
-  hydration_003: "/assets/task-cards/raw/hydration_003%C2%A0%E6%9D%AF%E5%AD%90%E8%A7%81%E5%BA%95.png",
-  social_001: "/assets/task-cards/raw/social_001%C2%A0%E5%BA%9F%E8%AF%9D%20KPI.png",
-  learning_005: "/assets/task-cards/raw/learning_005%C2%A0%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%AC%94%E8%AE%B0.png",
+  movement_004: "/assets/task-cards/illustrations/movement_004-window-heal.webp",
+  hydration_003: "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
+  social_001: "/assets/task-cards/illustrations/social_001-small-talk.webp",
+  learning_005: "/assets/task-cards/illustrations/learning_005-one-note.webp",
 };
 
 const effortLabels: Record<TaskEffort, SupplyTaskCardPreviewData["difficulty"]> = {

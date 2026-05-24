@@ -12,7 +12,7 @@ describe("supply backpack static assets", () => {
     expect(serializedMock).not.toContain("backpack-inventory-panel");
     expect(serializedMock).not.toContain("backpack-detail-panel");
     expect(serializedMock).not.toContain("/assets/home-scenes/supply/backpack/");
-    expect(serializedMock).not.toContain("/assets/home-scenes/supply/shop/");
+    expect(serializedMock).not.toMatch(/\/assets\/home-scenes\/supply\/shop\/(?!categories\/)/);
   });
 
   it("has all catalog-backed inventory and detail assets available", () => {
@@ -30,6 +30,15 @@ describe("supply backpack static assets", () => {
       expect(statSync(filePath).size, `${filePath} should stay under 100 KB`).toBeLessThanOrEqual(
         100 * 1024,
       );
+    }
+  });
+
+  it("reuses existing transparent category icon media for the sidebar", () => {
+    for (const category of supplyBackpackMock.sidebar.categories) {
+      expect(category.iconImage, `${category.id} should use an image icon`).toMatch(
+        /^\/assets\/home-scenes\/supply\/shop\/categories\/.+\.png$/,
+      );
+      expect(existsSync(projectPath(category.iconImage)), `${category.iconImage} should exist`).toBe(true);
     }
   });
 });

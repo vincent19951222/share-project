@@ -156,30 +156,73 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
 }
 
 function QuestCard({
+  onComplete,
   index,
   onReroll,
   quest,
 }: {
+  onComplete: (questId: string) => void;
   index: number;
   onReroll: (questTitle: string) => void;
   quest: SupplyDashboardQuest;
 }) {
+  const stateLabel = quest.completed ? "已完成" : "进行中";
+
   return (
-    <TaskCardPreview
-      card={toTaskCardPreviewData(quest)}
-      className={`supply-dashboard-quest-card supply-dashboard-quest-card--${index + 1}`}
-      density="dashboard"
-      onReroll={() => onReroll(quest.title)}
-    />
+    <div className="supply-dashboard-quest-card-shell" data-complete={quest.completed}>
+      <TaskCardPreview
+        card={toTaskCardPreviewData(quest)}
+        className={`supply-dashboard-quest-card supply-dashboard-quest-card--${index + 1}`}
+        density="dashboard"
+        showControls={false}
+      />
+      {quest.completed ? (
+        <div className="supply-dashboard-quest-card-complete-overlay" aria-hidden="true">
+          <span>✓</span>
+          <strong>已完成</strong>
+        </div>
+      ) : null}
+      {!quest.completed ? (
+        <button
+          className="supply-dashboard-quest-card-hitbox"
+          onClick={() => onComplete(quest.id)}
+          type="button"
+          aria-label={`打卡：${quest.title}`}
+          title={`打卡：${quest.title}`}
+        />
+      ) : null}
+      <div className="supply-dashboard-quest-card-actions" aria-label={`${quest.title} 操作`}>
+        <span
+          className="supply-task-card-icon-action supply-task-card-icon-action--status"
+          data-complete={quest.completed}
+          aria-label={`${quest.title}：${stateLabel}`}
+          role="status"
+          title={stateLabel}
+        >
+          <span aria-hidden="true">{quest.completed ? "✓" : "•"}</span>
+        </span>
+        <button
+          className="supply-task-card-icon-action supply-task-card-icon-action--reroll supply-task-card-reroll"
+          onClick={() => onReroll(quest.title)}
+          type="button"
+          aria-label={`更换任务：${quest.title}`}
+          title={`换一个：${quest.title}`}
+        >
+          <span aria-hidden="true">↻</span>
+        </button>
+      </div>
+    </div>
   );
 }
 
 function DailyQuestPanel({
   onClaimRewards,
+  onCompleteQuest,
   onRerollQuest,
   quests,
 }: {
   onClaimRewards: () => void;
+  onCompleteQuest: (questId: string) => void;
   onRerollQuest: (questTitle: string) => void;
   quests: SupplyDashboardQuest[];
 }) {
@@ -204,7 +247,13 @@ function DailyQuestPanel({
       </div>
       <div className="supply-dashboard-quest-list">
         {quests.map((quest, index) => (
-          <QuestCard index={index} key={quest.id} onReroll={onRerollQuest} quest={quest} />
+          <QuestCard
+            index={index}
+            key={quest.id}
+            onComplete={onCompleteQuest}
+            onReroll={onRerollQuest}
+            quest={quest}
+          />
         ))}
       </div>
       <div className="supply-dashboard-quest-footer">
@@ -223,6 +272,64 @@ function DailyQuestPanel({
         </button>
       </div>
     </SupplyUiLabPixelPanel>
+  );
+}
+
+function TaskCompletionConfirmDialog({
+  onCancel,
+  onConfirm,
+  quest,
+}: {
+  onCancel: () => void;
+  onConfirm: () => void;
+  quest: SupplyDashboardQuest;
+}) {
+  return (
+    <div className="supply-dashboard-task-confirm-backdrop" role="presentation">
+      <section
+        className="supply-dashboard-task-confirm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="supply-dashboard-task-confirm-title"
+      >
+        <div className="supply-dashboard-task-confirm-header">
+          <span>今日主线</span>
+          <b>{quest.difficulty}</b>
+        </div>
+        <div className="supply-dashboard-task-confirm-body">
+          <div className="supply-dashboard-task-confirm-art" aria-hidden="true">
+            <Image alt="" fill sizes="112px" src={quest.image} unoptimized />
+          </div>
+          <div className="supply-dashboard-task-confirm-copy">
+            <p>确认打卡</p>
+            <h3 id="supply-dashboard-task-confirm-title">{quest.title}</h3>
+            <div className="supply-dashboard-task-confirm-meta" aria-label="任务信息">
+              <span>{quest.subtitle}</span>
+              <span>{quest.tags[0] ?? "通用"}</span>
+              <span>{quest.durationLabel}</span>
+            </div>
+            <div className="supply-dashboard-task-confirm-reward">
+              <span>完成奖励</span>
+              <strong>
+                {quest.reward.icon} +{quest.reward.amount}
+              </strong>
+            </div>
+          </div>
+        </div>
+        <div className="supply-dashboard-task-confirm-actions">
+          <button className="supply-ui-lab-action" onClick={onCancel} type="button">
+            取消
+          </button>
+          <button
+            className="supply-ui-lab-action supply-ui-lab-action--primary"
+            onClick={onConfirm}
+            type="button"
+          >
+            确认打卡
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -268,7 +375,43 @@ export function SupplyDashboardScene({
 }: {
   data: SupplyDashboardPreview;
 }) {
+  const [dailyQuests, setDailyQuests] = useState(() => data.dailyQuests);
   const [feedbackMessage, setFeedbackMessage] = useState("本地预览：任务换班和奖励领取不会写入后端。");
+  const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
+  const pendingQuest = dailyQuests.find((quest) => quest.id === pendingQuestId) ?? null;
+
+  function handleOpenCompleteQuest(questId: string) {
+    const quest = dailyQuests.find((candidate) => candidate.id === questId);
+
+    if (!quest || quest.completed) {
+      return;
+    }
+
+    setPendingQuestId(questId);
+  }
+
+  function handleCancelCompleteQuest() {
+    setPendingQuestId(null);
+  }
+
+  function handleConfirmCompleteQuest() {
+    if (!pendingQuest) {
+      return;
+    }
+
+    setDailyQuests((currentQuests) =>
+      currentQuests.map((quest) =>
+        quest.id === pendingQuest.id
+          ? {
+              ...quest,
+              completed: true,
+            }
+          : quest,
+      ),
+    );
+    setFeedbackMessage(`已完成打卡：${pendingQuest.title}。这是本地 demo 状态，刷新后会恢复 mock 数据。`);
+    setPendingQuestId(null);
+  }
 
   function handleRerollQuest(questTitle: string) {
     setFeedbackMessage(`已触发换班预览：${questTitle}。mock 数据保持不变。`);
@@ -305,9 +448,17 @@ export function SupplyDashboardScene({
           <HeroCharacterStage data={data} />
           <DailyQuestPanel
             onClaimRewards={handleClaimRewards}
+            onCompleteQuest={handleOpenCompleteQuest}
             onRerollQuest={handleRerollQuest}
-            quests={data.dailyQuests}
+            quests={dailyQuests}
           />
+          {pendingQuest ? (
+            <TaskCompletionConfirmDialog
+              onCancel={handleCancelCompleteQuest}
+              onConfirm={handleConfirmCompleteQuest}
+              quest={pendingQuest}
+            />
+          ) : null}
           <p aria-live="polite" className="supply-dashboard-local-feedback" data-dashboard-feedback>
             {feedbackMessage}
           </p>

@@ -36,17 +36,14 @@ describe("supply dashboard static scene", () => {
       tab.textContent?.trim(),
     );
 
-    expect(tabs).toEqual(["⌂我的状态", "◎团队目标", "▤补给商店", "▣任务记录"]);
+    expect(tabs).toEqual(["⌂我的状态", "▤补给商店", "▣任务记录"]);
     expect(container.textContent).not.toContain("排行榜");
+    expect(container.textContent).not.toContain("团队目标");
     expect(container.querySelector('a[href="#"]')).toBeNull();
     expect(
       container.querySelector(".supply-ui-lab-tabs a[aria-selected='true']")?.textContent,
     ).toContain("我的状态");
-    expect(
-      container
-        .querySelector(".supply-ui-lab-tabs a[href='/ui-lab/supply-dashboard/team-goal']")
-        ?.textContent,
-    ).toContain("团队目标");
+    expect(container.querySelector(".supply-ui-lab-tabs a[href='/ui-lab/supply-dashboard/team-goal']")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-user-menu")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-resource--coins")?.textContent).toContain("银子");
     expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
@@ -54,11 +51,19 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-status-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-status-panel.supply-ui-lab-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-title-card")).not.toBeNull();
-    expect(container.querySelectorAll(".supply-dashboard-effect-card")).toHaveLength(2);
+    const effectCards = Array.from(container.querySelectorAll(".supply-dashboard-effect-card"));
+    expect(effectCards).toHaveLength(2);
+    supplyDashboardMock.activeEffects.forEach((effect, index) => {
+      const effectIcon = effectCards[index]?.querySelector("img");
+      expect(effectIcon?.getAttribute("src")).toBe(effect.icon);
+      expect(effectIcon?.getAttribute("alt")).toBe("");
+    });
     expect(container.textContent).toContain("牛马等级");
     expect(container.textContent).toContain("今日待生效");
     expect(container.textContent).toContain("今日已生效");
     expect(container.textContent).toContain("今日 23:59");
+    expect(container.textContent).not.toContain("small_boost_coupon");
+    expect(container.textContent).not.toContain("season_sprint_coupon");
     expect(container.textContent).not.toContain("补给券");
     expect(container.textContent).not.toContain("生命票");
     expect(container.textContent).not.toContain("体力");
@@ -71,9 +76,41 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-image")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-status")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-hero-progress [role='progressbar']")).not.toBeNull();
+    const heroProgress = container.querySelector(".supply-dashboard-hero-progress");
+    const heroProgressBar = heroProgress?.querySelector("[role='progressbar']");
+    expect(heroProgressBar).not.toBeNull();
+    expect(heroProgress?.textContent).not.toContain("720/1000");
+    expect(heroProgress?.querySelector(".supply-ui-lab-progress")?.getAttribute("data-progress-label")).toBe(
+      "720/1000 · 72%",
+    );
+    expect(heroProgressBar?.getAttribute("aria-valuetext")).toBe("720/1000 · 72%");
+    const heroBadge = container.querySelector(".supply-dashboard-level-avatar");
+    expect(heroBadge).not.toBeNull();
+    expect(heroBadge?.getAttribute("src")).toBe(supplyDashboardAssetPaths.levelAvatar);
+    expect(heroBadge?.getAttribute("alt")).toBe("");
+    expect(container.querySelector(".supply-dashboard-hero-status button")).toBeNull();
+    expect(container.querySelector(".supply-dashboard-hero-status a")).toBeNull();
+    expect(container.querySelector(".supply-dashboard-hero-status b")).toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-panel.supply-ui-lab-panel")).not.toBeNull();
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-shell")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='true']")).toHaveLength(3);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='false']")).toHaveLength(1);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(3);
+    expect(
+      container.querySelector(".supply-dashboard-quest-card-shell[data-complete='false'] .supply-dashboard-quest-card-complete-overlay"),
+    ).toBeNull();
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-actions")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-actions .supply-task-card-icon-action--status")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-actions .supply-task-card-icon-action--reroll")).toHaveLength(4);
+    expect(container.querySelector(".supply-dashboard-quest-card-actions .supply-task-card-icon-action--status")?.getAttribute("aria-label")).toBe(
+      "窗边回血：已完成",
+    );
+    expect(container.querySelector(".supply-dashboard-quest-card-actions .supply-task-card-reroll")?.getAttribute("aria-label")).toBe(
+      "更换任务：窗边回血",
+    );
+    expect(container.querySelector(".supply-dashboard-quest-card .supply-task-card-reroll")).toBeNull();
+    expect(container.querySelector(".supply-dashboard-quest-card .supply-task-card-state")).toBeNull();
     expect(container.querySelectorAll(".supply-dashboard-quest-card")).toHaveLength(4);
     expect(container.querySelectorAll(".supply-dashboard-quest-card.supply-task-card")).toHaveLength(4);
     expect(Array.from(container.querySelectorAll(".supply-dashboard-quest-card")).map((card) => card.getAttribute("data-card-id"))).toEqual([
@@ -118,6 +155,7 @@ describe("supply dashboard static scene", () => {
       ]),
     );
     expect(imageSources.join("\n")).not.toMatch(/dashboard-(status|hero|quests|shortcut|announcement)-panel/);
+    expect(imageSources.join("\n")).not.toContain("/assets/task-cards/raw/");
   });
 
   it("shows local mock feedback for reroll and reward claim actions", async () => {
@@ -147,5 +185,61 @@ describe("supply dashboard static scene", () => {
     });
 
     expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("奖励领取预览");
+  });
+
+  it("lets the unfinished quest card confirm completion in the local demo", async () => {
+    await act(async () => {
+      root.render(<SupplyDashboardScene data={supplyDashboardMock} />);
+    });
+
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(3);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='false']")).toHaveLength(1);
+
+    const learningCard = container.querySelector<HTMLElement>("[data-card-id='learning_005']");
+    const completeButton = learningCard
+      ?.closest(".supply-dashboard-quest-card-shell")
+      ?.querySelector<HTMLButtonElement>(".supply-dashboard-quest-card-hitbox");
+    expect(completeButton?.getAttribute("aria-label")).toBe("打卡：一句话笔记");
+
+    await act(async () => {
+      completeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const dialog = container.querySelector('[role="dialog"][aria-modal="true"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain("确认打卡");
+    expect(dialog?.textContent).toContain("一句话笔记");
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(3);
+
+    const cancelButton = Array.from(dialog?.querySelectorAll<HTMLButtonElement>("button") ?? []).find((button) =>
+      button.textContent?.includes("取消"),
+    );
+    expect(cancelButton).toBeDefined();
+
+    await act(async () => {
+      cancelButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector('[role="dialog"][aria-modal="true"]')).toBeNull();
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(3);
+
+    await act(async () => {
+      completeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const confirmButton = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find((button) =>
+      button.textContent?.includes("确认打卡"),
+    );
+    expect(confirmButton).toBeDefined();
+
+    await act(async () => {
+      confirmButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector('[role="dialog"][aria-modal="true"]')).toBeNull();
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='false']")).toHaveLength(0);
+    expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("已完成打卡：一句话笔记");
+    expect(container.querySelector(".supply-dashboard-quest-progress")?.textContent).toContain("进度：4/4");
   });
 });

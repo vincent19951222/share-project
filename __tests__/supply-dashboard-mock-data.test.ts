@@ -1,3 +1,4 @@
+import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyUiLabActiveEffects } from "@/components/gamification/ui-lab/supply-data/effects";
 import { supplyDashboardAssetPaths, supplyDashboardMock } from "@/components/gamification/ui-lab/supply-dashboard/mock-data";
@@ -43,15 +44,24 @@ describe("supply dashboard mock data", () => {
       "/ui-lab/supply-dashboard/task-record",
     ]);
     expect(supplyDashboardAssetPaths.hero).toBe("/assets/home-scenes/supply/dashboard/niuma-hero.webp");
+    expect(supplyDashboardAssetPaths.levelAvatar).toBe("/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png");
     expect(supplyDashboardAssetPaths.dockBackpack).toBe("/assets/home-scenes/supply/dashboard/dock-backpack.webp");
     expect(supplyDashboardAssetPaths.dockSupplyMachine).toBe("/assets/home-scenes/supply/dashboard/dock-supply-machine.webp");
     expect(supplyDashboardAssetPaths.dockTaskRecord).toBe("/assets/home-scenes/supply/dashboard/dock-task-record.webp");
   });
 
-  it("reuses existing raw task-card assets instead of new generated quest images", () => {
+  it("uses pure illustration task-card assets instead of raw full-card screenshots", () => {
     const taskCardPaths = Object.values(supplyDashboardAssetPaths.taskCards);
 
-    expect(taskCardPaths.every((path) => path.includes("/assets/task-cards/raw/"))).toBe(true);
+    expect(taskCardPaths).toEqual([
+      "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
+      "/assets/task-cards/illustrations/movement_004-window-heal.webp",
+      "/assets/task-cards/illustrations/social_001-small-talk.webp",
+      "/assets/task-cards/illustrations/learning_005-one-note.webp",
+    ]);
+    expect(taskCardPaths.every((path) => path.includes("/assets/task-cards/illustrations/"))).toBe(true);
+    expect(taskCardPaths.every((path) => !path.includes("/raw/"))).toBe(true);
+    expect(taskCardPaths.every((path) => existsSync(`public${path}`))).toBe(true);
     expect(taskCardPaths.join("\n")).not.toContain("/assets/home-scenes/supply/dashboard/quest-");
   });
 });

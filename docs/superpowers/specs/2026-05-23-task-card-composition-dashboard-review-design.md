@@ -12,7 +12,7 @@
 
 ## 背景
 
-当前 `public/assets/task-cards/raw/` 里已有早期 AI 直接生成的任务卡图。它们能临时撑住 Dashboard 结构，但问题明显：文字、边框、元素位置和任务语义不可控，不适合作为长期生产方向。
+当前 `public/assets/task-cards/raw/` 里已有早期 AI 直接生成的整卡图。它们只允许作为历史参考或一次性取材输入，不能作为运行时依赖；该目录后续可以删除。原因是整卡图内已经烘焙了中文标题、边框、标签和按钮，占用新组件的动态文字层，容易造成双标题、双边框和语义错位。
 
 后续方向应改成可组合的游戏卡牌管线：共享边框和底板控制卡牌体系，插图只负责画面，中文文字、状态和交互由代码渲染。这样既保留游戏卡牌质感，也避免 AI 生成整张卡时造成错字、错位和风格漂移。
 
@@ -24,7 +24,7 @@
 
 2. **第一轮 demo 使用混合方式。**
    - Frame layer：共享边框、底板、角块、纸纹和维度色，可由 CSS 或少量位图资产实现。
-   - Illustration layer：每张任务只提供中间插图。
+   - Illustration layer：每张任务只提供中间插图，统一放在 `public/assets/task-cards/illustrations/`。
    - Dynamic UI/Text layer：标题、维度 slogan、标签、状态、换任务按钮由 React/CSS 渲染。
 
 3. **第一轮 review 同时看两件事。**
@@ -51,6 +51,7 @@
 ## 非目标
 
 - 不把 AI 生成的完整卡图直接作为最终卡牌。
+- 不让运行时代码引用 `public/assets/task-cards/raw/*`。
 - 不在本轮接入真实任务 API、抽奖 API 或持久化状态。
 - 不替换正式 `components/gamification/SupplyStation.tsx`。
 - 不一次性建设完整卡牌设计系统。
@@ -72,6 +73,7 @@
    - 中间插图窗口占卡牌最大面积。
    - 插图按 `cover` 裁切，不拉伸。
    - 插图不包含最终边框、标题、slogan、标签、状态或按钮。
+   - 插图资产路径不得指向 `/assets/task-cards/raw/`。
 
 4. **Meta Tag Row**
    - 展示难度、场景、冷却，例如 `轻 / 通用 / 4天`。
@@ -153,14 +155,13 @@ Dashboard 预览至少包含两个方向：
 - Dashboard 今日主线 2x2 中每张卡仍保持 `3:4`。
 - Dashboard 中顶部进度、四张卡、底部奖励栏和领取按钮不互相遮挡。
 - 实现不修改正式 `SupplyStation`，只影响 UI lab 或隔离 review 页面。
-- 实现不把旧 raw 卡图当成最终整卡继续扩散；旧图只能作为插图或临时素材来源。
+- 实现不把旧 raw 卡图当成最终整卡继续扩散；运行时必须只引用非 raw 的插图资产。
 
 ## 后续实现顺序
 
 1. 定义 task-card demo 数据和维度 token。
 2. 创建 `3:4` 标准卡组件或 review-only 组件。
-3. 用现有四张 raw 图或裁剪图作为插图输入，先保证结构成立。
+3. 使用 `public/assets/task-cards/illustrations/` 下的四张纯插图输入，先保证结构成立；如需从 raw 取材，只能作为一次性离线裁剪来源。
 4. 生成四卡 contact sheet 页面或 review route。
 5. 修改或新增 Dashboard 今日主线预览，让 2x2 使用标准卡。
 6. 进行视觉 review，决定边框质感是否需要升级为开源素材或专门生成的 frame assets。
-

@@ -1,7 +1,10 @@
 import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyUiLabTaskRecordIcons } from "@/components/gamification/ui-lab/supply-data/records";
-import { supplyTaskRecordAssetPaths } from "@/components/gamification/ui-lab/supply-task-record/mock-data";
+import {
+  supplyTaskRecordAssetPaths,
+  supplyTaskRecordMock,
+} from "@/components/gamification/ui-lab/supply-task-record/mock-data";
 
 const publicPath = (assetPath: string) => `public${assetPath}`;
 
@@ -27,5 +30,14 @@ describe("supply task record reused assets", () => {
     expect(serializedPaths).not.toContain("design/ui-assets/任务记录.png");
     expect(serializedPaths).not.toContain("任务记录.png");
     expect(serializedPaths).not.toMatch(/task-record-(sidebar|timeline|radar|redemptions)-panel/);
+  });
+
+  it("references generated transparent menu icon media", () => {
+    for (const item of supplyTaskRecordMock.sidebar.menuItems) {
+      expect(item.iconImage, `${item.id} should use an image icon`).toMatch(
+        /^\/assets\/home-scenes\/supply\/task-record\/menu\/.+\.png$/,
+      );
+      expect(existsSync(publicPath(item.iconImage)), `${item.iconImage} should exist`).toBe(true);
+    }
   });
 });

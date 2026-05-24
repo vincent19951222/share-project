@@ -45,16 +45,25 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.querySelector("a.supply-task-record-back-link")?.getAttribute("href")).toBe(
       "/ui-lab/supply-dashboard",
     );
+    expect(container.querySelector(".supply-task-record-aside")).toBeNull();
+    expect(container.querySelectorAll(".supply-task-record-view-all")).toHaveLength(0);
     expect(container.querySelectorAll(".supply-task-record-sidebar nav button")).toHaveLength(5);
+    expect(container.querySelectorAll(".supply-task-record-menu-icon img")).toHaveLength(5);
+    expect(container.querySelector(".supply-task-record-menu-icon")?.textContent).toBe("");
     expect(container.querySelector(".supply-task-record-sidebar nav button[aria-pressed='true']")?.textContent).toContain(
       "今日记录",
     );
+    expect(container.querySelector(".supply-task-record-menu button:nth-child(2)")?.textContent).toContain("3");
+    expect(container.querySelector(".supply-task-record-menu button:nth-child(3)")?.textContent).toContain("1");
+    expect(container.querySelector(".supply-task-record-menu button:nth-child(4)")?.textContent).toContain("3");
     expect(container.querySelector("#task-record-title")?.textContent).toBe("今日记录");
     expect(container.querySelectorAll(".supply-task-record-date-tabs button")).toHaveLength(7);
     expect(container.querySelector(".supply-task-record-date-tabs button[aria-selected='true']")?.textContent).toContain(
       "今天",
     );
     expect(container.querySelectorAll("[data-testid='task-record-timeline-item']")).toHaveLength(7);
+    expect(container.querySelector(".supply-task-record-load-more")).toBeNull();
+    expect(container.textContent).toContain("已显示今日全部记录");
     expect(container.textContent).toContain("05月18日");
     expect(container.textContent).toContain("运动任务");
     expect(container.textContent).toContain("抽奖券 x1");
@@ -80,6 +89,29 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.textContent).toContain("05月13日");
     expect(container.textContent).toContain("这一天还没有任务记录");
     expect(container.querySelectorAll("[data-testid='task-record-timeline-item']")).toHaveLength(0);
+  });
+
+  it("filters today records through local state", async () => {
+    await act(async () => {
+      root.render(<SupplyTaskRecordScene data={supplyTaskRecordMock} />);
+    });
+
+    await clickButtonContaining(container, "社交互动");
+
+    expect(container.querySelector(".supply-ui-lab-filterbar [role='tab'][aria-selected='true']")?.textContent).toBe(
+      "社交互动",
+    );
+    expect(container.querySelectorAll("[data-testid='task-record-timeline-item']")).toHaveLength(1);
+    expect(container.textContent).toContain("社交任务");
+    expect(container.textContent).not.toContain("运动任务");
+
+    await clickButtonContaining(container, "系统通知");
+
+    expect(container.querySelector(".supply-ui-lab-filterbar [role='tab'][aria-selected='true']")?.textContent).toBe(
+      "系统通知",
+    );
+    expect(container.querySelectorAll("[data-testid='task-record-timeline-item']")).toHaveLength(1);
+    expect(container.textContent).toContain("连续打卡 18 天奖励");
   });
 
   it("switches sidebar modes into full main views", async () => {
@@ -119,6 +151,31 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.textContent).toContain("抽卡记录展示单抽、十连、消耗抽奖券和批次保底状态");
   });
 
+  it("keeps radar and redemption access in the left menu instead of a duplicated right rail", async () => {
+    await act(async () => {
+      root.render(<SupplyTaskRecordScene data={supplyTaskRecordMock} />);
+    });
+
+    expect(container.querySelector(".supply-task-record-aside")).toBeNull();
+    expect(container.querySelectorAll(".supply-task-record-view-all")).toHaveLength(0);
+
+    await clickButtonContaining(container, "队友雷达");
+
+    expect(container.querySelector("#task-record-title")?.textContent).toBe("队友雷达");
+    expect(container.querySelector(".supply-task-record-sidebar nav button[aria-pressed='true']")?.textContent).toContain(
+      "队友雷达",
+    );
+    expect(container.querySelectorAll("[data-testid='task-record-radar-invite-full']")).toHaveLength(5);
+
+    await clickButtonContaining(container, "兑换记录");
+
+    expect(container.querySelector("#task-record-title")?.textContent).toBe("兑换记录");
+    expect(container.querySelector(".supply-task-record-sidebar nav button[aria-pressed='true']")?.textContent).toContain(
+      "兑换记录",
+    );
+    expect(container.querySelectorAll("[data-testid='task-record-redemption-full']")).toHaveLength(3);
+  });
+
   it("uses reused reward and avatar images without panel crops", async () => {
     await act(async () => {
       root.render(<SupplyTaskRecordScene data={supplyTaskRecordMock} />);
@@ -136,17 +193,39 @@ describe("SupplyTaskRecordScene", () => {
         "/avatars/male1.png",
         "/gamification/rewards/icons/task_reroll_coupon.png",
         "/gamification/rewards/icons/coins_020.png",
-        "/gamification/rewards/icons/luckin_coffee_coupon.png",
         "/assets/home-scenes/supply/task-record/icons/task-record-movement.webp",
         "/assets/home-scenes/supply/task-record/icons/task-record-hydration.webp",
         "/assets/home-scenes/supply/task-record/icons/task-record-chat.webp",
         "/assets/home-scenes/supply/task-record/icons/task-record-learning.webp",
         "/assets/home-scenes/supply/task-record/icons/task-record-draw.webp",
-        "/avatars/male2.png",
-        "/avatars/female1.png",
-        "/avatars/male3.png",
       ]),
     );
+
+    await clickButtonContaining(container, "队友雷达");
+
+    const radarImageSources = Array.from(container.querySelectorAll("img")).map((image) => {
+      const src = image.getAttribute("src") ?? "";
+      const optimizedUrl = new URL(src, "http://localhost").searchParams.get("url");
+
+      return optimizedUrl ?? src;
+    });
+
+    expect(radarImageSources).toEqual(
+      expect.arrayContaining(["/avatars/male2.png", "/avatars/female1.png", "/avatars/male3.png"]),
+    );
+
+    await clickButtonContaining(container, "兑换记录");
+
+    const redemptionImageSources = Array.from(container.querySelectorAll("img")).map((image) => {
+      const src = image.getAttribute("src") ?? "";
+      const optimizedUrl = new URL(src, "http://localhost").searchParams.get("url");
+
+      return optimizedUrl ?? src;
+    });
+
+    expect(redemptionImageSources).toContain("/gamification/rewards/icons/luckin_coffee_coupon.png");
     expect(imageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/task-record\/.*-panel\.png/);
+    expect(radarImageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/task-record\/.*-panel\.png/);
+    expect(redemptionImageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/task-record\/.*-panel\.png/);
   });
 });

@@ -13,6 +13,15 @@ describe("supply shop static assets", () => {
     }
   });
 
+  it("references generated transparent category icon media", () => {
+    for (const category of supplyShopMock.sidebar.categories) {
+      expect(category.iconImage, `${category.id} should use an image icon`).toMatch(
+        /^\/assets\/home-scenes\/supply\/shop\/categories\/.+\.png$/,
+      );
+      expect(existsSync(publicPath(category.iconImage)), `${category.iconImage} should exist`).toBe(true);
+    }
+  });
+
   it("does not reference retired independent shop item media", () => {
     const productImages = supplyShopMock.products.map((product) => product.image);
 

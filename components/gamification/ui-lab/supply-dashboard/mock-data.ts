@@ -11,10 +11,10 @@ export const supplyDashboardAssetPaths = {
   dockTaskRecord: "/assets/home-scenes/supply/dashboard/dock-task-record.webp",
   fallbackLogo: "/logo.png",
   taskCards: {
-    hydration: "/assets/task-cards/raw/hydration_003%C2%A0%E6%9D%AF%E5%AD%90%E8%A7%81%E5%BA%95.png",
-    movement: "/assets/task-cards/raw/movement_004%C2%A0%E7%AA%97%E8%BE%B9%E5%9B%9E%E8%A1%80.png",
-    social: "/assets/task-cards/raw/social_001%C2%A0%E5%BA%9F%E8%AF%9D%20KPI.png",
-    learning: "/assets/task-cards/raw/learning_005%C2%A0%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%AC%94%E8%AE%B0.png",
+    hydration: "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
+    movement: "/assets/task-cards/illustrations/movement_004-window-heal.webp",
+    social: "/assets/task-cards/illustrations/social_001-small-talk.webp",
+    learning: "/assets/task-cards/illustrations/learning_005-one-note.webp",
   },
   rewardIcons: {
     coin: "/gamification/rewards/icons/coins_020.png",

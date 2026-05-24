@@ -8,6 +8,8 @@
 
 **Tech Stack:** Next.js App Router, React client components, TypeScript strict mode, CSS in `app/globals.css`, Vitest + jsdom.
 
+**2026-05-23 correction:** Any earlier step or snippet in this plan that points at `public/assets/task-cards/raw/*` is obsolete. Runtime data must use `public/assets/task-cards/illustrations/*`; raw full-card images are removable history/reference files only.
+
 ---
 
 ## File Structure

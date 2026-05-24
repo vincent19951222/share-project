@@ -12,8 +12,6 @@ import { SupplyShopScene } from "@/components/gamification/ui-lab/supply-shop/Su
 import { supplyShopMock } from "@/components/gamification/ui-lab/supply-shop/mock-data";
 import { SupplyTaskRecordScene } from "@/components/gamification/ui-lab/supply-task-record/SupplyTaskRecordScene";
 import { supplyTaskRecordMock } from "@/components/gamification/ui-lab/supply-task-record/mock-data";
-import { SupplyTeamGoalScene } from "@/components/gamification/ui-lab/supply-team-goal/SupplyTeamGoalScene";
-import { supplyTeamGoalMock } from "@/components/gamification/ui-lab/supply-team-goal/mock-data";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -23,7 +21,6 @@ function renderAllSupplyUiLabScenes() {
   return (
     <>
       <SupplyDashboardScene data={supplyDashboardMock} />
-      <SupplyTeamGoalScene data={supplyTeamGoalMock} />
       <SupplyShopScene data={supplyShopMock} />
       <SupplyTaskRecordScene data={supplyTaskRecordMock} />
       <SupplyDrawPoolScene data={supplyDrawPoolMock} />

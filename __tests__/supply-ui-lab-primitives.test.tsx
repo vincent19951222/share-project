@@ -40,6 +40,7 @@ describe("Supply UI Lab shared primitives", () => {
               ]}
             />
             <SupplyUiLabProgress current={35} label="完成度" max={100} />
+            <SupplyUiLabProgress current={72} label="百分比进度" max={100} showPercent valueDisplay="tooltip" />
             <SupplyUiLabStatusBadge tone="success">已完成</SupplyUiLabStatusBadge>
             <SupplyUiLabActionButton tone="primary">领取</SupplyUiLabActionButton>
             <SupplyUiLabActionButton tone="danger">放弃</SupplyUiLabActionButton>
@@ -55,13 +56,30 @@ describe("Supply UI Lab shared primitives", () => {
     const progressBars = Array.from(container.querySelectorAll("[role='progressbar']"));
 
     expect(progressBars[0]?.getAttribute("aria-valuenow")).toBe("35");
-    expect(progressBars[1]?.getAttribute("aria-valuenow")).toBe("100");
-    expect(progressBars[1]?.getAttribute("aria-valuemax")).toBe("100");
-    expect(progressBars[2]?.getAttribute("aria-valuenow")).toBe("0");
-    expect(progressBars[2]?.getAttribute("aria-valuemax")).toBe("0");
+    expect(progressBars[1]?.getAttribute("aria-valuetext")).toBe("72/100 · 72%");
+    expect(progressBars[1]?.closest(".supply-ui-lab-progress")?.getAttribute("data-progress-label")).toBe(
+      "72/100 · 72%",
+    );
+    expect(container.textContent).not.toContain("72/100 · 72%");
+    expect(progressBars[2]?.getAttribute("aria-valuenow")).toBe("100");
+    expect(progressBars[2]?.getAttribute("aria-valuemax")).toBe("100");
+    expect(progressBars[3]?.getAttribute("aria-valuenow")).toBe("0");
+    expect(progressBars[3]?.getAttribute("aria-valuemax")).toBe("0");
     expect(container.querySelector("button")?.textContent).toContain("全部");
     expect(container.querySelector(".supply-ui-lab-action--danger")?.textContent).toBe("放弃");
     expect(container.textContent).toContain("领取");
+
+    await act(async () => {
+      progressBars[1]?.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("72/100 · 72%");
+
+    await act(async () => {
+      progressBars[1]?.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+    });
+
+    expect(container.textContent).not.toContain("72/100 · 72%");
   });
 
   it("supports controlled filter selection", async () => {

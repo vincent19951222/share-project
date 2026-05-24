@@ -25,6 +25,13 @@ export const supplyTaskRecordAssetPaths = {
     ticket: "/gamification/rewards/icons/task_reroll_coupon.png",
     coffee: "/gamification/rewards/icons/luckin_coffee_coupon.png",
   },
+  menuIcons: {
+    today: "/assets/home-scenes/supply/task-record/menu/menu-today.png",
+    draws: "/assets/home-scenes/supply/task-record/menu/menu-draws.png",
+    redemptions: "/assets/home-scenes/supply/task-record/menu/menu-redemptions.png",
+    radar: "/assets/home-scenes/supply/task-record/menu/menu-radar.png",
+    rules: "/assets/home-scenes/supply/task-record/menu/menu-rules.png",
+  },
 } as const;
 
 export const supplyTaskRecordMock: SupplyTaskRecordPreview = {
@@ -43,11 +50,11 @@ export const supplyTaskRecordMock: SupplyTaskRecordPreview = {
   },
   sidebar: {
     menuItems: [
-      { id: "today", label: "今日记录", icon: "▤" },
-      { id: "draws", label: "抽卡记录", icon: "▥" },
-      { id: "redemptions", label: "兑换记录", icon: "券" },
-      { id: "radar", label: "队友雷达", icon: "●●" },
-      { id: "rules", label: "规则说明", icon: "册" },
+      { id: "today", label: "今日记录", iconImage: supplyTaskRecordAssetPaths.menuIcons.today },
+      { id: "draws", label: "抽卡记录", iconImage: supplyTaskRecordAssetPaths.menuIcons.draws },
+      { id: "redemptions", label: "兑换记录", iconImage: supplyTaskRecordAssetPaths.menuIcons.redemptions },
+      { id: "radar", label: "队友雷达", iconImage: supplyTaskRecordAssetPaths.menuIcons.radar },
+      { id: "rules", label: "规则说明", iconImage: supplyTaskRecordAssetPaths.menuIcons.rules },
     ],
     backHref: "/ui-lab/supply-dashboard",
     mascot: {

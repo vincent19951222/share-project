@@ -1,3 +1,4 @@
+import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import {
   taskCardReviewCards,
@@ -27,7 +28,15 @@ describe("supply task-card demo data", () => {
       ["中", "通用", "4天"],
     ]);
 
-    expect(taskCardReviewCards.every((card) => card.image.includes("/assets/task-cards/raw/"))).toBe(true);
+    expect(taskCardReviewCards.map((card) => card.image)).toEqual([
+      "/assets/task-cards/illustrations/movement_004-window-heal.webp",
+      "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
+      "/assets/task-cards/illustrations/social_001-small-talk.webp",
+      "/assets/task-cards/illustrations/learning_005-one-note.webp",
+    ]);
+    expect(taskCardReviewCards.every((card) => card.image.includes("/assets/task-cards/illustrations/"))).toBe(true);
+    expect(taskCardReviewCards.every((card) => !card.image.includes("/raw/"))).toBe(true);
+    expect(taskCardReviewCards.every((card) => existsSync(`public${card.image}`))).toBe(true);
     expect(taskCardReviewCards.every((card) => card.aspectRatio === "3:4")).toBe(true);
   });
 

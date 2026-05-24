@@ -1,4 +1,5 @@
 import { supplyUiLabCatalog } from "../supply-data/catalog";
+import { supplyUiLabCategoryIcons } from "../supply-data/category-icons";
 import { supplyUiLabActiveEffects } from "../supply-data/effects";
 import { supplyUiLabResources } from "../supply-data/resources";
 import type { SupplyUiLabCatalogItem, SupplyUiLabUseTiming } from "../supply-data/types";
@@ -124,11 +125,17 @@ export const supplyBackpackMock: SupplyBackpackPreview = {
   sidebar: {
     capacity: "18/60",
     categories: [
-      { id: "all", label: "全部", icon: "▦", active: true },
-      { id: "boost", label: "增益", icon: "✧", active: false },
-      { id: "task", label: "任务", icon: "▣", active: false },
-      { id: "social", label: "社交", icon: "♟", active: false },
-      { id: "real", label: "真实福利", icon: "▤", active: false },
+      { id: "all", label: "全部", icon: "▦", iconImage: supplyUiLabCategoryIcons.all, active: true },
+      { id: "boost", label: "增益", icon: "✧", iconImage: supplyUiLabCategoryIcons.boost, active: false },
+      { id: "task", label: "任务", icon: "▣", iconImage: supplyUiLabCategoryIcons.task, active: false },
+      { id: "social", label: "社交", icon: "♟", iconImage: supplyUiLabCategoryIcons.social, active: false },
+      {
+        id: "real",
+        label: "真实福利",
+        icon: "▤",
+        iconImage: supplyUiLabCategoryIcons.real_world,
+        active: false,
+      },
     ],
     todayEffects: supplyUiLabActiveEffects,
   },

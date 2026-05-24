@@ -5,7 +5,7 @@ export type SupplyTaskRecordMode = "today" | "draws" | "redemptions" | "radar" |
 export type SupplyTaskRecordMenuItem = {
   id: SupplyTaskRecordMode;
   label: string;
-  icon: string;
+  iconImage: string;
 };
 
 export type SupplyTaskRecordFilter = {

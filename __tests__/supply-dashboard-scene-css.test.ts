@@ -88,19 +88,39 @@ describe("supply dashboard scene CSS", () => {
   it("styles semantic dashboard components instead of transparent screenshot hotspots", () => {
     const rawCss = readFileSync("app/globals.css", "utf8");
     const dashboardCss = normalizeCss(rawCss.slice(rawCss.indexOf("Dashboard UI Lab componentized prototype scene")));
+    const questList = extractRuleBody(dashboardCss, ".supply-dashboard-quest-list");
     const questHotspot = extractRuleBody(dashboardCss, ".supply-dashboard-quest-card");
+    const dashboardTaskCard = extractRuleBody(dashboardCss, ".supply-dashboard-quest-card.supply-task-card");
     const questCardOne = extractRuleBody(dashboardCss, ".supply-dashboard-quest-card--1");
+    const titleCardStrong = extractRuleBody(dashboardCss, ".supply-dashboard-title-card strong");
+    const titleCardLevel = extractRuleBody(dashboardCss, ".supply-dashboard-title-card b");
     const shortcutDock = extractRuleBody(dashboardCss, ".supply-dashboard-shortcut-dock");
     const shortcutCard = extractRuleBody(dashboardCss, ".supply-dashboard-shortcut-card");
     const shortcutTitle = extractRuleBody(dashboardCss, ".supply-dashboard-shortcut-copy strong");
+    const heroProgressBar = extractRuleBody(
+      dashboardCss,
+      '.supply-dashboard-hero-progress .supply-ui-lab-progress [role="progressbar"]',
+    );
+    const heroProgressWrapper = extractRuleBody(dashboardCss, ".supply-dashboard-hero-progress .supply-ui-lab-progress");
+    const heroProgressTooltip = extractRuleBody(dashboardCss, ".supply-dashboard-hero-progress .supply-ui-lab-progress-tooltip");
 
-    expect(questHotspot).toMatch(/max-height:\s*100%/);
-    expect(dashboardCss).toMatch(/\.supply-dashboard-quest-list\s*{[\s\S]*place-items:\s*center/);
+    expect(questHotspot).not.toMatch(/max-height:\s*100%/);
+    expect(questList).toMatch(/grid-template-columns:\s*repeat\(2,\s*max-content\)/);
+    expect(questList).toMatch(/justify-content:\s*center/);
+    expect(questList).toMatch(/align-content:\s*center/);
+    expect(questList).toMatch(/place-items:\s*center/);
     expect(rawCss).toMatch(/\.supply-task-card\s*{[\s\S]*aspect-ratio:\s*3\s*\/\s*4/);
+    expect(dashboardTaskCard).toMatch(/width:\s*min\(100%,\s*var\(--dashboard-quest-card-width\)\)/);
+    expect(dashboardTaskCard).toMatch(/aspect-ratio:\s*3\s*\/\s*4/);
     expect(questCardOne).toMatch(/top:\s*auto/);
     expect(questCardOne).toMatch(/left:\s*auto/);
     expect(questCardOne).toMatch(/width:\s*auto/);
     expect(questCardOne).toMatch(/height:\s*auto/);
+    expect(titleCardStrong).toMatch(/width:\s*min\(100%,\s*11\.6rem\)/);
+    expect(titleCardStrong).toMatch(/justify-content:\s*space-between/);
+    expect(titleCardStrong).toMatch(/white-space:\s*nowrap/);
+    expect(titleCardLevel).toMatch(/min-width:\s*2\.8rem/);
+    expect(titleCardLevel).toMatch(/padding:\s*0\s*0\.38rem/);
     expect(shortcutDock).toMatch(/margin:\s*0/);
     expect(shortcutDock).toMatch(/aspect-ratio:\s*auto/);
     expect(shortcutCard).toMatch(/display:\s*grid/);
@@ -108,6 +128,13 @@ describe("supply dashboard scene CSS", () => {
     expect(shortcutCard).not.toMatch(/background:\s*transparent/);
     expect(shortcutTitle).toMatch(/border:\s*0/);
     expect(shortcutTitle).toMatch(/background:\s*transparent/);
+    expect(heroProgressWrapper).toMatch(/position:\s*relative/);
+    expect(heroProgressWrapper).toMatch(/overflow:\s*visible/);
+    expect(heroProgressBar).toMatch(/height:\s*clamp\(1\.1rem,\s*1\.5vw,\s*1\.45rem\)/);
+    expect(heroProgressBar).toMatch(/overflow:\s*visible/);
+    expect(heroProgressTooltip).toMatch(/z-index:\s*20/);
+    expect(heroProgressTooltip).toMatch(/font-size:\s*clamp\(0\.56rem,\s*0\.72vw,\s*0\.72rem\)/);
+    expect(heroProgressTooltip).toMatch(/pointer-events:\s*none/);
     expect(dashboardCss).toMatch(/\.supply-dashboard-shortcut-card--task-record\s*{[\s\S]*left:\s*66\.73%/);
   });
 

@@ -16,6 +16,7 @@ export type SupplyShopCategory = {
   id: SupplyShopCategoryId;
   label: string;
   icon: string;
+  iconImage: string;
   active: boolean;
 };
 

@@ -8,7 +8,6 @@ type SupplyDashboardTab = {
 
 const supplyDashboardTabs: SupplyDashboardTab[] = [
   { label: "我的状态", icon: "⌂", href: "/ui-lab/supply-dashboard" },
-  { label: "团队目标", icon: "◎", href: "/ui-lab/supply-dashboard/team-goal" },
   { label: "补给商店", icon: "▤", href: "/ui-lab/supply-dashboard/shop" },
   { label: "任务记录", icon: "▣", href: "/ui-lab/supply-dashboard/task-record" },
 ];

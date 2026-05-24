@@ -14,6 +14,7 @@ export type SupplyBackpackCategory = {
   id: SupplyBackpackCategoryId;
   label: string;
   icon: string;
+  iconImage: string;
   active: boolean;
 };
 

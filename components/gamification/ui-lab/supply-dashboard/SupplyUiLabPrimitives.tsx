@@ -1,6 +1,6 @@
 "use client";
 
-import type { PropsWithChildren, ReactNode } from "react";
+import { useState, type PropsWithChildren, type ReactNode } from "react";
 
 export type SupplyUiLabPanelTone = "paper" | "yellow" | "dark";
 export type SupplyUiLabStatusTone = "success" | "warning" | "danger" | "muted";
@@ -64,21 +64,54 @@ export function SupplyUiLabStatusBadge({
   return <span className={`supply-ui-lab-status supply-ui-lab-status--${tone}`}>{children}</span>;
 }
 
-export function SupplyUiLabProgress({ current, label, max }: { current: number; label: string; max: number }) {
+export function SupplyUiLabProgress({
+  current,
+  label,
+  max,
+  showPercent = false,
+  valueDisplay = "inline",
+}: {
+  current: number;
+  label: string;
+  max: number;
+  showPercent?: boolean;
+  valueDisplay?: "inline" | "tooltip";
+}) {
   const safeMax = Math.max(0, max);
   const safeCurrent = Math.min(safeMax, Math.max(0, current));
   const percent = safeMax <= 0 ? 0 : Math.min(100, Math.max(0, Math.round((safeCurrent / safeMax) * 100)));
+  const valueLabel = showPercent ? `${current}/${max} · ${percent}%` : `${current}/${max}`;
+  const showInlineValue = valueDisplay === "inline";
+  const showTooltipValue = valueDisplay === "tooltip";
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   return (
-    <div className="supply-ui-lab-progress">
+    <div
+      className="supply-ui-lab-progress"
+      data-progress-label={valueDisplay === "tooltip" ? valueLabel : undefined}
+    >
       <div className="supply-ui-lab-progress-label">
         <span>{label}</span>
-        <strong>
-          {current}/{max}
-        </strong>
+        {showInlineValue ? <strong>{valueLabel}</strong> : null}
       </div>
-      <div aria-label={label} aria-valuemax={safeMax} aria-valuemin={0} aria-valuenow={safeCurrent} role="progressbar">
+      <div
+        aria-label={label}
+        aria-valuemax={safeMax}
+        aria-valuemin={0}
+        aria-valuenow={safeCurrent}
+        aria-valuetext={valueLabel}
+        data-progress-label={valueDisplay === "tooltip" ? valueLabel : undefined}
+        onBlur={showTooltipValue ? () => setIsTooltipVisible(false) : undefined}
+        onFocus={showTooltipValue ? () => setIsTooltipVisible(true) : undefined}
+        onMouseEnter={showTooltipValue ? () => setIsTooltipVisible(true) : undefined}
+        onMouseLeave={showTooltipValue ? () => setIsTooltipVisible(false) : undefined}
+        role="progressbar"
+        tabIndex={valueDisplay === "tooltip" ? 0 : undefined}
+      >
         <span style={{ width: `${percent}%` }} />
+        {showTooltipValue && isTooltipVisible ? (
+          <strong className="supply-ui-lab-progress-tooltip">{valueLabel}</strong>
+        ) : null}
       </div>
     </div>
   );
