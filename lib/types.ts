@@ -235,12 +235,21 @@ export interface GamificationRedemptionSectionSnapshot {
   adminQueue: GamificationRedemptionSnapshot[];
 }
 
+export interface GamificationProfileSnapshot {
+  totalExp: number;
+  level: number;
+  currentLevelExp: number;
+  nextLevelExp: number;
+  title: string;
+}
+
 export interface GamificationStateSnapshot {
   currentUserId: string;
   currentUserRole: string;
   teamId: string;
   dayKey: string;
   ticketBalance: number;
+  profile: GamificationProfileSnapshot;
   dimensions: GamificationDimensionSnapshot[];
   ticketSummary: GamificationTicketSummary;
   lottery: GamificationLotterySummary;

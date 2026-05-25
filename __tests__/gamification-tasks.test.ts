@@ -108,6 +108,15 @@ describe("gamification daily tasks", () => {
 
     expect(assignment.completedAt).toBeInstanceOf(Date);
     expect(assignment.completionText).toBe("屁股离线");
+
+    const userAfterCompletion = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const expLedger = await prisma.experienceLedger.findFirstOrThrow({
+      where: { userId, sourceType: "daily_task_assignment", sourceId: assignment.id },
+    });
+
+    expect(userAfterCompletion.exp).toBe(50);
+    expect(expLedger.reason).toBe("DAILY_TASK_COMPLETION_EXP");
+    expect(expLedger.delta).toBe(50);
   });
 
   it("does not rewrite an already completed task", async () => {
@@ -145,6 +154,9 @@ describe("gamification daily tasks", () => {
 
     expect(after.completedAt?.toISOString()).toBe(before.completedAt?.toISOString());
     expect(after.completionText).toBe("第一次");
+    expect(await prisma.experienceLedger.count({ where: { userId } })).toBe(1);
+    const userAfterDuplicate = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    expect(userAfterDuplicate.exp).toBe(50);
   });
 
   it("rerolls an incomplete task once per dimension", async () => {

@@ -252,6 +252,13 @@ function buildSnapshot(
     teamId: "team-1",
     dayKey: "2026-04-29",
     ticketBalance: 8,
+    profile: {
+      totalExp: 0,
+      level: 1,
+      currentLevelExp: 0,
+      nextLevelExp: 1000,
+      title: "自律牛马",
+    },
     dimensions: [
       {
         key: "movement",

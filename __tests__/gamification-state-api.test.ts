@@ -42,6 +42,13 @@ describe("GET /api/gamification/state", () => {
       teamId,
       dayKey: getShanghaiDayKey(),
       ticketBalance: 0,
+      profile: {
+        totalExp: 0,
+        level: 1,
+        currentLevelExp: 0,
+        nextLevelExp: 1000,
+        title: "自律牛马",
+      },
       ticketSummary: {
         maxFreeTicketsToday: 2,
         todayEarned: 0,
@@ -98,6 +105,7 @@ describe("GET /api/gamification/state", () => {
       data: {
         ticketBalance: 4,
         coins: 500,
+        exp: 10_240,
       },
     });
 
@@ -115,6 +123,13 @@ describe("GET /api/gamification/state", () => {
       dailyTopUpLimit: 10,
       ticketPrice: 40,
       message: "还差 6 张券，可用 240 银子补齐十连。",
+    });
+    expect(body.snapshot.profile).toMatchObject({
+      totalExp: 10_240,
+      level: 11,
+      currentLevelExp: 240,
+      nextLevelExp: 1000,
+      title: "稳定脱脂牛马",
     });
   });
 

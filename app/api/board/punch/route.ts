@@ -16,6 +16,7 @@ import {
   FitnessTicketAlreadySpentError,
   shouldGrantFitnessPunchTicket,
 } from "@/lib/gamification/fitness-ticket";
+import { grantFitnessPunchExperience } from "@/lib/gamification/experience";
 import {
   getPunchRewardForStreak,
   getShanghaiDayKey,
@@ -161,6 +162,14 @@ export async function POST(request: NextRequest) {
           },
         });
         const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
+
+        await grantFitnessPunchExperience({
+          userId: user.id,
+          teamId: user.teamId,
+          dayKey: todayDayKey,
+          punchRecordId: punch.id,
+          db: tx,
+        });
 
         const boostSettlement = await settleBoostForPunch({
           tx,
@@ -435,6 +444,7 @@ export async function DELETE(request: NextRequest) {
     const todayDayKey = getShanghaiDayKey(now);
 
     try {
+      // Phase 3 records EXP as an achievement ledger; undoing a punch does not revoke EXP.
       await prisma.$transaction(async (tx) => {
         const todayPunch = await tx.punchRecord.findUnique({
           where: {

@@ -2,6 +2,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { getGamificationDimensions, getTaskCards } from "@/lib/gamification/content";
 import { adjustLotteryTickets } from "@/lib/gamification/db";
+import { grantTaskCompletionExperience } from "@/lib/gamification/experience";
 import {
   buildTaskStreakDynamic,
   isGameTaskStreakMilestone,
@@ -315,12 +316,22 @@ export async function completeDailyTask({
   }
 
   if (!assignment.completedAt) {
-    await prisma.dailyTaskAssignment.update({
-      where: { id: assignment.id },
-      data: {
-        completedAt: now,
-        completionText: normalizedCompletionText,
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.dailyTaskAssignment.update({
+        where: { id: assignment.id },
+        data: {
+          completedAt: now,
+          completionText: normalizedCompletionText,
+        },
+      });
+
+      await grantTaskCompletionExperience({
+        userId,
+        teamId: assignment.teamId,
+        dayKey,
+        assignmentId: assignment.id,
+        db: tx,
+      });
     });
   }
 

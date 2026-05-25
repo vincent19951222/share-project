@@ -75,6 +75,11 @@ describe("/api/board/punch", () => {
         userId: { in: teamUsers.map((member) => member.id) },
       },
     });
+    await prisma.experienceLedger.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
     await prisma.activityEvent.deleteMany({
       where: {
         userId: { in: teamUsers.map((member) => member.id) },
@@ -108,6 +113,7 @@ describe("/api/board/punch", () => {
       where: { id: { in: teamUsers.map((member) => member.id) } },
       data: {
         coins: 10,
+        exp: 0,
         currentStreak: 0,
         lastPunchDayKey: null,
       },
@@ -167,6 +173,9 @@ describe("/api/board/punch", () => {
       where: { userId_dayKey: { userId, dayKey: todayDayKey } },
     });
     const after = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const expLedger = await prisma.experienceLedger.findFirstOrThrow({
+      where: { userId, sourceType: "fitness_punch", sourceId: record!.id },
+    });
 
     expect(record?.punched).toBe(true);
     expect(record?.dayIndex).toBe(today);
@@ -175,6 +184,9 @@ describe("/api/board/punch", () => {
     expect(record?.streakAfterPunch).toBe(2);
     expect(record?.countedForSeasonSlot).toBe(false);
     expect(after.coins).toBe(before.coins + 20);
+    expect(after.exp).toBe(before.exp + 100);
+    expect(expLedger.delta).toBe(100);
+    expect(expLedger.reason).toBe("FITNESS_PUNCH_EXP");
     expect(after.currentStreak).toBe(2);
     expect(after.lastPunchDayKey).toBe(todayDayKey);
     expect(body.snapshot.currentUserId).toBe(userId);
