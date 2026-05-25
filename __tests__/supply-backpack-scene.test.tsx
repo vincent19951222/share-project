@@ -51,6 +51,11 @@ describe("SupplyBackpackScene", () => {
     );
     expect(container.querySelector("[role='grid'][aria-label='背包库存']")).not.toBeNull();
     expect(container.querySelector(".supply-backpack-detail[aria-label='道具详情']")).not.toBeNull();
+    expect(container.querySelector(".supply-backpack-detail-card[data-inspection='item-card']")).not.toBeNull();
+    expect(container.querySelector(".supply-backpack-detail-result-preview")?.textContent).toContain("使用后");
+    expect(container.querySelector(".supply-backpack-use-button")?.getAttribute("data-action-state")).toMatch(
+      /usable|active|admin|unavailable/,
+    );
     expect(container.textContent).toContain("小提示：");
     expect(container.textContent).not.toContain("扩容");
     expect(container.textContent).not.toContain("帮助中心");
@@ -73,6 +78,9 @@ describe("SupplyBackpackScene", () => {
     expect(
       grid?.querySelector("[role='gridcell'][aria-label*='任务换班券']")?.getAttribute("aria-selected"),
     ).toBe("true");
+    expect(
+      grid?.querySelector("[role='gridcell'][aria-label*='任务换班券']")?.getAttribute("data-selected-visual"),
+    ).toBe("focus");
     expect(container.querySelector(".supply-backpack-pagination")?.textContent).toContain("1 / 3");
   });
 

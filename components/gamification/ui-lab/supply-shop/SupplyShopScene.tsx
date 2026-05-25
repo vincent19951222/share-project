@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
-  SupplyUiLabActionButton,
   SupplyUiLabFilterBar,
   SupplyUiLabPixelPanel,
   SupplyUiLabStatusBadge,
@@ -137,6 +136,7 @@ function ShopProductCard({
       className={`supply-shop-product-card supply-shop-product-card--${rarityClassName[product.rarity]} ${
         selected ? "is-selected" : ""
       }`}
+      data-selected-visual={selected ? "focus" : undefined}
       data-testid="supply-shop-product-card"
       onClick={() => onSelect(product.id)}
       type="button"
@@ -259,20 +259,20 @@ function ShopDetail({
           </div>
         </div>
         <p className="supply-shop-detail-description">{detail.description}</p>
-        <dl className="supply-shop-detail-rules">
-          <div>
+        <dl className="supply-shop-detail-attributes">
+          <div className="supply-shop-detail-attribute" data-attribute="source">
             <dt>来源</dt>
             <dd>{detail.sourceLabel}</dd>
           </div>
-          <div>
+          <div className="supply-shop-detail-attribute" data-attribute="effect">
             <dt>效果</dt>
             <dd>{detail.effect}</dd>
           </div>
-          <div>
+          <div className="supply-shop-detail-attribute" data-attribute="timing">
             <dt>使用时机</dt>
             <dd>{detail.useTiming}</dd>
           </div>
-          <div>
+          <div className="supply-shop-detail-attribute" data-attribute="limit">
             <dt>购买限制</dt>
             <dd>{detail.purchaseLimit}</dd>
           </div>
@@ -285,9 +285,21 @@ function ShopDetail({
           <p className="supply-shop-admin-note">{detail.adminConfirmationLabel}</p>
         ) : null}
         <p className="supply-shop-detail-footnote">{detail.footnote}</p>
-        <SupplyUiLabActionButton className="supply-shop-redeem-button" onClick={onRedeem} tone="primary">
-          {detail.redeemLabel}
-        </SupplyUiLabActionButton>
+        <button
+          className="supply-shop-redeem-button supply-ui-lab-action supply-ui-lab-action--primary"
+          data-action-state={detail.redeemState}
+          disabled={detail.redeemState === "insufficient" || detail.redeemState === "limitReached"}
+          onClick={onRedeem}
+          type="button"
+        >
+          {detail.redeemState === "adminConfirmation"
+            ? "申请兑换"
+            : detail.redeemState === "insufficient"
+              ? "银子不足"
+              : detail.redeemState === "limitReached"
+                ? detail.redeemDisabledReason ?? "已达上限"
+                : detail.redeemLabel}
+        </button>
         <p aria-live="polite" className="supply-shop-action-feedback" data-shop-feedback>
           {feedbackMessage}
         </p>

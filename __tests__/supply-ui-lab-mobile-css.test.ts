@@ -95,8 +95,10 @@ describe("Supply UI Lab mobile CSS", () => {
     expectMobileRule(".supply-dashboard-stage", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
   });
 
-  it("removes the Dashboard character stage from the narrow mobile flow", () => {
+  it("keeps a compact Dashboard hero in the narrow mobile flow", () => {
     expectMobileRule(".supply-dashboard-hero-stage", /display:\s*none/);
+    expectMobileRule(".supply-dashboard-mobile-hero", /display:\s*grid/);
+    expectMobileRule(".supply-dashboard-mobile-hero", /grid-template-columns:\s*auto\s+minmax\(0,\s*1fr\)/);
     expectMobileRule(".supply-dashboard-quest-list", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
   });
 
@@ -110,5 +112,20 @@ describe("Supply UI Lab mobile CSS", () => {
       /clip:\s*rect\(0\s+0\s+0\s+0\)/,
     );
     expectMobileRule(".supply-ui-lab-topbar--breadcrumb .supply-ui-lab-close", /justify-self:\s*end/);
+  });
+
+  it("keeps the shared topbar readable as a three-row mobile header", () => {
+    expectMobileRule(
+      ".supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb)",
+      [/grid-template-rows:\s*auto\s+auto\s+auto/, /overflow:\s*hidden/],
+    );
+    expectMobileRule(
+      ".supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-resource-strip",
+      /overflow-x:\s*auto/,
+    );
+    expectMobileRule(
+      ".supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-resource strong",
+      /text-overflow:\s*ellipsis/,
+    );
   });
 });

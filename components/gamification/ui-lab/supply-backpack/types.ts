@@ -9,6 +9,7 @@ export type SupplyBackpackRarity = SupplyUiLabCatalogRarity;
 export type SupplyBackpackCategoryId = "all" | "boost" | "task" | "social" | "real";
 
 export type SupplyBackpackResource = SupplyUiLabResource;
+export type SupplyBackpackActionState = "usable" | "active" | "admin" | "unavailable";
 
 export type SupplyBackpackCategory = {
   id: SupplyBackpackCategoryId;
@@ -53,6 +54,8 @@ export type SupplyBackpackSelectedDetail = {
   restrictions: string[];
   primaryAction: string;
   secondaryAction: string;
+  actionState: SupplyBackpackActionState;
+  resultPreview: string;
   shopCta: {
     label: string;
     href: string;

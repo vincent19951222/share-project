@@ -45,6 +45,14 @@ describe("Supply UI Lab shared primitives", () => {
             <SupplyUiLabActionButton tone="primary">领取</SupplyUiLabActionButton>
             <SupplyUiLabActionButton tone="danger">放弃</SupplyUiLabActionButton>
           </SupplyUiLabPixelPanel>
+          <SupplyUiLabPixelPanel title="主焦点" tone="hero" ariaLabel="主焦点面板">
+            <SupplyUiLabStatusBadge tone="rare">SSR</SupplyUiLabStatusBadge>
+            <SupplyUiLabActionButton tone="secondary">次要动作</SupplyUiLabActionButton>
+            <SupplyUiLabActionButton tone="quiet">稍后再说</SupplyUiLabActionButton>
+          </SupplyUiLabPixelPanel>
+          <SupplyUiLabPixelPanel title="低噪信息" tone="quiet" ariaLabel="低噪信息面板">
+            <SupplyUiLabActionButton tone="primary">主动作</SupplyUiLabActionButton>
+          </SupplyUiLabPixelPanel>
           <SupplyUiLabProgress current={120} label="溢出进度" max={100} />
           <SupplyUiLabProgress current={-5} label="负数进度" max={-10} />
         </>,
@@ -52,6 +60,10 @@ describe("Supply UI Lab shared primitives", () => {
     });
 
     expect(container.querySelector(".supply-ui-lab-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-panel--hero")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-panel--quiet")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-status--rare")?.textContent).toBe("SSR");
+    expect(container.querySelector(".supply-ui-lab-action--quiet")?.textContent).toBe("稍后再说");
     expect(container.querySelector("[role='tablist']")?.getAttribute("aria-label")).toBe("商品筛选");
     const progressBars = Array.from(container.querySelectorAll("[role='progressbar']"));
 

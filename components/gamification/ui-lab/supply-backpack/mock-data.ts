@@ -85,6 +85,20 @@ const toDetail = (item: SupplyUiLabCatalogItem): SupplyBackpackSelectedDetail =>
   restrictions: buildRestrictions(item),
   primaryAction: "今日使用",
   secondaryAction: "申请兑换",
+  actionState: item.shop.requiresAdminConfirmation
+    ? "admin"
+    : item.sourceItemId === "small_boost_coupon"
+      ? "active"
+      : item.sourceItemId === "double_niuma_coupon"
+        ? "unavailable"
+        : "usable",
+  resultPreview: item.shop.requiresAdminConfirmation
+    ? "使用后将进入管理员确认流程，确认后发放真实福利。"
+    : item.sourceItemId === "small_boost_coupon"
+      ? "今天已经生效，可在左侧今日效果查看剩余时间。"
+      : item.sourceItemId === "double_niuma_coupon"
+        ? "当前场景暂不可用，请在真实健身打卡前再使用。"
+        : "使用后将立即进入今日效果，并持续到今日 23:59。",
   shopCta: {
     label: "去商店",
     href: "/ui-lab/supply-dashboard/shop",

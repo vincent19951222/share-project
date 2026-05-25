@@ -153,6 +153,32 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
   );
 }
 
+function MobileHeroSummary({ data }: { data: SupplyDashboardPreview }) {
+  return (
+    <section className="supply-dashboard-mobile-hero" aria-label="今日牛马状态摘要">
+      <Image
+        alt="脱脂牛马角色"
+        height={96}
+        src={supplyDashboardAssetPaths.hero}
+        unoptimized
+        width={72}
+      />
+      <div>
+        <p>今日主线</p>
+        <h2>{data.motto}</h2>
+        <strong>Lv.{data.profile.level}</strong>
+        <SupplyUiLabProgress
+          current={data.profile.currentLevelExp}
+          label="等级经验"
+          max={data.profile.nextLevelExp}
+          showPercent
+          valueDisplay="tooltip"
+        />
+      </div>
+    </section>
+  );
+}
+
 function QuestCard({
   onComplete,
   index,
@@ -175,7 +201,7 @@ function QuestCard({
         showControls={false}
       />
       {quest.completed ? (
-        <div className="supply-dashboard-quest-card-complete-overlay" aria-hidden="true">
+        <div className="supply-dashboard-quest-card-complete-overlay" data-visual="stamp" aria-hidden="true">
           <span>✓</span>
           <strong>已完成</strong>
         </div>
@@ -337,6 +363,7 @@ function DashboardShortcutDock({ data }: { data: SupplyDashboardPreview }) {
       {data.shortcutLinks.map((shortcut) => (
         <Link
           className={`supply-dashboard-shortcut-card supply-dashboard-shortcut-card--${shortcut.id}`}
+          data-priority={shortcut.id === "home" ? "primary" : "secondary"}
           href={shortcut.href}
           key={shortcut.id}
         >
@@ -361,7 +388,7 @@ function DashboardShortcutDock({ data }: { data: SupplyDashboardPreview }) {
 
 function TeamAnnouncementBar({ message }: { message: string }) {
   return (
-    <aside className="supply-dashboard-announcement" aria-label="团队公告">
+    <aside className="supply-dashboard-announcement" data-priority="quiet" aria-label="团队公告">
       <span aria-hidden="true">📣</span>
       <p>{message}</p>
     </aside>
@@ -442,6 +469,7 @@ export function SupplyDashboardScene({
           resources={getTopBarResources(data)}
         />
         <section className="supply-dashboard-stage" aria-label="我的状态原型舞台">
+          <MobileHeroSummary data={data} />
           <CharacterStatusPanel data={data} />
           <HeroCharacterStage data={data} />
           <DailyQuestPanel

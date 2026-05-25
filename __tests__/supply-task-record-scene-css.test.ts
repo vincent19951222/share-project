@@ -25,6 +25,10 @@ describe("supply task record scene css", () => {
     expect(css).not.toContain(".supply-task-record-view-all");
     expect(css).toContain(".supply-task-record-date-tabs");
     expect(css).toContain(".supply-task-record-empty");
+    expect(css).toContain(".supply-task-record-empty-state");
+    expect(css).toContain('.supply-task-record-timeline-item[data-event-type="task"]');
+    expect(css).toContain('.supply-task-record-timeline-item[data-event-type="draw"]');
+    expect(css).toContain(".supply-task-record-event-icon");
     expect(css).toContain(".supply-task-record-draw-list");
     expect(css).toContain(".supply-task-record-draw");
     expect(css).toContain(".supply-task-record-reward-grid");

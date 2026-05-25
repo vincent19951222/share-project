@@ -32,6 +32,10 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-stage")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-topbar")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-tabs")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-current-page")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-current-page")?.textContent).toBe("我的状态");
+    expect(container.querySelector(".supply-ui-lab-resource-strip")).not.toBeNull();
+    expect(container.querySelectorAll(".supply-ui-lab-topbar-tab[aria-current='page']")).toHaveLength(1);
     const tabs = Array.from(container.querySelectorAll(".supply-ui-lab-topbar-tab")).map((tab) =>
       tab.textContent?.trim(),
     );
@@ -79,6 +83,12 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-streak-card")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-image")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-mobile-hero")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-mobile-hero img")?.getAttribute("src")).toBe(
+      supplyDashboardAssetPaths.hero,
+    );
+    expect(container.querySelector(".supply-dashboard-mobile-hero")?.textContent).toContain("Lv.1");
+    expect(container.querySelector(".supply-dashboard-mobile-hero")?.textContent).toContain(supplyDashboardMock.motto);
     expect(container.querySelector(".supply-dashboard-hero-status")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-status")?.textContent).toContain("Lv.1");
     expect(container.querySelector(".supply-dashboard-hero-status")?.textContent).toContain("距离升级还差 1000 EXP");
@@ -103,6 +113,7 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='true']")).toHaveLength(3);
     expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='false']")).toHaveLength(1);
     expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(3);
+    expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay[data-visual='stamp']")).toHaveLength(3);
     expect(
       container.querySelector(".supply-dashboard-quest-card-shell[data-complete='false'] .supply-dashboard-quest-card-complete-overlay"),
     ).toBeNull();
@@ -130,6 +141,11 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-quest-footer .supply-ui-lab-action")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-shortcut-dock")).not.toBeNull();
     expect(container.querySelectorAll(".supply-dashboard-shortcut-card")).toHaveLength(4);
+    expect(container.querySelector(".supply-dashboard-shortcut-card--home")?.getAttribute("data-priority")).toBe("primary");
+    expect(container.querySelector(".supply-dashboard-shortcut-card--backpack")?.getAttribute("data-priority")).toBe(
+      "secondary",
+    );
+    expect(container.querySelector(".supply-dashboard-announcement")?.getAttribute("data-priority")).toBe("quiet");
     expect(container.querySelector(".supply-dashboard-panel-image")).toBeNull();
     expect(container.textContent).toContain("牛马补给站");
     expect(container.textContent).toContain("我的状态");

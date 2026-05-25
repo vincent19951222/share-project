@@ -95,6 +95,11 @@ function buildProductDetail(item: (typeof supplyUiLabCatalog)[number]): SupplySh
   const adminConfirmationLabel = item.shop.requiresAdminConfirmation
     ? "真实福利：兑换后进入管理员确认流程"
     : null;
+  const redeemState = item.shop.requiresAdminConfirmation
+    ? "adminConfirmation"
+    : item.sourceItemId === "double_niuma_coupon"
+      ? "limitReached"
+      : "available";
 
   return {
     productId: item.sourceItemId,
@@ -113,7 +118,11 @@ function buildProductDetail(item: (typeof supplyUiLabCatalog)[number]): SupplySh
     redeemLabel: item.shop.requiresAdminConfirmation ? "申请兑换" : `兑换 ${item.name}`,
     redeemFeedback: item.shop.requiresAdminConfirmation
       ? "兑换中：已提交管理员确认"
+      : redeemState === "limitReached"
+        ? "今日预览：该稀有道具本周限购已达上限"
       : `已加入背包：${item.name}`,
+    redeemState,
+    redeemDisabledReason: redeemState === "limitReached" ? "本周限购已达上限" : undefined,
   };
 }
 

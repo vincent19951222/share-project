@@ -138,20 +138,22 @@ function DrawMachineStage({
           unoptimized
           width={640}
         />
-        <div className="supply-draw-pool-machine-controls">
+        <div className="supply-draw-pool-machine-controls" data-control-style="arcade">
           {data.machine.actions.map((action) => {
             const shortage = Math.max(0, action.costTicket - ticketBalance);
             const disabled = shortage > 0;
 
             return (
-              <SupplyUiLabActionButton
-                ariaLabel={`${action.label} x${action.drawCount}，消耗抽奖券 x${action.costTicket}，${action.guaranteeLabel}${
+              <button
+                aria-label={`${action.label} x${action.drawCount}，消耗抽奖券 x${action.costTicket}，${action.guaranteeLabel}${
                   disabled ? `，抽奖券不足，还差 ${shortage} 张` : ""
                 }`}
-                className={`supply-draw-pool-action supply-draw-pool-action--${action.tone}`}
+                className={`supply-ui-lab-action supply-draw-pool-action supply-draw-pool-action--${action.tone}`}
+                data-priority={action.id === "ten" ? "primary" : "secondary"}
                 disabled={disabled}
                 key={action.id}
                 onClick={() => onDraw(action.drawCount)}
+                type="button"
               >
                 <strong>
                   {action.label} x{action.drawCount}
@@ -161,7 +163,7 @@ function DrawMachineStage({
                   x{action.costTicket}
                 </em>
                 <span>{action.guaranteeLabel}</span>
-              </SupplyUiLabActionButton>
+              </button>
             );
           })}
         </div>
@@ -211,7 +213,11 @@ function DrawRewardList({ rewards }: { rewards: SupplyDrawPoolRewardRow[] }) {
   return (
     <ul className="supply-draw-pool-drop-list">
       {rewards.map((drop) => (
-        <li className={`supply-draw-pool-drop supply-draw-pool-drop--${drop.rarity.toLowerCase()}`} key={drop.id}>
+        <li
+          className={`supply-draw-pool-drop supply-draw-pool-drop--${drop.rarity.toLowerCase()}`}
+          data-rarity={drop.rarity}
+          key={drop.id}
+        >
           <SupplyUiLabStatusBadge tone={drop.rarity === "SSR" ? "warning" : "muted"}>{drop.rarity}</SupplyUiLabStatusBadge>
           <Image alt="" height={84} src={drop.image} unoptimized width={84} />
           <strong>{drop.quantityLabel}</strong>
@@ -222,11 +228,17 @@ function DrawRewardList({ rewards }: { rewards: SupplyDrawPoolRewardRow[] }) {
   );
 }
 
-function DrawResultPanel({
+function DrawResultModal({
+  canContinueTenDraw,
+  onClose,
+  onContinueTenDraw,
   resultLabel,
   results,
   ticketBalance,
 }: {
+  canContinueTenDraw: boolean;
+  onClose: () => void;
+  onContinueTenDraw: () => void;
   resultLabel: string | null;
   results: SupplyDrawPoolRewardRow[];
   ticketBalance: number;
@@ -236,10 +248,40 @@ function DrawResultPanel({
   }
 
   return (
-    <SupplyUiLabPixelPanel ariaLabel={resultLabel} className="supply-draw-pool-result" title={resultLabel}>
-      <p>剩余 {ticketBalance} 张抽奖券</p>
-      <DrawRewardList rewards={results} />
-    </SupplyUiLabPixelPanel>
+    <div className="supply-draw-pool-result-backdrop">
+      <section
+        aria-label={resultLabel}
+        aria-modal="true"
+        className="supply-ui-lab-panel supply-ui-lab-panel--paper supply-draw-pool-result supply-draw-pool-result-modal"
+        role="dialog"
+      >
+        <header className="supply-draw-pool-result-header">
+          <h2 className="supply-ui-lab-panel-title">{resultLabel}</h2>
+          <p>剩余 {ticketBalance} 张抽奖券</p>
+        </header>
+        <div className="supply-draw-pool-result-reveal" data-result-reveal="rarity">
+          {results.length > 0 ? <DrawRewardList rewards={results} /> : <p>抽奖券不够啦，先去任务里攒一波。</p>}
+        </div>
+        <div className="supply-draw-pool-result-actions">
+          <SupplyUiLabActionButton
+            className="supply-draw-pool-result-action supply-draw-pool-result-action--accept"
+            onClick={onClose}
+            tone="secondary"
+          >
+            收下
+          </SupplyUiLabActionButton>
+          <SupplyUiLabActionButton
+            ariaLabel={canContinueTenDraw ? "继续十连抽" : "继续十连抽，抽奖券不足"}
+            className="supply-draw-pool-result-action supply-draw-pool-result-action--continue"
+            disabled={!canContinueTenDraw}
+            onClick={onContinueTenDraw}
+            tone="primary"
+          >
+            继续十连抽
+          </SupplyUiLabActionButton>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -265,6 +307,7 @@ export function SupplyDrawPoolScene({ data }: { data: SupplyDrawPoolPreview }) {
 
   function handleDraw(drawCount: number) {
     if (ticketBalance < drawCount) {
+      setDrawResults([]);
       setResultLabel(emptyDrawMessage);
       return;
     }
@@ -272,6 +315,16 @@ export function SupplyDrawPoolScene({ data }: { data: SupplyDrawPoolPreview }) {
     setTicketBalance((current) => current - drawCount);
     setDrawResults(drawCount === 10 ? data.tenDrawResult : data.singleDrawResult);
     setResultLabel(drawCount === 10 ? "本次十连结果" : "本次结果");
+  }
+
+  function handleCloseResult() {
+    setResultLabel(null);
+  }
+
+  function handleContinueTenDraw() {
+    if (ticketBalance >= 10) {
+      handleDraw(10);
+    }
   }
 
   return (
@@ -289,7 +342,6 @@ export function SupplyDrawPoolScene({ data }: { data: SupplyDrawPoolPreview }) {
           </aside>
           <div className="supply-draw-pool-center">
             <DrawMachineStage data={data} onDraw={handleDraw} ticketBalance={ticketBalance} />
-            <DrawResultPanel resultLabel={resultLabel} results={drawResults} ticketBalance={ticketBalance} />
             <RecentDropsPanel data={data} />
           </div>
           <DrawInfoRail data={data} />
@@ -299,6 +351,14 @@ export function SupplyDrawPoolScene({ data }: { data: SupplyDrawPoolPreview }) {
           返回大厅
         </Link>
       </div>
+      <DrawResultModal
+        canContinueTenDraw={ticketBalance >= 10}
+        onClose={handleCloseResult}
+        onContinueTenDraw={handleContinueTenDraw}
+        resultLabel={resultLabel}
+        results={drawResults}
+        ticketBalance={ticketBalance}
+      />
     </main>
   );
 }

@@ -18,6 +18,10 @@ describe("supply shop scene css", () => {
     expect(css).toContain(".supply-shop-category-list");
     expect(css).toContain(".supply-shop-product-image");
     expect(css).toContain(".supply-shop-product-card");
+    expect(css).toContain('.supply-shop-product-card[data-selected-visual="focus"]');
+    expect(css).toContain(".supply-shop-detail-attributes");
+    expect(css).toContain('.supply-shop-redeem-button[data-action-state="insufficient"]');
+    expect(css).toContain('.supply-shop-redeem-button[data-action-state="limitReached"]');
     expect(css).not.toContain(".supply-shop-detail-redeem-hotspot");
     expect(css).toContain("width: 100vw");
   });

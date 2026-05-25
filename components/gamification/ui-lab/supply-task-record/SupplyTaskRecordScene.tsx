@@ -48,6 +48,21 @@ const modeTitles: Record<SupplyTaskRecordMode, string> = {
   today: "今日记录",
 };
 
+const timelineEventTypeByCategory: Record<SupplyTaskRecordTimelineItem["category"], string> = {
+  draw: "draw",
+  mainline: "task",
+  reward: "reward",
+  social: "social",
+  system: "reward",
+};
+
+const timelineEventIconByType: Record<string, string> = {
+  draw: "券",
+  reward: "银",
+  social: "友",
+  task: "✓",
+};
+
 function filterTimelineRecords(
   records: SupplyTaskRecordTimelineItem[],
   filterId: SupplyTaskRecordFilter["id"],
@@ -316,7 +331,8 @@ function TaskTimelinePanel({
         {records.length > 0 ? (
           records.map((record) => <TimelineItem key={record.id} record={record} />)
         ) : (
-          <div className="supply-task-record-empty">
+          <div className="supply-task-record-empty supply-task-record-empty-state" role="status">
+            <strong>当前筛选没有记录</strong>
             <strong>这一天还没有任务记录</strong>
             <p>空状态来自本地 recordsByDate，不再展示假数据。</p>
           </div>
@@ -328,10 +344,20 @@ function TaskTimelinePanel({
 }
 
 function TimelineItem({ record }: { record: SupplyTaskRecordTimelineItem }) {
+  const eventType = timelineEventTypeByCategory[record.category];
+
   return (
-    <article className="supply-task-record-timeline-item" data-status={record.status} data-testid="task-record-timeline-item">
+    <article
+      className="supply-task-record-timeline-item"
+      data-event-type={eventType}
+      data-status={record.status}
+      data-testid="task-record-timeline-item"
+    >
       <time>{record.time}</time>
       <span className="supply-task-record-dot" aria-hidden="true" />
+      <span className="supply-task-record-event-icon" aria-hidden="true">
+        {timelineEventIconByType[eventType]}
+      </span>
       <div className="supply-task-record-entry">
         <div className="supply-task-record-entry-icon" aria-hidden="true">
           {record.icon.type === "image" ? (

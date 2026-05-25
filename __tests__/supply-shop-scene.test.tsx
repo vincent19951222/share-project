@@ -54,6 +54,19 @@ describe("SupplyShopScene", () => {
     expect(container.querySelector("[data-testid='supply-shop-product-card'][aria-selected='true']")?.textContent).toContain(
       "任务换班券",
     );
+    expect(
+      container.querySelector("[data-testid='supply-shop-product-card'][aria-selected='true']")?.getAttribute(
+        "data-selected-visual",
+      ),
+    ).toBe("focus");
+    expect(container.querySelector(".supply-shop-detail-attributes")).not.toBeNull();
+    expect(container.querySelector(".supply-shop-detail-attribute[data-attribute='effect']")?.textContent).toContain(
+      "效果",
+    );
+    expect(container.querySelector(".supply-shop-detail-attribute[data-attribute='timing']")?.textContent).toContain(
+      "使用时机",
+    );
+    expect(container.querySelector(".supply-shop-redeem-button")?.getAttribute("data-action-state")).toBe("available");
     expect(container.querySelectorAll("[data-testid='supply-shop-product-card'] img").length).toBeGreaterThan(0);
     expect(container.querySelector('a[href="#rules"]')).toBeNull();
     expect(container.textContent).toContain("本页规则");
@@ -86,6 +99,31 @@ describe("SupplyShopScene", () => {
     expect(container.textContent).toContain("管理员确认后兑换 1 杯瑞幸咖啡");
     expect(container.textContent).toContain("真实福利：兑换后进入管理员确认流程");
     expect(container.querySelector(".supply-shop-redeem-button")?.textContent).toBe("申请兑换");
+    expect(container.querySelector(".supply-shop-redeem-button")?.getAttribute("data-action-state")).toBe(
+      "adminConfirmation",
+    );
+  });
+
+  it("shows a clear limit-reached redemption state", async () => {
+    await act(async () => {
+      root.render(<SupplyShopScene data={supplyShopMock} />);
+    });
+
+    const rareCard = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-testid='supply-shop-product-card']"),
+    ).find((card) => card.textContent?.includes("双倍牛马券"));
+
+    expect(rareCard).toBeDefined();
+
+    await act(async () => {
+      rareCard?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector(".supply-shop-redeem-button")?.getAttribute("data-action-state")).toBe(
+      "limitReached",
+    );
+    expect(container.querySelector<HTMLButtonElement>(".supply-shop-redeem-button")?.disabled).toBe(true);
+    expect(container.querySelector(".supply-shop-detail-cost")?.textContent).toContain("银子");
   });
 
   it("switches category and filter buttons through local state", async () => {

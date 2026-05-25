@@ -62,6 +62,13 @@ describe("SupplyTaskRecordScene", () => {
       "今天",
     );
     expect(container.querySelectorAll("[data-testid='task-record-timeline-item']")).toHaveLength(7);
+    expect(container.querySelectorAll(".supply-task-record-timeline-item[data-event-type]")).not.toHaveLength(0);
+    expect(
+      Array.from(container.querySelectorAll(".supply-task-record-timeline-item[data-event-type]")).map((item) =>
+        item.getAttribute("data-event-type"),
+      ),
+    ).toEqual(expect.arrayContaining(["task", "reward"]));
+    expect(container.querySelector(".supply-task-record-event-icon")).not.toBeNull();
     expect(container.querySelector(".supply-task-record-load-more")).toBeNull();
     expect(container.textContent).toContain("已显示今日全部记录");
     expect(container.textContent).toContain("05月18日");
@@ -87,6 +94,7 @@ describe("SupplyTaskRecordScene", () => {
     await clickButtonContaining(container, "5天前");
 
     expect(container.textContent).toContain("05月13日");
+    expect(container.querySelector(".supply-task-record-empty-state")?.textContent).toContain("当前筛选没有记录");
     expect(container.textContent).toContain("这一天还没有任务记录");
     expect(container.querySelectorAll("[data-testid='task-record-timeline-item']")).toHaveLength(0);
   });

@@ -9,6 +9,7 @@ export type SupplyShopCurrency = "coins";
 export type SupplyShopRarity = SupplyUiLabCatalogRarity;
 export type SupplyShopCategoryId = "all" | SupplyUiLabCatalogCategory;
 export type SupplyShopFilterId = "all" | "redeemable" | "owned" | "admin";
+export type SupplyShopRedeemState = "available" | "insufficient" | "limitReached" | "adminConfirmation";
 
 export type SupplyShopResource = SupplyUiLabResource;
 
@@ -60,6 +61,8 @@ export type SupplyShopProductDetail = {
   footnote: string;
   redeemLabel: string;
   redeemFeedback: string;
+  redeemState: SupplyShopRedeemState;
+  redeemDisabledReason?: string;
 };
 
 export type SupplyShopPreview = {

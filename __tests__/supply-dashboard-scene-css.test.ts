@@ -80,8 +80,13 @@ describe("supply dashboard scene CSS", () => {
     expect(stage).toMatch(/position:\s*relative/);
     expect(stage).toMatch(/aspect-ratio:\s*1536\s*\/\s*946/);
     expect(dashboardCss).toMatch(/\.supply-dashboard-status-panel\s*{[\s\S]*left:\s*0\.52%/);
+    expect(dashboardCss).toMatch(/\.supply-dashboard-status-panel[\s\S]*box-shadow:\s*3px\s+3px\s+0/);
     expect(dashboardCss).toMatch(/\.supply-dashboard-hero-stage\s*{[\s\S]*left:\s*24\.35%/);
     expect(dashboardCss).toMatch(/\.supply-dashboard-quest-panel\s*{[\s\S]*left:\s*63\.15%/);
+    expect(dashboardCss).toMatch(/\.supply-dashboard-quest-card-complete-overlay\[data-visual="stamp"\]/);
+    expect(dashboardCss).toMatch(
+      /\.supply-dashboard-announcement\[data-priority="quiet"\][\s\S]*background:\s*#fef3c7/,
+    );
     expect(dashboardCss).not.toContain(".supply-dashboard-panel-image");
   });
 

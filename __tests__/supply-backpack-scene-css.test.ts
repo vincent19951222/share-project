@@ -11,6 +11,10 @@ describe("supply backpack scene css", () => {
     expect(css).toContain(".supply-backpack-sidebar-card");
     expect(css).toContain(".supply-backpack-grid");
     expect(css).toContain(".supply-backpack-detail");
+    expect(css).toContain('.supply-backpack-detail-card[data-inspection="item-card"]');
+    expect(css).toContain('.supply-backpack-slot[data-selected-visual="focus"]');
+    expect(css).toContain(".supply-backpack-detail-result-preview");
+    expect(css).toContain('.supply-backpack-use-button[data-action-state="unavailable"]');
     expect(css).toContain(".supply-backpack-hint");
     expect(css).toContain(".supply-backpack-slot.is-selected");
     expect(css).toContain(".supply-backpack-slot.is-empty");

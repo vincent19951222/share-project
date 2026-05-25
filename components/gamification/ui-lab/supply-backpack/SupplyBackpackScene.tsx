@@ -300,6 +300,7 @@ function InventoryItemCard({
       className={`supply-backpack-slot is-item ${rarityClass[item.rarity]} ${
         selected ? "is-selected" : ""
       }`}
+      data-selected-visual={selected ? "focus" : undefined}
       role="gridcell"
       type="button"
       onClick={() => onSelectItem(item.id)}
@@ -322,7 +323,11 @@ function BackpackDetailPanel({
   onAction: (label: string) => void;
 }) {
   return (
-    <section className="supply-backpack-detail" aria-label="道具详情">
+    <section
+      className="supply-backpack-detail supply-backpack-detail-card"
+      data-inspection="item-card"
+      aria-label="道具详情"
+    >
       <div className="supply-backpack-detail-hero">
         <div className="supply-backpack-detail-image">
           <span>{detail.rarity}</span>
@@ -353,9 +358,25 @@ function BackpackDetailPanel({
           ))}
         </ul>
       </div>
+      <div className="supply-backpack-detail-result-preview">
+        <span>使用后</span>
+        <p>{detail.resultPreview}</p>
+      </div>
       <div className="supply-backpack-actions">
-        <button type="button" onClick={() => onAction(`${detail.primaryAction}已模拟`)}>
-          {detail.primaryAction}
+        <button
+          className="supply-backpack-use-button"
+          data-action-state={detail.actionState}
+          disabled={detail.actionState === "active" || detail.actionState === "unavailable"}
+          type="button"
+          onClick={() => onAction(`${detail.primaryAction}已模拟`)}
+        >
+          {detail.actionState === "active"
+            ? "今日已生效"
+            : detail.actionState === "admin"
+              ? "申请使用"
+              : detail.actionState === "unavailable"
+                ? "暂不可用"
+                : detail.primaryAction}
         </button>
         <button
           type="button"

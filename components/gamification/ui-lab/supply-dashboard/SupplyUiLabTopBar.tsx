@@ -85,31 +85,34 @@ export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
               );
             })}
           </nav>
+          <strong className="supply-ui-lab-current-page">{activeLabel}</strong>
         </>
       )}
-      <div className="supply-ui-lab-statusbar" aria-label="资源状态">
-        {resources.map((resource) => (
-          <div className={`supply-ui-lab-resource supply-ui-lab-resource--${resource.id}`} key={resource.id}>
-            <span aria-hidden="true">
-              {resource.iconImage ? (
-                <Image alt="" height={44} src={resource.iconImage} unoptimized width={44} />
-              ) : (
-                resource.icon
-              )}
-            </span>
-            <em>{resource.label}</em>
-            <strong>{resource.value}</strong>
-          </div>
-        ))}
-        {isBreadcrumb ? (
-          <Link className="supply-ui-lab-close" href={props.closeHref} aria-label={`关闭${activeLabel}并返回大厅`}>
-            ×
-          </Link>
-        ) : (
-          <div className="supply-ui-lab-user-profile" aria-label={`${props.profile.username} 的用户头像`}>
-            <Image alt="" height={40} src={props.profile.avatar} unoptimized width={40} />
-          </div>
-        )}
+      <div className="supply-ui-lab-resource-strip">
+        <div className="supply-ui-lab-statusbar" aria-label="资源状态">
+          {resources.map((resource) => (
+            <div className={`supply-ui-lab-resource supply-ui-lab-resource--${resource.id}`} key={resource.id}>
+              <span aria-hidden="true">
+                {resource.iconImage ? (
+                  <Image alt="" height={44} src={resource.iconImage} unoptimized width={44} />
+                ) : (
+                  resource.icon
+                )}
+              </span>
+              <em>{resource.label}</em>
+              <strong>{resource.value}</strong>
+            </div>
+          ))}
+          {isBreadcrumb ? (
+            <Link className="supply-ui-lab-close" href={props.closeHref} aria-label={`关闭${activeLabel}并返回大厅`}>
+              ×
+            </Link>
+          ) : (
+            <div className="supply-ui-lab-user-profile" aria-label={`${props.profile.username} 的用户头像`}>
+              <Image alt="" height={40} src={props.profile.avatar} unoptimized width={40} />
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

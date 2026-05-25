@@ -2,8 +2,8 @@
 
 import { useState, type PropsWithChildren, type ReactNode } from "react";
 
-export type SupplyUiLabPanelTone = "paper" | "yellow" | "dark";
-export type SupplyUiLabStatusTone = "success" | "warning" | "danger" | "muted";
+export type SupplyUiLabPanelTone = "hero" | "primary" | "paper" | "yellow" | "dark" | "quiet";
+export type SupplyUiLabStatusTone = "success" | "warning" | "danger" | "muted" | "rare";
 
 export function SupplyUiLabPixelPanel({
   ariaLabel,
@@ -41,7 +41,7 @@ export function SupplyUiLabActionButton({
   className?: string;
   disabled?: boolean;
   onClick?: () => void;
-  tone?: "primary" | "secondary" | "ghost" | "danger";
+  tone?: "primary" | "secondary" | "ghost" | "quiet" | "danger";
   type?: "button" | "submit" | "reset";
 }>) {
   return (
