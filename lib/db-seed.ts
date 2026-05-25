@@ -96,6 +96,14 @@ export async function seedDatabase(): Promise<void> {
     where: { teamId: team.id },
   });
 
+  await prisma.shopPurchase.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.experienceLedger.deleteMany({
+    where: { teamId: team.id },
+  });
+
   await prisma.dailyTaskAssignment.deleteMany({
     where: { teamId: team.id },
   });
@@ -136,6 +144,7 @@ export async function seedDatabase(): Promise<void> {
         lastPunchDayKey: null,
         coins: seedUser.coins,
         ticketBalance: 0,
+        exp: 0,
         password: passwordHash,
         teamId: team.id,
       },
@@ -148,6 +157,7 @@ export async function seedDatabase(): Promise<void> {
         lastPunchDayKey: null,
         coins: seedUser.coins,
         ticketBalance: 0,
+        exp: 0,
         teamId: team.id,
       },
     });
@@ -179,6 +189,7 @@ export async function seedDatabase(): Promise<void> {
     data: {
       coins: 10,
       ticketBalance: 0,
+      exp: 0,
       currentStreak: 0,
       lastPunchDayKey: null,
     },
@@ -237,6 +248,8 @@ export async function seedDatabase(): Promise<void> {
     }
     await prisma.inventoryItem.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.lotteryTicketLedger.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.shopPurchase.deleteMany({ where: { userId: { in: extraUserIds } } });
+    await prisma.experienceLedger.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.dailyTaskAssignment.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.punchRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.seasonMemberStat.deleteMany({ where: { userId: { in: extraUserIds } } });

@@ -98,6 +98,16 @@ describe("seedDatabase", () => {
         OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
       },
     });
+    await prisma.shopPurchase.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
+    await prisma.experienceLedger.deleteMany({
+      where: {
+        OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
+      },
+    });
     await prisma.dailyTaskAssignment.deleteMany({
       where: {
         OR: [{ userId: { in: fixtureUserIds } }, { teamId: { in: fixtureTeamIds } }],
