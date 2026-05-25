@@ -75,8 +75,6 @@ export type SupplyShopPreview = {
     resources: SupplyShopResource[];
   };
   filters: SupplyShopFilter[];
-  sortOptions: string[];
-  selectedSort: string;
   products: SupplyShopProduct[];
   productDetails: SupplyShopProductDetail[];
   selectedProductDetail: SupplyShopProductDetail;

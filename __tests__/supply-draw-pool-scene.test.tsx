@@ -37,10 +37,18 @@ describe("SupplyDrawPoolScene", () => {
     expect(container.querySelector("a.supply-draw-pool-back")?.getAttribute("href")).toBe(
       "/ui-lab/supply-dashboard",
     );
+    expect(container.querySelector(".supply-draw-pool-resource-pill b")).toBeNull();
     expect(container.textContent).toContain("当前拥有");
     expect(container.textContent).toContain("抽奖券");
     expect(container.textContent).toContain("18 张");
     expect(container.textContent).toContain("今日获取上限：18/30 张抽奖券");
+    expect(container.querySelector(".supply-draw-pool-wallet-actions")).toBeNull();
+    expect(container.querySelector(".supply-draw-pool-guide button")).toBeNull();
+    expect(container.querySelector(".supply-draw-pool-skip-toggle")).toBeNull();
+    expect(container.textContent).not.toContain("获取更多抽奖券");
+    expect(container.textContent).not.toContain("前往任务");
+    expect(container.textContent).not.toContain("去完成");
+    expect(container.textContent).not.toContain("跳过抽奖动画");
     expect(container.textContent).toContain("十连保底说明");
     expect(container.textContent).toContain("单抽没有保底");
     expect(container.textContent).toContain("十连批次如果自然结果没有实用、社交或稀有奖励");

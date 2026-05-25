@@ -10,14 +10,15 @@ import type {
   SupplyTaskCardPreviewData,
   SupplyTaskCardThemeToken,
 } from "./types";
+import { taskCardIllustrationById } from "./task-card-art";
 
 const reviewCardIds = ["movement_004", "hydration_003", "social_001", "learning_005"] as const;
 
 const taskCardArtById: Record<(typeof reviewCardIds)[number], string> = {
-  movement_004: "/assets/task-cards/illustrations/movement_004-window-heal.webp",
-  hydration_003: "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
-  social_001: "/assets/task-cards/illustrations/social_001-small-talk.webp",
-  learning_005: "/assets/task-cards/illustrations/learning_005-one-note.webp",
+  movement_004: taskCardIllustrationById.movement_004,
+  hydration_003: taskCardIllustrationById.hydration_003,
+  social_001: taskCardIllustrationById.social_001,
+  learning_005: taskCardIllustrationById.learning_005,
 };
 
 const effortLabels: Record<TaskEffort, SupplyTaskCardPreviewData["difficulty"]> = {

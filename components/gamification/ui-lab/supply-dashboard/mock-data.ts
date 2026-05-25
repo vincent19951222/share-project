@@ -1,6 +1,10 @@
 import { supplyUiLabActiveEffects } from "../supply-data/effects";
 import { supplyUiLabResources } from "../supply-data/resources";
+import { taskCardIllustrationById } from "../task-cards/task-card-art";
 import type { SupplyDashboardPreview, SupplyDashboardResource } from "./types";
+
+export const DEFAULT_SUPPLY_DASHBOARD_MOTTO = "不是在健身，就是在去健身的路上！";
+export const DEFAULT_SUPPLY_DASHBOARD_TEAM_ANNOUNCEMENT = "团队公告：周六早上 8 点公园团练，记得来哦！";
 
 export const supplyDashboardAssetPaths = {
   background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
@@ -11,10 +15,10 @@ export const supplyDashboardAssetPaths = {
   dockTaskRecord: "/assets/home-scenes/supply/dashboard/dock-task-record.webp",
   fallbackLogo: "/logo.png",
   taskCards: {
-    hydration: "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
-    movement: "/assets/task-cards/illustrations/movement_004-window-heal.webp",
-    social: "/assets/task-cards/illustrations/social_001-small-talk.webp",
-    learning: "/assets/task-cards/illustrations/learning_005-one-note.webp",
+    hydration: taskCardIllustrationById.hydration_003,
+    movement: taskCardIllustrationById.movement_004,
+    social: taskCardIllustrationById.social_001,
+    learning: taskCardIllustrationById.learning_005,
   },
   rewardIcons: {
     coin: "/gamification/rewards/icons/coins_020.png",
@@ -47,13 +51,13 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
     username: "Vincent",
     avatar: "/avatars/male1.png",
     title: "自律牛马",
-    level: 28,
-    totalExp: 27720,
-    currentLevelExp: 720,
+    level: 1,
+    totalExp: 0,
+    currentLevelExp: 0,
     nextLevelExp: 1000,
     streakDays: 18,
   },
-  motto: "不是在健身，就是在去健身的路上！",
+  motto: DEFAULT_SUPPLY_DASHBOARD_MOTTO,
   resources: supplyUiLabResources.dashboard.map(toDashboardResource),
   activeEffects: supplyUiLabActiveEffects,
   dailyQuests: [
@@ -205,6 +209,6 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
     ],
   },
   announcement: {
-    message: "团队公告：周六早上 8 点公园团练，记得来哦！",
+    message: DEFAULT_SUPPLY_DASHBOARD_TEAM_ANNOUNCEMENT,
   },
 };

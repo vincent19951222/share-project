@@ -32,7 +32,6 @@ function DrawPoolTopBar({ data, ticketBalance }: { data: SupplyDrawPoolPreview; 
             </span>
             <em>{resource.label}</em>
             <strong>{resource.id === "ticket" ? ticketBalance : resource.value}</strong>
-            <b aria-hidden="true">+</b>
           </div>
         ))}
       </div>
@@ -61,13 +60,6 @@ function TicketWalletPanel({
       </div>
       <SupplyUiLabProgress current={data.wallet.dailyEarned} label="今日获取上限" max={data.wallet.dailyLimit} />
       <p className="supply-draw-pool-wallet-helper">{data.wallet.helper}</p>
-      <div className="supply-draw-pool-wallet-actions">
-        {data.wallet.actions.map((action) => (
-          <SupplyUiLabActionButton ariaLabel={action.label} key={action.id} tone={action.tone}>
-            {action.label}
-          </SupplyUiLabActionButton>
-        ))}
-      </div>
     </SupplyUiLabPixelPanel>
   );
 }
@@ -78,9 +70,6 @@ function DrawGuidePanel({ data }: { data: SupplyDrawPoolPreview }) {
       <Image alt="健身牛马助手" height={96} src={data.guide.mascotImage} unoptimized width={96} />
       <div>
         <p>{data.guide.message}</p>
-        <SupplyUiLabActionButton ariaLabel={data.guide.actionLabel} tone="secondary">
-          {data.guide.actionLabel}
-        </SupplyUiLabActionButton>
       </div>
     </SupplyUiLabPixelPanel>
   );
@@ -181,10 +170,6 @@ function DrawMachineStage({
             十连还差 {Math.max(0, 10 - ticketBalance)} 张抽奖券
           </p>
         ) : null}
-        <label className="supply-draw-pool-skip-toggle">
-          <input checked={data.machine.skipAnimation} readOnly type="checkbox" />
-          跳过抽奖动画
-        </label>
       </div>
     </section>
   );

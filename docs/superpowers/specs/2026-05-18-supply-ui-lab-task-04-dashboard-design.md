@@ -30,6 +30,8 @@ Dashboard 使用：
 
 - `supplyUiLabResources.dashboard`
 - `supplyUiLabActiveEffects`
+- 默认 Hero 口号文案：`不是在健身，就是在去健身的路上！`，作为当前阶段 Dashboard 主视觉兜底台词。
+- 默认团队公告文案：`团队公告：周六早上 8 点公园团练，记得来哦！`，作为当前阶段没有后台公告配置时的兜底展示。
 
 等级公式仅用于 mock 展示：
 
@@ -38,6 +40,8 @@ level = floor(totalExp / 1000) + 1
 currentLevelExp = totalExp % 1000
 nextLevelExp = 1000
 ```
+
+版本更新后所有成员从 Lv.1 开始，Dashboard 静态预览使用 `totalExp = 0`、`currentLevelExp = 0`、`nextLevelExp = 1000`。
 
 ## 非目标
 

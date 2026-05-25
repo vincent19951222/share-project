@@ -149,8 +149,6 @@ export const supplyShopMock: SupplyShopPreview = {
     resources: supplyUiLabResources.shop,
   },
   filters,
-  sortOptions: ["默认排序", "价格从低到高", "价格从高到低"],
-  selectedSort: "默认排序",
   products,
   productDetails,
   selectedProductDetail: productDetails[0],

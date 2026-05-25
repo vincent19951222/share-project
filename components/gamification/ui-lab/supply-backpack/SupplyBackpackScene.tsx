@@ -175,12 +175,7 @@ function BackpackSidebar({
         ariaLabel="今日效果"
         className="supply-backpack-effects-card"
         title={
-          <span>
-            今日效果
-            <button type="button" aria-label="今日效果说明">
-              i
-            </button>
-          </span>
+          <span>今日效果</span>
         }
         tone="yellow"
       >
@@ -231,14 +226,6 @@ function BackpackInventoryPanel({
     <section className="supply-backpack-inventory-panel" aria-label="库存面板">
       <div className="supply-backpack-inventory-toolbar">
         <h2>库存</h2>
-        <label className="supply-backpack-sort-control">
-          <span>排序</span>
-          <select aria-label="库存排序" defaultValue={data.selectedSort}>
-            {data.sortOptions.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
-        </label>
       </div>
       <div className="supply-backpack-grid" role="grid" aria-label="背包库存">
         {visibleSlots.map((slot) => (

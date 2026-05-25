@@ -72,8 +72,6 @@ export type SupplyBackpackPreview = {
     categories: SupplyBackpackCategory[];
     todayEffects: SupplyBackpackTodayEffect[];
   };
-  sortOptions: string[];
-  selectedSort: string;
   inventory: {
     page: number;
     pageSize: number;

@@ -139,8 +139,6 @@ export const supplyBackpackMock: SupplyBackpackPreview = {
     ],
     todayEffects: supplyUiLabActiveEffects,
   },
-  sortOptions: ["按稀有度", "按数量", "按获得时间"],
-  selectedSort: "按稀有度",
   inventory: {
     page: 1,
     pageSize: BACKPACK_PAGE_SIZE,

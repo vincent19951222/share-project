@@ -44,12 +44,16 @@ describe("supply dashboard static scene", () => {
       container.querySelector(".supply-ui-lab-tabs a[aria-selected='true']")?.textContent,
     ).toContain("我的状态");
     expect(container.querySelector(".supply-ui-lab-tabs a[href='/ui-lab/supply-dashboard/team-goal']")).toBeNull();
-    expect(container.querySelector(".supply-ui-lab-user-menu")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-user-menu")).toBeNull();
+    expect(container.querySelector(".supply-ui-lab-user-profile")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-resource b")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-resource--coins")?.textContent).toContain("银子");
     expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
     expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
     expect(container.querySelector(".supply-dashboard-status-panel")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-status-panel.supply-ui-lab-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-status-panel .supply-dashboard-section-heading button")).toBeNull();
+    expect(container.querySelector(".supply-dashboard-status-panel .supply-dashboard-section-heading span[aria-hidden='true']")).toBeNull();
     expect(container.querySelector(".supply-dashboard-title-card")).not.toBeNull();
     const effectCards = Array.from(container.querySelectorAll(".supply-dashboard-effect-card"));
     expect(effectCards).toHaveLength(2);
@@ -76,14 +80,16 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-image")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-status")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-hero-status")?.textContent).toContain("Lv.1");
+    expect(container.querySelector(".supply-dashboard-hero-status")?.textContent).toContain("距离升级还差 1000 EXP");
     const heroProgress = container.querySelector(".supply-dashboard-hero-progress");
     const heroProgressBar = heroProgress?.querySelector("[role='progressbar']");
     expect(heroProgressBar).not.toBeNull();
-    expect(heroProgress?.textContent).not.toContain("720/1000");
+    expect(heroProgress?.textContent).not.toContain("0/1000");
     expect(heroProgress?.querySelector(".supply-ui-lab-progress")?.getAttribute("data-progress-label")).toBe(
-      "720/1000 · 72%",
+      "0/1000 · 0%",
     );
-    expect(heroProgressBar?.getAttribute("aria-valuetext")).toBe("720/1000 · 72%");
+    expect(heroProgressBar?.getAttribute("aria-valuetext")).toBe("0/1000 · 0%");
     const heroBadge = container.querySelector(".supply-dashboard-level-avatar");
     expect(heroBadge).not.toBeNull();
     expect(heroBadge?.getAttribute("src")).toBe(supplyDashboardAssetPaths.levelAvatar);

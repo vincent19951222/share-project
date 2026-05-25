@@ -44,6 +44,8 @@ describe("SupplyBackpackScene", () => {
       supplyUiLabResourceIconPaths.backpack,
     );
     expect(container.querySelector("nav[aria-label='背包分类']")).not.toBeNull();
+    expect(container.querySelector("button[aria-label='今日效果说明']")).toBeNull();
+    expect(container.querySelector("select[aria-label='库存排序']")).toBeNull();
     expect(container.querySelectorAll(".supply-backpack-category-icon img")).toHaveLength(
       supplyBackpackMock.sidebar.categories.length,
     );

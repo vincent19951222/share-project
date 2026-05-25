@@ -8,25 +8,17 @@ export type SupplyDrawPoolActionId = "single" | "ten";
 export type SupplyDrawPoolRateTier = "coin" | SupplyUiLabDrawTier;
 export type SupplyDrawPoolRarity = SupplyUiLabCatalogRarity;
 
-export type SupplyDrawPoolWalletAction = {
-  id: "more-tickets" | "tasks";
-  label: string;
-  tone: "primary" | "secondary";
-};
-
 export type SupplyDrawPoolWallet = {
   ticketIcon: string;
   ticketBalance: number;
   dailyEarned: number;
   dailyLimit: number;
   helper: string;
-  actions: SupplyDrawPoolWalletAction[];
 };
 
 export type SupplyDrawPoolGuide = {
   mascotImage: string;
   message: string;
-  actionLabel: string;
 };
 
 export type SupplyDrawPoolRate = {
@@ -48,7 +40,6 @@ export type SupplyDrawPoolMachineAction = {
 export type SupplyDrawPoolMachine = {
   title: string;
   emblemImage: string;
-  skipAnimation: boolean;
   actions: SupplyDrawPoolMachineAction[];
 };
 

@@ -45,6 +45,7 @@ describe("SupplyShopScene", () => {
     expect(container.querySelector(".supply-ui-lab-filterbar [role='tab'][aria-selected='true']")?.textContent).toBe(
       "全部",
     );
+    expect(container.querySelector("select[aria-label='商品排序']")).toBeNull();
     expect(container.querySelectorAll("[data-testid='supply-shop-product-card']")).toHaveLength(12);
     expect(container.querySelector(".supply-shop-product-price img")?.getAttribute("src")).toBe(
       supplyUiLabResourceIconPaths.coins,

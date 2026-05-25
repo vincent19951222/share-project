@@ -35,6 +35,7 @@ const redemptionStatusTone: Record<SupplyTaskRecordRedemption["status"], "succes
 
 const radarStatusTone: Record<SupplyTaskRecordRadarStatus, "success" | "warning" | "muted"> = {
   expired: "muted",
+  ignored: "muted",
   pending: "warning",
   responded: "success",
 };
@@ -62,7 +63,11 @@ function filterTimelineRecords(
   return records.filter((record) => record.category === filterId);
 }
 
-function getMenuBadge(data: SupplyTaskRecordPreview, mode: SupplyTaskRecordMode) {
+function getMenuBadge(
+  data: SupplyTaskRecordPreview,
+  mode: SupplyTaskRecordMode,
+  radarInvites: SupplyTaskRecordInvite[],
+) {
   if (mode === "draws") {
     return String(data.drawHistory.length);
   }
@@ -73,7 +78,7 @@ function getMenuBadge(data: SupplyTaskRecordPreview, mode: SupplyTaskRecordMode)
   }
 
   if (mode === "radar") {
-    const pendingInvites = data.radar.invites.filter((invite) => invite.status === "pending").length;
+    const pendingInvites = radarInvites.filter((invite) => invite.status === "pending").length;
     return pendingInvites > 0 ? String(pendingInvites) : null;
   }
 
@@ -83,6 +88,7 @@ function getMenuBadge(data: SupplyTaskRecordPreview, mode: SupplyTaskRecordMode)
 export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview }) {
   const [activeMode, setActiveMode] = useState<SupplyTaskRecordMode>(data.activeMode);
   const [activeDateKey, setActiveDateKey] = useState(data.activeDateKey);
+  const [radarInvites, setRadarInvites] = useState(() => data.radar.invites);
   const [activeFilterId, setActiveFilterId] = useState<SupplyTaskRecordFilter["id"]>(
     data.filters.find((filter) => filter.active)?.id ?? "all",
   );
@@ -100,19 +106,40 @@ export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview 
     active: filter.id === activeFilterId,
   }));
 
+  function handleRadarInviteAction(inviteId: string, action: "respond" | "ignore") {
+    setRadarInvites((currentInvites) =>
+      currentInvites.map((invite) =>
+        invite.id === inviteId
+          ? {
+              ...invite,
+              status: action === "respond" ? "responded" : "ignored",
+              statusLabel: action === "respond" ? "已回应" : "已忽略",
+            }
+          : invite,
+      ),
+    );
+  }
+
   return (
     <main className="supply-task-record-scene">
       <div className="supply-task-record-background" aria-hidden="true" />
       <div className="supply-task-record-content">
         <SupplyUiLabTopBar activeLabel="任务记录" profile={data.topBar.profile} resources={data.topBar.resources} />
         <section className="supply-task-record-shell" aria-label="任务记录静态页">
-          <TaskRecordSidebar activeMode={activeMode} data={data} onSelectMode={setActiveMode} />
+          <TaskRecordSidebar
+            activeMode={activeMode}
+            data={data}
+            onSelectMode={setActiveMode}
+            radarInvites={radarInvites}
+          />
           <TaskRecordMainPanel
             activeDateKey={activeDateKey}
             activeMode={activeMode}
             data={data}
             filters={filters}
+            onRadarInviteAction={handleRadarInviteAction}
             records={visibleRecords}
+            radarInvites={radarInvites}
             selectedDate={selectedDate}
             onSelectDate={setActiveDateKey}
             onSelectFilter={(filterId) => setActiveFilterId(filterId as SupplyTaskRecordFilter["id"])}
@@ -127,10 +154,12 @@ function TaskRecordSidebar({
   activeMode,
   data,
   onSelectMode,
+  radarInvites,
 }: {
   activeMode: SupplyTaskRecordMode;
   data: SupplyTaskRecordPreview;
   onSelectMode: (mode: SupplyTaskRecordMode) => void;
+  radarInvites: SupplyTaskRecordInvite[];
 }) {
   return (
     <aside className="supply-task-record-sidebar" aria-label="任务记录分类">
@@ -147,7 +176,7 @@ function TaskRecordSidebar({
         <nav className="supply-task-record-menu" aria-label="任务记录分类">
           {data.sidebar.menuItems.map((item) => {
             const isActive = item.id === activeMode;
-            const badge = getMenuBadge(data, item.id);
+            const badge = getMenuBadge(data, item.id, radarInvites);
 
             return (
               <button
@@ -194,8 +223,10 @@ function TaskRecordMainPanel({
   activeMode,
   data,
   filters,
+  onRadarInviteAction,
   onSelectDate,
   onSelectFilter,
+  radarInvites,
   records,
   selectedDate,
 }: {
@@ -203,8 +234,10 @@ function TaskRecordMainPanel({
   activeMode: SupplyTaskRecordMode;
   data: SupplyTaskRecordPreview;
   filters: SupplyTaskRecordFilter[];
+  onRadarInviteAction: (inviteId: string, action: "respond" | "ignore") => void;
   onSelectDate: (dateKey: string) => void;
   onSelectFilter: (filterId: string) => void;
+  radarInvites: SupplyTaskRecordInvite[];
   records: SupplyTaskRecordTimelineItem[];
   selectedDate?: SupplyTaskRecordDateOption;
 }) {
@@ -233,7 +266,9 @@ function TaskRecordMainPanel({
         ) : null}
         {activeMode === "draws" ? <DrawHistoryPanel draws={data.drawHistory} /> : null}
         {activeMode === "redemptions" ? <RedemptionFullPanel items={data.redemptions.items} /> : null}
-        {activeMode === "radar" ? <RadarFullPanel invites={data.radar.invites} /> : null}
+        {activeMode === "radar" ? (
+          <RadarFullPanel invites={radarInvites} onInviteAction={onRadarInviteAction} />
+        ) : null}
         {activeMode === "rules" ? <RulesPanel rules={data.rules} /> : null}
       </SupplyUiLabPixelPanel>
     </section>
@@ -361,12 +396,18 @@ function RedemptionFullPanel({ items }: { items: SupplyTaskRecordRedemption[] })
   );
 }
 
-function RadarFullPanel({ invites }: { invites: SupplyTaskRecordInvite[] }) {
+function RadarFullPanel({
+  invites,
+  onInviteAction,
+}: {
+  invites: SupplyTaskRecordInvite[];
+  onInviteAction: (inviteId: string, action: "respond" | "ignore") => void;
+}) {
   return (
     <div className="supply-task-record-full-list" aria-label="完整队友雷达">
       {invites.map((invite) => (
         <div data-testid="task-record-radar-invite-full" key={invite.id}>
-          <InviteRecord invite={invite} />
+          <InviteRecord invite={invite} onInviteAction={onInviteAction} />
         </div>
       ))}
     </div>
@@ -385,7 +426,13 @@ function RulesPanel({ rules }: { rules: string[] }) {
   );
 }
 
-function InviteRecord({ invite }: { invite: SupplyTaskRecordInvite }) {
+function InviteRecord({
+  invite,
+  onInviteAction,
+}: {
+  invite: SupplyTaskRecordInvite;
+  onInviteAction: (inviteId: string, action: "respond" | "ignore") => void;
+}) {
   return (
     <article className="supply-task-record-invite" data-testid="task-record-radar-invite" key={invite.id}>
       <Image src={invite.avatar} alt={invite.name} width={54} height={54} unoptimized />
@@ -396,8 +443,16 @@ function InviteRecord({ invite }: { invite: SupplyTaskRecordInvite }) {
       </div>
       <div className="supply-task-record-radar-actions">
         <SupplyUiLabStatusBadge tone={radarStatusTone[invite.status]}>{invite.statusLabel}</SupplyUiLabStatusBadge>
-        {invite.status === "pending" ? <button type="button">回应</button> : null}
-        {invite.status === "pending" ? <button type="button">忽略</button> : null}
+        {invite.status === "pending" ? (
+          <button type="button" onClick={() => onInviteAction(invite.id, "respond")}>
+            回应
+          </button>
+        ) : null}
+        {invite.status === "pending" ? (
+          <button type="button" onClick={() => onInviteAction(invite.id, "ignore")}>
+            忽略
+          </button>
+        ) : null}
       </div>
     </article>
   );

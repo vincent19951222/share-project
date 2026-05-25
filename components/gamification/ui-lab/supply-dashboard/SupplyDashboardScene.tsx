@@ -58,10 +58,8 @@ function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
     <SupplyUiLabPixelPanel className="supply-dashboard-status-panel" ariaLabel="角色状态">
       <div className="supply-dashboard-section-heading">
         <div>
-          <span aria-hidden="true">✚</span>
           <h2>角色状态</h2>
         </div>
-        <button type="button" aria-label="更多角色状态操作">•••</button>
       </div>
 
       <div className="supply-dashboard-title-card">

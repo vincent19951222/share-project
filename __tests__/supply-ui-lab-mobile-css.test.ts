@@ -109,10 +109,6 @@ describe("Supply UI Lab mobile CSS", () => {
       ".supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-resource em",
       /clip:\s*rect\(0\s+0\s+0\s+0\)/,
     );
-    expectMobileRule(
-      ".supply-ui-lab-topbar:not(.supply-ui-lab-topbar--breadcrumb) .supply-ui-lab-resource b",
-      /display:\s*none/,
-    );
     expectMobileRule(".supply-ui-lab-topbar--breadcrumb .supply-ui-lab-close", /justify-self:\s*end/);
   });
 });

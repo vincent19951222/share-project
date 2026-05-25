@@ -99,7 +99,6 @@ export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
             </span>
             <em>{resource.label}</em>
             <strong>{resource.value}</strong>
-            {resource.id !== "backpack" ? <b aria-hidden="true">+</b> : null}
           </div>
         ))}
         {isBreadcrumb ? (
@@ -107,10 +106,9 @@ export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
             ×
           </Link>
         ) : (
-          <button className="supply-ui-lab-user-menu" type="button" aria-label={`打开 ${props.profile.username} 的用户菜单`}>
+          <div className="supply-ui-lab-user-profile" aria-label={`${props.profile.username} 的用户头像`}>
             <Image alt="" height={40} src={props.profile.avatar} unoptimized width={40} />
-            <span aria-hidden="true">⌄</span>
-          </button>
+          </div>
         )}
       </div>
     </header>

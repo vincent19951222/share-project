@@ -68,15 +68,10 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
     dailyEarned: 18,
     dailyLimit: 30,
     helper: "今日获取上限：18/30 张抽奖券",
-    actions: [
-      { id: "more-tickets", label: "获取更多抽奖券", tone: "primary" },
-      { id: "tasks", label: "前往任务", tone: "secondary" },
-    ],
   },
   guide: {
     mascotImage: supplyDrawPoolAssetPaths.drawPool.guideMascot,
     message: "完成任务拿抽奖券，抽银子、道具和福利奖励！",
-    actionLabel: "去完成",
   },
   poolRates: [
     { tier: "coin", rarity: "银子", percent: 45, tone: "n" },
@@ -87,7 +82,6 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
   machine: {
     title: "补给抽卡机",
     emblemImage: supplyDrawPoolAssetPaths.cowLogo,
-    skipAnimation: false,
     actions: [
       { id: "single", label: "单抽", drawCount: 1, costTicket: 1, tone: "single", guaranteeLabel: "单抽无保底" },
       { id: "ten", label: "十连", drawCount: 10, costTicket: 10, tone: "ten", guaranteeLabel: "十连批次保底" },
@@ -120,7 +114,7 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
     coinRows[4],
     catalogItemToDrawRow(supplyUiLabCatalogBySourceItemId.luckin_coffee_coupon),
   ],
-  emptyDrawMessage: "抽奖券不足，先完成任务获取更多抽奖券。",
+  emptyDrawMessage: "抽奖券不足，先完成今日主线获取更多。",
   rules: [
     "消耗抽奖券进行抽取，随机获得银子、实用道具、社交道具或稀有奖励。",
     "单抽没有保底。",

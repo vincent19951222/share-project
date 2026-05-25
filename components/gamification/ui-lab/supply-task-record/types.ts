@@ -56,7 +56,7 @@ export type SupplyTaskRecordDrawHistoryItem = {
   rewards: Array<{ name: string; quantityLabel: string; rarity: string }>;
 };
 
-export type SupplyTaskRecordRadarStatus = "pending" | "responded" | "expired";
+export type SupplyTaskRecordRadarStatus = "pending" | "responded" | "expired" | "ignored";
 
 export type SupplyTaskRecordRadarTab = {
   id: SupplyTaskRecordRadarStatus;

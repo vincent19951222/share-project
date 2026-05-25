@@ -192,14 +192,6 @@ function ShopCatalog({
       <SupplyUiLabPixelPanel ariaLabel="商品列表" className="supply-shop-catalog-card">
         <div className="supply-shop-catalog-toolbar">
           <SupplyUiLabFilterBar ariaLabel="商品筛选" filters={filters} onSelect={onSelectFilter} />
-          <label className="supply-shop-sort-control">
-            <span>排序</span>
-            <select aria-label="商品排序" defaultValue={data.selectedSort}>
-              {data.sortOptions.map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
-          </label>
         </div>
         <div className="supply-shop-product-grid">
           {products.map((product) => (

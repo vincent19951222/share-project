@@ -176,6 +176,45 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.querySelectorAll("[data-testid='task-record-redemption-full']")).toHaveLength(3);
   });
 
+  it("handles pending radar invites through local read-like actions", async () => {
+    await act(async () => {
+      root.render(<SupplyTaskRecordScene data={supplyTaskRecordMock} />);
+    });
+
+    await clickButtonContaining(container, "队友雷达");
+
+    expect(container.querySelector(".supply-task-record-menu button:nth-child(4)")?.textContent).toContain("3");
+    expect(container.querySelectorAll(".supply-task-record-radar-actions button")).toHaveLength(6);
+
+    const firstInvite = container.querySelector("[data-testid='task-record-radar-invite']");
+    const respondButton = Array.from(firstInvite?.querySelectorAll<HTMLButtonElement>("button") ?? []).find((button) =>
+      button.textContent?.includes("回应"),
+    );
+
+    await act(async () => {
+      respondButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(firstInvite?.textContent).toContain("已回应");
+    expect(firstInvite?.querySelectorAll("button")).toHaveLength(0);
+    expect(container.querySelector(".supply-task-record-menu button:nth-child(4)")?.textContent).toContain("2");
+
+    const nextPendingInvite = Array.from(
+      container.querySelectorAll<HTMLElement>("[data-testid='task-record-radar-invite']"),
+    ).find((invite) => invite.textContent?.includes("待响应"));
+    const ignoreButton = Array.from(nextPendingInvite?.querySelectorAll<HTMLButtonElement>("button") ?? []).find((button) =>
+      button.textContent?.includes("忽略"),
+    );
+
+    await act(async () => {
+      ignoreButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(nextPendingInvite?.textContent).toContain("已忽略");
+    expect(nextPendingInvite?.querySelectorAll("button")).toHaveLength(0);
+    expect(container.querySelector(".supply-task-record-menu button:nth-child(4)")?.textContent).toContain("1");
+  });
+
   it("uses reused reward and avatar images without panel crops", async () => {
     await act(async () => {
       root.render(<SupplyTaskRecordScene data={supplyTaskRecordMock} />);
