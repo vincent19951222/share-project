@@ -29,6 +29,19 @@ describe("supply production view model", () => {
     await prisma.inventoryItem.create({
       data: { userId, teamId, itemId: "task_reroll_coupon", quantity: 2 },
     });
+    await prisma.experienceLedger.create({
+      data: {
+        userId,
+        teamId,
+        dayKey: "2026-05-25",
+        delta: 50,
+        balanceAfter: 2720,
+        reason: "DAILY_TASK_COMPLETION_EXP",
+        sourceType: "view_model_test",
+        sourceId: "view-model-exp-1",
+        createdAt: new Date("2026-05-25T08:30:00+08:00"),
+      },
+    });
   });
 
   afterAll(async () => {
@@ -84,7 +97,15 @@ describe("supply production view model", () => {
       dateLabel: "05/25",
       weekday: "周一",
     });
-    expect(snapshot?.taskRecord.timeline).toEqual([]);
+    expect(snapshot?.taskRecord.timeline).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          category: "exp",
+          title: "获得 EXP",
+          subtitle: expect.stringContaining("+50 EXP"),
+        }),
+      ]),
+    );
   });
 
   it("returns null for an unknown user", async () => {

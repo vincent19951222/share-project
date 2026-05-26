@@ -1,42 +1,15 @@
 import { getShopCatalogItems } from "@/content/gamification/shop-catalog";
-import { getShanghaiDayKey } from "@/lib/economy";
 import { getItemDefinition } from "@/lib/gamification/content";
 import { buildGamificationStateForUser } from "@/lib/gamification/state";
+import { buildSupplyTaskRecordSnapshot } from "@/lib/gamification/task-records";
 import { prisma } from "@/lib/prisma";
 import type {
   GamificationBackpackCategory,
   SupplyShopProductSnapshot,
   SupplyStationProductionSnapshot,
-  SupplyTaskRecordSnapshot,
 } from "@/lib/types";
 
 export const SUPPLY_BACKPACK_CAPACITY = 60;
-
-const WEEKDAY_LABELS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"] as const;
-const DAY_MS = 86_400_000;
-
-function formatDateLabel(date: Date) {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${month}/${day}`;
-}
-
-function buildTaskRecordPlaceholder(now: Date): SupplyTaskRecordSnapshot {
-  const dates = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(now.getTime() - index * DAY_MS);
-    const key = getShanghaiDayKey(date);
-
-    return {
-      key,
-      label: index === 0 ? "今天" : index === 1 ? "昨天" : `${index} 天前`,
-      dateLabel: formatDateLabel(date),
-      weekday: WEEKDAY_LABELS[date.getDay()],
-    };
-  });
-
-  return { dates, timeline: [] };
-}
 
 function buildShopProducts(input: {
   ownedQuantityByItemId: Map<string, number>;
@@ -137,7 +110,11 @@ export async function buildSupplyStationViewModelForUser(
     shop: {
       products: buildShopProducts({ ownedQuantityByItemId }),
     },
-    taskRecord: buildTaskRecordPlaceholder(now),
+    taskRecord: await buildSupplyTaskRecordSnapshot({
+      userId: user.id,
+      teamId: snapshot.teamId,
+      now,
+    }),
     social: snapshot.social,
     redemptions: snapshot.redemptions,
   };
