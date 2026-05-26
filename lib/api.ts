@@ -308,6 +308,26 @@ export async function useGamificationItem(payload: UseGamificationItemRequest): 
   return readApiResult(response, "道具使用响应解析失败");
 }
 
+export async function purchaseGamificationShopItem(itemId: string): Promise<{
+  purchase: {
+    id: string;
+    itemId: string;
+    totalPriceCoins: number;
+  };
+  snapshot: GamificationStateSnapshot;
+}> {
+  const response = await fetch("/api/gamification/shop/purchase", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ itemId }),
+  });
+
+  return readApiResult(response, "购买补给响应解析失败");
+}
+
 export async function respondToSocialInvitation(payload: {
   invitationId: string;
   responseText?: string;
