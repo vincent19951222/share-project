@@ -815,7 +815,7 @@ export function toSupplyShopPreview(
       "达到限购或余额不足时按钮会禁用。",
       "真实福利类商品会进入管理员确认流程。",
     ],
-    initialFeedback: "生产模式：操作会写入真实补给站数据。",
+    initialFeedback: null,
   };
 }
 

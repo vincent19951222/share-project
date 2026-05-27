@@ -329,9 +329,9 @@ describe("SupplyStationShell", () => {
     await flush();
 
     await act(async () => {
-      Array.from(container.querySelectorAll("button"))
-        .find((button) => button.textContent?.includes("抽奖池"))
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      Array.from(container.querySelectorAll("a"))
+        .find((link) => link.textContent?.includes("抽奖池"))
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
     });
     await act(async () => {
       container
@@ -416,8 +416,9 @@ describe("SupplyStationShell", () => {
 
     expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.textContent).toContain("玩法规则");
-    expect(container.textContent).toContain("抽奖概率");
+    expect(container.querySelector(".supply-ui-lab-production-nav")).toBeNull();
+    expect(container.textContent).not.toContain("玩法规则");
+    expect(container.textContent).not.toContain("抽奖概率");
   });
 
   it("renders a login recovery state for 401 responses", async () => {

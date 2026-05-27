@@ -241,7 +241,7 @@ function ShopDetail({
   product,
 }: {
   detail: SupplyShopProductDetail;
-  feedbackMessage: string;
+  feedbackMessage: string | null;
   onRedeem: () => void;
   product: SupplyShopProduct;
 }) {
@@ -304,9 +304,11 @@ function ShopDetail({
                 ? detail.redeemDisabledReason ?? "已达上限"
                 : detail.redeemLabel}
         </button>
-        <p aria-live="polite" className="supply-shop-action-feedback" data-shop-feedback>
-          {feedbackMessage}
-        </p>
+        {feedbackMessage ? (
+          <p aria-live="polite" className="supply-shop-action-feedback" data-shop-feedback>
+            {feedbackMessage}
+          </p>
+        ) : null}
       </SupplyUiLabPixelPanel>
     </aside>
   );

@@ -37,38 +37,6 @@ body {
   pointer-events: auto;
 }
 
-.supply-ui-lab-production-nav {
-  position: fixed;
-  z-index: 70;
-  left: 50%;
-  bottom: 0.75rem;
-  display: flex;
-  max-width: calc(100vw - 2rem);
-  transform: translateX(-50%);
-  gap: 0.35rem;
-  overflow-x: auto;
-  border: 3px solid #111827;
-  background: rgba(255, 248, 232, 0.94);
-  box-shadow: 4px 4px 0 rgba(17, 24, 39, 0.9);
-  padding: 0.35rem;
-}
-
-.supply-ui-lab-production-nav button,
-.supply-ui-lab-production-nav a {
-  flex: 0 0 auto;
-  border: 2px solid #111827;
-  background: #fffef8;
-  color: #111827;
-  padding: 0.35rem 0.55rem;
-  font-size: 0.78rem;
-  font-weight: 1000;
-  text-decoration: none;
-}
-
-.supply-ui-lab-production-nav button[aria-pressed="true"] {
-  background: #fde047;
-}
-
 /* Supply UI Lab 3:4 task-card review */
 .supply-task-card-review-scene {
   min-height: 100svh;

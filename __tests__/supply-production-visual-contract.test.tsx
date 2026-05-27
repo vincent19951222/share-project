@@ -159,9 +159,12 @@ describe("production supply UI Lab visual contract", () => {
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-topbar")).not.toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
+    expect(container.querySelector(".supply-ui-lab-production-nav")).toBeNull();
     expect(container.textContent).toContain("银子");
     expect(container.textContent).toContain("845");
     expect(container.textContent).toContain("50/1000");
+    expect(container.textContent).not.toContain("生产模式");
+    expect(container.textContent).not.toContain("操作会写入真实补给站数据");
   });
 
   it("keeps top navigation inside production supply station instead of linking to UI Lab routes", async () => {

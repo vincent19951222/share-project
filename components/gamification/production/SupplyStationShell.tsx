@@ -56,14 +56,6 @@ export interface SupplyBackpackUseTarget {
   message?: string;
 }
 
-const panelItems: Array<{ key: SupplyProductionPanel; label: string }> = [
-  { key: "dashboard", label: "我的状态" },
-  { key: "drawPool", label: "抽奖池" },
-  { key: "backpack", label: "背包" },
-  { key: "shop", label: "补给商店" },
-  { key: "taskRecord", label: "任务记录" },
-];
-
 function getSupplyErrorState(caught: unknown): SupplyErrorState {
   if (caught instanceof ApiError) {
     return {
@@ -289,25 +281,10 @@ export function SupplyStationShell({
 
       {snapshot ? (
         <>
-          <nav className="supply-ui-lab-production-nav" aria-label="补给站页面">
-            {panelItems.map((panel) => (
-              <button
-                aria-pressed={activePanel === panel.key}
-                key={panel.key}
-                onClick={() => selectPanel(panel.key)}
-                type="button"
-              >
-                {panel.label}
-              </button>
-            ))}
-            <a href="/docs?tab=rules#supply-station-rules">玩法规则</a>
-            <a href="/docs?tab=rules#supply-station-probability">抽奖概率</a>
-          </nav>
-
           {activePanel === "dashboard" ? (
             <SupplyDashboardScene
               data={toSupplyDashboardPreview(snapshot)}
-              feedbackMessage={successMessage ?? "生产模式：操作会写入真实补给站数据。"}
+              feedbackMessage={successMessage}
               onBackToPunch={onBackToPunch}
               onClaimRewards={handleClaimTicket}
               onCompleteQuest={(questId) => handleCompleteTask(questId as GamificationDimensionSnapshot["key"])}

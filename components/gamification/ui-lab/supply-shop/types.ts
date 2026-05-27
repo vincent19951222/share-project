@@ -83,5 +83,5 @@ export type SupplyShopPreview = {
   selectedProductDetail: SupplyShopProductDetail;
   notice: string;
   rules: string[];
-  initialFeedback: string;
+  initialFeedback: string | null;
 };

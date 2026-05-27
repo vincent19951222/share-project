@@ -440,6 +440,8 @@ export function SupplyDashboardScene({
   const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
   const quests = onCompleteQuest ? data.dailyQuests : dailyQuests;
   const pendingQuest = quests.find((quest) => quest.id === pendingQuestId) ?? null;
+  const visibleFeedbackMessage =
+    controlledFeedbackMessage === undefined ? feedbackMessage : controlledFeedbackMessage;
 
   function handleOpenCompleteQuest(questId: string) {
     const quest = quests.find((candidate) => candidate.id === questId);
@@ -546,9 +548,11 @@ export function SupplyDashboardScene({
               quest={pendingQuest}
             />
           ) : null}
-          <p aria-live="polite" className="supply-dashboard-local-feedback" data-dashboard-feedback>
-            {controlledFeedbackMessage ?? feedbackMessage}
-          </p>
+          {visibleFeedbackMessage ? (
+            <p aria-live="polite" className="supply-dashboard-local-feedback" data-dashboard-feedback>
+              {visibleFeedbackMessage}
+            </p>
+          ) : null}
           <DashboardShortcutDock data={data} onNavigate={onNavigate} />
           <TeamAnnouncementBar message={data.announcement.message} />
         </section>
