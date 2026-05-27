@@ -85,6 +85,41 @@
 - 上线前先备份服务器数据库
 - 拉线上数据到本地时，用“导出快照”思路，不用“git 同步数据库文件”思路
 
+## 牛马补给站第三阶段 DB 变更
+
+第三阶段会新增真实 EXP、等级和商店购买能力。对应 schema 变更是：
+
+- `User.exp`
+- `ExperienceLedger`
+- `ShopPurchase`
+
+当前项目第三阶段生产发布约定使用 `npx prisma db push` 同步 SQLite schema。本文前面保留的 migration 叙述用于长期数据库方法论；牛马补给站第三阶段按本节和生产发布清单执行。
+
+发布前必须备份生产 SQLite：
+
+```powershell
+New-Item -ItemType Directory -Force E:\data\share-project\backups
+Copy-Item E:\data\share-project\prod.db E:\data\share-project\backups\prod-$(Get-Date -Format "yyyy-MM-dd-HHmmss").db
+```
+
+生产 schema 同步顺序：
+
+```powershell
+Set-Location E:\Projects\share-project
+$env:DATABASE_URL="file:/E:/data/share-project/prod.db"
+npm install
+npx prisma generate
+npx prisma db push
+npm run build
+cmd /c "set DATABASE_URL=file:/E:/data/share-project/prod.db && pm2 restart share-project --update-env"
+```
+
+生产禁令：
+
+- 不要在生产执行 `npx tsx prisma/seed.ts`。
+- 不要在生产执行 `npx tsx scripts/fill-gamification-test-data.ts`。
+- 不要用本地 `dev.db`、验收库或 UI Lab mock 数据覆盖 `E:\data\share-project\prod.db`。
+
 ## Should `.db` Files Be In Git
 
 推荐决策：

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useCallback } from "react";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
@@ -9,10 +10,12 @@ import { AssetIcon } from "@/components/ui/AssetIcon";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { TeamDynamicsBell } from "./TeamDynamicsBell";
+import { appTabRoutes } from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
-export function Navbar() {
+export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {}) {
   const { state, dispatch } = useBoard();
+  const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
@@ -21,10 +24,12 @@ export function Navbar() {
     state.members.find((member) => member.id === state.currentUserId) ??
     state.members[0] ??
     null;
+  const activeTab = activeTabOverride ?? state.activeTab;
 
   function handleTabChange(tab: AppTab) {
     dispatch({ type: "SET_TAB", tab });
     setMobileTabsOpen(false);
+    router.push(appTabRoutes[tab]);
   }
 
   const handleProfileClick = useCallback(() => {
@@ -60,14 +65,14 @@ export function Navbar() {
             </div>
             <div className="calendar-tab-strip home-tab-strip hidden min-w-0 gap-2 overflow-x-auto rounded-full border-2 border-slate-200 bg-slate-100 p-1 min-[761px]:flex">
               <TabBtn
-                active={state.activeTab === "punch"}
+                active={activeTab === "punch"}
                 onClick={() => handleTabChange("punch")}
               >
                 <AssetIcon name="workout" className="h-4 w-4 object-contain" />
                 健身打卡
               </TabBtn>
               <TabBtn
-                active={state.activeTab === "board"}
+                active={activeTab === "board"}
                 className="board-tab"
                 onClick={() => handleTabChange("board")}
               >
@@ -75,7 +80,7 @@ export function Navbar() {
                 共享看板
               </TabBtn>
               <TabBtn
-                active={state.activeTab === "coffee"}
+                active={activeTab === "coffee"}
                 className="coffee-tab"
                 onClick={() => handleTabChange("coffee")}
               >
@@ -83,7 +88,7 @@ export function Navbar() {
                 续命咖啡
               </TabBtn>
               <TabBtn
-                active={state.activeTab === "calendar"}
+                active={activeTab === "calendar"}
                 className="calendar-tab"
                 onClick={() => handleTabChange("calendar")}
               >
@@ -91,7 +96,7 @@ export function Navbar() {
                 牛马日历
               </TabBtn>
               <TabBtn
-                active={state.activeTab === "dash"}
+                active={activeTab === "dash"}
                 className="report-tab"
                 onClick={() => handleTabChange("dash")}
               >
@@ -99,7 +104,7 @@ export function Navbar() {
                 战报中心
               </TabBtn>
               <TabBtn
-                active={state.activeTab === "supply"}
+                active={activeTab === "supply"}
                 className="supply-tab"
                 onClick={() => handleTabChange("supply")}
               >
@@ -147,7 +152,7 @@ export function Navbar() {
         {mobileTabsOpen ? (
           <div className="mobile-tab-panel mt-3 flex flex-col gap-2 rounded-[1.5rem] border-4 border-slate-800 bg-white p-3 shadow-[0_8px_0_0_#1f2937] min-[761px]:hidden">
             <TabBtn
-              active={state.activeTab === "punch"}
+              active={activeTab === "punch"}
               className="mobile-tab-btn justify-between"
               onClick={() => handleTabChange("punch")}
             >
@@ -157,7 +162,7 @@ export function Navbar() {
               </span>
             </TabBtn>
             <TabBtn
-              active={state.activeTab === "board"}
+              active={activeTab === "board"}
               className="mobile-tab-btn board-tab justify-between"
               onClick={() => handleTabChange("board")}
             >
@@ -167,7 +172,7 @@ export function Navbar() {
               </span>
             </TabBtn>
             <TabBtn
-              active={state.activeTab === "coffee"}
+              active={activeTab === "coffee"}
               className="mobile-tab-btn coffee-tab justify-between"
               onClick={() => handleTabChange("coffee")}
             >
@@ -177,7 +182,7 @@ export function Navbar() {
               </span>
             </TabBtn>
             <TabBtn
-              active={state.activeTab === "calendar"}
+              active={activeTab === "calendar"}
               className="mobile-tab-btn calendar-tab justify-between"
               onClick={() => handleTabChange("calendar")}
             >
@@ -187,7 +192,7 @@ export function Navbar() {
               </span>
             </TabBtn>
             <TabBtn
-              active={state.activeTab === "dash"}
+              active={activeTab === "dash"}
               className="mobile-tab-btn report-tab justify-between"
               onClick={() => handleTabChange("dash")}
             >
@@ -197,7 +202,7 @@ export function Navbar() {
               </span>
             </TabBtn>
             <TabBtn
-              active={state.activeTab === "supply"}
+              active={activeTab === "supply"}
               className="mobile-tab-btn supply-tab justify-between"
               onClick={() => handleTabChange("supply")}
             >

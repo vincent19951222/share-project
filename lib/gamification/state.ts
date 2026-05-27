@@ -18,6 +18,7 @@ import {
 import { expirePastPendingItemUses } from "@/lib/gamification/item-use";
 import { expirePastSocialInvitations } from "@/lib/gamification/social-invitations";
 import { buildRedemptionSnapshot } from "@/lib/gamification/redemptions";
+import { getUserLevelSnapshot } from "@/lib/gamification/experience";
 import { prisma } from "@/lib/prisma";
 import type {
   GamificationBackpackGroupSnapshot,
@@ -317,6 +318,7 @@ export async function buildGamificationStateForUser(
       role: true,
       coins: true,
       ticketBalance: true,
+      exp: true,
       dailyTaskAssignments: {
         where: { dayKey },
         select: {
@@ -559,6 +561,7 @@ export async function buildGamificationStateForUser(
     teamId: user.teamId,
     dayKey,
     ticketBalance: user.ticketBalance,
+    profile: getUserLevelSnapshot(user.exp),
     dimensions,
     ticketSummary: {
       maxFreeTicketsToday: 2,

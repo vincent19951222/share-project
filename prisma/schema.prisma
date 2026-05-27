@@ -29,6 +29,8 @@ model Team {
   socialInvitations SocialInvitation[]
   socialInvitationResponses SocialInvitationResponse[]
   realWorldRedemptions RealWorldRedemption[]
+  experienceLedgers ExperienceLedger[]
+  shopPurchases ShopPurchase[]
 }
 
 model User {
@@ -41,6 +43,7 @@ model User {
   lastPunchDayKey       String?
   coins                 Int                    @default(0)
   ticketBalance         Int                    @default(0)
+  exp                   Int                    @default(0)
   teamId                String
   team                  Team                   @relation(fields: [teamId], references: [id])
   punchRecords          PunchRecord[]
@@ -59,6 +62,8 @@ model User {
   receivedSocialInvitations SocialInvitation[] @relation("SocialInvitationRecipient")
   socialInvitationResponses SocialInvitationResponse[] @relation("SocialInvitationResponder")
   realWorldRedemptions  RealWorldRedemption[]
+  experienceLedgers     ExperienceLedger[]
+  shopPurchases         ShopPurchase[]
   confirmedRedemptions  RealWorldRedemption[]  @relation("RedemptionConfirmer")
   cancelledRedemptions  RealWorldRedemption[]  @relation("RedemptionCanceller")
   createdAt             DateTime               @default(now())
@@ -205,6 +210,47 @@ model LotteryTicketLedger {
   @@index([userId, createdAt])
   @@index([teamId, dayKey, createdAt])
   @@unique([sourceType, sourceId])
+}
+
+model ExperienceLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  teamId       String
+  team         Team     @relation(fields: [teamId], references: [id])
+  dayKey       String
+  delta        Int
+  balanceAfter Int
+  reason       String
+  sourceType   String
+  sourceId     String
+  metadataJson String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([teamId, dayKey, createdAt])
+  @@unique([sourceType, sourceId])
+}
+
+model ShopPurchase {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  teamId          String
+  team            Team     @relation(fields: [teamId], references: [id])
+  itemId          String
+  quantity        Int
+  unitPriceCoins  Int
+  totalPriceCoins Int
+  dayKey          String
+  weekKey         String
+  status          String
+  metadataJson    String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId, dayKey, itemId])
+  @@index([userId, weekKey, itemId])
+  @@index([teamId, createdAt])
 }
 
 model InventoryItem {

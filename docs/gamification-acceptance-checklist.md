@@ -227,6 +227,36 @@ select status, count(*) from RealWorldRedemption group by status;
 - 抽奖后 `LotteryDraw` 与 `LotteryDrawResult` 有对应记录。
 - 兑换记录只出现 `REQUESTED`、`CONFIRMED`、`CANCELLED`。
 
+### 第三阶段 EXP 和商店购买验收
+
+第三阶段补给站接入生产后，追加这些端到端检查：
+
+- [ ] 补给站资源栏继续把 `User.coins` 展示为“银子”。
+- [ ] 用户能看到真实等级和 EXP 进度，不再使用 UI Lab 静态假数据。
+- [ ] 完成每日四维任务后，`User.exp` 增加，并写入 `ExperienceLedger`。
+- [ ] 完成真实健身打卡后，`User.exp` 增加，并写入 `ExperienceLedger`。
+- [ ] 商店购买成功后，`User.coins` 减少、`InventoryItem.quantity` 增加，并写入 `ShopPurchase`。
+
+每次完整验收后跑下面的只读 SQL：
+
+```bash
+sqlite3 /Users/vincent/data/share-project/dev.db '
+select
+  u.username,
+  u.exp as userExp,
+  coalesce((select sum(delta) from ExperienceLedger e where e.userId = u.id), 0) as ledgerExp,
+  coalesce((select count(*) from ShopPurchase s where s.userId = u.id), 0) as shopPurchases
+from User u
+order by u.createdAt;
+'
+```
+
+通过标准：
+
+- `userExp = ledgerExp`。
+- 发生商店购买后，`shopPurchases` 增加。
+- 商店购买后的银子减少和库存增加能从 `ShopPurchase` 与 `InventoryItem` 解释。
+
 ## 3. 管理员流程验收
 
 管理员账号：`li / 0000`。

@@ -41,6 +41,49 @@ npx tsx scripts/fill-gamification-test-data.ts
 
 通过后再考虑生产发布。生产环境不要执行 `prisma/seed.ts` 或验收数据填充脚本。
 
+## 牛马补给站第三阶段发布专项检查
+
+第三阶段 schema 变更：
+
+- `User.exp`
+- `ExperienceLedger`
+- `ShopPurchase`
+
+生产目标必须保持：
+
+```text
+code: E:\Projects\share-project
+db:   E:\data\share-project\prod.db
+env:  DATABASE_URL="file:/E:/data/share-project/prod.db"
+```
+
+发布前确认：
+
+- [ ] 当前 release commit 包含第三阶段 schema 和代码。
+- [ ] `E:\data\share-project\prod.db` 已备份到 `E:\data\share-project\backups`。
+- [ ] 生产环境变量为 `DATABASE_URL="file:/E:/data/share-project/prod.db"`。
+- [ ] 生产环境不要执行 `npx tsx prisma/seed.ts`。
+- [ ] 生产环境不要执行 `npx tsx scripts/fill-gamification-test-data.ts`。
+
+涉及 schema 变更时，生产执行顺序为：
+
+```powershell
+Set-Location E:\Projects\share-project
+$env:DATABASE_URL="file:/E:/data/share-project/prod.db"
+npm install
+npx prisma generate
+npx prisma db push
+npm run build
+cmd /c "set DATABASE_URL=file:/E:/data/share-project/prod.db && pm2 restart share-project --update-env"
+```
+
+发布后 smoke 增加：
+
+- [ ] 补给站能展示新 UI 和原有抽奖、背包、兑换能力。
+- [ ] 用户等级和 EXP 能加载，且不显示静态假数据。
+- [ ] 商店购买会扣银子、增加背包库存并写入 `ShopPurchase`。
+- [ ] 管理员兑换队列仍能确认或取消真实福利兑换。
+
 ## Production Flow
 
 ```text

@@ -7,6 +7,7 @@ import type {
   GamificationStateSnapshot,
   GamificationWeeklyReportPublishResult,
   GamificationWeeklyReportSnapshot,
+  SupplyStationProductionSnapshot,
 } from "@/lib/types";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
 
@@ -192,6 +193,18 @@ export async function fetchGamificationState(): Promise<GamificationStateSnapsho
   return readGamificationSnapshot(response);
 }
 
+export async function fetchSupplyStationState(): Promise<SupplyStationProductionSnapshot> {
+  const response = await fetch("/api/gamification/supply/state", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  const payload = await readApiResult<{
+    snapshot: SupplyStationProductionSnapshot;
+  }>(response, "获取牛马补给站失败");
+
+  return payload.snapshot;
+}
+
 export async function fetchGamificationWeeklyReport(
   weekStartDayKey?: string,
 ): Promise<GamificationWeeklyReportSnapshot> {
@@ -306,6 +319,26 @@ export async function useGamificationItem(payload: UseGamificationItemRequest): 
   });
 
   return readApiResult(response, "道具使用响应解析失败");
+}
+
+export async function purchaseGamificationShopItem(itemId: string): Promise<{
+  purchase: {
+    id: string;
+    itemId: string;
+    totalPriceCoins: number;
+  };
+  snapshot: GamificationStateSnapshot;
+}> {
+  const response = await fetch("/api/gamification/shop/purchase", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ itemId }),
+  });
+
+  return readApiResult(response, "购买补给响应解析失败");
 }
 
 export async function respondToSocialInvitation(payload: {

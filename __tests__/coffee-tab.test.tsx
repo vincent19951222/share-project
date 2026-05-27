@@ -7,6 +7,7 @@ import type { BoardState } from "@/lib/types";
   true;
 
 const dispatch = vi.fn();
+const routerPush = vi.fn();
 
 const boardState: BoardState = {
   members: [{ id: "u1", name: "li", avatarKey: "male1" }],
@@ -31,6 +32,10 @@ vi.mock("@/lib/store", () => ({
   useBoard: () => ({ state: boardState, dispatch }),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: routerPush }),
+}));
+
 describe("coffee tab navigation", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -44,6 +49,7 @@ describe("coffee tab navigation", () => {
 
   beforeEach(() => {
     dispatch.mockClear();
+    routerPush.mockClear();
     setViewportWidth(1280);
     container = document.createElement("div");
     document.body.appendChild(container);
@@ -76,6 +82,7 @@ describe("coffee tab navigation", () => {
     });
 
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "coffee" });
+    expect(routerPush).toHaveBeenCalledWith("/drink");
   });
 
   it("dispatches the supply station tab selection from the navbar", async () => {
@@ -99,6 +106,7 @@ describe("coffee tab navigation", () => {
     });
 
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "supply" });
+    expect(routerPush).toHaveBeenCalledWith("/dashboard/status");
   });
 
   it("uses managed pixel SVG assets for the primary navigation tabs", async () => {
@@ -165,6 +173,7 @@ describe("coffee tab navigation", () => {
     });
 
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_TAB", tab: "coffee" });
+    expect(routerPush).toHaveBeenCalledWith("/drink");
     expect(container.querySelector(".mobile-tab-panel")).toBeNull();
   });
 

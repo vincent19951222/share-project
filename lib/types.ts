@@ -235,16 +235,96 @@ export interface GamificationRedemptionSectionSnapshot {
   adminQueue: GamificationRedemptionSnapshot[];
 }
 
+export interface GamificationProfileSnapshot {
+  totalExp: number;
+  level: number;
+  currentLevelExp: number;
+  nextLevelExp: number;
+  title: string;
+}
+
 export interface GamificationStateSnapshot {
   currentUserId: string;
   currentUserRole: string;
   teamId: string;
   dayKey: string;
   ticketBalance: number;
+  profile: GamificationProfileSnapshot;
   dimensions: GamificationDimensionSnapshot[];
   ticketSummary: GamificationTicketSummary;
   lottery: GamificationLotterySummary;
   backpack: GamificationBackpackSummary;
+  social: GamificationSocialSummary;
+  redemptions: GamificationRedemptionSectionSnapshot;
+}
+
+export interface SupplyResourceSnapshot {
+  label: "银子" | "抽奖券" | "背包";
+  value: number;
+  maxValue?: number;
+}
+
+export interface SupplyShopProductSnapshot {
+  itemId: string;
+  name: string;
+  description: string;
+  category: GamificationBackpackCategory;
+  priceCoins: number;
+  ownedQuantity: number;
+  dailyLimit?: number;
+  weeklyLimit?: number;
+  purchaseEnabled: boolean;
+  purchaseDisabledReason: string | null;
+  requiresAdminConfirmation: boolean;
+}
+
+export interface SupplyTaskRecordSnapshot {
+  dates: Array<{
+    key: string;
+    label: string;
+    dateLabel: string;
+    weekday: string;
+  }>;
+  timeline: Array<{
+    id: string;
+    dayKey: string;
+    occurredAt: string;
+    title: string;
+    subtitle: string;
+    category: "task" | "draw" | "ticket" | "exp" | "shop" | "item" | "redemption" | "social";
+    statusLabel: string;
+  }>;
+}
+
+export interface SupplyStationProductionSnapshot {
+  currentUserId: string;
+  currentUserRole: string;
+  teamId: string;
+  dayKey: string;
+  resources: {
+    coins: SupplyResourceSnapshot;
+    ticket: SupplyResourceSnapshot;
+    backpack: SupplyResourceSnapshot;
+  };
+  profile: GamificationProfileSnapshot & {
+    username: string;
+    avatarKey: string;
+  };
+  dashboard: {
+    dailyQuests: GamificationDimensionSnapshot[];
+    todayEffects: GamificationTodayEffectSnapshot[];
+  };
+  drawPool: {
+    wallet: GamificationTicketSummary & { ticketBalance: number };
+    lottery: GamificationLotterySummary;
+  };
+  backpack: GamificationBackpackSummary & {
+    capacity: { usedSlots: number; totalSlots: 60 };
+  };
+  shop: {
+    products: SupplyShopProductSnapshot[];
+  };
+  taskRecord: SupplyTaskRecordSnapshot;
   social: GamificationSocialSummary;
   redemptions: GamificationRedemptionSectionSnapshot;
 }
