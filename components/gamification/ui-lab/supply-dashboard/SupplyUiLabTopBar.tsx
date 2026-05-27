@@ -14,9 +14,16 @@ export type SupplyUiLabProfile = {
   avatar: string;
 };
 
+export type SupplyUiLabTopBarTabId = "status" | "shop" | "task-record";
+
 type SupplyUiLabTopBarTabProps = {
   activeLabel: string;
+  onSelectTab?: (tabId: SupplyUiLabTopBarTabId) => void;
   profile: SupplyUiLabProfile;
+  returnAction?: {
+    label: string;
+    onClick: () => void;
+  };
   resources: SupplyUiLabResource[];
   variant?: "tabs";
 };
@@ -32,9 +39,9 @@ type SupplyUiLabTopBarBreadcrumbProps = {
 type SupplyUiLabTopBarProps = SupplyUiLabTopBarTabProps | SupplyUiLabTopBarBreadcrumbProps;
 
 const supplyUiLabTabs = [
-  { id: "status", label: "我的状态", icon: "⌂", href: "/ui-lab/supply-dashboard" },
-  { id: "shop", label: "补给商店", icon: "▤", href: "/ui-lab/supply-dashboard/shop" },
-  { id: "task-record", label: "任务记录", icon: "▣", href: "/ui-lab/supply-dashboard/task-record" },
+  { id: "status", label: "我的状态", icon: "⌂", href: "/dashboard/status" },
+  { id: "shop", label: "补给商店", icon: "▤", href: "/dashboard/store" },
+  { id: "task-record", label: "任务记录", icon: "▣", href: "/dashboard/quest" },
 ] as const;
 
 const SUPPLY_UI_LAB_LOGO = "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png";
@@ -51,7 +58,7 @@ export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
     >
       {isBreadcrumb ? (
         <div className="supply-ui-lab-breadcrumb-brand">
-          <Link className="supply-ui-lab-brand" href="/ui-lab/supply-dashboard" aria-label={brandLabel}>
+          <Link className="supply-ui-lab-brand" href="/dashboard/status" aria-label={brandLabel}>
             <Image alt="" height={58} src={SUPPLY_UI_LAB_LOGO} unoptimized width={58} />
             <strong>{brandLabel}</strong>
           </Link>
@@ -62,29 +69,56 @@ export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
         </div>
       ) : (
         <>
-          <Link className="supply-ui-lab-brand" href="/ui-lab/supply-dashboard" aria-label={brandLabel}>
+          <Link className="supply-ui-lab-brand" href="/dashboard/status" aria-label={brandLabel}>
             <Image alt="" height={58} src={SUPPLY_UI_LAB_LOGO} unoptimized width={58} />
             <strong>{brandLabel}</strong>
           </Link>
-          <nav className="supply-ui-lab-tabs" role="tablist" aria-label="补给站分区">
-            {supplyUiLabTabs.map((tab) => {
-              const isActive = tab.label === activeLabel;
+          <div className="supply-ui-lab-nav-cluster">
+            {props.returnAction ? (
+              <button className="supply-ui-lab-return-action" onClick={props.returnAction.onClick} type="button">
+                <span aria-hidden="true">←</span>
+                {props.returnAction.label}
+              </button>
+            ) : null}
+            <nav className="supply-ui-lab-tabs" role="tablist" aria-label="补给站分区">
+              {supplyUiLabTabs.map((tab) => {
+                const isActive = tab.label === activeLabel;
 
-              return (
-                <Link
-                  aria-current={isActive ? "page" : undefined}
-                  aria-selected={isActive}
-                  className={`supply-ui-lab-topbar-tab supply-ui-lab-topbar-tab--${tab.id}`}
-                  href={tab.href}
-                  key={tab.id}
-                  role="tab"
-                >
-                  <span aria-hidden="true">{tab.icon}</span>
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </nav>
+                const className = `supply-ui-lab-topbar-tab supply-ui-lab-topbar-tab--${tab.id}`;
+
+                if (props.onSelectTab) {
+                  return (
+                    <button
+                      aria-current={isActive ? "page" : undefined}
+                      aria-selected={isActive}
+                      className={className}
+                      key={tab.id}
+                      onClick={() => props.onSelectTab?.(tab.id)}
+                      role="tab"
+                      type="button"
+                    >
+                      <span aria-hidden="true">{tab.icon}</span>
+                      {tab.label}
+                    </button>
+                  );
+                }
+
+                return (
+                  <Link
+                    aria-current={isActive ? "page" : undefined}
+                    aria-selected={isActive}
+                    className={className}
+                    href={tab.href}
+                    key={tab.id}
+                    role="tab"
+                  >
+                    <span aria-hidden="true">{tab.icon}</span>
+                    {tab.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
           <strong className="supply-ui-lab-current-page">{activeLabel}</strong>
         </>
       )}

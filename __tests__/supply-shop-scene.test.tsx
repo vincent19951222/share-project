@@ -34,7 +34,7 @@ describe("SupplyShopScene", () => {
     expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
     expect(container.querySelector(".supply-shop-resource-card")).toBeNull();
     expect(container.querySelector("a.supply-shop-back-link")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard",
+      "/dashboard/status",
     );
     expect(container.querySelectorAll(".supply-shop-category-list button")).toHaveLength(6);
     expect(container.querySelector(".supply-shop-category-list button[aria-current='page']")?.textContent).toContain(
@@ -70,7 +70,7 @@ describe("SupplyShopScene", () => {
     expect(container.querySelectorAll("[data-testid='supply-shop-product-card'] img").length).toBeGreaterThan(0);
     expect(container.querySelector('a[href="#rules"]')).toBeNull();
     expect(container.textContent).toContain("本页规则");
-    expect(container.textContent).toContain("来源：抽卡池 / 商店");
+    expect(container.textContent).toContain("来源：抽奖池 / 商店");
     expect(container.textContent).toContain("持有 2");
     expect(container.textContent).toContain("银子 150");
     expect(container.textContent).toContain("本地预览：兑换不会写入后端");

@@ -135,7 +135,7 @@ describe("SupplyStation legacy entry", () => {
     vi.resetModules();
   });
 
-  it("renders the production shell through the stable SupplyStation export", async () => {
+  it("renders the UI Lab production scene through the stable SupplyStation export", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot() })));
     const { SupplyStation } = await import("@/components/gamification/SupplyStation");
 
@@ -149,7 +149,8 @@ describe("SupplyStation legacy entry", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.querySelector(".supply-production-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-production-shell")).toBeNull();
     expect(container.textContent).toContain("牛马补给站");
     expect(container.textContent).toContain("工位重启");
 

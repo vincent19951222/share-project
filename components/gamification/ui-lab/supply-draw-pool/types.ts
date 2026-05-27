@@ -33,6 +33,7 @@ export type SupplyDrawPoolMachineAction = {
   label: string;
   drawCount: number;
   costTicket: number;
+  disabled?: boolean;
   tone: "single" | "ten";
   guaranteeLabel: "单抽无保底" | "十连批次保底";
 };

@@ -32,10 +32,10 @@ describe("SupplyDrawPoolScene", () => {
     expect(container.querySelector(".supply-draw-pool-topbar-image")).toBeNull();
     expect(container.querySelector(".supply-draw-pool-wallet-image")).toBeNull();
     expect(container.querySelector("a.supply-draw-pool-close")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard",
+      "/dashboard/status",
     );
     expect(container.querySelector("a.supply-draw-pool-back")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard",
+      "/dashboard/status",
     );
     expect(container.querySelector(".supply-draw-pool-resource-pill b")).toBeNull();
     expect(container.textContent).toContain("当前拥有");

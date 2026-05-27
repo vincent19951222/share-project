@@ -38,7 +38,7 @@ describe("SupplyBackpackScene", () => {
     expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
     expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
     expect(container.querySelector(".supply-ui-lab-close")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard",
+      "/dashboard/status",
     );
     expect(container.querySelector(".supply-backpack-sidebar-title-icon")?.getAttribute("src")).toBe(
       supplyUiLabResourceIconPaths.backpack,
@@ -162,7 +162,7 @@ describe("SupplyBackpackScene", () => {
     expect(detail?.textContent).toContain("管理员确认后兑换 1 杯瑞幸咖啡");
   });
 
-  it("shows local feedback for use and redemption actions and keeps shop CTA in UI Lab", async () => {
+  it("shows local feedback for use and redemption actions and keeps shop CTA on the formal store route", async () => {
     await act(async () => {
       root.render(<SupplyBackpackScene data={supplyBackpackMock} />);
     });
@@ -183,7 +183,7 @@ describe("SupplyBackpackScene", () => {
 
     expect(container.querySelector("[role='status']")?.textContent).toContain("申请兑换已模拟");
     expect(container.querySelector(".supply-backpack-shop-cta a")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard/shop",
+      "/dashboard/store",
     );
   });
 });

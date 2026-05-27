@@ -5,27 +5,10 @@ import {
 } from "../supply-data/catalog";
 import { supplyUiLabResources } from "../supply-data/resources";
 import type { SupplyUiLabCatalogItem, SupplyUiLabCoinRewardRow } from "../supply-data/types";
+import { supplyDrawPoolAssetPaths } from "./assets";
 import type { SupplyDrawPoolPreview, SupplyDrawPoolRewardRow } from "./types";
 
-export const supplyDrawPoolAssetPaths = {
-  logo: "/logo.png",
-  cowLogo: "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
-  background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
-  drawPool: {
-    machine: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.png",
-    capsuleBed: "/assets/home-scenes/supply/draw-pool/draw-pool-capsule-bed.webp",
-    guideMascot: "/assets/home-scenes/supply/draw-pool/draw-pool-guide-mascot.webp",
-    wristband: "/assets/home-scenes/supply/draw-pool/draw-pool-wristband.webp",
-    runningShoe: "/assets/home-scenes/supply/draw-pool/draw-pool-running-shoe.webp",
-  },
-  rewardIcons: {
-    ticket: "/gamification/rewards/icons/task_reroll_coupon.png",
-    coins: "/gamification/rewards/icons/coins_120.png",
-    exp: "/gamification/rewards/icons/small_boost_coupon.png",
-    coffee: "/gamification/rewards/icons/luckin_coffee_coupon.png",
-    social: "/gamification/rewards/icons/team_broadcast_coupon.png",
-  },
-} as const;
+export { supplyDrawPoolAssetPaths };
 
 const coinRewardToDrawRow = (row: SupplyUiLabCoinRewardRow): SupplyDrawPoolRewardRow => ({
   id: row.rewardId,
@@ -60,7 +43,7 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
   },
   topBar: {
     resources: supplyUiLabResources.drawPool,
-    closeHref: "/ui-lab/supply-dashboard",
+    closeHref: "/dashboard/status",
   },
   wallet: {
     ticketIcon: supplyDrawPoolAssetPaths.rewardIcons.ticket,
@@ -121,6 +104,6 @@ export const supplyDrawPoolMock: SupplyDrawPoolPreview = {
     "十连批次如果自然十连没有实用、社交或稀有奖励，则补 1 个合格奖励。",
   ],
   probabilityHref: "/docs?tab=rules#supply-station-probability",
-  recordsHref: "/ui-lab/supply-dashboard/task-record",
-  backHref: "/ui-lab/supply-dashboard",
+  recordsHref: "/dashboard/quest",
+  backHref: "/dashboard/status",
 };

@@ -46,7 +46,7 @@ export function TaskCardReviewScene({
   return (
     <main className="supply-task-card-review-scene" aria-label="任务卡 3:4 组合评审">
       <header className="supply-task-card-review-header">
-        <a href="/ui-lab/supply-dashboard">返回 Dashboard</a>
+        <a href="/dashboard/status">返回 Dashboard</a>
         <div>
           <p>Task Card Review</p>
           <h1>3:4 今日主线任务卡</h1>

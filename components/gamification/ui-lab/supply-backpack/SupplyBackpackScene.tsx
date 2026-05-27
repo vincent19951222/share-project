@@ -33,7 +33,19 @@ function isCategoryMatch(item: SupplyBackpackInventoryItem, categoryId: SupplyBa
   return categoryId === "all" || item.categoryId === categoryId;
 }
 
-export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
+export function SupplyBackpackScene({
+  data,
+  onRequestRedemption,
+  onSelectItem,
+  onUseItem,
+  selectedItemId: controlledSelectedItemId,
+}: {
+  data: SupplyBackpackPreview;
+  onRequestRedemption?: (itemId: string) => void;
+  onSelectItem?: (itemId: string) => void;
+  onUseItem?: (itemId: string) => void;
+  selectedItemId?: string | null;
+}) {
   const [brandLabel = "牛马补给站", activeLabel = "背包"] = data.topBar.breadcrumb;
   const [page, setPage] = useState(data.inventory.page);
   const [selectedCategoryId, setSelectedCategoryId] = useState<SupplyBackpackCategoryId>(
@@ -41,6 +53,7 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
   );
   const [selectedItemId, setSelectedItemId] = useState(data.selectedItemDetail.itemId);
   const [actionLabel, setActionLabel] = useState<string | null>(null);
+  const activeSelectedItemId = controlledSelectedItemId ?? selectedItemId;
   const inventoryItems = useMemo(() => getInventoryItems(data.inventory.slots), [data.inventory.slots]);
   const filteredInventoryItems = useMemo(
     () => inventoryItems.filter((item) => isCategoryMatch(item, selectedCategoryId)),
@@ -54,13 +67,13 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
 
   const selectedDetail =
     useMemo(
-      () => data.itemDetails.find((detail) => detail.itemId === selectedItemId),
-      [data.itemDetails, selectedItemId],
+      () => data.itemDetails.find((detail) => detail.itemId === activeSelectedItemId),
+      [activeSelectedItemId, data.itemDetails],
     ) ?? data.selectedItemDetail;
 
   function handleSelectCategory(categoryId: SupplyBackpackCategoryId) {
     const categoryItems = inventoryItems.filter((item) => isCategoryMatch(item, categoryId));
-    const selectedItemStillVisible = categoryItems.some((item) => item.id === selectedItemId);
+    const selectedItemStillVisible = categoryItems.some((item) => item.id === activeSelectedItemId);
 
     setSelectedCategoryId(categoryId);
     setPage(1);
@@ -68,6 +81,7 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
 
     if (!selectedItemStillVisible && categoryItems[0]) {
       setSelectedItemId(categoryItems[0].id);
+      onSelectItem?.(categoryItems[0].id);
     }
   }
 
@@ -78,7 +92,7 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
         <SupplyUiLabTopBar
           activeLabel={activeLabel}
           brandLabel={brandLabel}
-          closeHref="/ui-lab/supply-dashboard"
+          closeHref="/dashboard/status"
           resources={data.topBar.resources}
           variant="breadcrumb"
         />
@@ -92,17 +106,20 @@ export function SupplyBackpackScene({ data }: { data: SupplyBackpackPreview }) {
             data={data}
             inventoryItems={filteredInventoryItems}
             page={safePage}
-            selectedItemId={selectedItemId}
+            selectedItemId={activeSelectedItemId}
             totalPages={totalPages}
             onPageChange={setPage}
             onSelectItem={(itemId) => {
               setSelectedItemId(itemId);
+              onSelectItem?.(itemId);
               setActionLabel(null);
             }}
           />
           <BackpackDetailPanel
             actionLabel={actionLabel}
             detail={selectedDetail}
+            onRequestRedemption={onRequestRedemption}
+            onUseItem={onUseItem}
             onAction={setActionLabel}
           />
         </section>
@@ -165,7 +182,7 @@ function BackpackSidebar({
           })}
         </nav>
         <div className="supply-backpack-sidebar-controls" aria-label="背包操作">
-          <Link href="/ui-lab/supply-dashboard" className="supply-backpack-back-link">
+          <Link href="/dashboard/status" className="supply-backpack-back-link">
             返回大厅
           </Link>
         </div>
@@ -317,11 +334,42 @@ function BackpackDetailPanel({
   detail,
   actionLabel,
   onAction,
+  onRequestRedemption,
+  onUseItem,
 }: {
   detail: SupplyBackpackSelectedDetail;
   actionLabel: string | null;
   onAction: (label: string) => void;
+  onRequestRedemption?: (itemId: string) => void;
+  onUseItem?: (itemId: string) => void;
 }) {
+  function handlePrimaryAction() {
+    if (detail.requiresAdminConfirmation && onRequestRedemption) {
+      onRequestRedemption(detail.itemId);
+      return;
+    }
+
+    if (onUseItem) {
+      onUseItem(detail.itemId);
+      return;
+    }
+
+    onAction(`${detail.primaryAction}已模拟`);
+  }
+
+  function handleSecondaryAction() {
+    if (detail.requiresAdminConfirmation && onRequestRedemption) {
+      onRequestRedemption(detail.itemId);
+      return;
+    }
+
+    onAction(
+      detail.requiresAdminConfirmation
+        ? `${detail.secondaryAction}已模拟，${detail.redemptionStateLabel ?? "等待管理员确认"}`
+        : `${detail.secondaryAction}已模拟`,
+    );
+  }
+
   return (
     <section
       className="supply-backpack-detail supply-backpack-detail-card"
@@ -365,10 +413,11 @@ function BackpackDetailPanel({
       <div className="supply-backpack-actions">
         <button
           className="supply-backpack-use-button"
+          data-action={detail.requiresAdminConfirmation ? "request-redemption" : "use-item"}
           data-action-state={detail.actionState}
           disabled={detail.actionState === "active" || detail.actionState === "unavailable"}
           type="button"
-          onClick={() => onAction(`${detail.primaryAction}已模拟`)}
+          onClick={handlePrimaryAction}
         >
           {detail.actionState === "active"
             ? "今日已生效"
@@ -379,14 +428,9 @@ function BackpackDetailPanel({
                 : detail.primaryAction}
         </button>
         <button
+          data-action={detail.requiresAdminConfirmation ? "request-redemption" : undefined}
           type="button"
-          onClick={() =>
-            onAction(
-              detail.requiresAdminConfirmation
-                ? `${detail.secondaryAction}已模拟，${detail.redemptionStateLabel ?? "等待管理员确认"}`
-                : `${detail.secondaryAction}已模拟`,
-            )
-          }
+          onClick={handleSecondaryAction}
         >
           {detail.secondaryAction}
         </button>

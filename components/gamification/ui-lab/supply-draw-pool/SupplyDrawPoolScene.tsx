@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,7 +11,7 @@ import {
   SupplyUiLabStatusBadge,
 } from "../supply-dashboard/SupplyUiLabPrimitives";
 import { supplyUiLabResourceIconPaths } from "../supply-data/resources";
-import type { SupplyDrawPoolPreview, SupplyDrawPoolRewardRow } from "./types";
+import type { SupplyDrawPoolActionId, SupplyDrawPoolPreview, SupplyDrawPoolRewardRow } from "./types";
 
 function DrawPoolTopBar({ data, ticketBalance }: { data: SupplyDrawPoolPreview; ticketBalance: number }) {
   return (
@@ -104,7 +104,7 @@ function DrawMachineStage({
   ticketBalance,
 }: {
   data: SupplyDrawPoolPreview;
-  onDraw: (drawCount: number) => void;
+  onDraw: (actionId: SupplyDrawPoolActionId, drawCount: number) => void;
   ticketBalance: number;
 }) {
   return (
@@ -141,7 +141,7 @@ function DrawMachineStage({
         <div className="supply-draw-pool-machine-controls" data-control-style="arcade">
           {data.machine.actions.map((action) => {
             const shortage = Math.max(0, action.costTicket - ticketBalance);
-            const disabled = shortage > 0;
+            const disabled = action.disabled ?? shortage > 0;
 
             return (
               <button
@@ -149,10 +149,11 @@ function DrawMachineStage({
                   disabled ? `，抽奖券不足，还差 ${shortage} 张` : ""
                 }`}
                 className={`supply-ui-lab-action supply-draw-pool-action supply-draw-pool-action--${action.tone}`}
+                data-action={action.id === "single" ? "draw-single" : "draw-ten"}
                 data-priority={action.id === "ten" ? "primary" : "secondary"}
                 disabled={disabled}
                 key={action.id}
-                onClick={() => onDraw(action.drawCount)}
+                onClick={() => onDraw(action.id, action.drawCount)}
                 type="button"
               >
                 <strong>
@@ -299,13 +300,28 @@ function RecentDropsPanel({ data }: { data: SupplyDrawPoolPreview }) {
   );
 }
 
-export function SupplyDrawPoolScene({ data }: { data: SupplyDrawPoolPreview }) {
+export function SupplyDrawPoolScene({
+  data,
+  onDraw,
+}: {
+  data: SupplyDrawPoolPreview;
+  onDraw?: (actionId: SupplyDrawPoolActionId) => void;
+}) {
   const [ticketBalance, setTicketBalance] = useState(data.wallet.ticketBalance);
   const [resultLabel, setResultLabel] = useState<string | null>(null);
   const [drawResults, setDrawResults] = useState(data.singleDrawResult);
   const emptyDrawMessage = useMemo(() => data.emptyDrawMessage, [data.emptyDrawMessage]);
 
-  function handleDraw(drawCount: number) {
+  useEffect(() => {
+    setTicketBalance(data.wallet.ticketBalance);
+  }, [data.wallet.ticketBalance]);
+
+  function handleDraw(actionId: SupplyDrawPoolActionId, drawCount: number) {
+    if (onDraw) {
+      onDraw(actionId);
+      return;
+    }
+
     if (ticketBalance < drawCount) {
       setDrawResults([]);
       setResultLabel(emptyDrawMessage);
@@ -323,12 +339,12 @@ export function SupplyDrawPoolScene({ data }: { data: SupplyDrawPoolPreview }) {
 
   function handleContinueTenDraw() {
     if (ticketBalance >= 10) {
-      handleDraw(10);
+      handleDraw("ten", 10);
     }
   }
 
   return (
-    <main className="supply-draw-pool-scene" aria-label="抽卡池 UI Lab">
+    <main className="supply-draw-pool-scene" aria-label="抽奖池">
       <div className="supply-draw-pool-background" aria-hidden="true">
         <Image alt="" fill priority sizes="100vw" src={data.media.background} unoptimized />
       </div>

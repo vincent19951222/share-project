@@ -34,11 +34,11 @@ export function SupplyDrawPoolPanel({
   const isBusy = activeAction !== null;
 
   return (
-    <section className="supply-production-draw-pool" aria-label="抽卡池">
+    <section className="supply-production-draw-pool" aria-label="抽奖池">
       <header className="supply-production-draw-pool__header">
         <div>
           <p>补给抽卡机</p>
-          <h2>抽卡池</h2>
+          <h2>抽奖池</h2>
         </div>
         <article className="supply-production-draw-pool__wallet" aria-label="抽奖券钱包">
           <span>抽奖券</span>

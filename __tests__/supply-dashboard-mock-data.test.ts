@@ -47,10 +47,10 @@ describe("supply dashboard mock data", () => {
     expect(serializedAssets).not.toMatch(/dashboard-(status|hero|quests|shortcut|announcement)-panel/);
     expect(serializedMock).not.toMatch(/panelImages/);
     expect(supplyDashboardMock.shortcutLinks.map((link) => link.href)).toEqual([
-      "/ui-lab/supply-dashboard",
-      "/ui-lab/supply-dashboard/backpack",
-      "/ui-lab/supply-dashboard/draw-pool",
-      "/ui-lab/supply-dashboard/task-record",
+      "/dashboard/status",
+      "/dashboard/backpack",
+      "/dashboard/cards",
+      "/dashboard/quest",
     ]);
     expect(supplyDashboardAssetPaths.hero).toBe("/assets/home-scenes/supply/dashboard/niuma-hero.webp");
     expect(supplyDashboardAssetPaths.levelAvatar).toBe("/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png");

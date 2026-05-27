@@ -1,7 +1,7 @@
 import { supplyUiLabCatalog } from "../supply-data/catalog";
-import { supplyUiLabCategoryIcons } from "../supply-data/category-icons";
 import { supplyUiLabResources } from "../supply-data/resources";
 import type { SupplyUiLabCatalogCategory, SupplyUiLabUseTiming } from "../supply-data/types";
+import { supplyShopAssetPaths } from "./assets";
 import type {
   SupplyShopCategory,
   SupplyShopCategoryId,
@@ -12,10 +12,7 @@ import type {
   SupplyShopRarity,
 } from "./types";
 
-export const supplyShopAssetPaths = {
-  profileAvatar: "/avatars/male1.png",
-  categoryIcons: supplyUiLabCategoryIcons,
-} as const;
+export { supplyShopAssetPaths };
 
 const categoryMeta: Record<SupplyShopCategoryId, { label: string; icon: string; iconImage: string }> = {
   all: { label: "全部商品", icon: "▦", iconImage: supplyShopAssetPaths.categoryIcons.all },
@@ -84,7 +81,7 @@ function buildProduct(item: (typeof supplyUiLabCatalog)[number], index: number):
       amount: item.shop.priceCoins,
     },
     ownedQuantity: item.inventory.quantity,
-    sourceLabel: "来源：抽卡池 / 商店",
+    sourceLabel: "来源：抽奖池 / 商店",
     limitLabel,
     requiresAdminConfirmation: item.shop.requiresAdminConfirmation,
     selected: index === 0,
@@ -109,7 +106,7 @@ function buildProductDetail(item: (typeof supplyUiLabCatalog)[number]): SupplySh
     useTimingId: item.useTiming,
     purchaseLimit: formatLimit(item),
     costLabel: `银子 ${item.shop.priceCoins}`,
-    sourceLabel: "来源：抽卡池 / 商店",
+    sourceLabel: "来源：抽奖池 / 商店",
     ownedLabel: `持有 ${item.inventory.quantity}`,
     adminConfirmationLabel,
     footnote: item.shop.requiresAdminConfirmation
@@ -161,7 +158,7 @@ export const supplyShopMock: SupplyShopPreview = {
   products,
   productDetails,
   selectedProductDetail: productDetails[0],
-  notice: "商店商品与抽卡池 active 道具保持一致，当前页面仅做本地兑换预览。",
+  notice: "商店商品与抽奖池 active 道具保持一致，当前页面仅做本地兑换预览。",
   rules: [
     "商品来源统一为共享 catalog，银子奖励不会作为商品出售。",
     "虚拟道具点击兑换后只展示已加入背包的本地反馈。",

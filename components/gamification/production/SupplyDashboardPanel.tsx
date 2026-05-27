@@ -170,7 +170,7 @@ export function SupplyDashboardPanel({
 
       <nav className="supply-production-dashboard__shortcuts" aria-label="补给站快捷入口">
         <button onClick={() => onNavigate("draw-pool")} type="button">
-          去抽卡池
+          去抽奖池
         </button>
         <button onClick={() => onNavigate("backpack")} type="button">
           看背包

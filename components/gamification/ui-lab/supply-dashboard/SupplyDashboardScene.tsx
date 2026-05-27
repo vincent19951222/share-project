@@ -11,10 +11,11 @@ import {
   SupplyUiLabPixelPanel,
   SupplyUiLabProgress,
 } from "./SupplyUiLabPrimitives";
-import { SupplyUiLabTopBar, type SupplyUiLabResource } from "./SupplyUiLabTopBar";
+import { SupplyUiLabTopBar, type SupplyUiLabResource, type SupplyUiLabTopBarTabId } from "./SupplyUiLabTopBar";
 import type {
   SupplyDashboardPreview,
   SupplyDashboardQuest,
+  SupplyDashboardShortcutLink,
 } from "./types";
 
 function formatResource(value: number, maxValue?: number) {
@@ -138,6 +139,9 @@ function HeroCharacterStage({ data }: { data: SupplyDashboardPreview }) {
             showPercent
           />
         </div>
+        <span className="supply-dashboard-exp-value">
+          {data.profile.currentLevelExp}/{data.profile.nextLevelExp}
+        </span>
         <p>距离升级还差 {remainingExp} EXP</p>
         <Image
           alt=""
@@ -187,7 +191,7 @@ function QuestCard({
 }: {
   onComplete: (questId: string) => void;
   index: number;
-  onReroll: (questTitle: string) => void;
+  onReroll: (questId: string) => void;
   quest: SupplyDashboardQuest;
 }) {
   const stateLabel = quest.completed ? "已完成" : "进行中";
@@ -209,6 +213,7 @@ function QuestCard({
       {!quest.completed ? (
         <button
           className="supply-dashboard-quest-card-hitbox"
+          data-action="complete-task"
           onClick={() => onComplete(quest.id)}
           type="button"
           aria-label={`打卡：${quest.title}`}
@@ -227,7 +232,8 @@ function QuestCard({
         </span>
         <button
           className="supply-task-card-icon-action supply-task-card-icon-action--reroll supply-task-card-reroll"
-          onClick={() => onReroll(quest.title)}
+          data-action="reroll-task"
+          onClick={() => onReroll(quest.id)}
           type="button"
           aria-label={`更换任务：${quest.title}`}
           title={`换一个：${quest.title}`}
@@ -247,7 +253,7 @@ function DailyQuestPanel({
 }: {
   onClaimRewards: () => void;
   onCompleteQuest: (questId: string) => void;
-  onRerollQuest: (questTitle: string) => void;
+  onRerollQuest: (questId: string) => void;
   quests: SupplyDashboardQuest[];
 }) {
   const completedCount = quests.filter((quest) => quest.completed).length;
@@ -289,6 +295,7 @@ function DailyQuestPanel({
         </p>
         <button
           className="supply-ui-lab-action supply-ui-lab-action--primary"
+          data-action="claim-ticket"
           onClick={onClaimRewards}
           type="button"
         >
@@ -357,7 +364,13 @@ function TaskCompletionConfirmDialog({
   );
 }
 
-function DashboardShortcutDock({ data }: { data: SupplyDashboardPreview }) {
+function DashboardShortcutDock({
+  data,
+  onNavigate,
+}: {
+  data: SupplyDashboardPreview;
+  onNavigate?: (target: SupplyDashboardShortcutLink["id"]) => void;
+}) {
   return (
     <nav className="supply-dashboard-shortcut-dock" aria-label="快捷入口">
       {data.shortcutLinks.map((shortcut) => (
@@ -366,6 +379,14 @@ function DashboardShortcutDock({ data }: { data: SupplyDashboardPreview }) {
           data-priority={shortcut.id === "home" ? "primary" : "secondary"}
           href={shortcut.href}
           key={shortcut.id}
+          onClick={(event) => {
+            if (!onNavigate) {
+              return;
+            }
+
+            event.preventDefault();
+            onNavigate(shortcut.id);
+          }}
         >
           <span className="supply-dashboard-shortcut-icon" aria-hidden="true">
             {shortcut.image ? (
@@ -397,16 +418,31 @@ function TeamAnnouncementBar({ message }: { message: string }) {
 
 export function SupplyDashboardScene({
   data,
+  feedbackMessage: controlledFeedbackMessage,
+  onBackToPunch,
+  onClaimRewards,
+  onCompleteQuest,
+  onNavigate,
+  onRerollQuest,
+  onSelectSupplyTab,
 }: {
   data: SupplyDashboardPreview;
+  feedbackMessage?: string | null;
+  onBackToPunch?: () => void;
+  onClaimRewards?: () => void;
+  onCompleteQuest?: (questId: string) => void;
+  onNavigate?: (target: SupplyDashboardShortcutLink["id"]) => void;
+  onRerollQuest?: (questId: string) => void;
+  onSelectSupplyTab?: (tabId: SupplyUiLabTopBarTabId) => void;
 }) {
   const [dailyQuests, setDailyQuests] = useState(() => data.dailyQuests);
   const [feedbackMessage, setFeedbackMessage] = useState("本地预览：任务换班和奖励领取不会写入后端。");
   const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
-  const pendingQuest = dailyQuests.find((quest) => quest.id === pendingQuestId) ?? null;
+  const quests = onCompleteQuest ? data.dailyQuests : dailyQuests;
+  const pendingQuest = quests.find((quest) => quest.id === pendingQuestId) ?? null;
 
   function handleOpenCompleteQuest(questId: string) {
-    const quest = dailyQuests.find((candidate) => candidate.id === questId);
+    const quest = quests.find((candidate) => candidate.id === questId);
 
     if (!quest || quest.completed) {
       return;
@@ -424,30 +460,46 @@ export function SupplyDashboardScene({
       return;
     }
 
-    setDailyQuests((currentQuests) =>
-      currentQuests.map((quest) =>
-        quest.id === pendingQuest.id
-          ? {
-              ...quest,
-              completed: true,
-            }
-          : quest,
-      ),
-    );
-    setFeedbackMessage(`已完成打卡：${pendingQuest.title}。这是本地 demo 状态，刷新后会恢复 mock 数据。`);
+    if (onCompleteQuest) {
+      onCompleteQuest(pendingQuest.id);
+    } else {
+      setDailyQuests((currentQuests) =>
+        currentQuests.map((quest) =>
+          quest.id === pendingQuest.id
+            ? {
+                ...quest,
+                completed: true,
+              }
+            : quest,
+        ),
+      );
+      setFeedbackMessage(`已完成打卡：${pendingQuest.title}。这是本地 demo 状态，刷新后会恢复 mock 数据。`);
+    }
     setPendingQuestId(null);
   }
 
-  function handleRerollQuest(questTitle: string) {
+  function handleRerollQuest(questId: string) {
+    if (onRerollQuest) {
+      onRerollQuest(questId);
+      return;
+    }
+
+    const questTitle = quests.find((quest) => quest.id === questId)?.title ?? questId;
+
     setFeedbackMessage(`已触发换班预览：${questTitle}。mock 数据保持不变。`);
   }
 
   function handleClaimRewards() {
+    if (onClaimRewards) {
+      onClaimRewards();
+      return;
+    }
+
     setFeedbackMessage("奖励领取预览：EXP、银子和抽奖券只展示反馈，不写入后端。");
   }
 
   return (
-    <main className="supply-dashboard-scene" aria-label="牛马补给站 Dashboard UI Lab">
+    <main className="supply-dashboard-scene" aria-label="牛马补给站">
       <div className="supply-dashboard-background" aria-hidden="true">
         <Image
           alt=""
@@ -462,6 +514,15 @@ export function SupplyDashboardScene({
       <div className="supply-dashboard-content">
         <SupplyUiLabTopBar
           activeLabel="我的状态"
+          onSelectTab={onSelectSupplyTab}
+          returnAction={
+            onBackToPunch
+              ? {
+                  label: "回到打卡",
+                  onClick: onBackToPunch,
+                }
+              : undefined
+          }
           profile={{
             username: data.profile.username,
             avatar: data.profile.avatar,
@@ -476,7 +537,7 @@ export function SupplyDashboardScene({
             onClaimRewards={handleClaimRewards}
             onCompleteQuest={handleOpenCompleteQuest}
             onRerollQuest={handleRerollQuest}
-            quests={dailyQuests}
+            quests={quests}
           />
           {pendingQuest ? (
             <TaskCompletionConfirmDialog
@@ -486,9 +547,9 @@ export function SupplyDashboardScene({
             />
           ) : null}
           <p aria-live="polite" className="supply-dashboard-local-feedback" data-dashboard-feedback>
-            {feedbackMessage}
+            {controlledFeedbackMessage ?? feedbackMessage}
           </p>
-          <DashboardShortcutDock data={data} />
+          <DashboardShortcutDock data={data} onNavigate={onNavigate} />
           <TeamAnnouncementBar message={data.announcement.message} />
         </section>
       </div>

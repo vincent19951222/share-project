@@ -43,7 +43,7 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.querySelector(".supply-ui-lab-resource--ticket")?.textContent).toContain("抽奖券");
     expect(container.querySelector(".supply-ui-lab-resource--backpack")?.textContent).toContain("18/60");
     expect(container.querySelector("a.supply-task-record-back-link")?.getAttribute("href")).toBe(
-      "/ui-lab/supply-dashboard",
+      "/dashboard/status",
     );
     expect(container.querySelector(".supply-task-record-aside")).toBeNull();
     expect(container.querySelectorAll(".supply-task-record-view-all")).toHaveLength(0);

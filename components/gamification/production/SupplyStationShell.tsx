@@ -15,21 +15,26 @@ import {
   useGamificationItem,
   type UseGamificationItemRequest,
 } from "@/lib/api";
+import { SupplyBackpackScene } from "@/components/gamification/ui-lab/supply-backpack/SupplyBackpackScene";
+import { SupplyDashboardScene } from "@/components/gamification/ui-lab/supply-dashboard/SupplyDashboardScene";
+import type { SupplyUiLabTopBarTabId } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
+import { SupplyDrawPoolScene } from "@/components/gamification/ui-lab/supply-draw-pool/SupplyDrawPoolScene";
+import { SupplyShopScene } from "@/components/gamification/ui-lab/supply-shop/SupplyShopScene";
+import { SupplyTaskRecordScene } from "@/components/gamification/ui-lab/supply-task-record/SupplyTaskRecordScene";
 import type {
   GamificationDimensionSnapshot,
   GamificationLotteryDrawSnapshot,
   SupplyStationProductionSnapshot,
 } from "@/lib/types";
 import {
-  SupplyBackpackPanel,
-  type SupplyBackpackUseTarget,
-} from "./SupplyBackpackPanel";
-import { SupplyDashboardPanel } from "./SupplyDashboardPanel";
-import { SupplyDrawPoolPanel } from "./SupplyDrawPoolPanel";
-import { SupplyShopPanel } from "./SupplyShopPanel";
-import { SupplyTaskRecordPanel } from "./SupplyTaskRecordPanel";
+  toSupplyBackpackPreview,
+  toSupplyDashboardPreview,
+  toSupplyDrawPoolPreview,
+  toSupplyShopPreview,
+  toSupplyTaskRecordPreview,
+} from "./supply-ui-lab-adapters";
 
-type SupplyProductionPanel = "dashboard" | "drawPool" | "backpack" | "shop" | "taskRecord";
+export type SupplyProductionPanel = "dashboard" | "drawPool" | "backpack" | "shop" | "taskRecord";
 type SupplyDashboardAction = "complete-task" | "reroll-task" | "claim-ticket";
 type SupplyAction =
   | SupplyDashboardAction
@@ -45,9 +50,15 @@ interface SupplyErrorState {
   status: number | null;
 }
 
+export interface SupplyBackpackUseTarget {
+  dimensionKey?: string;
+  recipientUserId?: string;
+  message?: string;
+}
+
 const panelItems: Array<{ key: SupplyProductionPanel; label: string }> = [
   { key: "dashboard", label: "我的状态" },
-  { key: "drawPool", label: "抽卡池" },
+  { key: "drawPool", label: "抽奖池" },
   { key: "backpack", label: "背包" },
   { key: "shop", label: "补给商店" },
   { key: "taskRecord", label: "任务记录" },
@@ -65,14 +76,6 @@ function getSupplyErrorState(caught: unknown): SupplyErrorState {
     message: caught instanceof Error ? caught.message : "牛马补给站加载失败，稍后再试。",
     status: null,
   };
-}
-
-function isDashboardAction(action: SupplyAction | null): action is SupplyDashboardAction {
-  return action === "complete-task" || action === "reroll-task" || action === "claim-ticket";
-}
-
-function formatNumber(value: number) {
-  return new Intl.NumberFormat("zh-CN").format(value);
 }
 
 function normalizeBackpackUseTarget(
@@ -97,10 +100,18 @@ function normalizeBackpackUseTarget(
   };
 }
 
-export function SupplyStationShell() {
+export function SupplyStationShell({
+  initialPanel = "dashboard",
+  onBackToPunch,
+  onPanelChange,
+}: {
+  initialPanel?: SupplyProductionPanel;
+  onBackToPunch?: () => void;
+  onPanelChange?: (panel: SupplyProductionPanel) => void;
+}) {
   const [snapshot, setSnapshot] = useState<SupplyStationProductionSnapshot | null>(null);
-  const [activePanel, setActivePanel] = useState<SupplyProductionPanel>("dashboard");
-  const [activeAction, setActiveAction] = useState<SupplyAction | null>(null);
+  const [activePanel, setActivePanel] = useState<SupplyProductionPanel>(initialPanel);
+  const [, setActiveAction] = useState<SupplyAction | null>(null);
   const [latestDraw, setLatestDraw] = useState<GamificationLotteryDrawSnapshot | null>(null);
   const [selectedBackpackItemId, setSelectedBackpackItemId] = useState<string | null>(null);
   const [selectedShopItemId, setSelectedShopItemId] = useState<string | null>(null);
@@ -120,6 +131,18 @@ export function SupplyStationShell() {
   useEffect(() => {
     void loadSnapshot();
   }, [loadSnapshot]);
+
+  useEffect(() => {
+    setActivePanel(initialPanel);
+  }, [initialPanel]);
+
+  const selectPanel = useCallback(
+    (panel: SupplyProductionPanel) => {
+      setActivePanel(panel);
+      onPanelChange?.(panel);
+    },
+    [onPanelChange],
+  );
 
   const runAction = useCallback(
     async (action: SupplyAction, work: () => Promise<string | void>) => {
@@ -173,11 +196,11 @@ export function SupplyStationShell() {
       void runAction(drawType === "TEN" ? "draw-ten" : "draw-single", async () => {
         const result = await drawGamificationLottery({ drawType, useCoinTopUp });
         setLatestDraw(result.draw);
-        setActivePanel("drawPool");
+        selectPanel("drawPool");
         return drawType === "TEN" ? "十连完成" : "单抽完成";
       });
     },
-    [runAction],
+    [runAction, selectPanel],
   );
 
   const handleUseItem = useCallback(
@@ -224,55 +247,31 @@ export function SupplyStationShell() {
     [runAction],
   );
 
-  const handlePanelNavigation = useCallback((target: "draw-pool" | "backpack" | "shop" | "task-record") => {
+  const handlePanelNavigation = useCallback((target: "home" | "draw-pool" | "backpack" | "shop" | "task-record") => {
     const nextPanelByTarget: Record<typeof target, SupplyProductionPanel> = {
+      home: "dashboard",
       "draw-pool": "drawPool",
       backpack: "backpack",
       shop: "shop",
       "task-record": "taskRecord",
     };
 
-    setActivePanel(nextPanelByTarget[target]);
-  }, []);
+    selectPanel(nextPanelByTarget[target]);
+  }, [selectPanel]);
+
+  const handleTopBarTabNavigation = useCallback((tabId: SupplyUiLabTopBarTabId) => {
+    const nextPanelByTab: Record<SupplyUiLabTopBarTabId, SupplyProductionPanel> = {
+      status: "dashboard",
+      shop: "shop",
+      "task-record": "taskRecord",
+    };
+
+    selectPanel(nextPanelByTab[tabId]);
+  }, [selectPanel]);
 
   return (
-    <section className="supply-production-shell" aria-label="牛马补给站">
-      <header className="supply-production-shell__header">
-        <div>
-          <p>脱脂牛马</p>
-          <h1>牛马补给站</h1>
-        </div>
-        {snapshot ? (
-          <div className="supply-production-shell__resources" aria-label="补给站资源">
-            <span>Lv.{snapshot.profile.level}</span>
-            <span>{snapshot.resources.coins.label} {formatNumber(snapshot.resources.coins.value)}</span>
-            <span>{snapshot.resources.ticket.label} {formatNumber(snapshot.resources.ticket.value)}</span>
-            <span>
-              {snapshot.resources.backpack.label} {formatNumber(snapshot.resources.backpack.value)}/
-              {formatNumber(snapshot.resources.backpack.maxValue ?? 60)}
-            </span>
-          </div>
-        ) : null}
-        <nav className="supply-production-shell__links" aria-label="补给站文档">
-          <a href="/docs?tab=rules#supply-station-rules">玩法规则</a>
-          <a href="/docs?tab=rules#supply-station-probability">抽奖概率</a>
-        </nav>
-      </header>
-
-      <nav className="supply-production-shell__tabs" aria-label="补给站页面">
-        {panelItems.map((panel) => (
-          <button
-            aria-pressed={activePanel === panel.key}
-            key={panel.key}
-            onClick={() => setActivePanel(panel.key)}
-            type="button"
-          >
-            {panel.label}
-          </button>
-        ))}
-      </nav>
-
-      <div className="supply-production-shell__status" role="status">
+    <section className="supply-ui-lab-production-frame" aria-label="牛马补给站">
+      <div className="supply-ui-lab-production-status" role="status">
         {!snapshot && !error ? <p>补给站加载中...</p> : null}
         {error ? (
           <div>
@@ -289,56 +288,77 @@ export function SupplyStationShell() {
       </div>
 
       {snapshot ? (
-        <main className="supply-production-shell__main">
+        <>
+          <nav className="supply-ui-lab-production-nav" aria-label="补给站页面">
+            {panelItems.map((panel) => (
+              <button
+                aria-pressed={activePanel === panel.key}
+                key={panel.key}
+                onClick={() => selectPanel(panel.key)}
+                type="button"
+              >
+                {panel.label}
+              </button>
+            ))}
+            <a href="/docs?tab=rules#supply-station-rules">玩法规则</a>
+            <a href="/docs?tab=rules#supply-station-probability">抽奖概率</a>
+          </nav>
+
           {activePanel === "dashboard" ? (
-            <SupplyDashboardPanel
-              activeAction={isDashboardAction(activeAction) ? activeAction : null}
-              onClaimTicket={handleClaimTicket}
-              onCompleteTask={handleCompleteTask}
-              onNavigate={handlePanelNavigation}
-              onRerollTask={handleRerollTask}
-              snapshot={snapshot}
+            <SupplyDashboardScene
+              data={toSupplyDashboardPreview(snapshot)}
+              feedbackMessage={successMessage ?? "生产模式：操作会写入真实补给站数据。"}
+              onBackToPunch={onBackToPunch}
+              onClaimRewards={handleClaimTicket}
+              onCompleteQuest={(questId) => handleCompleteTask(questId as GamificationDimensionSnapshot["key"])}
+              onNavigate={(target) => handlePanelNavigation(target)}
+              onRerollQuest={(questId) => handleRerollTask(questId as GamificationDimensionSnapshot["key"])}
+              onSelectSupplyTab={handleTopBarTabNavigation}
             />
           ) : null}
 
           {activePanel === "drawPool" ? (
-            <SupplyDrawPoolPanel
-              activeAction={activeAction}
-              latestDraw={latestDraw}
-              onDraw={handleDraw}
-              snapshot={snapshot}
+            <SupplyDrawPoolScene
+              data={toSupplyDrawPoolPreview(snapshot, latestDraw)}
+              onDraw={(actionId) =>
+                handleDraw(
+                  actionId === "ten" ? "TEN" : "SINGLE",
+                  actionId === "ten" && snapshot.drawPool.lottery.tenDrawTopUpRequired > 0,
+                )
+              }
             />
           ) : null}
 
           {activePanel === "backpack" ? (
-            <SupplyBackpackPanel
-              activeAction={activeAction}
+            <SupplyBackpackScene
+              data={toSupplyBackpackPreview(snapshot, selectedBackpackItemId)}
               onRequestRedemption={handleRequestRedemption}
               onSelectItem={setSelectedBackpackItemId}
               onUseItem={handleUseItem}
               selectedItemId={selectedBackpackItemId}
-              snapshot={snapshot}
             />
           ) : null}
 
           {activePanel === "shop" ? (
-            <SupplyShopPanel
-              activeAction={activeAction}
+            <SupplyShopScene
+              data={toSupplyShopPreview(snapshot, selectedShopItemId)}
+              onBackToPunch={onBackToPunch}
               onPurchase={handlePurchase}
-              onSelectItem={setSelectedShopItemId}
-              selectedItemId={selectedShopItemId}
-              snapshot={snapshot}
+              onSelectProduct={setSelectedShopItemId}
+              onSelectSupplyTab={handleTopBarTabNavigation}
+              selectedProductId={selectedShopItemId}
             />
           ) : null}
 
           {activePanel === "taskRecord" ? (
-            <SupplyTaskRecordPanel
-              activeAction={activeAction}
+            <SupplyTaskRecordScene
+              data={toSupplyTaskRecordPreview(snapshot)}
+              onBackToPunch={onBackToPunch}
               onRespondSocialInvitation={handleRespondSocialInvitation}
-              snapshot={snapshot}
+              onSelectSupplyTab={handleTopBarTabNavigation}
             />
           ) : null}
-        </main>
+        </>
       ) : null}
     </section>
   );

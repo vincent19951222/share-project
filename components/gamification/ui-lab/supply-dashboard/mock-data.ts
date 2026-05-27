@@ -1,31 +1,12 @@
 import { supplyUiLabActiveEffects } from "../supply-data/effects";
 import { supplyUiLabResources } from "../supply-data/resources";
-import { taskCardIllustrationById } from "../task-cards/task-card-art";
+import { supplyDashboardAssetPaths } from "./assets";
 import type { SupplyDashboardPreview, SupplyDashboardResource } from "./types";
+
+export { supplyDashboardAssetPaths };
 
 export const DEFAULT_SUPPLY_DASHBOARD_MOTTO = "不是在健身，就是在去健身的路上！";
 export const DEFAULT_SUPPLY_DASHBOARD_TEAM_ANNOUNCEMENT = "团队公告：周六早上 8 点公园团练，记得来哦！";
-
-export const supplyDashboardAssetPaths = {
-  background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
-  hero: "/assets/home-scenes/supply/dashboard/niuma-hero.webp",
-  levelAvatar: "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
-  dockBackpack: "/assets/home-scenes/supply/dashboard/dock-backpack.webp",
-  dockSupplyMachine: "/assets/home-scenes/supply/dashboard/dock-supply-machine.webp",
-  dockTaskRecord: "/assets/home-scenes/supply/dashboard/dock-task-record.webp",
-  fallbackLogo: "/logo.png",
-  taskCards: {
-    hydration: taskCardIllustrationById.hydration_003,
-    movement: taskCardIllustrationById.movement_004,
-    social: taskCardIllustrationById.social_001,
-    learning: taskCardIllustrationById.learning_005,
-  },
-  rewardIcons: {
-    coin: "/gamification/rewards/icons/coins_020.png",
-    ticket: "/gamification/rewards/icons/task_reroll_coupon.png",
-    boost: "/gamification/rewards/icons/small_boost_coupon.png",
-  },
-} as const;
 
 function toDashboardResource(resource: {
   id: string;
@@ -129,7 +110,7 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
   shortcutLinks: [
     {
       id: "home",
-      href: "/ui-lab/supply-dashboard",
+      href: "/dashboard/status",
       title: "首页",
       subtitle: "查看你的今日状态",
       badge: "",
@@ -137,7 +118,7 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
     },
     {
       id: "backpack",
-      href: "/ui-lab/supply-dashboard/backpack",
+      href: "/dashboard/backpack",
       title: "背包",
       subtitle: "查看全部道具",
       badge: "18/60",
@@ -145,15 +126,15 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
     },
     {
       id: "draw-pool",
-      href: "/ui-lab/supply-dashboard/draw-pool",
-      title: "补给站",
+      href: "/dashboard/cards",
+      title: "抽奖池",
       subtitle: "随机获取道具、银子或真实福利！",
       badge: "999/999",
       image: supplyDashboardAssetPaths.dockSupplyMachine,
     },
     {
       id: "task-record",
-      href: "/ui-lab/supply-dashboard/task-record",
+      href: "/dashboard/quest",
       title: "任务记录",
       subtitle: "查看历史任务与奖励",
       badge: "",

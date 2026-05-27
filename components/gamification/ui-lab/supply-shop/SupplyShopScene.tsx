@@ -9,7 +9,10 @@ import {
   SupplyUiLabPixelPanel,
   SupplyUiLabStatusBadge,
 } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabPrimitives";
-import { SupplyUiLabTopBar } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
+import {
+  SupplyUiLabTopBar,
+  type SupplyUiLabTopBarTabId,
+} from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
 import { supplyUiLabResourceIconPaths } from "../supply-data/resources";
 import type {
   SupplyShopCategoryId,
@@ -112,7 +115,7 @@ function ShopSidebar({
             );
           })}
         </nav>
-        <Link className="supply-shop-back-link" href="/ui-lab/supply-dashboard">
+        <Link className="supply-shop-back-link" href="/dashboard/status">
           返回大厅
         </Link>
       </SupplyUiLabPixelPanel>
@@ -287,6 +290,7 @@ function ShopDetail({
         <p className="supply-shop-detail-footnote">{detail.footnote}</p>
         <button
           className="supply-shop-redeem-button supply-ui-lab-action supply-ui-lab-action--primary"
+          data-action="purchase-shop-item"
           data-action-state={detail.redeemState}
           disabled={detail.redeemState === "insufficient" || detail.redeemState === "limitReached"}
           onClick={onRedeem}
@@ -308,7 +312,21 @@ function ShopDetail({
   );
 }
 
-export function SupplyShopScene({ data }: { data: SupplyShopPreview }) {
+export function SupplyShopScene({
+  data,
+  onBackToPunch,
+  onPurchase,
+  onSelectProduct,
+  onSelectSupplyTab,
+  selectedProductId: controlledSelectedProductId,
+}: {
+  data: SupplyShopPreview;
+  onBackToPunch?: () => void;
+  onPurchase?: (itemId: string) => void;
+  onSelectProduct?: (itemId: string) => void;
+  onSelectSupplyTab?: (tabId: SupplyUiLabTopBarTabId) => void;
+  selectedProductId?: string | null;
+}) {
   const initialProductId = data.selectedProductDetail.productId;
   const [selectedCategoryId, setSelectedCategoryId] = useState<SupplyShopCategoryId>("all");
   const [selectedFilterId, setSelectedFilterId] = useState<SupplyShopFilterId>("all");
@@ -323,8 +341,9 @@ export function SupplyShopScene({ data }: { data: SupplyShopPreview }) {
     });
   }, [data.products, selectedCategoryId, selectedFilterId]);
 
+  const activeSelectedProductId = controlledSelectedProductId ?? selectedProductId;
   const selectedProduct =
-    data.products.find((product) => product.id === selectedProductId) ?? visibleProducts[0] ?? data.products[0];
+    data.products.find((product) => product.id === activeSelectedProductId) ?? visibleProducts[0] ?? data.products[0];
   const selectedDetail = findDetail(data, selectedProduct.id);
 
   function handleSelectCategory(categoryId: SupplyShopCategoryId) {
@@ -332,6 +351,7 @@ export function SupplyShopScene({ data }: { data: SupplyShopPreview }) {
     const nextProduct = data.products.find((product) => categoryId === "all" || product.categoryId === categoryId);
     if (nextProduct) {
       setSelectedProductId(nextProduct.id);
+      onSelectProduct?.(nextProduct.id);
     }
   }
 
@@ -345,25 +365,47 @@ export function SupplyShopScene({ data }: { data: SupplyShopPreview }) {
 
     if (nextProduct) {
       setSelectedProductId(nextProduct.id);
+      onSelectProduct?.(nextProduct.id);
     }
   }
 
   function handleRedeem() {
+    if (onPurchase) {
+      onPurchase(selectedProduct.id);
+      return;
+    }
+
     setFeedbackMessage(selectedDetail.redeemFeedback);
   }
 
   return (
-    <main className="supply-shop-scene" aria-label="补给商店 UI Lab">
+    <main className="supply-shop-scene" aria-label="补给商店">
       <div className="supply-shop-background" aria-hidden="true" />
       <div className="supply-shop-content">
-        <SupplyUiLabTopBar activeLabel="补给商店" profile={data.topBar.profile} resources={data.topBar.resources} />
+        <SupplyUiLabTopBar
+          activeLabel="补给商店"
+          onSelectTab={onSelectSupplyTab}
+          profile={data.topBar.profile}
+          resources={data.topBar.resources}
+          returnAction={
+            onBackToPunch
+              ? {
+                  label: "回到打卡",
+                  onClick: onBackToPunch,
+                }
+              : undefined
+          }
+        />
         <section className="supply-shop-shell" aria-label="补给商店静态复刻">
           <ShopSidebar data={data} onSelectCategory={handleSelectCategory} selectedCategoryId={selectedCategoryId} />
           <ShopCatalog
             data={data}
             onRedeem={handleRedeem}
             onSelectFilter={handleSelectFilter}
-            onSelectProduct={setSelectedProductId}
+            onSelectProduct={(productId) => {
+              setSelectedProductId(productId);
+              onSelectProduct?.(productId);
+            }}
             onToggleRules={() => setRulesExpanded((expanded) => !expanded)}
             products={visibleProducts}
             rulesExpanded={rulesExpanded}

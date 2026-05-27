@@ -1,10 +1,5 @@
-import { SupplyDrawPoolScene } from "@/components/gamification/ui-lab/supply-draw-pool/SupplyDrawPoolScene";
-import { supplyDrawPoolMock } from "@/components/gamification/ui-lab/supply-draw-pool/mock-data";
+import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "抽卡池 UI Lab",
-};
-
-export default function SupplyDashboardDrawPoolPage() {
-  return <SupplyDrawPoolScene data={supplyDrawPoolMock} />;
+export default function SupplyDashboardDrawPoolLegacyPage() {
+  redirect("/dashboard/cards");
 }

@@ -1,6 +1,6 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SupplyDashboardScene } from "@/components/gamification/ui-lab/supply-dashboard/SupplyDashboardScene";
 import { supplyDashboardAssetPaths, supplyDashboardMock } from "@/components/gamification/ui-lab/supply-dashboard/mock-data";
 
@@ -48,6 +48,7 @@ describe("supply dashboard static scene", () => {
       container.querySelector(".supply-ui-lab-tabs a[aria-selected='true']")?.textContent,
     ).toContain("我的状态");
     expect(container.querySelector(".supply-ui-lab-tabs a[href='/ui-lab/supply-dashboard/team-goal']")).toBeNull();
+    expect(container.querySelector(".supply-ui-lab-return-action")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-user-menu")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-user-profile")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-resource b")).toBeNull();
@@ -263,5 +264,26 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelectorAll(".supply-dashboard-quest-card-shell[data-complete='false']")).toHaveLength(0);
     expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("已完成打卡：一句话笔记");
     expect(container.querySelector(".supply-dashboard-quest-progress")?.textContent).toContain("进度：4/4");
+  });
+
+  it("renders an optional return action before the status tab", async () => {
+    const onBackToPunch = vi.fn();
+
+    await act(async () => {
+      root.render(<SupplyDashboardScene data={supplyDashboardMock} onBackToPunch={onBackToPunch} />);
+    });
+
+    const navCluster = container.querySelector(".supply-ui-lab-nav-cluster");
+    const returnAction = container.querySelector<HTMLButtonElement>(".supply-ui-lab-return-action");
+
+    expect(navCluster?.firstElementChild).toBe(returnAction);
+    expect(returnAction?.textContent).toContain("回到打卡");
+    expect(container.querySelector(".supply-ui-lab-topbar-tab--status")?.textContent).toContain("我的状态");
+
+    await act(async () => {
+      returnAction?.click();
+    });
+
+    expect(onBackToPunch).toHaveBeenCalledTimes(1);
   });
 });

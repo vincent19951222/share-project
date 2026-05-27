@@ -219,7 +219,8 @@ describe("SupplyStationShell", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.querySelector(".supply-production-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-production-shell")).toBeNull();
     expect(container.textContent).toContain("牛马补给站");
     expect(container.textContent).toContain("工位重启");
   });
@@ -264,6 +265,11 @@ describe("SupplyStationShell", () => {
     await act(async () => {
       container
         .querySelector<HTMLButtonElement>("[data-action='complete-task']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await act(async () => {
+      Array.from(container.querySelectorAll("button"))
+        .find((button) => button.textContent?.includes("确认打卡"))
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
@@ -324,7 +330,7 @@ describe("SupplyStationShell", () => {
 
     await act(async () => {
       Array.from(container.querySelectorAll("button"))
-        .find((button) => button.textContent?.includes("抽卡池"))
+        .find((button) => button.textContent?.includes("抽奖池"))
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await act(async () => {
@@ -408,7 +414,8 @@ describe("SupplyStationShell", () => {
     });
     await flush();
 
-    expect(container.querySelector(".supply-production-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-production-shell")).toBeNull();
     expect(container.textContent).toContain("玩法规则");
     expect(container.textContent).toContain("抽奖概率");
   });

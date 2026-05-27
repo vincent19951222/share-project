@@ -9,6 +9,7 @@ const productionFiles = [
   "components/gamification/production/SupplyBackpackPanel.tsx",
   "components/gamification/production/SupplyShopPanel.tsx",
   "components/gamification/production/SupplyTaskRecordPanel.tsx",
+  "components/gamification/production/supply-ui-lab-adapters.ts",
   "lib/gamification/supply-view-model.ts",
 ];
 
@@ -28,7 +29,6 @@ const bannedProductionTerms = [
   "supplyBackpackMock",
   "supplyTaskRecordMock",
   "supplyDrawPoolMock",
-  "components/gamification/ui-lab",
   "team-goal",
   "团队目标",
 ];
@@ -37,6 +37,19 @@ const bannedUiLabRouteTerms = [
   "@/lib/api",
   "/api/gamification",
   "fetch(",
+];
+
+const requiredProductionVisualTerms = [
+  "SupplyDashboardScene",
+  "SupplyDrawPoolScene",
+  "SupplyBackpackScene",
+  "SupplyShopScene",
+  "SupplyTaskRecordScene",
+  "toSupplyDashboardPreview",
+  "toSupplyDrawPoolPreview",
+  "toSupplyBackpackPreview",
+  "toSupplyShopPreview",
+  "toSupplyTaskRecordPreview",
 ];
 
 function readSource(file: string) {
@@ -61,6 +74,15 @@ describe("supply production isolation", () => {
       for (const term of bannedUiLabRouteTerms) {
         expect(source, `${file} should not contain ${term}`).not.toContain(term);
       }
+    }
+  });
+
+  it("production uses UI Lab visual scenes through production adapters", () => {
+    const shell = readSource("components/gamification/production/SupplyStationShell.tsx");
+    const adapters = readSource("components/gamification/production/supply-ui-lab-adapters.ts");
+
+    for (const term of requiredProductionVisualTerms) {
+      expect(`${shell}\n${adapters}`, `missing ${term}`).toContain(term);
     }
   });
 });

@@ -48,7 +48,7 @@ describe("supply shop mock data", () => {
         description: catalogItem.description,
         effect: catalogItem.effectSummary,
         costLabel: `银子 ${catalogItem.shop.priceCoins}`,
-        sourceLabel: "来源：抽卡池 / 商店",
+        sourceLabel: "来源：抽奖池 / 商店",
         ownedLabel: `持有 ${catalogItem.inventory.quantity}`,
       });
       expect(detail?.useTiming.length, catalogItem.sourceItemId).toBeGreaterThan(0);

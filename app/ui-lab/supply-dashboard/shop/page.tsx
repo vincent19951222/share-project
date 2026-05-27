@@ -1,6 +1,5 @@
-import { SupplyShopScene } from "@/components/gamification/ui-lab/supply-shop/SupplyShopScene";
-import { supplyShopMock } from "@/components/gamification/ui-lab/supply-shop/mock-data";
+import { redirect } from "next/navigation";
 
-export default function SupplyDashboardShopPage() {
-  return <SupplyShopScene data={supplyShopMock} />;
+export default function SupplyDashboardShopLegacyPage() {
+  redirect("/dashboard/store");
 }

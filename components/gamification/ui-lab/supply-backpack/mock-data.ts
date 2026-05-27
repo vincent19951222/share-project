@@ -101,7 +101,7 @@ const toDetail = (item: SupplyUiLabCatalogItem): SupplyBackpackSelectedDetail =>
         : "使用后将立即进入今日效果，并持续到今日 23:59。",
   shopCta: {
     label: "去商店",
-    href: "/ui-lab/supply-dashboard/shop",
+    href: "/dashboard/store",
     description: "前往补给商店查看同源道具与兑换入口",
   },
   requiresAdminConfirmation: item.shop.requiresAdminConfirmation,

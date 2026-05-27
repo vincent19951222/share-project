@@ -9,7 +9,10 @@ import {
   SupplyUiLabPixelPanel,
   SupplyUiLabStatusBadge,
 } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabPrimitives";
-import { SupplyUiLabTopBar } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
+import {
+  SupplyUiLabTopBar,
+  type SupplyUiLabTopBarTabId,
+} from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
 import type {
   SupplyTaskRecordDateOption,
   SupplyTaskRecordDrawHistoryItem,
@@ -100,7 +103,17 @@ function getMenuBadge(
   return null;
 }
 
-export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview }) {
+export function SupplyTaskRecordScene({
+  data,
+  onBackToPunch,
+  onRespondSocialInvitation,
+  onSelectSupplyTab,
+}: {
+  data: SupplyTaskRecordPreview;
+  onBackToPunch?: () => void;
+  onRespondSocialInvitation?: (inviteId: string) => void;
+  onSelectSupplyTab?: (tabId: SupplyUiLabTopBarTabId) => void;
+}) {
   const [activeMode, setActiveMode] = useState<SupplyTaskRecordMode>(data.activeMode);
   const [activeDateKey, setActiveDateKey] = useState(data.activeDateKey);
   const [radarInvites, setRadarInvites] = useState(() => data.radar.invites);
@@ -122,6 +135,11 @@ export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview 
   }));
 
   function handleRadarInviteAction(inviteId: string, action: "respond" | "ignore") {
+    if (action === "respond" && onRespondSocialInvitation) {
+      onRespondSocialInvitation(inviteId);
+      return;
+    }
+
     setRadarInvites((currentInvites) =>
       currentInvites.map((invite) =>
         invite.id === inviteId
@@ -139,7 +157,20 @@ export function SupplyTaskRecordScene({ data }: { data: SupplyTaskRecordPreview 
     <main className="supply-task-record-scene">
       <div className="supply-task-record-background" aria-hidden="true" />
       <div className="supply-task-record-content">
-        <SupplyUiLabTopBar activeLabel="任务记录" profile={data.topBar.profile} resources={data.topBar.resources} />
+        <SupplyUiLabTopBar
+          activeLabel="任务记录"
+          onSelectTab={onSelectSupplyTab}
+          profile={data.topBar.profile}
+          resources={data.topBar.resources}
+          returnAction={
+            onBackToPunch
+              ? {
+                  label: "回到打卡",
+                  onClick: onBackToPunch,
+                }
+              : undefined
+          }
+        />
         <section className="supply-task-record-shell" aria-label="任务记录静态页">
           <TaskRecordSidebar
             activeMode={activeMode}
@@ -470,7 +501,7 @@ function InviteRecord({
       <div className="supply-task-record-radar-actions">
         <SupplyUiLabStatusBadge tone={radarStatusTone[invite.status]}>{invite.statusLabel}</SupplyUiLabStatusBadge>
         {invite.status === "pending" ? (
-          <button type="button" onClick={() => onInviteAction(invite.id, "respond")}>
+          <button data-action="respond-social-invitation" type="button" onClick={() => onInviteAction(invite.id, "respond")}>
             回应
           </button>
         ) : null}
