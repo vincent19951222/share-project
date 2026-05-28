@@ -13,14 +13,13 @@ type BoardMessage = {
   text: string;
 };
 
-export function SharedBoard() {
+export function SharedBoard({ isActive = true }: { isActive?: boolean }) {
   const { state } = useBoard();
   const [notes, setNotes] = useState<BoardNoteDto[]>([]);
   const [syncState, setSyncState] = useState<SyncState>("idle");
   const [submitting, setSubmitting] = useState(false);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(() => new Set());
   const [message, setMessage] = useState<BoardMessage | null>(null);
-  const isActive = state.activeTab === "board";
 
   const currentMember = useMemo(
     () => state.members.find((member) => member.id === state.currentUserId) ?? state.members[0],

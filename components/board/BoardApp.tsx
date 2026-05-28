@@ -31,17 +31,11 @@ export function BoardApp({
   activeTab: AppTab;
   supplyPanel?: SupplyPanelKey;
 }) {
-  const { state, dispatch } = useBoard();
+  const { state } = useBoard();
   const router = useRouter();
   const [supplyNavContext, setSupplyNavContext] = useState<SupplyNavContext | null>(() =>
     getCachedSupplyNavContext(state.currentUserId),
   );
-
-  useEffect(() => {
-    if (state.activeTab !== activeTab) {
-      dispatch({ type: "SET_TAB", tab: activeTab });
-    }
-  }, [activeTab, dispatch, state.activeTab]);
 
   useEffect(() => {
     if (activeTab === "supply") {
@@ -97,7 +91,7 @@ export function BoardApp({
       case "punch":
         return <PunchBoard />;
       case "board":
-        return <SharedBoard />;
+        return <SharedBoard isActive={activeTab === "board"} />;
       case "coffee":
         return <CoffeeCheckin />;
       case "supply":

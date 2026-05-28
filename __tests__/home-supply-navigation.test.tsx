@@ -288,6 +288,18 @@ describe("Home supply navigation", () => {
     );
   });
 
+  it("does not dispatch SET_TAB after rendering a route-selected tab", async () => {
+    activeTab = "punch";
+    const { default: SharedBoardRoutePage } = await import("@/app/(board)/board/page");
+
+    await act(async () => {
+      root.render(<SharedBoardRoutePage />);
+    });
+
+    expect(container.querySelector("[data-testid='shared-board']")).not.toBeNull();
+    expect(dispatchMock).not.toHaveBeenCalledWith({ type: "SET_TAB", tab: "board" });
+  });
+
   it("does not mount the coffee polling provider on tabs that do not read coffee state", async () => {
     activeTab = "punch";
     const { default: Home } = await import("@/app/(board)/page");
