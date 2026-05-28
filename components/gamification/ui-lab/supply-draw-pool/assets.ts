@@ -3,7 +3,7 @@ export const supplyDrawPoolAssetPaths = {
   cowLogo: "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
   background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
   drawPool: {
-    machine: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.png",
+    machine: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.webp",
     capsuleBed: "/assets/home-scenes/supply/draw-pool/draw-pool-capsule-bed.webp",
     guideMascot: "/assets/home-scenes/supply/draw-pool/draw-pool-guide-mascot.webp",
     wristband: "/assets/home-scenes/supply/draw-pool/draw-pool-wristband.webp",

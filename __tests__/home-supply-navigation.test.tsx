@@ -42,23 +42,7 @@ vi.mock("@/components/punch-board/PunchBoard", () => ({
   PunchBoard: () => <section data-testid="punch-board">健身打卡</section>,
 }));
 
-vi.mock("@/components/shared-board/SharedBoard", () => ({
-  SharedBoard: () => <section data-testid="shared-board">共享看板</section>,
-}));
-
-vi.mock("@/components/coffee-checkin/CoffeeCheckin", () => ({
-  CoffeeCheckin: () => <section data-testid="coffee-checkin">续命咖啡</section>,
-}));
-
-vi.mock("@/components/report-center/ReportCenter", () => ({
-  ReportCenter: () => <section data-testid="report-center">战报中心</section>,
-}));
-
-vi.mock("@/components/calendar/CalendarBoard", () => ({
-  CalendarBoard: () => <section data-testid="calendar-board">牛马日历</section>,
-}));
-
-vi.mock("@/components/gamification/SupplyStation", async () => {
+vi.mock("@/components/board/dynamic-tabs", async () => {
   const React = await vi.importActual<typeof import("react")>("react");
 
   function createSupplyNavContext() {
@@ -79,7 +63,15 @@ vi.mock("@/components/gamification/SupplyStation", async () => {
   }
 
   return {
-    SupplyStation: ({
+    DynamicSharedBoard: ({ isActive }: { isActive?: boolean }) => (
+      <section data-active={String(isActive)} data-testid="shared-board">
+        共享看板
+      </section>
+    ),
+    DynamicCoffeeCheckin: () => <section data-testid="coffee-checkin">续命咖啡</section>,
+    DynamicReportCenter: () => <section data-testid="report-center">战报中心</section>,
+    DynamicCalendarBoard: () => <section data-testid="calendar-board">牛马日历</section>,
+    DynamicSupplyStation: ({
       initialPanel,
       onBackToPunch,
       onNavContextChange,
@@ -286,6 +278,18 @@ describe("Home supply navigation", () => {
         }),
       }),
     );
+  });
+
+  it("does not dispatch SET_TAB after rendering a route-selected tab", async () => {
+    activeTab = "punch";
+    const { default: SharedBoardRoutePage } = await import("@/app/(board)/board/page");
+
+    await act(async () => {
+      root.render(<SharedBoardRoutePage />);
+    });
+
+    expect(container.querySelector("[data-testid='shared-board']")).not.toBeNull();
+    expect(dispatchMock).not.toHaveBeenCalledWith({ type: "SET_TAB", tab: "board" });
   });
 
   it("does not mount the coffee polling provider on tabs that do not read coffee state", async () => {

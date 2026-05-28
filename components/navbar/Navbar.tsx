@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useCallback, useEffect, useTransition } from "react";
+import { preloadBoardTabComponent, preloadSupplyPanelComponent } from "@/components/board/tab-component-loaders";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
@@ -33,6 +34,8 @@ export function Navbar({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
   const [supplyMenuOpen, setSupplyMenuOpen] = useState(false);
+  const [pendingTab, setPendingTab] = useState<AppTab | null>(null);
+  const [pendingSupplyPanel, setPendingSupplyPanel] = useState<SupplyPanelKey | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const prefetchedTabsRef = useRef(false);
   const supplyMenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,14 +57,35 @@ export function Navbar({
     });
   }, [router]);
 
+  const prefetchAppTab = useCallback(
+    (tab: AppTab) => {
+      router.prefetch?.(appTabRoutes[tab]);
+      preloadBoardTabComponent(tab);
+    },
+    [router],
+  );
+
+  const prefetchSupplyPanel = useCallback(
+    (panel: SupplyPanelKey) => {
+      const item = supplyNavItems.find((candidate) => candidate.id === panel);
+      if (item) {
+        router.prefetch?.(item.route);
+        preloadSupplyPanelComponent(panel);
+      }
+    },
+    [router],
+  );
+
   function handleTabChange(tab: AppTab) {
     setMobileTabsOpen(false);
     setSupplyMenuOpen(false);
+    setPendingSupplyPanel(null);
 
     if (tab === activeTab) {
       return;
     }
 
+    setPendingTab(tab);
     startTransition(() => {
       router.push(appTabRoutes[tab]);
     });
@@ -74,6 +98,13 @@ export function Navbar({
     }
 
     setSupplyMenuOpen(false);
+
+    if (panel === activeSupplyPanel) {
+      return;
+    }
+
+    setPendingTab("supply");
+    setPendingSupplyPanel(panel);
     startTransition(() => {
       router.push(item.route);
     });
@@ -115,6 +146,18 @@ export function Navbar({
   const mobileNavLabel = mobileTabsOpen ? "收起导航" : "展开导航";
   const showSupplyChrome = activeTab === "supply";
 
+  useEffect(() => {
+    if (pendingTab === activeTab) {
+      setPendingTab(null);
+    }
+  }, [activeTab, pendingTab]);
+
+  useEffect(() => {
+    if (pendingSupplyPanel && pendingSupplyPanel === activeSupplyPanel) {
+      setPendingSupplyPanel(null);
+    }
+  }, [activeSupplyPanel, pendingSupplyPanel]);
+
   return (
     <>
       <nav
@@ -141,6 +184,9 @@ export function Navbar({
             <div className="calendar-tab-strip home-tab-strip hidden min-w-0 gap-2 overflow-x-auto rounded-full border-2 border-slate-200 bg-slate-100 p-1 min-[761px]:flex">
               <TabBtn
                 active={activeTab === "punch"}
+                pending={pendingTab === "punch"}
+                onFocus={() => prefetchAppTab("punch")}
+                onMouseEnter={() => prefetchAppTab("punch")}
                 onClick={() => handleTabChange("punch")}
               >
                 <AssetIcon name="workout" className="h-4 w-4 object-contain" />
@@ -149,6 +195,9 @@ export function Navbar({
               <TabBtn
                 active={activeTab === "board"}
                 className="board-tab"
+                pending={pendingTab === "board"}
+                onFocus={() => prefetchAppTab("board")}
+                onMouseEnter={() => prefetchAppTab("board")}
                 onClick={() => handleTabChange("board")}
               >
                 <AssetIcon name="board" className="h-4 w-4 object-contain" />
@@ -157,6 +206,9 @@ export function Navbar({
               <TabBtn
                 active={activeTab === "coffee"}
                 className="coffee-tab"
+                pending={pendingTab === "coffee"}
+                onFocus={() => prefetchAppTab("coffee")}
+                onMouseEnter={() => prefetchAppTab("coffee")}
                 onClick={() => handleTabChange("coffee")}
               >
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
@@ -165,6 +217,9 @@ export function Navbar({
               <TabBtn
                 active={activeTab === "calendar"}
                 className="calendar-tab"
+                pending={pendingTab === "calendar"}
+                onFocus={() => prefetchAppTab("calendar")}
+                onMouseEnter={() => prefetchAppTab("calendar")}
                 onClick={() => handleTabChange("calendar")}
               >
                 <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
@@ -173,6 +228,9 @@ export function Navbar({
               <TabBtn
                 active={activeTab === "dash"}
                 className="report-tab"
+                pending={pendingTab === "dash"}
+                onFocus={() => prefetchAppTab("dash")}
+                onMouseEnter={() => prefetchAppTab("dash")}
                 onClick={() => handleTabChange("dash")}
               >
                 <AssetIcon name="report" className="h-4 w-4 object-contain" />
@@ -182,8 +240,15 @@ export function Navbar({
                 active={activeTab === "supply"}
                 className="supply-tab app-supply-primary-tab"
                 onBlur={scheduleSupplyMenuClose}
-                onFocus={openSupplyMenu}
-                onMouseEnter={openSupplyMenu}
+                pending={pendingTab === "supply"}
+                onFocus={() => {
+                  openSupplyMenu();
+                  prefetchAppTab("supply");
+                }}
+                onMouseEnter={() => {
+                  openSupplyMenu();
+                  prefetchAppTab("supply");
+                }}
                 onMouseLeave={scheduleSupplyMenuClose}
                 onClick={() => handleTabChange("supply")}
               >
@@ -268,6 +333,9 @@ export function Navbar({
             <TabBtn
               active={activeTab === "punch"}
               className="mobile-tab-btn justify-between"
+              pending={pendingTab === "punch"}
+              onFocus={() => prefetchAppTab("punch")}
+              onMouseEnter={() => prefetchAppTab("punch")}
               onClick={() => handleTabChange("punch")}
             >
               <span className="flex items-center gap-2">
@@ -278,6 +346,9 @@ export function Navbar({
             <TabBtn
               active={activeTab === "board"}
               className="mobile-tab-btn board-tab justify-between"
+              pending={pendingTab === "board"}
+              onFocus={() => prefetchAppTab("board")}
+              onMouseEnter={() => prefetchAppTab("board")}
               onClick={() => handleTabChange("board")}
             >
               <span className="flex items-center gap-2">
@@ -288,6 +359,9 @@ export function Navbar({
             <TabBtn
               active={activeTab === "coffee"}
               className="mobile-tab-btn coffee-tab justify-between"
+              pending={pendingTab === "coffee"}
+              onFocus={() => prefetchAppTab("coffee")}
+              onMouseEnter={() => prefetchAppTab("coffee")}
               onClick={() => handleTabChange("coffee")}
             >
               <span className="flex items-center gap-2">
@@ -298,6 +372,9 @@ export function Navbar({
             <TabBtn
               active={activeTab === "calendar"}
               className="mobile-tab-btn calendar-tab justify-between"
+              pending={pendingTab === "calendar"}
+              onFocus={() => prefetchAppTab("calendar")}
+              onMouseEnter={() => prefetchAppTab("calendar")}
               onClick={() => handleTabChange("calendar")}
             >
               <span className="flex items-center gap-2">
@@ -308,6 +385,9 @@ export function Navbar({
             <TabBtn
               active={activeTab === "dash"}
               className="mobile-tab-btn report-tab justify-between"
+              pending={pendingTab === "dash"}
+              onFocus={() => prefetchAppTab("dash")}
+              onMouseEnter={() => prefetchAppTab("dash")}
               onClick={() => handleTabChange("dash")}
             >
               <span className="flex items-center gap-2">
@@ -318,6 +398,9 @@ export function Navbar({
             <TabBtn
               active={activeTab === "supply"}
               className="mobile-tab-btn supply-tab justify-between"
+              pending={pendingTab === "supply"}
+              onFocus={() => prefetchAppTab("supply")}
+              onMouseEnter={() => prefetchAppTab("supply")}
               onClick={() => handleTabChange("supply")}
             >
               <span className="flex items-center gap-2">
@@ -343,8 +426,10 @@ export function Navbar({
                 <button
                   aria-current={selected ? "page" : undefined}
                   aria-selected={selected}
-                  className="app-supply-secondary-tab"
+                  className={`app-supply-secondary-tab${pendingSupplyPanel === item.id ? " pending" : ""}`}
                   key={item.id}
+                  onFocus={() => prefetchSupplyPanel(item.id)}
+                  onMouseEnter={() => prefetchSupplyPanel(item.id)}
                   onClick={() => handleSupplyPanelChange(item.id)}
                   role="tab"
                   type="button"

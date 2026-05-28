@@ -423,6 +423,41 @@ body {
   color: #f8fafc;
 }
 
+.board-tab-loading-shell {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  padding: 1rem;
+}
+
+.board-tab-loading-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 3px solid #111827;
+  border-radius: 1rem;
+  background: #fff8e8;
+  box-shadow: 5px 5px 0 rgba(17, 24, 39, 0.45);
+  color: #111827;
+  font-weight: 1000;
+  padding: 0.9rem 1rem;
+}
+
+.board-tab-loading-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid #111827;
+  border-radius: 999px;
+  background: #fde047;
+  animation: board-tab-loading-pulse 700ms ease-in-out infinite alternate;
+}
+
+@keyframes board-tab-loading-pulse {
+  to {
+    transform: scale(1.25);
+  }
+}
+
 .app-top-nav--supply {
   z-index: 70;
 }
@@ -2879,6 +2914,30 @@ body {
 .tab-btn.inactive:hover {
   background-color: rgba(248, 250, 252, 0.14);
   color: #ffffff;
+}
+
+.tab-btn.pending,
+.app-supply-secondary-tab.pending {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 #111827;
+  filter: saturate(0.92);
+}
+
+.tab-btn.pending::after,
+.app-supply-secondary-tab.pending::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: tab-pending-spin 700ms linear infinite;
+}
+
+@keyframes tab-pending-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .home-tab-strip .tab-btn.active,
