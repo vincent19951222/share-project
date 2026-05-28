@@ -1,0 +1,102 @@
+# Main Tab Performance Measurement
+
+Generated at: 2026-05-28T15:30:41.990Z
+
+## Main Tab App Chunks
+- /(board)/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/page-db9c206f3b2e3f17.js: 0 KB
+- /(board)/board/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/board/page-9b8a362b2049836a.js: 0 KB
+- /(board)/drink/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/drink/page-e0caae6748157624.js: 0 KB
+- /(board)/calendar/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/calendar/page-b9a15bdc71037af0.js: 0 KB
+- /(board)/report/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/report/page-c7b9bd86c63cbde6.js: 0 KB
+- /(board)/dashboard/status/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/dashboard/status/page-3743a88081f596ac.js: 0 KB
+- /(board)/dashboard/store/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/dashboard/store/page-8bc664562d5058e9.js: 0 KB
+- /(board)/dashboard/quest/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/dashboard/quest/page-24618ccf4ec49b61.js: 0 KB
+- /(board)/dashboard/backpack/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/dashboard/backpack/page-ca8c06e965e96aba.js: 0 KB
+- /(board)/dashboard/cards/page: 588 KB
+  - static/chunks/webpack-117a7103b978829f.js: 3 KB
+  - static/chunks/4bd1b696-f785427dddbba9fb.js: 169 KB
+  - static/chunks/1255-5fe68596fe147850.js: 168 KB
+  - static/chunks/main-app-e1db89dfb0f1cd3b.js: 1 KB
+  - static/chunks/1356-209f642d1993562b.js: 14 KB
+  - static/chunks/2619-38012e79151e370a.js: 8 KB
+  - static/chunks/5482-9974da4e23637f78.js: 225 KB
+  - static/chunks/app/(board)/dashboard/cards/page-f59e2e74b9fd87d2.js: 0 KB
+
+## Watched Assets
+- public/assets/home-scenes/supply/draw-pool/draw-pool-machine.png: 1.47 MB
+- public/assets/home-scenes/supply/draw-pool/draw-pool-machine.webp: missing
+- public/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp: 213 KB
+
+Supply home-scene asset total: 5.52 MB
