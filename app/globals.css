@@ -5292,7 +5292,7 @@ body {
     inset: auto;
     height: auto;
     overflow: visible;
-    padding: 0.75rem;
+    padding: 0;
   }
 
   .report-scene {

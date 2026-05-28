@@ -127,7 +127,7 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
             <button
               onClick={handleProfileClick}
               disabled={!currentMember}
-              className="flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full pl-2 pr-4 py-1 hover:border-slate-800 transition-colors"
+              className="flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full pl-2 pr-4 py-1 text-slate-900 hover:border-slate-800 transition-colors"
             >
               <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-white shadow-sm overflow-hidden">
                 {currentMember ? (

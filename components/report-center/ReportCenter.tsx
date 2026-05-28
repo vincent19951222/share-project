@@ -47,7 +47,7 @@ export function ReportCenter() {
   );
 
   return (
-    <div className="report-board absolute inset-0 overflow-y-auto p-4 transition-opacity duration-300 sm:p-6">
+    <div className="report-board absolute inset-0 overflow-y-auto transition-opacity duration-300">
       <div className="report-scene relative isolate min-h-full overflow-hidden rounded-[2rem] border-[3px] border-slate-900 bg-[#f7f3e8] shadow-[0_16px_0_0_#111827]">
         <div className="report-scene-background absolute inset-0">
           <img
