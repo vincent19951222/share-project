@@ -215,4 +215,81 @@ describe("Navbar supply chrome", () => {
 
     expect(routerPushMock).toHaveBeenCalledWith("/dashboard/backpack");
   });
+
+  it("marks a primary tab as pending immediately after click and clears when it becomes active", async () => {
+    activeTab = "punch";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
+    });
+
+    const boardTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
+      button.textContent?.includes("共享看板"),
+    );
+
+    await act(async () => {
+      boardTab?.click();
+    });
+
+    expect(routerPushMock).toHaveBeenCalledWith("/board");
+    expect(boardTab?.classList.contains("pending")).toBe(true);
+    expect(boardTab?.getAttribute("aria-busy")).toBe("true");
+
+    activeTab = "board";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="board" supplyNavContext={supplyNavContext} />);
+    });
+
+    const activeBoardTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
+      button.textContent?.includes("共享看板"),
+    );
+
+    expect(activeBoardTab?.classList.contains("pending")).toBe(false);
+    expect(activeBoardTab?.getAttribute("aria-busy")).toBeNull();
+  });
+
+  it("does not mark the current primary tab as pending", async () => {
+    activeTab = "punch";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
+    });
+
+    const punchTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
+      button.textContent?.includes("健身打卡"),
+    );
+
+    await act(async () => {
+      punchTab?.click();
+    });
+
+    expect(routerPushMock).not.toHaveBeenCalled();
+    expect(punchTab?.classList.contains("pending")).toBe(false);
+  });
+
+  it("prefetches primary and supply secondary routes on hover or focus", async () => {
+    activeTab = "punch";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
+    });
+
+    routerPrefetchMock.mockClear();
+
+    const calendarTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
+      button.textContent?.includes("牛马日历"),
+    );
+    const drawPoolTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".app-supply-secondary-tab")).find(
+      (button) => button.textContent?.includes("抽奖池"),
+    );
+
+    await act(async () => {
+      calendarTab?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      drawPoolTab?.focus();
+    });
+
+    expect(routerPrefetchMock).toHaveBeenCalledWith("/calendar");
+    expect(routerPrefetchMock).toHaveBeenCalledWith("/dashboard/cards");
+  });
 });

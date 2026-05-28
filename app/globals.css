@@ -2881,6 +2881,30 @@ body {
   color: #ffffff;
 }
 
+.tab-btn.pending,
+.app-supply-secondary-tab.pending {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 #111827;
+  filter: saturate(0.92);
+}
+
+.tab-btn.pending::after,
+.app-supply-secondary-tab.pending::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: tab-pending-spin 700ms linear infinite;
+}
+
+@keyframes tab-pending-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .home-tab-strip .tab-btn.active,
 .home-tab-strip .tab-btn.board-tab.active,
 .home-tab-strip .tab-btn.coffee-tab.active,
