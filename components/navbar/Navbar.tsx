@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useCallback, useEffect, useTransition } from "react";
+import { preloadBoardTabComponent, preloadSupplyPanelComponent } from "@/components/board/tab-component-loaders";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
@@ -59,6 +60,7 @@ export function Navbar({
   const prefetchAppTab = useCallback(
     (tab: AppTab) => {
       router.prefetch?.(appTabRoutes[tab]);
+      preloadBoardTabComponent(tab);
     },
     [router],
   );
@@ -68,6 +70,7 @@ export function Navbar({
       const item = supplyNavItems.find((candidate) => candidate.id === panel);
       if (item) {
         router.prefetch?.(item.route);
+        preloadSupplyPanelComponent(panel);
       }
     },
     [router],

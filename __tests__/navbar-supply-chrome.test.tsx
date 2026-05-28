@@ -11,6 +11,10 @@ import type { AppTab } from "@/lib/types";
 
 const routerPushMock = vi.fn();
 const routerPrefetchMock = vi.fn();
+const { preloadBoardTabComponentMock, preloadSupplyPanelComponentMock } = vi.hoisted(() => ({
+  preloadBoardTabComponentMock: vi.fn(),
+  preloadSupplyPanelComponentMock: vi.fn(),
+}));
 
 let activeTab: AppTab = "supply";
 
@@ -36,6 +40,11 @@ vi.mock("next/navigation", () => ({
     push: routerPushMock,
     prefetch: routerPrefetchMock,
   }),
+}));
+
+vi.mock("@/components/board/tab-component-loaders", () => ({
+  preloadBoardTabComponent: preloadBoardTabComponentMock,
+  preloadSupplyPanelComponent: preloadSupplyPanelComponentMock,
 }));
 
 vi.mock("@/components/navbar/TeamDynamicsBell", () => ({
@@ -76,6 +85,8 @@ describe("Navbar supply chrome", () => {
     container.remove();
     routerPushMock.mockClear();
     routerPrefetchMock.mockClear();
+    preloadBoardTabComponentMock.mockClear();
+    preloadSupplyPanelComponentMock.mockClear();
     activeTab = "supply";
     vi.useRealTimers();
   });
@@ -291,5 +302,7 @@ describe("Navbar supply chrome", () => {
 
     expect(routerPrefetchMock).toHaveBeenCalledWith("/calendar");
     expect(routerPrefetchMock).toHaveBeenCalledWith("/dashboard/cards");
+    expect(preloadBoardTabComponentMock).toHaveBeenCalledWith("calendar");
+    expect(preloadSupplyPanelComponentMock).toHaveBeenCalledWith("drawPool");
   });
 });
