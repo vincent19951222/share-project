@@ -6,6 +6,7 @@ import type { BoardAction, BoardState } from "./types";
 
 let nextPollRequestId = 0;
 let nextPunchEpoch = 0;
+const BOARD_STATE_POLL_INTERVAL_MS = 15000;
 
 export function reservePollRequestId() {
   nextPollRequestId += 1;
@@ -129,8 +130,14 @@ export function BoardProvider({
 
   useEffect(() => {
     let cancelled = false;
+    let inFlight = false;
 
     const sync = async () => {
+      if (inFlight || document.hidden) {
+        return;
+      }
+
+      inFlight = true;
       const requestId = reservePollRequestId();
       const pendingPunchEpochAtStart = stateRef.current.pendingPunchEpoch ?? 0;
       const settledPunchEpochAtStart =
@@ -150,13 +157,23 @@ export function BoardProvider({
         }
       } catch {
         // Keep the current UI usable when polling fails.
+      } finally {
+        inFlight = false;
       }
     };
 
-    const timer = window.setInterval(sync, 5000);
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        void sync();
+      }
+    };
+
+    const timer = window.setInterval(sync, BOARD_STATE_POLL_INTERVAL_MS);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

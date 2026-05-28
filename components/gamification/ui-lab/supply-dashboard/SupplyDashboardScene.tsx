@@ -250,13 +250,22 @@ function DailyQuestPanel({
   onCompleteQuest,
   onRerollQuest,
   quests,
+  rewardState,
 }: {
   onClaimRewards: () => void;
   onCompleteQuest: (questId: string) => void;
   onRerollQuest: (questId: string) => void;
   quests: SupplyDashboardQuest[];
+  rewardState?: SupplyDashboardPreview["dailyReward"];
 }) {
   const completedCount = quests.filter((quest) => quest.completed).length;
+  const claimState = rewardState?.claimed
+    ? "claimed"
+    : rewardState?.claimable === false
+      ? "locked"
+      : "claimable";
+  const claimButtonLabel = claimState === "claimed" ? "已领取" : "领取奖励";
+  const claimDisabled = claimState !== "claimable";
 
   return (
     <SupplyUiLabPixelPanel className="supply-dashboard-quest-panel" ariaLabel="今日主线">
@@ -294,12 +303,14 @@ function DailyQuestPanel({
           <span>抽奖券 1</span>
         </p>
         <button
-          className="supply-ui-lab-action supply-ui-lab-action--primary"
+          className="supply-ui-lab-action supply-ui-lab-action--primary supply-dashboard-claim-button"
           data-action="claim-ticket"
+          data-claim-state={claimState}
+          disabled={claimDisabled}
           onClick={onClaimRewards}
           type="button"
         >
-          领取奖励
+          {claimButtonLabel}
         </button>
       </div>
     </SupplyUiLabPixelPanel>
@@ -540,6 +551,7 @@ export function SupplyDashboardScene({
             onCompleteQuest={handleOpenCompleteQuest}
             onRerollQuest={handleRerollQuest}
             quests={quests}
+            rewardState={data.dailyReward}
           />
           {pendingQuest ? (
             <TaskCompletionConfirmDialog

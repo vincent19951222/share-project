@@ -26,6 +26,15 @@ interface CoffeeContextType {
 }
 
 const CoffeeContext = createContext<CoffeeContextType | null>(null);
+const COFFEE_BACKED_PATHS = new Set(["/drink", "/report"]);
+
+function shouldSyncCoffeeState() {
+  if (typeof window === "undefined") {
+    return true;
+  }
+
+  return COFFEE_BACKED_PATHS.has(window.location.pathname);
+}
 
 function getCoffeeErrorMessage(caught: unknown) {
   if (caught instanceof ApiError && caught.status === 401) {
@@ -43,6 +52,10 @@ export function CoffeeProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   async function refresh() {
+    if (!shouldSyncCoffeeState()) {
+      return;
+    }
+
     try {
       const next = await fetchCoffeeState();
       setSnapshot(next);
@@ -72,6 +85,10 @@ export function CoffeeProvider({ children }: { children: ReactNode }) {
     let timer: number | undefined;
 
     async function sync() {
+      if (!shouldSyncCoffeeState()) {
+        return;
+      }
+
       try {
         const next = await fetchCoffeeState();
         if (!cancelled) {

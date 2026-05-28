@@ -7575,6 +7575,12 @@ body {
   box-shadow: 3px 3px 0 rgba(17, 24, 39, 0.24);
 }
 
+.supply-dashboard-claim-button[data-claim-state="claimed"] {
+  background: #d1d5db;
+  color: #4b5563;
+  box-shadow: 3px 3px 0 rgba(75, 85, 99, 0.26);
+}
+
 .supply-dashboard-shortcut-dock {
   position: absolute;
   inset: 0;
@@ -8866,38 +8872,6 @@ body {
   font-style: normal;
   font-weight: 850;
   line-height: 1.35;
-}
-
-.supply-shop-product-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
-  right: 0.65rem;
-  z-index: 2;
-  align-items: flex-start;
-}
-
-.supply-shop-product-tags span,
-.supply-shop-product-body small {
-  width: fit-content;
-  border: 2px solid #111827;
-  background: #facc15;
-  padding: 0.12rem 0.35rem;
-  font-size: 0.68rem;
-  font-weight: 1000;
-  line-height: 1.2;
-}
-
-.supply-shop-product-body small {
-  position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  z-index: 3;
-  background: #dcfce7;
-  color: #166534;
 }
 
 .supply-shop-product-price {
@@ -10458,6 +10432,23 @@ body {
   margin: 0.35rem 0 0;
   font-weight: 900;
   line-height: 1.35;
+}
+
+.supply-backpack-social-target {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  font-weight: 1000;
+}
+
+.supply-backpack-social-target select {
+  min-height: 3rem;
+  border: 3px solid #111827;
+  border-radius: 0.35rem;
+  background: #fff;
+  padding: 0 0.8rem;
+  font: inherit;
+  font-weight: 900;
 }
 
 .supply-backpack-actions {

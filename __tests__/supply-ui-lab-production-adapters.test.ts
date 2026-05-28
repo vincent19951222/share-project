@@ -171,4 +171,72 @@ describe("supply production to UI Lab adapters", () => {
       title: "购买补给",
     });
   });
+
+  it("maps available teammates to direct social backpack items", () => {
+    const socialSnapshot: SupplyStationProductionSnapshot = {
+      ...snapshot,
+      backpack: {
+        ...snapshot.backpack,
+        groups: [
+          {
+            category: "social",
+            label: "社交",
+            totalQuantity: 1,
+            items: [
+              {
+                itemId: "drink_water_ping",
+                category: "social",
+                categoryLabel: "社交",
+                name: "点名喝水令",
+                description: "点名一位成员喝水，对方确认后生成响应记录。",
+                quantity: 1,
+                reservedQuantity: 0,
+                availableQuantity: 1,
+                useEnabled: true,
+                useDisabledReason: null,
+                useTiming: "instant",
+                useTimingLabel: "立即生效",
+                effectSummary: "发起 1 次喝水提醒",
+                usageLimitSummary: "每天最多使用 2 张",
+                stackable: true,
+                requiresAdminConfirmation: false,
+                enabled: true,
+                knownDefinition: true,
+              },
+            ],
+          },
+        ],
+      },
+      social: {
+        ...snapshot.social,
+        availableRecipients: [
+          { userId: "u2", username: "han", avatarKey: "female1" },
+          { userId: "u3", username: "wang", avatarKey: "male2" },
+        ],
+      },
+    };
+
+    const backpack = toSupplyBackpackPreview(socialSnapshot, "drink_water_ping");
+
+    expect(backpack.selectedItemDetail.socialTargets).toEqual(socialSnapshot.social.availableRecipients);
+  });
+
+  it("maps claimed daily quest reward state to the dashboard preview", () => {
+    const claimedSnapshot: SupplyStationProductionSnapshot = {
+      ...snapshot,
+      drawPool: {
+        ...snapshot.drawPool,
+        wallet: {
+          ...snapshot.drawPool.wallet,
+          lifeTicketClaimable: false,
+          lifeTicketEarned: true,
+        },
+      },
+    };
+
+    expect(toSupplyDashboardPreview(claimedSnapshot).dailyReward).toEqual({
+      claimable: false,
+      claimed: true,
+    });
+  });
 });

@@ -9,7 +9,6 @@ import type {
   SupplyShopPreview,
   SupplyShopProduct,
   SupplyShopProductDetail,
-  SupplyShopRarity,
 } from "./types";
 
 export { supplyShopAssetPaths };
@@ -33,13 +32,6 @@ const categoryTagLabel: Record<SupplyUiLabCatalogCategory, string> = {
   real_world: "真实福利",
 };
 
-const rarityTagLabel: Record<SupplyShopRarity, string> = {
-  N: "N",
-  R: "R",
-  SR: "SR",
-  SSR: "SSR",
-};
-
 const useTimingLabel: Record<SupplyUiLabUseTiming, string> = {
   today: "今日生效，可在当天结算前使用",
   instant: "立即生效，兑换后进入背包预览",
@@ -48,11 +40,11 @@ const useTimingLabel: Record<SupplyUiLabUseTiming, string> = {
 
 function formatLimit(item: (typeof supplyUiLabCatalog)[number]) {
   if (item.shop.dailyLimit !== undefined) {
-    return `每日限购 ${item.shop.dailyLimit} 次`;
+    return `每天限购${item.shop.dailyLimit}次`;
   }
 
   if (item.shop.weeklyLimit !== undefined) {
-    return `每周限购 ${item.shop.weeklyLimit} 次`;
+    return `每周限购${item.shop.weeklyLimit}次`;
   }
 
   return "不限购";
@@ -70,12 +62,6 @@ function buildProduct(item: (typeof supplyUiLabCatalog)[number], index: number):
     categoryLabel,
     image: item.media.image,
     rarity: item.rarity,
-    tags: [
-      rarityTagLabel[item.rarity],
-      categoryLabel,
-      limitLabel,
-      ...(item.shop.requiresAdminConfirmation ? ["需要管理员确认"] : []),
-    ],
     price: {
       currency: "coins",
       amount: item.shop.priceCoins,

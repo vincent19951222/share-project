@@ -60,12 +60,19 @@ import type {
   GamificationLotteryRewardSnapshot,
   GamificationTodayEffectSnapshot,
   SocialInvitationSnapshot,
+  SocialRecipientSnapshot,
   SupplyShopProductSnapshot,
   SupplyStationProductionSnapshot,
   SupplyTaskRecordSnapshot,
 } from "@/lib/types";
 
 const BACKPACK_PAGE_SIZE = 20;
+const DIRECT_SOCIAL_ITEM_IDS = new Set([
+  "drink_water_ping",
+  "walk_ping",
+  "chat_ping",
+  "share_info_ping",
+]);
 
 const categoryLabels = {
   boost: "增益",
@@ -262,12 +269,16 @@ function getEmptyBackpackDetail(snapshot: SupplyStationProductionSnapshot): Supp
   };
 }
 
-function toBackpackDetail(item: GamificationBackpackItemSnapshot): SupplyBackpackSelectedDetail {
+function toBackpackDetail(
+  item: GamificationBackpackItemSnapshot,
+  socialTargets: SocialRecipientSnapshot[],
+): SupplyBackpackSelectedDetail {
   const actionState = item.requiresAdminConfirmation
     ? "admin"
     : !item.useEnabled || item.availableQuantity <= 0
       ? "unavailable"
       : "usable";
+  const requiresSocialTarget = DIRECT_SOCIAL_ITEM_IDS.has(item.itemId);
 
   return {
     itemId: item.itemId,
@@ -295,6 +306,7 @@ function toBackpackDetail(item: GamificationBackpackItemSnapshot): SupplyBackpac
     },
     requiresAdminConfirmation: item.requiresAdminConfirmation,
     redemptionStateLabel: item.requiresAdminConfirmation ? "等待管理员确认" : undefined,
+    socialTargets: requiresSocialTarget ? socialTargets : undefined,
   };
 }
 
@@ -315,11 +327,11 @@ function toInventoryItem(
 
 function getLimitLabel(product: SupplyShopProductSnapshot) {
   if (product.dailyLimit !== undefined) {
-    return `每日限购 ${formatNumber(product.dailyLimit)} 次`;
+    return `每天限购${formatNumber(product.dailyLimit)}次`;
   }
 
   if (product.weeklyLimit !== undefined) {
-    return `每周限购 ${formatNumber(product.weeklyLimit)} 次`;
+    return `每周限购${formatNumber(product.weeklyLimit)}次`;
   }
 
   return "不限购";
@@ -505,6 +517,10 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
         amount: 50,
       },
     })),
+    dailyReward: {
+      claimable: snapshot.drawPool.wallet.lifeTicketClaimable,
+      claimed: snapshot.drawPool.wallet.lifeTicketEarned,
+    },
     shortcutLinks: [
       {
         id: "home",
@@ -640,7 +656,7 @@ export function toSupplyBackpackPreview(
     { length: Math.max(0, snapshot.backpack.capacity.totalSlots - itemSlots.length) },
     (_, index) => ({ type: "empty", id: `empty-${index + 1}` }),
   );
-  const itemDetails = items.map(toBackpackDetail);
+  const itemDetails = items.map((item) => toBackpackDetail(item, snapshot.social.availableRecipients));
   const emptyDetail = getEmptyBackpackDetail(snapshot);
   const selectedItemDetail =
     itemDetails.find((detail) => detail.itemId === selectedItemId) ?? itemDetails[0] ?? emptyDetail;
@@ -707,12 +723,6 @@ export function toSupplyShopPreview(
       categoryLabel: categoryLabels[categoryId],
       image: catalogItem?.media.image ?? getItemImage(product.itemId, product.category),
       rarity: catalogItem?.rarity ?? "R",
-      tags: [
-        catalogItem?.rarity ?? "R",
-        categoryLabels[categoryId],
-        limitLabel,
-        ...(product.requiresAdminConfirmation ? ["需要管理员确认"] : []),
-      ],
       price: {
         currency: "coins",
         amount: product.priceCoins,

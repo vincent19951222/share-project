@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect, useTransition } from "react";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
@@ -14,22 +14,41 @@ import { appTabRoutes } from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
 export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {}) {
-  const { state, dispatch } = useBoard();
+  const { state } = useBoard();
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const prefetchedTabsRef = useRef(false);
+  const [, startTransition] = useTransition();
   const currentMember =
     state.members.find((member) => member.id === state.currentUserId) ??
     state.members[0] ??
     null;
   const activeTab = activeTabOverride ?? state.activeTab;
 
+  useEffect(() => {
+    if (prefetchedTabsRef.current) {
+      return;
+    }
+
+    prefetchedTabsRef.current = true;
+    Object.values(appTabRoutes).forEach((route) => {
+      router.prefetch?.(route);
+    });
+  }, [router]);
+
   function handleTabChange(tab: AppTab) {
-    dispatch({ type: "SET_TAB", tab });
     setMobileTabsOpen(false);
-    router.push(appTabRoutes[tab]);
+
+    if (tab === activeTab) {
+      return;
+    }
+
+    startTransition(() => {
+      router.push(appTabRoutes[tab]);
+    });
   }
 
   const handleProfileClick = useCallback(() => {

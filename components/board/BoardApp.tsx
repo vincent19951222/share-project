@@ -55,14 +55,20 @@ export function BoardApp({
     }
   })();
 
-  return (
-    <CoffeeProvider>
+  const pageShell = (
+    <>
       {activeTab === "supply" ? null : <Navbar activeTabOverride={activeTab} />}
       <div className="board-tab-stage flex-1 w-full relative overflow-hidden">
         <div className="board-tab-panel board-tab-panel-active absolute inset-0 opacity-100 transition-opacity duration-300">
           {activeContent}
         </div>
       </div>
-    </CoffeeProvider>
+    </>
   );
+
+  if (activeTab === "coffee" || activeTab === "dash") {
+    return <CoffeeProvider>{pageShell}</CoffeeProvider>;
+  }
+
+  return pageShell;
 }

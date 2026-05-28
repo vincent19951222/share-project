@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SupplyUiLabPixelPanel,
   SupplyUiLabStatusBadge,
@@ -43,7 +43,7 @@ export function SupplyBackpackScene({
   data: SupplyBackpackPreview;
   onRequestRedemption?: (itemId: string) => void;
   onSelectItem?: (itemId: string) => void;
-  onUseItem?: (itemId: string) => void;
+  onUseItem?: (itemId: string, target?: { recipientUserId?: string }) => void;
   selectedItemId?: string | null;
 }) {
   const [brandLabel = "牛马补给站", activeLabel = "背包"] = data.topBar.breadcrumb;
@@ -341,8 +341,17 @@ function BackpackDetailPanel({
   actionLabel: string | null;
   onAction: (label: string) => void;
   onRequestRedemption?: (itemId: string) => void;
-  onUseItem?: (itemId: string) => void;
+  onUseItem?: (itemId: string, target?: { recipientUserId?: string }) => void;
 }) {
+  const [selectedSocialTargetId, setSelectedSocialTargetId] = useState("");
+  const needsSocialTarget = detail.socialTargets !== undefined;
+  const canUseDirectSocialItem = !needsSocialTarget || selectedSocialTargetId !== "";
+  const awaitingSocialTarget = detail.actionState === "usable" && !canUseDirectSocialItem;
+
+  useEffect(() => {
+    setSelectedSocialTargetId("");
+  }, [detail.itemId]);
+
   function handlePrimaryAction() {
     if (detail.requiresAdminConfirmation && onRequestRedemption) {
       onRequestRedemption(detail.itemId);
@@ -350,7 +359,10 @@ function BackpackDetailPanel({
     }
 
     if (onUseItem) {
-      onUseItem(detail.itemId);
+      onUseItem(
+        detail.itemId,
+        needsSocialTarget ? { recipientUserId: selectedSocialTargetId } : undefined,
+      );
       return;
     }
 
@@ -410,16 +422,39 @@ function BackpackDetailPanel({
         <span>使用后</span>
         <p>{detail.resultPreview}</p>
       </div>
+      {needsSocialTarget ? (
+        <label className="supply-backpack-social-target">
+          <span>点名对象</span>
+          <select
+            aria-label="选择点名对象"
+            onChange={(event) => setSelectedSocialTargetId(event.target.value)}
+            value={selectedSocialTargetId}
+          >
+            <option value="">选择一位同队成员</option>
+            {detail.socialTargets?.map((target) => (
+              <option key={target.userId} value={target.userId}>
+                {target.username}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       <div className="supply-backpack-actions">
         <button
           className="supply-backpack-use-button"
           data-action={detail.requiresAdminConfirmation ? "request-redemption" : "use-item"}
           data-action-state={detail.actionState}
-          disabled={detail.actionState === "active" || detail.actionState === "unavailable"}
+          disabled={
+            detail.actionState === "active" ||
+            detail.actionState === "unavailable" ||
+            awaitingSocialTarget
+          }
           type="button"
           onClick={handlePrimaryAction}
         >
-          {detail.actionState === "active"
+          {awaitingSocialTarget
+            ? "选择队友"
+            : detail.actionState === "active"
             ? "今日已生效"
             : detail.actionState === "admin"
               ? "申请使用"

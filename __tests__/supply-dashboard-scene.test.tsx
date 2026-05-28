@@ -210,6 +210,37 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("奖励领取预览");
   });
 
+  it("shows claimed reward state as a disabled gray button", async () => {
+    const onClaimRewards = vi.fn();
+    const claimedData = {
+      ...supplyDashboardMock,
+      dailyReward: {
+        claimable: false,
+        claimed: true,
+      },
+      dailyQuests: supplyDashboardMock.dailyQuests.map((quest) => ({
+        ...quest,
+        completed: true,
+      })),
+    };
+
+    await act(async () => {
+      root.render(<SupplyDashboardScene data={claimedData} onClaimRewards={onClaimRewards} />);
+    });
+
+    const claimButton = container.querySelector<HTMLButtonElement>("[data-action='claim-ticket']");
+
+    expect(claimButton?.textContent).toBe("已领取");
+    expect(claimButton?.disabled).toBe(true);
+    expect(claimButton?.getAttribute("data-claim-state")).toBe("claimed");
+
+    await act(async () => {
+      claimButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(onClaimRewards).not.toHaveBeenCalled();
+  });
+
   it("lets the unfinished quest card confirm completion in the local demo", async () => {
     await act(async () => {
       root.render(<SupplyDashboardScene data={supplyDashboardMock} />);

@@ -150,14 +150,6 @@ function ShopProductCard({
       <span className="supply-shop-product-body">
         <strong>{product.name}</strong>
         <em>{product.subtitle}</em>
-        <span className="supply-shop-product-tags">
-          {product.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </span>
-        <small>
-          {product.sourceLabel} · {product.limitLabel}
-        </small>
       </span>
       <ProductPrice product={product} />
     </button>

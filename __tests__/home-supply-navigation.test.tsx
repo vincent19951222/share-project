@@ -74,7 +74,9 @@ vi.mock("@/components/gamification/SupplyStation", () => ({
 }));
 
 vi.mock("@/lib/coffee-store", () => ({
-  CoffeeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  CoffeeProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="coffee-provider">{children}</div>
+  ),
 }));
 
 describe("Home supply navigation", () => {
@@ -123,6 +125,35 @@ describe("Home supply navigation", () => {
 
     expect(container.querySelector("[data-testid='home-navbar']")).not.toBeNull();
     expect(container.querySelector("[data-testid='punch-board']")).not.toBeNull();
+  });
+
+  it("does not mount the coffee polling provider on tabs that do not read coffee state", async () => {
+    activeTab = "punch";
+    const { default: Home } = await import("@/app/(board)/page");
+
+    await act(async () => {
+      root.render(<Home />);
+    });
+
+    expect(container.querySelector("[data-testid='coffee-provider']")).toBeNull();
+  });
+
+  it("mounts the coffee polling provider only for coffee-backed tabs", async () => {
+    const { default: DrinkPage } = await import("@/app/(board)/drink/page");
+
+    await act(async () => {
+      root.render(<DrinkPage />);
+    });
+
+    expect(container.querySelector("[data-testid='coffee-provider']")).not.toBeNull();
+
+    const { default: ReportPage } = await import("@/app/(board)/report/page");
+
+    await act(async () => {
+      root.render(<ReportPage />);
+    });
+
+    expect(container.querySelector("[data-testid='coffee-provider']")).not.toBeNull();
   });
 
   it("wires the supply station return action back to the punch tab", async () => {

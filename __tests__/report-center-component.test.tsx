@@ -186,6 +186,7 @@ describe("ReportCenter", () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
+    window.history.pushState({}, "", "/report");
     vi.setSystemTime(new Date("2026-04-24T12:00:00+08:00"));
     vi.stubGlobal(
       "fetch",

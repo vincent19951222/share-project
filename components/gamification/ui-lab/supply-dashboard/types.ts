@@ -62,6 +62,10 @@ export type SupplyDashboardPreview = {
   resources: SupplyDashboardResource[];
   activeEffects: SupplyDashboardActiveEffect[];
   dailyQuests: SupplyDashboardQuest[];
+  dailyReward?: {
+    claimable: boolean;
+    claimed: boolean;
+  };
   shortcutLinks: SupplyDashboardShortcutLink[];
   inventoryPreview: {
     usedSlots: number;

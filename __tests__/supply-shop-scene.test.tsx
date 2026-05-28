@@ -79,6 +79,21 @@ describe("SupplyShopScene", () => {
     expect(container.textContent).not.toContain("生命票");
   });
 
+  it("keeps source and purchase limits out of product cards", async () => {
+    await act(async () => {
+      root.render(<SupplyShopScene data={supplyShopMock} />);
+    });
+
+    const selectedCard = container.querySelector<HTMLElement>(
+      "[data-testid='supply-shop-product-card'][aria-selected='true']",
+    );
+
+    expect(selectedCard?.textContent).not.toContain("来源：");
+    expect(selectedCard?.textContent).not.toContain("每天限购");
+    expect(selectedCard?.textContent).not.toContain("每周限购");
+    expect(selectedCard?.querySelector(".supply-shop-product-limit-badges")).toBeNull();
+  });
+
   it("switches selected product details locally", async () => {
     await act(async () => {
       root.render(<SupplyShopScene data={supplyShopMock} />);

@@ -185,11 +185,15 @@ describe("BoardProvider sync", () => {
   afterEach(() => {
     act(() => root.unmount());
     container.remove();
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      value: false,
+    });
     vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 
-  it("polls every five seconds and keeps client-only state while replacing the snapshot", async () => {
+  it("polls every fifteen seconds and keeps client-only state while replacing the snapshot", async () => {
     await act(async () => {
       root.render(
         <BoardProvider initialState={initialState}>
@@ -200,6 +204,13 @@ describe("BoardProvider sync", () => {
 
     await act(async () => {
       vi.advanceTimersByTime(5000);
+      await Promise.resolve();
+    });
+
+    expect(fetch).not.toHaveBeenCalled();
+
+    await act(async () => {
+      vi.advanceTimersByTime(10000);
       await Promise.resolve();
     });
 
@@ -214,6 +225,65 @@ describe("BoardProvider sync", () => {
     expect(state.activeTab).toBe("dash");
     expect(state.logs).toHaveLength(1);
     expect(state.logs[0].text).toBe("保留这条本地日志");
+  });
+
+  it("skips background polling while the document is hidden", async () => {
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      value: true,
+    });
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={initialState}>
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    await act(async () => {
+      vi.advanceTimersByTime(15000);
+      await Promise.resolve();
+    });
+
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("syncs once when a hidden document becomes visible again", async () => {
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      value: true,
+    });
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={initialState}>
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    await act(async () => {
+      vi.advanceTimersByTime(15000);
+      await Promise.resolve();
+    });
+
+    expect(fetch).not.toHaveBeenCalled();
+
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      value: false,
+    });
+
+    await act(async () => {
+      document.dispatchEvent(new Event("visibilitychange"));
+      await Promise.resolve();
+    });
+
+    expect(fetch).toHaveBeenCalledWith("/api/board/state", {
+      cache: "no-store",
+      credentials: "same-origin",
+    });
   });
 
   it("ignores a stale poll that started while a punch sync was still in flight", async () => {
@@ -285,7 +355,7 @@ describe("BoardProvider sync", () => {
     });
 
     await act(async () => {
-      vi.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(15000);
       await Promise.resolve();
     });
 

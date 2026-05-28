@@ -63,6 +63,11 @@ export type SupplyBackpackSelectedDetail = {
   };
   requiresAdminConfirmation: boolean;
   redemptionStateLabel?: string;
+  socialTargets?: {
+    userId: string;
+    username: string;
+    avatarKey: string;
+  }[];
 };
 
 export type SupplyBackpackPreview = {

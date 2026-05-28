@@ -111,6 +111,7 @@ describe("CoffeeCheckin", () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
+    window.history.pushState({}, "", "/drink");
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
@@ -182,6 +183,27 @@ describe("CoffeeCheckin", () => {
     );
     expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "calendar:refresh" }));
     expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "activity-events:refresh" }));
+  });
+
+  it("does not poll coffee state while a cached provider is no longer on a coffee-backed route", async () => {
+    window.history.pushState({}, "", "/");
+    vi.stubGlobal("fetch", vi.fn());
+
+    await act(async () => {
+      root.render(
+        <CoffeeProvider>
+          <div>cached coffee route</div>
+        </CoffeeProvider>,
+      );
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000);
+      await Promise.resolve();
+    });
+
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("shows an actionable error when the initial coffee state is unauthorized", async () => {

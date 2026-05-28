@@ -1,6 +1,6 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { supplyUiLabResourceIconPaths } from "@/components/gamification/ui-lab/supply-data/resources";
 import { SupplyBackpackScene } from "@/components/gamification/ui-lab/supply-backpack/SupplyBackpackScene";
 import { supplyBackpackMock } from "@/components/gamification/ui-lab/supply-backpack/mock-data";
@@ -185,5 +185,60 @@ describe("SupplyBackpackScene", () => {
     expect(container.querySelector(".supply-backpack-shop-cta a")?.getAttribute("href")).toBe(
       "/dashboard/store",
     );
+  });
+
+  it("requires a teammate target before using a direct social item", async () => {
+    const onUseItem = vi.fn();
+    const socialData = {
+      ...supplyBackpackMock,
+      selectedItemDetail: {
+        ...supplyBackpackMock.itemDetails.find((detail) => detail.itemId === "drink_water_ping")!,
+        socialTargets: [
+          { userId: "user-li", username: "李雷", avatarKey: "avatar-01" },
+          { userId: "user-han", username: "韩梅梅", avatarKey: "avatar-02" },
+        ],
+      },
+      itemDetails: supplyBackpackMock.itemDetails.map((detail) =>
+        detail.itemId === "drink_water_ping"
+          ? {
+              ...detail,
+              socialTargets: [
+                { userId: "user-li", username: "李雷", avatarKey: "avatar-01" },
+                { userId: "user-han", username: "韩梅梅", avatarKey: "avatar-02" },
+              ],
+            }
+          : detail,
+      ),
+    };
+
+    await act(async () => {
+      root.render(
+        <SupplyBackpackScene
+          data={socialData}
+          onUseItem={onUseItem}
+          selectedItemId="drink_water_ping"
+        />,
+      );
+    });
+
+    const targetSelect = container.querySelector<HTMLSelectElement>(
+      "select[aria-label='选择点名对象']",
+    );
+
+    expect(targetSelect).not.toBeNull();
+    expect(container.querySelector(".supply-backpack-use-button")?.textContent).toBe("选择队友");
+
+    await act(async () => {
+      targetSelect!.value = "user-han";
+      targetSelect!.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-action='use-item']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(onUseItem).toHaveBeenCalledWith("drink_water_ping", { recipientUserId: "user-han" });
   });
 });

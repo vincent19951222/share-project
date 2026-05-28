@@ -35,7 +35,6 @@ export type SupplyShopProduct = {
   categoryLabel: string;
   image: string;
   rarity: SupplyShopRarity;
-  tags: string[];
   price: {
     currency: SupplyShopCurrency;
     amount: number;
