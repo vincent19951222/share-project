@@ -69,7 +69,7 @@ const supplyTabs: SupplyTab[] = [
     icon: "◈",
     accent: "#c4b5fd",
     summary: "奖池刷新中，10 连抽还差 3 张券",
-    image: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.png",
+    image: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.webp",
   },
 ];
 

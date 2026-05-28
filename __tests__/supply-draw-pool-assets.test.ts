@@ -4,6 +4,7 @@ import { supplyDrawPoolAssetPaths, supplyDrawPoolMock } from "@/components/gamif
 
 const requiredDrawPoolAssets = [
   ["draw-pool-machine.png", 1600 * 1024],
+  ["draw-pool-machine.webp", 520 * 1024],
   ["draw-pool-capsule-bed.webp", 280 * 1024],
   ["draw-pool-guide-mascot.webp", 160 * 1024],
   ["draw-pool-wristband.webp", 90 * 1024],
@@ -44,6 +45,13 @@ describe("supply draw pool static assets", () => {
     for (const src of Object.values(supplyDrawPoolAssetPaths.rewardIcons)) {
       expect(existsSync(publicPath(src)), `${src} should exist`).toBe(true);
     }
+  });
+
+  it("uses the optimized WebP machine art in draw-pool view models", () => {
+    expect(supplyDrawPoolAssetPaths.drawPool.machine).toBe(
+      "/assets/home-scenes/supply/draw-pool/draw-pool-machine.webp",
+    );
+    expect(existsSync(publicPath(supplyDrawPoolAssetPaths.drawPool.machine))).toBe(true);
   });
 
   it("references existing assets for recent drops and local draw results", () => {
