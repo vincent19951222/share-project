@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarBoard } from "@/components/calendar/CalendarBoard";
-import { CoffeeCheckin } from "@/components/coffee-checkin/CoffeeCheckin";
-import { SupplyStation } from "@/components/gamification/SupplyStation";
+import {
+  DynamicCalendarBoard,
+  DynamicCoffeeCheckin,
+  DynamicReportCenter,
+  DynamicSharedBoard,
+  DynamicSupplyStation,
+} from "@/components/board/dynamic-tabs";
 import { Navbar } from "@/components/navbar/Navbar";
 import { PunchBoard } from "@/components/punch-board/PunchBoard";
-import { ReportCenter } from "@/components/report-center/ReportCenter";
-import { SharedBoard } from "@/components/shared-board/SharedBoard";
 import {
   appTabRoutes,
   supplyPanelRoutes,
@@ -91,12 +93,12 @@ export function BoardApp({
       case "punch":
         return <PunchBoard />;
       case "board":
-        return <SharedBoard isActive={activeTab === "board"} />;
+        return <DynamicSharedBoard isActive={activeTab === "board"} />;
       case "coffee":
-        return <CoffeeCheckin />;
+        return <DynamicCoffeeCheckin />;
       case "supply":
         return (
-          <SupplyStation
+          <DynamicSupplyStation
             initialPanel={supplyPanel}
             onBackToPunch={handleBackToPunch}
             onNavContextChange={handleSupplyNavContextChange}
@@ -104,9 +106,9 @@ export function BoardApp({
           />
         );
       case "calendar":
-        return <CalendarBoard />;
+        return <DynamicCalendarBoard />;
       case "dash":
-        return <ReportCenter />;
+        return <DynamicReportCenter />;
       default:
         return <PunchBoard />;
     }
