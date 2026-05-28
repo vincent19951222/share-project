@@ -67,7 +67,7 @@ describe("SharedBoard polling", () => {
     act(() => {
       root.render(
         <BoardProvider initialState={initialState}>
-          <SharedBoard />
+          <SharedBoard isActive={false} />
         </BoardProvider>,
       );
     });
@@ -103,7 +103,7 @@ describe("SharedBoard polling", () => {
     await act(async () => {
       root.render(
         <BoardProvider initialState={activeBoardState}>
-          <SharedBoard />
+          <SharedBoard isActive />
         </BoardProvider>,
       );
     });
