@@ -301,9 +301,11 @@ function RecentDropsPanel({ data }: { data: SupplyDrawPoolPreview }) {
 }
 
 export function SupplyDrawPoolScene({
+  chrome = "standalone",
   data,
   onDraw,
 }: {
+  chrome?: "standalone" | "embedded";
   data: SupplyDrawPoolPreview;
   onDraw?: (actionId: SupplyDrawPoolActionId) => void;
 }) {
@@ -344,12 +346,15 @@ export function SupplyDrawPoolScene({
   }
 
   return (
-    <main className="supply-draw-pool-scene" aria-label="抽奖池">
+    <main
+      className={`supply-draw-pool-scene${chrome === "embedded" ? " supply-draw-pool-scene--embedded" : ""}`}
+      aria-label="抽奖池"
+    >
       <div className="supply-draw-pool-background" aria-hidden="true">
         <Image alt="" fill priority sizes="100vw" src={data.media.background} unoptimized />
       </div>
       <div className="supply-draw-pool-content">
-        <DrawPoolTopBar data={data} ticketBalance={ticketBalance} />
+        {chrome === "standalone" ? <DrawPoolTopBar data={data} ticketBalance={ticketBalance} /> : null}
         <div className="supply-draw-pool-layout">
           <aside className="supply-draw-pool-left-rail">
             <TicketWalletPanel data={data} ticketBalance={ticketBalance} />
@@ -362,10 +367,12 @@ export function SupplyDrawPoolScene({
           </div>
           <DrawInfoRail data={data} />
         </div>
-        <Link className="supply-draw-pool-back" href={data.backHref}>
-          <span aria-hidden="true">⌂</span>
-          返回大厅
-        </Link>
+        {chrome === "standalone" ? (
+          <Link className="supply-draw-pool-back" href={data.backHref}>
+            <span aria-hidden="true">⌂</span>
+            返回大厅
+          </Link>
+        ) : null}
       </div>
       <DrawResultModal
         canContinueTenDraw={ticketBalance >= 10}

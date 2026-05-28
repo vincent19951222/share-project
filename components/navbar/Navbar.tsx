@@ -10,17 +10,32 @@ import { AssetIcon } from "@/components/ui/AssetIcon";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { TeamDynamicsBell } from "./TeamDynamicsBell";
-import { appTabRoutes } from "@/lib/navigation-routes";
+import {
+  appTabRoutes,
+  supplyNavItems,
+  type SupplyNavContext,
+  type SupplyPanelKey,
+} from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
-export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {}) {
+export function Navbar({
+  activeSupplyPanel,
+  activeTabOverride,
+  supplyNavContext,
+}: {
+  activeSupplyPanel?: SupplyPanelKey;
+  activeTabOverride?: AppTab;
+  supplyNavContext?: SupplyNavContext | null;
+} = {}) {
   const { state } = useBoard();
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
+  const [supplyMenuOpen, setSupplyMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const prefetchedTabsRef = useRef(false);
+  const supplyMenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [, startTransition] = useTransition();
   const currentMember =
     state.members.find((member) => member.id === state.currentUserId) ??
@@ -41,6 +56,7 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
 
   function handleTabChange(tab: AppTab) {
     setMobileTabsOpen(false);
+    setSupplyMenuOpen(false);
 
     if (tab === activeTab) {
       return;
@@ -50,6 +66,40 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
       router.push(appTabRoutes[tab]);
     });
   }
+
+  function handleSupplyPanelChange(panel: SupplyPanelKey) {
+    const item = supplyNavItems.find((candidate) => candidate.id === panel);
+    if (!item) {
+      return;
+    }
+
+    setSupplyMenuOpen(false);
+    startTransition(() => {
+      router.push(item.route);
+    });
+  }
+
+  const clearSupplyMenuCloseTimer = useCallback(() => {
+    if (supplyMenuCloseTimerRef.current) {
+      clearTimeout(supplyMenuCloseTimerRef.current);
+      supplyMenuCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const openSupplyMenu = useCallback(() => {
+    clearSupplyMenuCloseTimer();
+    setSupplyMenuOpen(true);
+  }, [clearSupplyMenuCloseTimer]);
+
+  const scheduleSupplyMenuClose = useCallback(() => {
+    clearSupplyMenuCloseTimer();
+    supplyMenuCloseTimerRef.current = setTimeout(() => {
+      setSupplyMenuOpen(false);
+      supplyMenuCloseTimerRef.current = null;
+    }, 220);
+  }, [clearSupplyMenuCloseTimer]);
+
+  useEffect(() => clearSupplyMenuCloseTimer, [clearSupplyMenuCloseTimer]);
 
   const handleProfileClick = useCallback(() => {
     if (!currentMember) {
@@ -63,10 +113,16 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
   }, []);
 
   const mobileNavLabel = mobileTabsOpen ? "收起导航" : "展开导航";
+  const showSupplyChrome = activeTab === "supply";
 
   return (
     <>
-      <nav ref={navRef} className="app-top-nav w-full shrink-0 px-2 py-2 z-50">
+      <nav
+        ref={navRef}
+        className={`app-top-nav app-top-nav--with-supply-menu w-full shrink-0 px-2 py-2 z-50${
+          showSupplyChrome ? " app-top-nav--supply" : ""
+        }${supplyMenuOpen ? " app-supply-menu-open" : ""}`}
+      >
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3 sm:gap-6">
             <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
@@ -124,7 +180,11 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
               </TabBtn>
               <TabBtn
                 active={activeTab === "supply"}
-                className="supply-tab"
+                className="supply-tab app-supply-primary-tab"
+                onBlur={scheduleSupplyMenuClose}
+                onFocus={openSupplyMenu}
+                onMouseEnter={openSupplyMenu}
+                onMouseLeave={scheduleSupplyMenuClose}
                 onClick={() => handleTabChange("supply")}
               >
                 <AssetIcon name="supply" className="h-4 w-4 object-contain" />
@@ -143,6 +203,41 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
               <span aria-hidden="true">{mobileTabsOpen ? "×" : "≡"}</span>
             </button>
             <TeamDynamicsBell />
+            <div
+              aria-busy={!supplyNavContext}
+              aria-label={supplyNavContext ? "补给站资产" : "补给站资产加载中"}
+              className={`app-supply-assets${supplyNavContext ? "" : " app-supply-assets--loading"}`}
+            >
+              {supplyNavContext ? (
+                supplyNavContext.resources.map((resource) => {
+                  const valueLabel = resource.maxValue ? `${resource.value}/${resource.maxValue}` : `${resource.value}`;
+
+                  return (
+                    <button
+                      aria-label={`${resource.label} ${valueLabel}`}
+                      className={`app-supply-asset-chip app-supply-asset-chip--${resource.id}`}
+                      key={resource.id}
+                      type="button"
+                    >
+                      <img src={resource.iconImage} alt="" aria-hidden="true" />
+                      <span>{resource.label}</span>
+                      <strong>{valueLabel}</strong>
+                    </button>
+                  );
+                })
+              ) : (
+                ["coins", "ticket", "backpack"].map((resourceId) => (
+                  <span
+                    aria-hidden="true"
+                    className={`app-supply-asset-chip app-supply-asset-skeleton app-supply-asset-chip--${resourceId}`}
+                    key={resourceId}
+                  >
+                    <i />
+                    <strong />
+                  </span>
+                ))
+              )}
+            </div>
             <button
               onClick={handleProfileClick}
               disabled={!currentMember}
@@ -232,6 +327,35 @@ export function Navbar({ activeTabOverride }: { activeTabOverride?: AppTab } = {
             </TabBtn>
           </div>
         ) : null}
+        <div
+          className="app-supply-secondary-nav"
+          aria-label="牛马补给站分区导航"
+          onBlur={scheduleSupplyMenuClose}
+          onFocus={openSupplyMenu}
+          onMouseEnter={openSupplyMenu}
+          onMouseLeave={scheduleSupplyMenuClose}
+        >
+          <div className="app-supply-secondary-rail" role="tablist">
+            {supplyNavItems.map((item) => {
+              const selected = item.id === (activeSupplyPanel ?? "dashboard");
+
+              return (
+                <button
+                  aria-current={selected ? "page" : undefined}
+                  aria-selected={selected}
+                  className="app-supply-secondary-tab"
+                  key={item.id}
+                  onClick={() => handleSupplyPanelChange(item.id)}
+                  role="tab"
+                  type="button"
+                >
+                  <img alt="" aria-hidden="true" src={item.iconImage} />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </nav>
       {editModalOpen && currentMember ? (
         <EditProfileModal

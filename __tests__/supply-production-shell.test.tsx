@@ -220,8 +220,10 @@ describe("SupplyStationShell", () => {
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
     expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.textContent).toContain("牛马补给站");
+    expect(container.querySelector(".supply-dashboard-scene")?.getAttribute("aria-label")).toBe("牛马补给站");
+    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
     expect(container.textContent).toContain("工位重启");
   });
 
@@ -373,15 +375,10 @@ describe("SupplyStationShell", () => {
     const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
 
     await act(async () => {
-      root.render(<SupplyStationShell />);
+      root.render(<SupplyStationShell initialPanel="shop" />);
     });
     await flush();
 
-    await act(async () => {
-      Array.from(container.querySelectorAll("button"))
-        .find((button) => button.textContent?.includes("补给商店"))
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
     await act(async () => {
       container
         .querySelector<HTMLButtonElement>("[data-action='purchase-shop-item']")
@@ -403,6 +400,57 @@ describe("SupplyStationShell", () => {
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
     expect(container.textContent).toContain("购买成功");
+  });
+
+  it("updates the shared nav asset cache after a supply mutation refreshes state", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            purchase: {
+              id: "purchase-1",
+              itemId: "task_reroll_coupon",
+              totalPriceCoins: 150,
+            },
+            snapshot: {},
+          }),
+        )
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            snapshot: buildSnapshot({
+              resources: {
+                coins: { label: "银子", value: 2250 },
+                ticket: { label: "抽奖券", value: 12 },
+                backpack: { label: "背包", value: 3, maxValue: 60 },
+              },
+            }),
+          }),
+        ),
+    );
+    const { getCachedSupplyNavContext } = await import("@/lib/supply-nav-cache");
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell initialPanel="shop" />);
+    });
+    await flush();
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-action='purchase-shop-item']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(getCachedSupplyNavContext()?.resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "coins", value: 2250 }),
+        expect.objectContaining({ id: "backpack", value: 3, maxValue: 60 }),
+      ]),
+    );
   });
 
   it("keeps the legacy SupplyStation export on the production shell", async () => {

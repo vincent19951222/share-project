@@ -104,11 +104,13 @@ function getMenuBadge(
 }
 
 export function SupplyTaskRecordScene({
+  chrome = "standalone",
   data,
   onBackToPunch,
   onRespondSocialInvitation,
   onSelectSupplyTab,
 }: {
+  chrome?: "standalone" | "embedded";
   data: SupplyTaskRecordPreview;
   onBackToPunch?: () => void;
   onRespondSocialInvitation?: (inviteId: string) => void;
@@ -154,23 +156,25 @@ export function SupplyTaskRecordScene({
   }
 
   return (
-    <main className="supply-task-record-scene">
+    <main className={`supply-task-record-scene${chrome === "embedded" ? " supply-task-record-scene--embedded" : ""}`}>
       <div className="supply-task-record-background" aria-hidden="true" />
       <div className="supply-task-record-content">
-        <SupplyUiLabTopBar
-          activeLabel="任务记录"
-          onSelectTab={onSelectSupplyTab}
-          profile={data.topBar.profile}
-          resources={data.topBar.resources}
-          returnAction={
-            onBackToPunch
-              ? {
-                  label: "回到打卡",
-                  onClick: onBackToPunch,
-                }
-              : undefined
-          }
-        />
+        {chrome === "standalone" ? (
+          <SupplyUiLabTopBar
+            activeLabel="任务记录"
+            onSelectTab={onSelectSupplyTab}
+            profile={data.topBar.profile}
+            resources={data.topBar.resources}
+            returnAction={
+              onBackToPunch
+                ? {
+                    label: "回到打卡",
+                    onClick: onBackToPunch,
+                  }
+                : undefined
+            }
+          />
+        ) : null}
         <section className="supply-task-record-shell" aria-label="任务记录静态页">
           <TaskRecordSidebar
             activeMode={activeMode}

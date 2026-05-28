@@ -5,16 +5,20 @@ import type { AppTab } from "@/lib/types";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-const { dispatchMock } = vi.hoisted(() => ({
+const { dispatchMock, fetchSupplyStationStateMock, navbarPropsMock, supplyContextReports } = vi.hoisted(() => ({
   dispatchMock: vi.fn(),
+  fetchSupplyStationStateMock: vi.fn(),
+  navbarPropsMock: vi.fn(),
+  supplyContextReports: { current: 0 },
 }));
 
 const routerPushMock = vi.fn();
 let activeTab: AppTab = "punch";
+let currentUserId = "u1";
 
 vi.mock("@/lib/store", () => ({
   useBoard: () => ({
-    state: { activeTab },
+    state: { activeTab, currentUserId },
     dispatch: dispatchMock,
   }),
 }));
@@ -23,8 +27,15 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: routerPushMock }),
 }));
 
+vi.mock("@/lib/api", () => ({
+  fetchSupplyStationState: fetchSupplyStationStateMock,
+}));
+
 vi.mock("@/components/navbar/Navbar", () => ({
-  Navbar: () => <nav data-testid="home-navbar">首页导航</nav>,
+  Navbar: (props: Record<string, unknown>) => {
+    navbarPropsMock(props);
+    return <nav data-testid="home-navbar">首页导航</nav>;
+  },
 }));
 
 vi.mock("@/components/punch-board/PunchBoard", () => ({
@@ -47,31 +58,65 @@ vi.mock("@/components/calendar/CalendarBoard", () => ({
   CalendarBoard: () => <section data-testid="calendar-board">牛马日历</section>,
 }));
 
-vi.mock("@/components/gamification/SupplyStation", () => ({
-  SupplyStation: ({
-    initialPanel,
-    onBackToPunch,
-    onPanelChange,
-  }: {
-    initialPanel?: string;
-    onBackToPunch?: () => void;
-    onPanelChange?: (panel: "shop" | "taskRecord") => void;
-  }) => (
-    <section data-testid="supply-station">
-      牛马补给站
-      <span data-testid="supply-panel">{initialPanel}</span>
-      <button onClick={onBackToPunch} type="button">
-        回到打卡
-      </button>
-      <button onClick={() => onPanelChange?.("shop")} type="button">
-        去商店
-      </button>
-      <button onClick={() => onPanelChange?.("taskRecord")} type="button">
-        去任务记录
-      </button>
-    </section>
-  ),
-}));
+vi.mock("@/components/gamification/SupplyStation", async () => {
+  const React = await vi.importActual<typeof import("react")>("react");
+
+  function createSupplyNavContext() {
+    return {
+      resources: [
+        { id: "coins", label: "银子", value: 440, iconImage: "/assets/home-scenes/supply/shared/supply-resource-coins.png" },
+        { id: "ticket", label: "抽奖券", value: 7, iconImage: "/assets/home-scenes/supply/shared/supply-resource-ticket.png" },
+        {
+          id: "backpack",
+          label: "背包",
+          value: 12,
+          maxValue: 60,
+          iconImage: "/assets/home-scenes/supply/shared/supply-resource-backpack.png",
+        },
+      ],
+      profile: { username: "li", avatarKey: "male1" },
+    };
+  }
+
+  return {
+    SupplyStation: ({
+      initialPanel,
+      onBackToPunch,
+      onNavContextChange,
+      onPanelChange,
+    }: {
+      initialPanel?: string;
+      onBackToPunch?: () => void;
+      onNavContextChange?: (context: unknown) => void;
+      onPanelChange?: (panel: "shop" | "taskRecord") => void;
+    }) => {
+      React.useEffect(() => {
+        supplyContextReports.current += 1;
+        if (supplyContextReports.current > 5) {
+          throw new Error("supply nav context callback is unstable");
+        }
+
+        onNavContextChange?.(createSupplyNavContext());
+      }, [onNavContextChange]);
+
+      return (
+        <section data-testid="supply-station">
+          牛马补给站
+          <span data-testid="supply-panel">{initialPanel}</span>
+          <button onClick={onBackToPunch} type="button">
+            回到打卡
+          </button>
+          <button onClick={() => onPanelChange?.("shop")} type="button">
+            去商店
+          </button>
+          <button onClick={() => onPanelChange?.("taskRecord")} type="button">
+            去任务记录
+          </button>
+        </section>
+      );
+    },
+  };
+});
 
 vi.mock("@/lib/coffee-store", () => ({
   CoffeeProvider: ({ children }: { children: React.ReactNode }) => (
@@ -82,32 +127,54 @@ vi.mock("@/lib/coffee-store", () => ({
 describe("Home supply navigation", () => {
   let container: HTMLDivElement;
   let root: Root;
+  const supplySnapshot = {
+    resources: {
+      coins: { label: "银子", value: 440 },
+      ticket: { label: "抽奖券", value: 7 },
+      backpack: { label: "背包", value: 12, maxValue: 60 },
+    },
+    profile: { username: "li", avatarKey: "male1" },
+  };
 
   beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
+    fetchSupplyStationStateMock.mockResolvedValue(supplySnapshot);
   });
 
   afterEach(() => {
     act(() => root.unmount());
     container.remove();
     activeTab = "punch";
+    currentUserId = "u1";
     dispatchMock.mockClear();
+    fetchSupplyStationStateMock.mockClear();
+    navbarPropsMock.mockClear();
     routerPushMock.mockClear();
+    supplyContextReports.current = 0;
     vi.resetModules();
   });
 
-  it("hides the home navbar while the dashboard status route is active", async () => {
+  it("keeps the home navbar while the dashboard status route is active", async () => {
     const { default: SupplyStatusPage } = await import("@/app/(board)/dashboard/status/page");
 
     await act(async () => {
       root.render(<SupplyStatusPage />);
     });
 
-    expect(container.querySelector("[data-testid='home-navbar']")).toBeNull();
+    expect(container.querySelector("[data-testid='home-navbar']")).not.toBeNull();
     expect(container.querySelector("[data-testid='supply-station']")).not.toBeNull();
     expect(container.querySelector("[data-testid='supply-panel']")?.textContent).toBe("dashboard");
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "supply",
+        activeSupplyPanel: "dashboard",
+        supplyNavContext: expect.objectContaining({
+          profile: { username: "li", avatarKey: "male1" },
+        }),
+      }),
+    );
     expect(container.querySelector("[data-testid='punch-board']")).toBeNull();
     expect(container.querySelector("[data-testid='shared-board']")).toBeNull();
     expect(container.querySelector("[data-testid='coffee-checkin']")).toBeNull();
@@ -123,8 +190,102 @@ describe("Home supply navigation", () => {
       root.render(<Home />);
     });
 
+    await act(async () => {
+      await Promise.resolve();
+    });
+
     expect(container.querySelector("[data-testid='home-navbar']")).not.toBeNull();
     expect(container.querySelector("[data-testid='punch-board']")).not.toBeNull();
+    expect(fetchSupplyStationStateMock).toHaveBeenCalledTimes(1);
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "punch",
+        supplyNavContext: expect.objectContaining({
+          profile: { username: "li", avatarKey: "male1" },
+        }),
+      }),
+    );
+  });
+
+  it("reuses cached supply assets on regular tab switches without refetching", async () => {
+    const { cacheSupplyNavSnapshot } = await import("@/lib/supply-nav-cache");
+    cacheSupplyNavSnapshot(supplySnapshot as never, currentUserId);
+    activeTab = "punch";
+    const { default: Home } = await import("@/app/(board)/page");
+
+    await act(async () => {
+      root.render(<Home />);
+    });
+
+    expect(fetchSupplyStationStateMock).not.toHaveBeenCalled();
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "punch",
+        supplyNavContext: expect.objectContaining({
+          resources: expect.arrayContaining([
+            expect.objectContaining({ id: "coins", value: 440 }),
+            expect.objectContaining({ id: "ticket", value: 7 }),
+            expect.objectContaining({ id: "backpack", value: 12, maxValue: 60 }),
+          ]),
+        }),
+      }),
+    );
+
+    navbarPropsMock.mockClear();
+    activeTab = "board";
+    const { default: SharedBoardRoutePage } = await import("@/app/(board)/board/page");
+
+    await act(async () => {
+      root.render(<SharedBoardRoutePage />);
+    });
+
+    expect(fetchSupplyStationStateMock).not.toHaveBeenCalled();
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "board",
+        supplyNavContext: expect.objectContaining({
+          profile: { username: "li", avatarKey: "male1" },
+        }),
+      }),
+    );
+  });
+
+  it("does not reuse another user's cached supply assets after an account switch", async () => {
+    const { cacheSupplyNavSnapshot } = await import("@/lib/supply-nav-cache");
+    cacheSupplyNavSnapshot(supplySnapshot as never, "u1");
+    currentUserId = "u2";
+    fetchSupplyStationStateMock.mockResolvedValueOnce({
+      resources: {
+        coins: { label: "银子", value: 125 },
+        ticket: { label: "抽奖券", value: 2 },
+        backpack: { label: "背包", value: 4, maxValue: 60 },
+      },
+      profile: { username: "wang", avatarKey: "female1" },
+    });
+    const { default: Home } = await import("@/app/(board)/page");
+
+    await act(async () => {
+      root.render(<Home />);
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(fetchSupplyStationStateMock).toHaveBeenCalledTimes(1);
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "punch",
+        supplyNavContext: expect.objectContaining({
+          resources: expect.arrayContaining([
+            expect.objectContaining({ id: "coins", value: 125 }),
+            expect.objectContaining({ id: "ticket", value: 2 }),
+            expect.objectContaining({ id: "backpack", value: 4, maxValue: 60 }),
+          ]),
+          profile: { username: "wang", avatarKey: "female1" },
+        }),
+      }),
+    );
   });
 
   it("does not mount the coffee polling provider on tabs that do not read coffee state", async () => {

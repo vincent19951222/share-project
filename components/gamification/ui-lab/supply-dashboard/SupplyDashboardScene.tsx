@@ -428,6 +428,7 @@ function TeamAnnouncementBar({ message }: { message: string }) {
 }
 
 export function SupplyDashboardScene({
+  chrome = "standalone",
   data,
   feedbackMessage: controlledFeedbackMessage,
   onBackToPunch,
@@ -437,6 +438,7 @@ export function SupplyDashboardScene({
   onRerollQuest,
   onSelectSupplyTab,
 }: {
+  chrome?: "standalone" | "embedded";
   data: SupplyDashboardPreview;
   feedbackMessage?: string | null;
   onBackToPunch?: () => void;
@@ -512,7 +514,10 @@ export function SupplyDashboardScene({
   }
 
   return (
-    <main className="supply-dashboard-scene" aria-label="牛马补给站">
+    <main
+      className={`supply-dashboard-scene${chrome === "embedded" ? " supply-dashboard-scene--embedded" : ""}`}
+      aria-label="牛马补给站"
+    >
       <div className="supply-dashboard-background" aria-hidden="true">
         <Image
           alt=""
@@ -525,23 +530,25 @@ export function SupplyDashboardScene({
       </div>
 
       <div className="supply-dashboard-content">
-        <SupplyUiLabTopBar
-          activeLabel="我的状态"
-          onSelectTab={onSelectSupplyTab}
-          returnAction={
-            onBackToPunch
-              ? {
-                  label: "回到打卡",
-                  onClick: onBackToPunch,
-                }
-              : undefined
-          }
-          profile={{
-            username: data.profile.username,
-            avatar: data.profile.avatar,
-          }}
-          resources={getTopBarResources(data)}
-        />
+        {chrome === "standalone" ? (
+          <SupplyUiLabTopBar
+            activeLabel="我的状态"
+            onSelectTab={onSelectSupplyTab}
+            returnAction={
+              onBackToPunch
+                ? {
+                    label: "回到打卡",
+                    onClick: onBackToPunch,
+                  }
+                : undefined
+            }
+            profile={{
+              username: data.profile.username,
+              avatar: data.profile.avatar,
+            }}
+            resources={getTopBarResources(data)}
+          />
+        ) : null}
         <section className="supply-dashboard-stage" aria-label="我的状态原型舞台">
           <MobileHeroSummary data={data} />
           <CharacterStatusPanel data={data} />

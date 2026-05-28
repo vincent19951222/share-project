@@ -307,6 +307,7 @@ function ShopDetail({
 }
 
 export function SupplyShopScene({
+  chrome = "standalone",
   data,
   onBackToPunch,
   onPurchase,
@@ -314,6 +315,7 @@ export function SupplyShopScene({
   onSelectSupplyTab,
   selectedProductId: controlledSelectedProductId,
 }: {
+  chrome?: "standalone" | "embedded";
   data: SupplyShopPreview;
   onBackToPunch?: () => void;
   onPurchase?: (itemId: string) => void;
@@ -373,23 +375,28 @@ export function SupplyShopScene({
   }
 
   return (
-    <main className="supply-shop-scene" aria-label="补给商店">
+    <main
+      className={`supply-shop-scene${chrome === "embedded" ? " supply-shop-scene--embedded" : ""}`}
+      aria-label="补给商店"
+    >
       <div className="supply-shop-background" aria-hidden="true" />
       <div className="supply-shop-content">
-        <SupplyUiLabTopBar
-          activeLabel="补给商店"
-          onSelectTab={onSelectSupplyTab}
-          profile={data.topBar.profile}
-          resources={data.topBar.resources}
-          returnAction={
-            onBackToPunch
-              ? {
-                  label: "回到打卡",
-                  onClick: onBackToPunch,
-                }
-              : undefined
-          }
-        />
+        {chrome === "standalone" ? (
+          <SupplyUiLabTopBar
+            activeLabel="补给商店"
+            onSelectTab={onSelectSupplyTab}
+            profile={data.topBar.profile}
+            resources={data.topBar.resources}
+            returnAction={
+              onBackToPunch
+                ? {
+                    label: "回到打卡",
+                    onClick: onBackToPunch,
+                  }
+                : undefined
+            }
+          />
+        ) : null}
         <section className="supply-shop-shell" aria-label="补给商店静态复刻">
           <ShopSidebar data={data} onSelectCategory={handleSelectCategory} selectedCategoryId={selectedCategoryId} />
           <ShopCatalog

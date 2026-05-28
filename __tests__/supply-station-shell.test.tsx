@@ -150,18 +150,13 @@ describe("SupplyStation legacy entry", () => {
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
     expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.textContent).toContain("牛马补给站");
+    expect(container.querySelector(".supply-dashboard-scene")?.getAttribute("aria-label")).toBe("牛马补给站");
+    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
     expect(container.textContent).toContain("工位重启");
 
-    const ruleLink = Array.from(container.querySelectorAll("a")).find((link) =>
-      link.textContent?.includes("玩法规则"),
-    );
-    const probabilityLink = Array.from(container.querySelectorAll("a")).find((link) =>
-      link.textContent?.includes("抽奖概率"),
-    );
-
-    expect(ruleLink?.getAttribute("href")).toBe("/docs?tab=rules#supply-station-rules");
-    expect(probabilityLink?.getAttribute("href")).toBe("/docs?tab=rules#supply-station-probability");
+    expect(container.textContent).not.toContain("玩法规则");
+    expect(container.textContent).not.toContain("抽奖概率");
   });
 });

@@ -156,6 +156,19 @@ describe("supply dashboard static scene", () => {
     expect(container.textContent).toContain("任务记录");
   });
 
+  it("can render embedded in the shared app shell without its internal topbar", async () => {
+    await act(async () => {
+      root.render(<SupplyDashboardScene chrome="embedded" data={supplyDashboardMock} />);
+    });
+
+    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
+    expect(container.querySelector(".supply-ui-lab-tabs")).toBeNull();
+    expect(container.querySelector(".supply-ui-lab-resource-strip")).toBeNull();
+    expect(container.querySelector(".supply-dashboard-stage")).not.toBeNull();
+  });
+
   it("uses atomic art assets plus the shared topbar logo", async () => {
     await act(async () => {
       root.render(<SupplyDashboardScene data={supplyDashboardMock} />);

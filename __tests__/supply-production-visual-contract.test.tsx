@@ -146,8 +146,10 @@ describe("production supply UI Lab visual contract", () => {
   });
 
   it("renders the approved UI Lab dashboard scene in production", async () => {
+    const navContextMock = vi.fn();
+
     await act(async () => {
-      root.render(<SupplyStationShell />);
+      root.render(<SupplyStationShell onNavContextChange={navContextMock} />);
     });
 
     await act(async () => {
@@ -155,39 +157,40 @@ describe("production supply UI Lab visual contract", () => {
     });
 
     expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-background")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
-    expect(container.querySelector(".supply-ui-lab-topbar")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-production-nav")).toBeNull();
-    expect(container.textContent).toContain("银子");
-    expect(container.textContent).toContain("845");
     expect(container.textContent).toContain("50/1000");
     expect(container.textContent).not.toContain("生产模式");
     expect(container.textContent).not.toContain("操作会写入真实补给站数据");
+    expect(navContextMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        resources: expect.arrayContaining([
+          expect.objectContaining({ id: "coins", label: "银子", value: 845 }),
+          expect.objectContaining({ id: "ticket", label: "抽奖券", value: 5 }),
+          expect.objectContaining({ id: "backpack", label: "背包", value: 17, maxValue: 60 }),
+        ]),
+        profile: { username: "li", avatarKey: "male1" },
+      }),
+    );
   });
 
-  it("keeps top navigation inside production supply station instead of linking to UI Lab routes", async () => {
+  it("embeds production panels without their internal top navigation", async () => {
     await act(async () => {
-      root.render(<SupplyStationShell onBackToPunch={vi.fn()} />);
+      root.render(<SupplyStationShell initialPanel="shop" onBackToPunch={vi.fn()} />);
     });
 
     await act(async () => {
       await Promise.resolve();
     });
 
-    const shopTab = container.querySelector<HTMLButtonElement>(".supply-ui-lab-topbar-tab--shop");
-
-    expect(shopTab?.tagName).toBe("BUTTON");
-    expect(shopTab?.getAttribute("href")).toBeNull();
-    expect(container.querySelector(".supply-ui-lab-return-action")?.textContent).toContain("回到打卡");
-
-    await act(async () => {
-      shopTab?.click();
-    });
-
     expect(container.querySelector(".supply-shop-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-ui-lab-return-action")?.textContent).toContain("回到打卡");
+    expect(container.querySelector(".supply-shop-scene--embedded")).not.toBeNull();
+    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
+    expect(container.querySelector(".supply-ui-lab-return-action")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-tabs a[href^='/ui-lab/supply-dashboard']")).toBeNull();
   });
 });

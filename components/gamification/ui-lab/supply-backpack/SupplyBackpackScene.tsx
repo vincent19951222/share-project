@@ -34,12 +34,14 @@ function isCategoryMatch(item: SupplyBackpackInventoryItem, categoryId: SupplyBa
 }
 
 export function SupplyBackpackScene({
+  chrome = "standalone",
   data,
   onRequestRedemption,
   onSelectItem,
   onUseItem,
   selectedItemId: controlledSelectedItemId,
 }: {
+  chrome?: "standalone" | "embedded";
   data: SupplyBackpackPreview;
   onRequestRedemption?: (itemId: string) => void;
   onSelectItem?: (itemId: string) => void;
@@ -86,16 +88,21 @@ export function SupplyBackpackScene({
   }
 
   return (
-    <main className="supply-backpack-scene" aria-label="牛马补给站背包静态原型">
+    <main
+      className={`supply-backpack-scene${chrome === "embedded" ? " supply-backpack-scene--embedded" : ""}`}
+      aria-label="牛马补给站背包静态原型"
+    >
       <div className="supply-backpack-background" aria-hidden="true" />
       <div className="supply-backpack-content">
-        <SupplyUiLabTopBar
-          activeLabel={activeLabel}
-          brandLabel={brandLabel}
-          closeHref="/dashboard/status"
-          resources={data.topBar.resources}
-          variant="breadcrumb"
-        />
+        {chrome === "standalone" ? (
+          <SupplyUiLabTopBar
+            activeLabel={activeLabel}
+            brandLabel={brandLabel}
+            closeHref="/dashboard/status"
+            resources={data.topBar.resources}
+            variant="breadcrumb"
+          />
+        ) : null}
         <section className="supply-backpack-shell" aria-label="背包静态复刻">
           <BackpackSidebar
             data={data}

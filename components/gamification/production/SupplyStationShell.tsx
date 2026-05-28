@@ -21,6 +21,9 @@ import type { SupplyUiLabTopBarTabId } from "@/components/gamification/ui-lab/su
 import { SupplyDrawPoolScene } from "@/components/gamification/ui-lab/supply-draw-pool/SupplyDrawPoolScene";
 import { SupplyShopScene } from "@/components/gamification/ui-lab/supply-shop/SupplyShopScene";
 import { SupplyTaskRecordScene } from "@/components/gamification/ui-lab/supply-task-record/SupplyTaskRecordScene";
+import type { SupplyNavContext } from "@/lib/navigation-routes";
+import { cacheSupplyNavSnapshot } from "@/lib/supply-nav-cache";
+import { buildSupplyNavContext } from "@/lib/supply-nav-context";
 import type {
   GamificationDimensionSnapshot,
   GamificationLotteryDrawSnapshot,
@@ -95,10 +98,12 @@ function normalizeBackpackUseTarget(
 export function SupplyStationShell({
   initialPanel = "dashboard",
   onBackToPunch,
+  onNavContextChange,
   onPanelChange,
 }: {
   initialPanel?: SupplyProductionPanel;
   onBackToPunch?: () => void;
+  onNavContextChange?: (context: SupplyNavContext | null) => void;
   onPanelChange?: (panel: SupplyProductionPanel) => void;
 }) {
   const [snapshot, setSnapshot] = useState<SupplyStationProductionSnapshot | null>(null);
@@ -110,15 +115,20 @@ export function SupplyStationShell({
   const [error, setError] = useState<SupplyErrorState | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const applySnapshot = useCallback((nextSnapshot: SupplyStationProductionSnapshot) => {
+    cacheSupplyNavSnapshot(nextSnapshot);
+    setSnapshot(nextSnapshot);
+  }, []);
+
   const loadSnapshot = useCallback(async () => {
     try {
       setError(null);
       const nextSnapshot = await fetchSupplyStationState();
-      setSnapshot(nextSnapshot);
+      applySnapshot(nextSnapshot);
     } catch (caught) {
       setError(getSupplyErrorState(caught));
     }
-  }, []);
+  }, [applySnapshot]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -127,6 +137,10 @@ export function SupplyStationShell({
   useEffect(() => {
     setActivePanel(initialPanel);
   }, [initialPanel]);
+
+  useEffect(() => {
+    onNavContextChange?.(snapshot ? buildSupplyNavContext(snapshot) : null);
+  }, [onNavContextChange, snapshot]);
 
   const selectPanel = useCallback(
     (panel: SupplyProductionPanel) => {
@@ -145,7 +159,7 @@ export function SupplyStationShell({
       try {
         const message = await work();
         const nextSnapshot = await fetchSupplyStationState();
-        setSnapshot(nextSnapshot);
+        applySnapshot(nextSnapshot);
         setSuccessMessage(message ?? "操作成功");
       } catch (caught) {
         setError(getSupplyErrorState(caught));
@@ -153,7 +167,7 @@ export function SupplyStationShell({
         setActiveAction(null);
       }
     },
-    [],
+    [applySnapshot],
   );
 
   const handleCompleteTask = useCallback(
@@ -283,6 +297,7 @@ export function SupplyStationShell({
         <>
           {activePanel === "dashboard" ? (
             <SupplyDashboardScene
+              chrome="embedded"
               data={toSupplyDashboardPreview(snapshot)}
               feedbackMessage={successMessage}
               onBackToPunch={onBackToPunch}
@@ -296,6 +311,7 @@ export function SupplyStationShell({
 
           {activePanel === "drawPool" ? (
             <SupplyDrawPoolScene
+              chrome="embedded"
               data={toSupplyDrawPoolPreview(snapshot, latestDraw)}
               onDraw={(actionId) =>
                 handleDraw(
@@ -308,6 +324,7 @@ export function SupplyStationShell({
 
           {activePanel === "backpack" ? (
             <SupplyBackpackScene
+              chrome="embedded"
               data={toSupplyBackpackPreview(snapshot, selectedBackpackItemId)}
               onRequestRedemption={handleRequestRedemption}
               onSelectItem={setSelectedBackpackItemId}
@@ -318,6 +335,7 @@ export function SupplyStationShell({
 
           {activePanel === "shop" ? (
             <SupplyShopScene
+              chrome="embedded"
               data={toSupplyShopPreview(snapshot, selectedShopItemId)}
               onBackToPunch={onBackToPunch}
               onPurchase={handlePurchase}
@@ -329,6 +347,7 @@ export function SupplyStationShell({
 
           {activePanel === "taskRecord" ? (
             <SupplyTaskRecordScene
+              chrome="embedded"
               data={toSupplyTaskRecordPreview(snapshot)}
               onBackToPunch={onBackToPunch}
               onRespondSocialInvitation={handleRespondSocialInvitation}
