@@ -1,6 +1,9 @@
 import { PrismaClient } from "@/lib/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-const adapter = new PrismaBetterSqlite3({ url: "file:./.local/dev.db" });
+import { ensureSqliteDatabaseDirectory, resolveSqliteDatabaseUrl } from "@/lib/sqlite-db-config";
+
+ensureSqliteDatabaseDirectory();
+const adapter = new PrismaBetterSqlite3({ url: resolveSqliteDatabaseUrl() });
 const prisma = new PrismaClient({ adapter });
 
 const USERS = [

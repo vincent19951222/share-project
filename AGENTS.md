@@ -76,7 +76,7 @@ lib/
 
 prisma/
   schema.prisma     # 数据库模型定义
-  dev.db            # 本地开发 SQLite 数据库文件（不作为生产库）
+  dev.db            # SQLite 文件名，默认存放在 ~/data/share-project（不作为生产库）
   seed.ts           # 数据库种子脚本
 ```
 
@@ -84,14 +84,14 @@ prisma/
 
 - **生产代码目录**: `E:\Projects\share-project`
 - **生产数据库**: `E:\data\share-project\prod.db`
-- **开发数据库**: `prisma/dev.db`
+- **开发数据库**: `~/data/share-project/dev.db`
 - **生产环境变量**: `DATABASE_URL="file:/E:/data/share-project/prod.db"`
-- **开发环境变量**: `DATABASE_URL="file:./prisma/dev.db"`
+- **开发环境变量**: `DATABASE_URL="file:~/data/share-project/dev.db"`
 
 **重要**:
 - 生产数据库不进 git
-- `prisma/dev.db` 仅用于本地开发，不作为生产数据库
-- 新拉取项目后默认没有 `prisma/dev.db`，这是预期行为
+- 本地开发库默认存放在 `~/data/share-project/dev.db`，不作为生产数据库
+- 新拉取项目后默认没有本地开发库文件，这是预期行为
 - 本地开发前需要执行 `npx prisma db push` 和 `npx tsx prisma/seed.ts` 来初始化开发库
 - 推荐将生产目录和开发目录分开，例如 `share-project` / `share-project-dev`
 - Windows 下用 PM2 时，直接托管 `next`，不要用 `pm2 start npm --name ... -- start`

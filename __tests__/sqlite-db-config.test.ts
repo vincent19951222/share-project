@@ -1,3 +1,4 @@
+import os from "os";
 import path from "path";
 import { describe, expect, it } from "vitest";
 import { resolveSqliteDatabasePath, resolveSqliteDatabaseUrl } from "@/lib/sqlite-db-config";
@@ -33,9 +34,19 @@ describe("sqlite database config", () => {
     expect(resolveSqliteDatabaseUrl(config)).toBe(`file:${expectedPath.replace(/\\/g, "/")}`);
   });
 
-  it("falls back to prisma/dev.db for local development", () => {
+  it("expands ~ inside DATABASE_URL values", () => {
+    const config = {
+      DATABASE_URL: "file:~/data/share-project/dev.db",
+    };
+    const expectedPath = path.join(os.homedir(), "data", "share-project", "dev.db");
+
+    expect(resolveSqliteDatabasePath(config)).toBe(expectedPath);
+    expect(resolveSqliteDatabaseUrl(config)).toBe(`file:${expectedPath.replace(/\\/g, "/")}`);
+  });
+
+  it("falls back to ~/data/share-project/dev.db for local development", () => {
     const config = {};
-    const expectedPath = path.resolve(process.cwd(), "prisma", "dev.db");
+    const expectedPath = path.join(os.homedir(), "data", "share-project", "dev.db");
 
     expect(resolveSqliteDatabasePath(config)).toBe(expectedPath);
     expect(resolveSqliteDatabaseUrl(config)).toBe(`file:${expectedPath.replace(/\\/g, "/")}`);

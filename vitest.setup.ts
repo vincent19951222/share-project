@@ -1,17 +1,10 @@
 import fs from "fs";
 import path from "path";
+import Database from "better-sqlite3";
 
 const projectRoot = process.cwd();
-const sourceDbPath = path.resolve(projectRoot, "prisma", "dev.db");
 const testDbPath = path.resolve(projectRoot, "prisma", "vitest.db");
-
-function copyIfExists(sourcePath: string, targetPath: string) {
-  if (!fs.existsSync(sourcePath)) {
-    return;
-  }
-
-  fs.copyFileSync(sourcePath, targetPath);
-}
+const migrationsPath = path.resolve(projectRoot, "prisma", "migrations");
 
 fs.mkdirSync(path.dirname(testDbPath), { recursive: true });
 
@@ -23,8 +16,21 @@ for (const suffix of ["", "-shm", "-wal"]) {
   }
 }
 
-copyIfExists(sourceDbPath, testDbPath);
-copyIfExists(`${sourceDbPath}-shm`, `${testDbPath}-shm`);
-copyIfExists(`${sourceDbPath}-wal`, `${testDbPath}-wal`);
+const db = new Database(testDbPath);
+
+try {
+  const migrationFiles = fs
+    .readdirSync(migrationsPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(migrationsPath, entry.name, "migration.sql"))
+    .filter((migrationPath) => fs.existsSync(migrationPath))
+    .sort();
+
+  for (const migrationPath of migrationFiles) {
+    db.exec(fs.readFileSync(migrationPath, "utf8"));
+  }
+} finally {
+  db.close();
+}
 
 process.env.PRISMA_DB_PATH = testDbPath;

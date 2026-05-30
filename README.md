@@ -24,10 +24,10 @@ npm install
 
 ## 本地开发
 
-本地开发默认使用仓库内的开发数据库：
+本地开发默认使用用户目录下的开发数据库：
 
 ```env
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="file:~/data/share-project/dev.db"
 ```
 
 `.env.example` 已经是这个默认值。首次启动本地开发时，建议按下面顺序执行：
@@ -40,9 +40,9 @@ npm run dev
 
 说明：
 
-- 新拉取项目后，默认不会自带 `prisma/dev.db`
+- 新拉取项目后，默认不会自带本地开发数据库文件
 - 这是预期行为，因为 `dev.db` 不再作为仓库文件提交
-- `npx prisma db push` 会创建本地开发数据库和表结构
+- `npx prisma db push` 会在 `~/data/share-project/dev.db` 创建本地开发数据库和表结构
 - `npx tsx prisma/seed.ts` 会写入一份基础开发数据
 - 本地 `dev.db` 应视为可重建文件，而不是需要从 git 同步的资产
 
@@ -122,7 +122,7 @@ cmd /c pm2 delete share-project
 
 ### 开发数据库
 
-- 默认路径：`prisma/dev.db`
+- 默认路径：`~/data/share-project/dev.db`
 - 用途：本地开发、调试、跑种子
 - 不作为生产数据源
 - 不应再作为多人同步数据库的方式
