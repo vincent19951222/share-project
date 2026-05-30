@@ -24,8 +24,21 @@ interface SeasonAdminPanelProps {
 
 type SeasonFormState = {
   goalName: string;
+  monthKey: string;
   targetSlots: string;
 };
+
+function getDefaultSeasonMonthKey(now = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+  }).formatToParts(now);
+  const year = parts.find((part) => part.type === "year")?.value ?? String(now.getFullYear());
+  const month = parts.find((part) => part.type === "month")?.value ?? "01";
+
+  return `${year}-${month}`;
+}
 
 function sortNewestFirst(seasons: SeasonListItem[]): SeasonListItem[] {
   return [...seasons].sort((left, right) => {
@@ -137,6 +150,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
   const [seasons, setSeasons] = useState(() => sortNewestFirst(initialSeasons));
   const [form, setForm] = useState<SeasonFormState>({
     goalName: "",
+    monthKey: getDefaultSeasonMonthKey(),
     targetSlots: String(ALLOWED_TARGET_SLOTS[1] ?? ALLOWED_TARGET_SLOTS[0]),
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -204,6 +218,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
     setError(null);
 
     const goalName = form.goalName.trim();
+    const monthKey = form.monthKey.trim();
     const targetSlots = Number(form.targetSlots);
 
     try {
@@ -212,7 +227,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ goalName, targetSlots }),
+        body: JSON.stringify({ goalName, monthKey, targetSlots }),
       });
 
       if (!response.ok) {
@@ -229,6 +244,7 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
       setSeasons((current) => normalizeSeasonList(season, current));
       setForm({
         goalName: "",
+        monthKey: getDefaultSeasonMonthKey(),
         targetSlots: String(ALLOWED_TARGET_SLOTS[1] ?? ALLOWED_TARGET_SLOTS[0]),
       });
       setMessage("新赛季已开启");
@@ -305,6 +321,19 @@ export function SeasonAdminPanel({ initialSeasons }: SeasonAdminPanelProps) {
               setForm((current) => ({ ...current, goalName: event.target.value }))
             }
             placeholder="例如: 五月掉脂挑战"
+            disabled={!canCreateSeason || isCreatingSeason || isEndingSeason}
+            className="rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-slate-800"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-bold text-slate-700">
+          赛季月份
+          <input
+            name="monthKey"
+            type="month"
+            value={form.monthKey}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, monthKey: event.target.value }))
+            }
             disabled={!canCreateSeason || isCreatingSeason || isEndingSeason}
             className="rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-slate-800"
           />

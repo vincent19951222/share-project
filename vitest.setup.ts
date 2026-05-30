@@ -16,6 +16,8 @@ for (const suffix of ["", "-shm", "-wal"]) {
   }
 }
 
+process.env.PRISMA_DB_PATH = testDbPath;
+
 const db = new Database(testDbPath);
 
 try {
@@ -32,5 +34,3 @@ try {
 } finally {
   db.close();
 }
-
-process.env.PRISMA_DB_PATH = testDbPath;

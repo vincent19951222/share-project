@@ -160,6 +160,70 @@ describe("board-state", () => {
     expect(snapshot).toBeNull();
   });
 
+  it("ignores an active season from a different month", async () => {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    const teamUsers = await prisma.user.findMany({
+      where: { teamId: user.teamId },
+      orderBy: { createdAt: "asc" },
+    });
+    const seasons = await prisma.season.findMany({
+      where: { teamId: user.teamId },
+      select: { id: true },
+    });
+
+    await prisma.seasonMemberStat.deleteMany({
+      where: {
+        seasonId: { in: seasons.map((season) => season.id) },
+      },
+    });
+    await prisma.season.deleteMany({
+      where: { id: { in: seasons.map((season) => season.id) } },
+    });
+
+    const staleSeason = await prisma.season.create({
+      data: {
+        teamId: user.teamId,
+        monthKey: "2026-03",
+        goalName: "March sprint",
+        status: "ACTIVE",
+        targetSlots: 50,
+        filledSlots: 7,
+        startedAt: new Date("2026-03-01T00:00:00+08:00"),
+      },
+    });
+
+    try {
+      await prisma.seasonMemberStat.create({
+        data: {
+          seasonId: staleSeason.id,
+          userId,
+          seasonIncome: 40,
+          slotContribution: 4,
+          colorIndex: 0,
+          memberOrder: 0,
+          firstContributionAt: new Date("2026-03-05T08:00:00+08:00"),
+        },
+      });
+
+      const snapshot = await buildBoardSnapshotForUser(
+        userId,
+        new Date("2026-04-18T09:00:00+08:00"),
+      );
+      const currentUserRow = snapshot!.members.find((member) => member.id === userId);
+
+      expect(snapshot!.activeSeason).toBeNull();
+      expect(snapshot!.currentUser).toMatchObject({ seasonIncome: 0 });
+      expect(currentUserRow?.seasonIncome).toBe(0);
+      expect(currentUserRow?.slotContribution).toBe(0);
+      expect(snapshot!.members).toHaveLength(teamUsers.length);
+    } finally {
+      await prisma.seasonMemberStat.deleteMany({ where: { seasonId: staleSeason.id } });
+      await prisma.season.deleteMany({ where: { id: staleSeason.id } });
+    }
+  });
+
   it("scopes punch records to the current Shanghai month", async () => {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },

@@ -2,15 +2,22 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
-import { deleteTodayPunch, submitTodayPunch } from "@/lib/api";
+import { deleteTodayPunch, submitTodayPunch, submitYesterdayMakeupPunch } from "@/lib/api";
 import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
 
+type PunchActionErrors = {
+  punch?: string | null;
+  undo?: string | null;
+  makeup?: string | null;
+};
+
 export function HeatmapGrid() {
   const { state, dispatch } = useBoard();
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<PunchActionErrors>({});
+  const submittingRef = useRef(false);
   const desktopScrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const currentUserIndex = state.members.findIndex((member) => member.id === state.currentUserId);
@@ -69,8 +76,13 @@ export function HeatmapGrid() {
   }, [state.today]);
 
   async function handlePunchConfirm() {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
-    setError(null);
+    setErrors((current) => ({ ...current, punch: null }));
     const punchEpoch = reservePunchEpoch();
     dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
 
@@ -97,7 +109,7 @@ export function HeatmapGrid() {
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "打卡失败";
-      setError(message);
+      setErrors((current) => ({ ...current, punch: message }));
       dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
       dispatch({
         type: "ADD_LOG",
@@ -111,12 +123,18 @@ export function HeatmapGrid() {
       return false;
     } finally {
       setSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
   async function handlePunchUndo() {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
-    setError(null);
+    setErrors((current) => ({ ...current, undo: null }));
     const punchEpoch = reservePunchEpoch();
     dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
 
@@ -143,7 +161,7 @@ export function HeatmapGrid() {
       return true;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "撤销失败";
-      setError(message);
+      setErrors((current) => ({ ...current, undo: message }));
       dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
       dispatch({
         type: "ADD_LOG",
@@ -157,6 +175,59 @@ export function HeatmapGrid() {
       return false;
     } finally {
       setSubmitting(false);
+      submittingRef.current = false;
+    }
+  }
+
+  async function handleMakeupYesterday() {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
+    setSubmitting(true);
+    setErrors((current) => ({ ...current, makeup: null }));
+    const punchEpoch = reservePunchEpoch();
+    dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
+
+    try {
+      const snapshot = await submitYesterdayMakeupPunch();
+
+      dispatch({
+        type: "SYNC_REMOTE_STATE",
+        snapshot,
+        source: "punch",
+        punchEpoch,
+      });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `makeup-punch-${Date.now()}`,
+          text: "<b>你</b> 已补签昨天健身打卡，服务器状态已同步。",
+          type: "success",
+          timestamp: new Date(),
+        },
+      });
+      window.dispatchEvent(new Event("activity-events:refresh"));
+      dispatchCalendarRefresh();
+      return true;
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "补签失败";
+      setErrors((current) => ({ ...current, makeup: message }));
+      dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `makeup-punch-error-${Date.now()}`,
+          text: `补签失败：${message}`,
+          type: "alert",
+          timestamp: new Date(),
+        },
+      });
+      return false;
+    } finally {
+      setSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
@@ -171,6 +242,26 @@ export function HeatmapGrid() {
     ].filter(Boolean).join(" ");
 
     if (day < state.today) {
+      const isYesterday = day === state.today - 1;
+
+      if (isYesterday && status === false && isCurrentUser) {
+        return (
+          <PunchPopup
+            key={day}
+            busy={submitting}
+            error={errors.makeup ?? null}
+            onConfirm={handleMakeupYesterday}
+            triggerContent="补"
+            triggerClassName={`${cellClassName} cell-missed cursor-pointer text-xs font-black text-slate-800 disabled:opacity-50`}
+            title="补昨天打卡"
+            description="确认补签昨天的健身打卡吗？"
+            helperText="补签会补发银子，并修正连续打卡和赛季进度。"
+            confirmLabel="确认补签"
+            busyLabel="补签中..."
+          />
+        );
+      }
+
       return (
         <div
           key={day}
@@ -187,7 +278,7 @@ export function HeatmapGrid() {
         <PunchPopup
           key={day}
           busy={submitting}
-          error={error}
+          error={errors.punch ?? null}
           onConfirm={handlePunchConfirm}
           triggerClassName={`${cellClassName} my-punch-btn text-xl cursor-pointer disabled:opacity-50`}
           helperText="确认后会记为今日健身打卡，并获得 1 张健身券。"
@@ -200,7 +291,7 @@ export function HeatmapGrid() {
         <PunchPopup
           key={day}
           busy={submitting}
-          error={error}
+          error={errors.undo ?? null}
           onConfirm={handlePunchUndo}
           triggerContent="✓"
           triggerClassName={`${cellClassName} cell-punched cursor-pointer disabled:opacity-50`}

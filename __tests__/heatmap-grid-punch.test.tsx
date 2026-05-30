@@ -50,6 +50,11 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+async function flushPromises() {
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 function createSnapshot(overrides: Partial<BoardSnapshot> = {}): BoardSnapshot {
   return {
     members: initialState.members,
@@ -85,6 +90,8 @@ function createMembersState(memberCount: number): BoardState {
 describe("HeatmapGrid punch flow", () => {
   let container: HTMLDivElement;
   let root: Root;
+  let originalClientWidthDescriptor: PropertyDescriptor | undefined;
+  let clientWidthDescriptorPatched = false;
 
   beforeEach(() => {
     container = document.createElement("div");
@@ -94,6 +101,15 @@ describe("HeatmapGrid punch flow", () => {
 
   afterEach(() => {
     act(() => root.unmount());
+    if (clientWidthDescriptorPatched) {
+      if (originalClientWidthDescriptor) {
+        Object.defineProperty(HTMLElement.prototype, "clientWidth", originalClientWidthDescriptor);
+      } else {
+        Reflect.deleteProperty(HTMLElement.prototype, "clientWidth");
+      }
+      originalClientWidthDescriptor = undefined;
+      clientWidthDescriptorPatched = false;
+    }
     container.remove();
     vi.unstubAllGlobals();
   });
@@ -126,6 +142,11 @@ describe("HeatmapGrid punch flow", () => {
   });
 
   it("centers today's mobile column using the rendered date column", async () => {
+    originalClientWidthDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "clientWidth",
+    );
+    clientWidthDescriptorPatched = true;
     Object.defineProperty(HTMLElement.prototype, "clientWidth", {
       configurable: true,
       get() {
@@ -452,5 +473,183 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterFailure.logs[0].type).toBe("alert");
     expect(stateAfterFailure.logs[0].text).toContain("健身券已经花掉了");
     expect(container.textContent).toContain("今天打卡送出的健身券已经花掉了，不能撤销打卡。");
+  });
+
+  it("shows a makeup entry on the current user's missed yesterday cell", async () => {
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[false, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    const makeupButtons = Array.from(container.querySelectorAll("button")).filter(
+      (button) => button.textContent?.trim() === "补",
+    );
+
+    expect(makeupButtons).toHaveLength(2);
+  });
+
+  it("does not show makeup entry when the current user's yesterday cell is already punched", async () => {
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[true, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    expect(container.textContent).not.toContain("补");
+  });
+
+  it("waits for the server snapshot before applying yesterday makeup", async () => {
+    const request = deferred<{
+      ok: boolean;
+      json: () => Promise<{ snapshot: BoardSnapshot }>;
+    }>();
+    const fetchMock = vi.fn().mockReturnValue(request.promise);
+    vi.stubGlobal("fetch", fetchMock);
+
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[false, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const makeupButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "补",
+    );
+    expect(makeupButton).toBeDefined();
+
+    await act(async () => {
+      makeupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("补昨天打卡");
+
+    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认补签"),
+    );
+    expect(confirmButton).toBeDefined();
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/board/punch/makeup-yesterday",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(readState(container).gridData[0][0]).toBe(false);
+
+    await act(async () => {
+      request.resolve({
+        ok: true,
+        json: async () => ({
+          snapshot: createSnapshot({
+            gridData: [[true, false, null], [false, false, null]],
+            today: 2,
+            totalDays: 3,
+            teamVaultTotal: 10,
+            currentUser: {
+              assetBalance: 10,
+              currentStreak: 1,
+              nextReward: 20,
+              seasonIncome: 10,
+              isAdmin: false,
+            },
+          }),
+        }),
+      });
+      await request.promise;
+      await flushPromises();
+    });
+
+    const stateAfterResponse = readState(container);
+
+    expect(stateAfterResponse.gridData[0][0]).toBe(true);
+    expect(stateAfterResponse.logs).toHaveLength(1);
+    expect(stateAfterResponse.logs[0].type).toBe("success");
+    expect(stateAfterResponse.logs[0].text).toContain("补签");
+  });
+
+  it("keeps the makeup popup open and displays the backend error when yesterday makeup is rejected", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: async () => ({ error: "昨天补签窗口已关闭" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const makeupState: BoardState = {
+      ...initialState,
+      today: 2,
+      totalDays: 3,
+      gridData: [[false, false, null], [false, false, null]],
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={makeupState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const makeupButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "补",
+    );
+    expect(makeupButton).toBeDefined();
+
+    await act(async () => {
+      makeupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("补昨天打卡");
+
+    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认补签"),
+    );
+    expect(confirmButton).toBeDefined();
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await flushPromises();
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/board/punch/makeup-yesterday",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(readState(container).gridData[0][0]).toBe(false);
+    expect(container.textContent).toContain("补昨天打卡");
+    expect(container.textContent).toContain("昨天补签窗口已关闭");
   });
 });

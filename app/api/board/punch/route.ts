@@ -68,6 +68,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     }
 
+    const now = new Date();
+    const today = getCurrentBoardDay(now);
+    const todayDayKey = getShanghaiDayKey(now);
+    const currentMonthKey = todayDayKey.slice(0, 7);
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -81,7 +86,7 @@ export async function POST(request: NextRequest) {
               orderBy: { createdAt: "asc" },
             },
             seasons: {
-              where: { status: "ACTIVE" },
+              where: { status: "ACTIVE", monthKey: currentMonthKey },
               orderBy: { startedAt: "desc" },
               take: 1,
             },
@@ -94,19 +99,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "user-not-found" }, { status: 401 });
     }
 
-    const now = new Date();
-    const today = getCurrentBoardDay(now);
-    const todayDayKey = getShanghaiDayKey(now);
-    const nextStreak = await getNextPunchStreakWithLeaveProtection({
-      userId: user.id,
-      currentStreak: user.currentStreak,
-      lastPunchDayKey: user.lastPunchDayKey,
-      todayDayKey,
-    });
-    const reward = getPunchRewardForStreak(nextStreak);
+    let nextStreak = 0;
+    let reward = 0;
     const activeSeason = user.team.seasons[0] ?? null;
-    const baseReward = reward;
-    const baseSeasonContribution = activeSeason ? baseReward : 0;
     const memberOrder = Math.max(
       user.team.users.findIndex((member) => member.id === user.id),
       0,
@@ -118,15 +113,59 @@ export async function POST(request: NextRequest) {
 
     try {
       await prisma.$transaction(async (tx) => {
+        const latestUserLedger = await tx.user.update({
+          where: { id: user.id },
+          data: {
+            coins: {
+              increment: 0,
+            },
+          },
+          select: {
+            currentStreak: true,
+            lastPunchDayKey: true,
+          },
+        });
+
+        nextStreak = await getNextPunchStreakWithLeaveProtection({
+          userId: user.id,
+          currentStreak: latestUserLedger.currentStreak,
+          lastPunchDayKey: latestUserLedger.lastPunchDayKey,
+          todayDayKey,
+          tx,
+        });
+        reward = getPunchRewardForStreak(nextStreak);
+        const baseReward = reward;
+
+        let seasonForLedger = activeSeason
+          ? await tx.season.findUnique({
+              where: { id: activeSeason.id },
+              select: {
+                id: true,
+                status: true,
+                monthKey: true,
+                targetSlots: true,
+                filledSlots: true,
+              },
+            })
+          : null;
+
+        if (
+          seasonForLedger?.status !== "ACTIVE" ||
+          seasonForLedger.monthKey !== currentMonthKey
+        ) {
+          seasonForLedger = null;
+        }
+
         let countsForSeasonSlot = false;
 
-        if (activeSeason) {
+        if (seasonForLedger) {
           const seasonUpdate = await tx.season.updateMany({
             where: {
-              id: activeSeason.id,
+              id: seasonForLedger.id,
               status: "ACTIVE",
+              monthKey: currentMonthKey,
               filledSlots: {
-                lt: activeSeason.targetSlots,
+                lt: seasonForLedger.targetSlots,
               },
             },
             data: {
@@ -137,16 +176,37 @@ export async function POST(request: NextRequest) {
           });
 
           countsForSeasonSlot = seasonUpdate.count === 1;
-          recordCountedForSeasonSlot = countsForSeasonSlot;
-          nextFilledSlots = countsForSeasonSlot
-            ? Math.min(activeSeason.filledSlots + 1, activeSeason.targetSlots)
-            : activeSeason.filledSlots;
+
+          if (!countsForSeasonSlot && seasonForLedger.filledSlots < seasonForLedger.targetSlots) {
+            const currentSeason = await tx.season.findUnique({
+              where: { id: seasonForLedger.id },
+              select: {
+                status: true,
+                monthKey: true,
+              },
+            });
+
+            if (
+              currentSeason?.status !== "ACTIVE" ||
+              currentSeason.monthKey !== currentMonthKey
+            ) {
+              seasonForLedger = null;
+            }
+          }
+
+          recordCountedForSeasonSlot = Boolean(seasonForLedger && countsForSeasonSlot);
+          nextFilledSlots = seasonForLedger
+            ? countsForSeasonSlot
+              ? Math.min(seasonForLedger.filledSlots + 1, seasonForLedger.targetSlots)
+              : seasonForLedger.filledSlots
+            : nextFilledSlots;
         }
 
+        const baseSeasonContribution = seasonForLedger ? baseReward : 0;
         const punch = await tx.punchRecord.create({
           data: {
             userId: user.id,
-            seasonId: activeSeason?.id ?? null,
+            seasonId: seasonForLedger?.id ?? null,
             dayIndex: today,
             dayKey: todayDayKey,
             punched: true,
@@ -158,7 +218,7 @@ export async function POST(request: NextRequest) {
             baseSeasonContribution,
             boostSeasonBonus: 0,
             seasonContributionAwarded: baseSeasonContribution,
-            countedForSeasonSlot: countsForSeasonSlot,
+            countedForSeasonSlot: Boolean(seasonForLedger && countsForSeasonSlot),
           },
         });
         const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
@@ -239,11 +299,11 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        if (activeSeason) {
+        if (seasonForLedger) {
           const existingStat = await tx.seasonMemberStat.findUnique({
             where: {
               seasonId_userId: {
-                seasonId: activeSeason.id,
+                seasonId: seasonForLedger.id,
                 userId: user.id,
               },
             },
@@ -256,7 +316,7 @@ export async function POST(request: NextRequest) {
             await tx.seasonMemberStat.update({
               where: {
                 seasonId_userId: {
-                  seasonId: activeSeason.id,
+                  seasonId: seasonForLedger.id,
                   userId: user.id,
                 },
               },
@@ -277,7 +337,7 @@ export async function POST(request: NextRequest) {
           } else {
             await tx.seasonMemberStat.create({
               data: {
-                seasonId: activeSeason.id,
+                seasonId: seasonForLedger.id,
                 userId: user.id,
                 seasonIncome: boostSettlement.seasonContributionAwarded,
                 slotContribution: countsForSeasonSlot ? 1 : 0,

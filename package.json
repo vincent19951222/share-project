@@ -1,6 +1,6 @@
 {
   "name": "share-project",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "prepare:prisma": "prisma generate",
@@ -9,6 +9,7 @@
     "prelint": "npm run prepare:prisma",
     "pretest": "npm run prepare:prisma",
     "dev": "next dev --port 3001",
+    "remind:daily-wework": "tsx scripts/send-daily-wework-reminder.ts",
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",

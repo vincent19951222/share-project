@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { pushWeeklyReportDynamicToWeWork } from "@/lib/wework-webhook";
+import {
+  DAILY_WEWORK_REMINDER_CONTENT,
+  pushDailyReminderToWeWork,
+  pushWeeklyReportDynamicToWeWork,
+} from "@/lib/wework-webhook";
 
 function createDynamic(payload: Record<string, unknown> = {}) {
   return {
@@ -33,6 +37,46 @@ function createJsonResponse(body: unknown, status = 200) {
 }
 
 describe("wework webhook", () => {
+  it("skips daily reminders when no webhook url is configured", async () => {
+    const fetchMock = vi.fn();
+
+    const result = await pushDailyReminderToWeWork({
+      webhookUrl: "",
+      fetchImpl: fetchMock,
+    });
+
+    expect(result).toEqual({ status: "skipped", reason: "missing-webhook" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("sends daily reminders as enterprise wechat text messages", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(createJsonResponse({ errcode: 0, errmsg: "ok" }));
+
+    const result = await pushDailyReminderToWeWork({
+      webhookUrl: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key",
+      fetchImpl: fetchMock,
+    });
+
+    expect(result).toEqual({ status: "sent" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    const body = JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string) as {
+      msgtype: string;
+      text: { content: string };
+    };
+
+    expect(body).toEqual({
+      msgtype: "text",
+      text: { content: DAILY_WEWORK_REMINDER_CONTENT },
+    });
+  });
+
   it("skips weekly report pushes when no webhook url is configured", async () => {
     const fetchMock = vi.fn();
 

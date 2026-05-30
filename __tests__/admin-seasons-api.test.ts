@@ -139,6 +139,45 @@ describe("admin seasons api", () => {
     expect(ALLOWED_TARGET_SLOTS).toContain(body.season.targetSlots);
   });
 
+  it("creates a season with an explicit month key and writes it to the team dynamic", async () => {
+    vi.setSystemTime(new Date("2026-04-30T20:00:00+08:00"));
+    const { admin } = await getSeedUsers();
+
+    const response = await POST(
+      makeRequest("POST", "/api/admin/seasons", admin.id, {
+        goalName: "May challenge",
+        targetSlots: 80,
+        monthKey: "2026-05",
+      }),
+    );
+
+    expect(response.status).toBe(201);
+
+    const body = await response.json();
+    expect(body.season.monthKey).toBe("2026-05");
+
+    const entry = await prisma.teamDynamic.findFirstOrThrow({
+      where: { teamId: admin.teamId, type: "SEASON_STARTED" },
+      orderBy: { occurredAt: "desc" },
+    });
+    const payload = JSON.parse(entry.payloadJson) as { monthKey?: unknown };
+    expect(payload.monthKey).toBe("2026-05");
+  });
+
+  it("rejects malformed explicit month keys", async () => {
+    const { admin } = await getSeedUsers();
+
+    const response = await POST(
+      makeRequest("POST", "/api/admin/seasons", admin.id, {
+        goalName: "May challenge",
+        targetSlots: 80,
+        monthKey: "2026-5",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
   it("rejects blank goal names", async () => {
     const { admin } = await getSeedUsers();
 

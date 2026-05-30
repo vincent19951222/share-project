@@ -129,7 +129,7 @@ describe("SeasonAdminPanel", () => {
     expect(container.textContent).toContain("完成率 90%");
   });
 
-  it("submits a new season with goalName and targetSlots", async () => {
+  it("submits a new season with goalName, monthKey, and targetSlots", async () => {
     const endedOnly: SeasonListItem[] = [
       {
         id: "season-ended",
@@ -151,7 +151,7 @@ describe("SeasonAdminPanel", () => {
           season: {
             id: "season-new",
             teamId: "team-1",
-            monthKey: "2026-04",
+            monthKey: "2026-05",
             goalName: "六月掉脂挑战",
             targetSlots: 100,
             filledSlots: 0,
@@ -169,10 +169,12 @@ describe("SeasonAdminPanel", () => {
     });
 
     const goalInput = container.querySelector<HTMLInputElement>('input[name="goalName"]');
+    const monthInput = container.querySelector<HTMLInputElement>('input[name="monthKey"]');
     const targetSelect = container.querySelector<HTMLSelectElement>('select[name="targetSlots"]');
     const form = container.querySelector("form");
 
     expect(goalInput).not.toBeNull();
+    expect(monthInput).not.toBeNull();
     expect(targetSelect).not.toBeNull();
     expect(form).not.toBeNull();
 
@@ -188,6 +190,8 @@ describe("SeasonAdminPanel", () => {
 
       setInputValue?.call(goalInput, "六月掉脂挑战");
       goalInput!.dispatchEvent(new Event("input", { bubbles: true }));
+      setInputValue?.call(monthInput, "2026-05");
+      monthInput!.dispatchEvent(new Event("input", { bubbles: true }));
       setSelectValue?.call(targetSelect, "100");
       targetSelect!.dispatchEvent(new Event("change", { bubbles: true }));
       form!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
@@ -198,7 +202,11 @@ describe("SeasonAdminPanel", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ goalName: "六月掉脂挑战", targetSlots: 100 }),
+        body: JSON.stringify({
+          goalName: "六月掉脂挑战",
+          monthKey: "2026-05",
+          targetSlots: 100,
+        }),
       }),
     );
   });
