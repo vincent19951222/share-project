@@ -58,6 +58,11 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.querySelector(".supply-task-record-menu button:nth-child(4)")?.textContent).toContain("3");
     expect(container.querySelector("#task-record-title")?.textContent).toBe("今日记录");
     expect(container.querySelectorAll(".supply-task-record-date-tabs button")).toHaveLength(7);
+    expect(
+      Array.from(container.querySelectorAll(".supply-task-record-date-tabs button span")).map(
+        (tab) => tab.textContent,
+      ),
+    ).toEqual(["6天前", "5天前", "4天前", "3天前", "前天", "昨天", "今天"]);
     expect(container.querySelector(".supply-task-record-date-tabs button[aria-selected='true']")?.textContent).toContain(
       "今天",
     );

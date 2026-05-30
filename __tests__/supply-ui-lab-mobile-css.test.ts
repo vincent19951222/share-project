@@ -93,6 +93,7 @@ describe("Supply UI Lab mobile CSS", () => {
     expectMobileRule(".supply-task-record-shell", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expectMobileRule(".supply-draw-pool-layout", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expectMobileRule(".supply-dashboard-stage", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expectMobileRule(".supply-ui-lab-panel.supply-dashboard-quest-panel", /position:\s*relative/);
   });
 
   it("keeps a compact Dashboard hero in the narrow mobile flow", () => {

@@ -342,11 +342,12 @@ function TaskTimelinePanel({
 }) {
   const activeFilterId = filters.find((filter) => filter.active)?.id ?? "all";
   const completeLabel = activeFilterId === "all" ? "已显示今日全部记录" : "已显示当前筛选全部记录";
+  const dateTabs = [...data.dates].reverse();
 
   return (
     <>
       <div className="supply-task-record-date-tabs" role="tablist" aria-label="记录日期">
-        {data.dates.map((date) => (
+        {dateTabs.map((date) => (
           <button
             aria-selected={date.key === activeDateKey}
             key={date.key}

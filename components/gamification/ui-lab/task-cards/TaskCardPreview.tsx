@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 import type { SupplyTaskCardPreviewData } from "./types";
 
 type TaskCardPreviewProps = {
+  actionControls?: ReactNode;
   card: SupplyTaskCardPreviewData;
   className?: string;
   density?: "review" | "dashboard";
@@ -16,6 +18,7 @@ function joinClassNames(parts: Array<string | undefined>) {
 }
 
 export function TaskCardPreview({
+  actionControls,
   card,
   className,
   density = "review",
@@ -46,10 +49,20 @@ export function TaskCardPreview({
       <div className="supply-task-card-art">
         <Image alt="" fill sizes="(max-width: 768px) 82vw, 300px" src={card.image} unoptimized />
       </div>
-      <div className="supply-task-card-meta" aria-label="任务标签">
+      <div
+        className={joinClassNames([
+          "supply-task-card-meta",
+          actionControls ? "supply-task-card-meta--actions" : undefined,
+        ])}
+        aria-label={actionControls ? "任务操作" : "任务标签"}
+      >
         <span data-level={card.difficulty}>{card.difficulty}</span>
-        <span>{card.sceneLabel}</span>
-        <span>{card.cooldownLabel}</span>
+        {actionControls ?? (
+          <>
+            <span>{card.sceneLabel}</span>
+            <span>{card.cooldownLabel}</span>
+          </>
+        )}
       </div>
       {showControls ? (
         <>

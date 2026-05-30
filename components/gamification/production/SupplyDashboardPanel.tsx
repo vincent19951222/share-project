@@ -128,7 +128,7 @@ export function SupplyDashboardPanel({
                   <small>
                     {dimension.subtitle}
                     {assignment
-                      ? ` · 换班 ${assignment.rerollCount}/${assignment.rerollLimit}`
+                      ? ` · 可换 ${assignment.rerollCount}/${assignment.rerollLimit}`
                       : ""}
                   </small>
                   <div>
@@ -142,7 +142,7 @@ export function SupplyDashboardPanel({
                         ? "打卡中"
                         : isCompleted
                           ? "已完成"
-                          : "完成打卡"}
+                          : "打卡"}
                     </button>
                     <button
                       data-action="reroll-task"
@@ -150,7 +150,7 @@ export function SupplyDashboardPanel({
                       onClick={() => onRerollTask(dimension.key)}
                       type="button"
                     >
-                      {activeAction === "reroll-task" ? "换班中" : "换班"}
+                      {activeAction === "reroll-task" ? "更换中" : "换一个"}
                     </button>
                   </div>
                 </article>

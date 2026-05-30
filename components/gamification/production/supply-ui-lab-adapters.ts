@@ -507,7 +507,7 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       image: supplyDashboardAssetPaths.taskCards[dimension.key],
       difficulty: dimension.key === "learning" ? "中" : "轻",
       tags: ["通用"],
-      durationLabel: `换班 ${dimension.assignment?.rerollCount ?? 0}/${dimension.assignment?.rerollLimit ?? 1}`,
+      durationLabel: `可换 ${dimension.assignment?.rerollCount ?? 0}/${dimension.assignment?.rerollLimit ?? 1}`,
       completed: dimension.assignment?.status === "completed",
       reward: {
         icon: "EXP",

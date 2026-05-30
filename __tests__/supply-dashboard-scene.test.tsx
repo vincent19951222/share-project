@@ -118,15 +118,23 @@ describe("supply dashboard static scene", () => {
     expect(
       container.querySelector(".supply-dashboard-quest-card-shell[data-complete='false'] .supply-dashboard-quest-card-complete-overlay"),
     ).toBeNull();
-    expect(container.querySelectorAll(".supply-dashboard-quest-card-actions")).toHaveLength(4);
-    expect(container.querySelectorAll(".supply-dashboard-quest-card-actions .supply-task-card-icon-action--status")).toHaveLength(4);
-    expect(container.querySelectorAll(".supply-dashboard-quest-card-actions .supply-task-card-icon-action--reroll")).toHaveLength(4);
-    expect(container.querySelector(".supply-dashboard-quest-card-actions .supply-task-card-icon-action--status")?.getAttribute("aria-label")).toBe(
-      "窗边回血：已完成",
+    expect(container.querySelector(".supply-dashboard-quest-card-actions")).toBeNull();
+    expect(container.querySelector(".supply-task-card-icon-action")).toBeNull();
+    expect(container.querySelectorAll(".supply-task-card-meta--actions")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-task-card-action--reroll")).toHaveLength(4);
+    expect(container.querySelectorAll(".supply-task-card-action--complete")).toHaveLength(4);
+    const pendingQuestCard = container.querySelector(".supply-dashboard-quest-card-shell[data-complete='false']");
+    expect(pendingQuestCard?.querySelector(".supply-task-card-action--reroll")?.textContent).toContain("↻换一个");
+    expect(pendingQuestCard?.querySelector(".supply-task-card-action--complete")?.textContent).toContain("✓打卡");
+    expect(pendingQuestCard?.querySelector(".supply-task-card-meta")?.textContent).not.toContain("通用");
+    expect(pendingQuestCard?.querySelector(".supply-task-card-meta")?.textContent).not.toContain("换班");
+    expect(pendingQuestCard?.querySelector(".supply-task-card-action--reroll")?.getAttribute("aria-label")).toBe(
+      "换一个任务：一句话笔记",
     );
-    expect(container.querySelector(".supply-dashboard-quest-card-actions .supply-task-card-reroll")?.getAttribute("aria-label")).toBe(
-      "更换任务：窗边回血",
+    expect(pendingQuestCard?.querySelector(".supply-task-card-action--complete")?.getAttribute("aria-label")).toBe(
+      "完成任务打卡：一句话笔记",
     );
+    expect(container.querySelector(".supply-dashboard-quest-card-hitbox")).toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-card .supply-task-card-reroll")).toBeNull();
     expect(container.querySelector(".supply-dashboard-quest-card .supply-task-card-state")).toBeNull();
     expect(container.querySelectorAll(".supply-dashboard-quest-card")).toHaveLength(4);
@@ -202,14 +210,16 @@ describe("supply dashboard static scene", () => {
     const feedback = container.querySelector("[data-dashboard-feedback]");
     expect(feedback?.textContent).toContain("本地预览");
 
-    const rerollButton = container.querySelector<HTMLButtonElement>(".supply-task-card-reroll");
+    const rerollButton = Array.from(container.querySelectorAll<HTMLButtonElement>(".supply-task-card-action--reroll")).find(
+      (button) => !button.disabled,
+    );
     expect(rerollButton).not.toBeNull();
 
     await act(async () => {
       rerollButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("已触发换班预览");
+    expect(container.querySelector("[data-dashboard-feedback]")?.textContent).toContain("已触发换一个预览");
 
     const claimButton = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find((button) =>
       button.textContent?.includes("领取奖励"),
@@ -265,8 +275,8 @@ describe("supply dashboard static scene", () => {
     const learningCard = container.querySelector<HTMLElement>("[data-card-id='learning_005']");
     const completeButton = learningCard
       ?.closest(".supply-dashboard-quest-card-shell")
-      ?.querySelector<HTMLButtonElement>(".supply-dashboard-quest-card-hitbox");
-    expect(completeButton?.getAttribute("aria-label")).toBe("打卡：一句话笔记");
+      ?.querySelector<HTMLButtonElement>(".supply-task-card-action--complete");
+    expect(completeButton?.getAttribute("aria-label")).toBe("完成任务打卡：一句话笔记");
 
     await act(async () => {
       completeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));

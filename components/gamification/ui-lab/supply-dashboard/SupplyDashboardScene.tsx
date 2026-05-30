@@ -195,10 +195,40 @@ function QuestCard({
   quest: SupplyDashboardQuest;
 }) {
   const stateLabel = quest.completed ? "已完成" : "进行中";
+  const completeLabel = quest.completed ? "已完成" : "打卡";
 
   return (
     <div className="supply-dashboard-quest-card-shell" data-complete={quest.completed}>
       <TaskCardPreview
+        actionControls={
+          <>
+            <button
+              className="supply-task-card-action supply-task-card-action--reroll"
+              data-action="reroll-task"
+              disabled={quest.completed}
+              onClick={() => onReroll(quest.id)}
+              type="button"
+              aria-label={`换一个任务：${quest.title}`}
+              title={`换一个：${quest.title}`}
+            >
+              <span aria-hidden="true">↻</span>
+              <span>换一个</span>
+            </button>
+            <button
+              className="supply-task-card-action supply-task-card-action--complete"
+              data-action="complete-task"
+              data-complete={quest.completed}
+              disabled={quest.completed}
+              onClick={() => onComplete(quest.id)}
+              type="button"
+              aria-label={quest.completed ? `任务已完成：${quest.title}` : `完成任务打卡：${quest.title}`}
+              title={quest.completed ? stateLabel : `打卡：${quest.title}`}
+            >
+              <span aria-hidden="true">✓</span>
+              <span>{completeLabel}</span>
+            </button>
+          </>
+        }
         card={toTaskCardPreviewData(quest)}
         className={`supply-dashboard-quest-card supply-dashboard-quest-card--${index + 1}`}
         density="dashboard"
@@ -210,37 +240,6 @@ function QuestCard({
           <strong>已完成</strong>
         </div>
       ) : null}
-      {!quest.completed ? (
-        <button
-          className="supply-dashboard-quest-card-hitbox"
-          data-action="complete-task"
-          onClick={() => onComplete(quest.id)}
-          type="button"
-          aria-label={`打卡：${quest.title}`}
-          title={`打卡：${quest.title}`}
-        />
-      ) : null}
-      <div className="supply-dashboard-quest-card-actions" aria-label={`${quest.title} 操作`}>
-        <span
-          className="supply-task-card-icon-action supply-task-card-icon-action--status"
-          data-complete={quest.completed}
-          aria-label={`${quest.title}：${stateLabel}`}
-          role="status"
-          title={stateLabel}
-        >
-          <span aria-hidden="true">{quest.completed ? "✓" : "•"}</span>
-        </span>
-        <button
-          className="supply-task-card-icon-action supply-task-card-icon-action--reroll supply-task-card-reroll"
-          data-action="reroll-task"
-          onClick={() => onReroll(quest.id)}
-          type="button"
-          aria-label={`更换任务：${quest.title}`}
-          title={`换一个：${quest.title}`}
-        >
-          <span aria-hidden="true">↻</span>
-        </button>
-      </div>
     </div>
   );
 }
@@ -355,7 +354,7 @@ function TaskCompletionConfirmDialog({
             </div>
             <div className="supply-dashboard-task-confirm-meta" aria-label="任务信息">
               <span>{quest.subtitle}</span>
-              <span>{quest.tags[0] ?? "通用"}</span>
+              <span>今日任务</span>
               <span>{quest.durationLabel}</span>
             </div>
             <div className="supply-dashboard-task-confirm-reward">
@@ -457,7 +456,7 @@ export function SupplyDashboardScene({
   onSelectSupplyTab?: (tabId: SupplyUiLabTopBarTabId) => void;
 }) {
   const [dailyQuests, setDailyQuests] = useState(() => data.dailyQuests);
-  const [feedbackMessage, setFeedbackMessage] = useState("本地预览：任务换班和奖励领取不会写入后端。");
+  const [feedbackMessage, setFeedbackMessage] = useState("本地预览：换一个任务和奖励领取不会写入后端。");
   const [pendingQuestId, setPendingQuestId] = useState<string | null>(null);
   const quests = onCompleteQuest ? data.dailyQuests : dailyQuests;
   const pendingQuest = quests.find((quest) => quest.id === pendingQuestId) ?? null;
@@ -509,7 +508,7 @@ export function SupplyDashboardScene({
 
     const questTitle = quests.find((quest) => quest.id === questId)?.title ?? questId;
 
-    setFeedbackMessage(`已触发换班预览：${questTitle}。mock 数据保持不变。`);
+    setFeedbackMessage(`已触发换一个预览：${questTitle}。mock 数据保持不变。`);
   }
 
   function handleClaimRewards() {

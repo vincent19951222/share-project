@@ -184,7 +184,7 @@ export function SupplyStationShell({
     (dimensionKey: GamificationDimensionSnapshot["key"]) => {
       void runAction("reroll-task", async () => {
         await rerollGamificationTask({ dimensionKey });
-        return "任务已换班";
+        return "任务已更换";
       });
     },
     [runAction],
