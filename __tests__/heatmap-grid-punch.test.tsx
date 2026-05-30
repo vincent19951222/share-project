@@ -23,6 +23,7 @@ const initialState: BoardState = {
     isAdmin: false,
   },
   activeSeason: null,
+  monthKey: "2026-04",
   today: 1,
   totalDays: 2,
   logs: [],
@@ -651,5 +652,121 @@ describe("HeatmapGrid punch flow", () => {
     expect(readState(container).gridData[0][0]).toBe(false);
     expect(container.textContent).toContain("补昨天打卡");
     expect(container.textContent).toContain("昨天补签窗口已关闭");
+  });
+
+  it("lets admins make up any member's missed past cell from the heatmap", async () => {
+    const request = deferred<{
+      ok: boolean;
+      json: () => Promise<{ snapshot: BoardSnapshot }>;
+    }>();
+    const fetchMock = vi.fn().mockReturnValue(request.promise);
+    vi.stubGlobal("fetch", fetchMock);
+
+    const adminState: BoardState = {
+      ...initialState,
+      today: 3,
+      totalDays: 4,
+      monthKey: "2026-04",
+      gridData: [[true, false, false, null], [false, false, false, null]],
+      currentUser: {
+        ...initialState.currentUser!,
+        isAdmin: true,
+      },
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={adminState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const adminMakeupButtons = Array.from(container.querySelectorAll("button")).filter(
+      (button) => button.textContent?.trim() === "补",
+    );
+
+    expect(adminMakeupButtons.length).toBeGreaterThan(1);
+
+    await act(async () => {
+      adminMakeupButtons.at(-1)!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("管理员补卡");
+    expect(container.textContent).toContain("给 Luo 补 2026-04-02 的健身打卡吗？");
+
+    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认补卡"),
+    );
+    expect(confirmButton).toBeDefined();
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/admin/board/makeup-punch",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ targetUserId: "user-2", dayKey: "2026-04-02" }),
+      }),
+    );
+    expect(readState(container).gridData[1][1]).toBe(false);
+
+    await act(async () => {
+      request.resolve({
+        ok: true,
+        json: async () => ({
+          snapshot: createSnapshot({
+            monthKey: "2026-04",
+            today: 3,
+            totalDays: 4,
+            gridData: [[true, false, false, null], [false, true, false, null]],
+            currentUser: {
+              ...initialState.currentUser!,
+              isAdmin: true,
+            },
+          }),
+        }),
+      });
+      await request.promise;
+      await flushPromises();
+    });
+
+    const stateAfterResponse = readState(container);
+
+    expect(stateAfterResponse.gridData[1][1]).toBe(true);
+    expect(stateAfterResponse.logs[0].text).toContain("已给 <b>Luo</b> 补 2026-04-02");
+  });
+
+  it("does not expose global makeup buttons to regular members", async () => {
+    const memberState: BoardState = {
+      ...initialState,
+      today: 3,
+      totalDays: 4,
+      monthKey: "2026-04",
+      gridData: [[true, false, false, null], [false, false, false, null]],
+      currentUser: {
+        ...initialState.currentUser!,
+        isAdmin: false,
+      },
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={memberState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    const makeupButtons = Array.from(container.querySelectorAll("button")).filter(
+      (button) => button.textContent?.trim() === "补",
+    );
+
+    expect(makeupButtons).toHaveLength(2);
+    expect(container.textContent).not.toContain("管理员补卡");
   });
 });

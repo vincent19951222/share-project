@@ -31,6 +31,7 @@ model Team {
   realWorldRedemptions RealWorldRedemption[]
   experienceLedgers ExperienceLedger[]
   shopPurchases ShopPurchase[]
+  adminMakeupPunchLedgers AdminMakeupPunchLedger[]
 }
 
 model User {
@@ -66,6 +67,8 @@ model User {
   shopPurchases         ShopPurchase[]
   confirmedRedemptions  RealWorldRedemption[]  @relation("RedemptionConfirmer")
   cancelledRedemptions  RealWorldRedemption[]  @relation("RedemptionCanceller")
+  administeredMakeupPunches AdminMakeupPunchLedger[] @relation("AdminMakeupPunchAdmin")
+  targetedMakeupPunches AdminMakeupPunchLedger[] @relation("AdminMakeupPunchTarget")
   createdAt             DateTime               @default(now())
 }
 
@@ -432,9 +435,30 @@ model PunchRecord {
   boostSummaryJson           String?
   countedForSeasonSlot       Boolean  @default(false)
   createdAt                  DateTime @default(now())
+  adminMakeupLedger          AdminMakeupPunchLedger?
 
   @@unique([userId, dayKey])
   @@index([boostItemUseRecordId])
+}
+
+model AdminMakeupPunchLedger {
+  id             String      @id @default(cuid())
+  teamId         String
+  team           Team        @relation(fields: [teamId], references: [id])
+  adminUserId    String
+  adminUser      User        @relation("AdminMakeupPunchAdmin", fields: [adminUserId], references: [id])
+  targetUserId   String
+  targetUser     User        @relation("AdminMakeupPunchTarget", fields: [targetUserId], references: [id])
+  punchRecordId  String      @unique
+  punchRecord    PunchRecord @relation(fields: [punchRecordId], references: [id])
+  monthKey       String
+  dayKey         String
+  rewardAwarded  Int
+  createdAt      DateTime    @default(now())
+
+  @@index([teamId, monthKey, createdAt])
+  @@index([targetUserId, dayKey])
+  @@index([adminUserId, createdAt])
 }
 
 model BoardNote {

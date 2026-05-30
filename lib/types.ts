@@ -677,6 +677,7 @@ export interface BoardSnapshot {
   teamVaultTotal?: number;
   currentUser?: CurrentUserSnapshot;
   activeSeason?: ActiveSeasonSnapshot | null;
+  monthKey?: string;
   /** @deprecated Kept only while the UI migrates to teamVaultTotal. */
   teamCoins?: number;
   /** @deprecated Kept only while the UI migrates to activeSeason target slots. */

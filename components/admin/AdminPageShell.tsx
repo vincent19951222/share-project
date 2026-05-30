@@ -3,10 +3,16 @@ import type { ReactNode } from "react";
 interface AdminPageShellProps {
   opsPanel: ReactNode;
   configPanel: ReactNode;
+  makeupPanel: ReactNode;
   seasonPanel: ReactNode;
 }
 
-export function AdminPageShell({ opsPanel, configPanel, seasonPanel }: AdminPageShellProps) {
+export function AdminPageShell({
+  opsPanel,
+  configPanel,
+  makeupPanel,
+  seasonPanel,
+}: AdminPageShellProps) {
   return (
     <main
       data-admin-page-shell
@@ -30,6 +36,9 @@ export function AdminPageShell({ opsPanel, configPanel, seasonPanel }: AdminPage
             <a className="supply-inline-link" href="#gamification-config">
               配置总览
             </a>
+            <a className="supply-inline-link" href="#admin-makeup">
+              全局补卡
+            </a>
             <a className="supply-inline-link" href="#season-admin">
               赛季设置
             </a>
@@ -41,6 +50,9 @@ export function AdminPageShell({ opsPanel, configPanel, seasonPanel }: AdminPage
         </section>
         <section id="gamification-config" className="scroll-mt-4">
           {configPanel}
+        </section>
+        <section id="admin-makeup" className="scroll-mt-4">
+          {makeupPanel}
         </section>
         <section id="season-admin" className="scroll-mt-4">
           {seasonPanel}

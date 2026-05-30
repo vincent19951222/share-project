@@ -1,6 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { DELETE, POST } from "@/app/api/board/punch/route";
+import { POST as POST_ADMIN_MAKEUP } from "@/app/api/admin/board/makeup-punch/route";
 import { POST as POST_MAKEUP_YESTERDAY } from "@/app/api/board/punch/makeup-yesterday/route";
 import { prisma } from "@/lib/prisma";
 import { seedDatabase } from "@/lib/db-seed";
@@ -27,6 +28,20 @@ function makeupRequest(userId?: string) {
       ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
     },
     body: JSON.stringify({}),
+  });
+}
+
+function adminMakeupRequest(
+  adminUserId: string | undefined,
+  body: { targetUserId?: string; dayKey?: string },
+) {
+  return new NextRequest("http://localhost/api/admin/board/makeup-punch", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(adminUserId ? { Cookie: `userId=${createCookieValue(adminUserId)}` } : {}),
+    },
+    body: JSON.stringify(body),
   });
 }
 
@@ -72,6 +87,11 @@ describe("/api/board/punch", () => {
     });
     const seasonIds = seasons.map((season) => season.id);
 
+    await prisma.adminMakeupPunchLedger.deleteMany({
+      where: {
+        teamId: user.teamId,
+      },
+    });
     await prisma.punchRecord.deleteMany({
       where: {
         userId: { in: teamUsers.map((member) => member.id) },
@@ -942,6 +962,146 @@ describe("/api/board/punch", () => {
     expect(statuses).toEqual([200, 409]);
     expect(records).toHaveLength(1);
     expect(after.coins).toBe(before.coins + 10);
+  });
+
+  it("lets admins globally make up any missed past day in the current month with a fixed +10 reward", async () => {
+    await resetState();
+    const season = await createActiveSeason({ filledSlots: 0, targetSlots: 5 });
+    const target = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
+    const beforeTarget = await prisma.user.findUniqueOrThrow({ where: { id: target.id } });
+    const makeupDayKey = "2026-04-10";
+
+    const response = await POST_ADMIN_MAKEUP(
+      adminMakeupRequest(userId, {
+        targetUserId: target.id,
+        dayKey: makeupDayKey,
+      }),
+    );
+
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    const record = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId: target.id, dayKey: makeupDayKey } },
+    });
+    const afterTarget = await prisma.user.findUniqueOrThrow({ where: { id: target.id } });
+    const afterSeason = await prisma.season.findUniqueOrThrow({ where: { id: season.id } });
+    const stat = await prisma.seasonMemberStat.findUniqueOrThrow({
+      where: { seasonId_userId: { seasonId: season.id, userId: target.id } },
+    });
+    const ledgerClient = prisma as unknown as {
+      adminMakeupPunchLedger: {
+        findFirstOrThrow(input: unknown): Promise<{
+          adminUserId: string;
+          targetUserId: string;
+          punchRecordId: string;
+          dayKey: string;
+          rewardAwarded: number;
+        }>;
+      };
+    };
+    const ledger = await ledgerClient.adminMakeupPunchLedger.findFirstOrThrow({
+      where: {
+        adminUserId: userId,
+        targetUserId: target.id,
+        dayKey: makeupDayKey,
+      },
+    });
+    const targetRowIndex = body.snapshot.members.findIndex(
+      (member: { id: string }) => member.id === target.id,
+    );
+
+    expect(record.punchType).toBe("admin-makeup");
+    expect(record.assetAwarded).toBe(10);
+    expect(record.baseAssetAwarded).toBe(10);
+    expect(record.boostAssetBonus).toBe(0);
+    expect(record.seasonContributionAwarded).toBe(10);
+    expect(record.countedForSeasonSlot).toBe(true);
+    expect(afterTarget.coins).toBe(beforeTarget.coins + 10);
+    expect(afterTarget.exp).toBe(beforeTarget.exp);
+    expect(afterTarget.ticketBalance).toBe(beforeTarget.ticketBalance);
+    expect(afterTarget.currentStreak).toBe(beforeTarget.currentStreak);
+    expect(afterTarget.lastPunchDayKey).toBe(beforeTarget.lastPunchDayKey);
+    expect(afterSeason.filledSlots).toBe(1);
+    expect(stat.seasonIncome).toBe(10);
+    expect(stat.slotContribution).toBe(1);
+    expect(ledger).toMatchObject({
+      adminUserId: userId,
+      targetUserId: target.id,
+      punchRecordId: record.id,
+      dayKey: makeupDayKey,
+      rewardAwarded: 10,
+    });
+    expect(body.snapshot.gridData[targetRowIndex][9]).toBe(true);
+  });
+
+  it("rejects global makeup from non-admin users", async () => {
+    await resetState();
+    const member = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
+
+    const response = await POST_ADMIN_MAKEUP(
+      adminMakeupRequest(member.id, {
+        targetUserId: userId,
+        dayKey: "2026-04-10",
+      }),
+    );
+
+    expect(response.status).toBe(403);
+  });
+
+  it("rejects admin global makeup when the target day already has a punch", async () => {
+    await resetState();
+    const target = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
+    const makeupDayKey = "2026-04-10";
+    await prisma.punchRecord.create({
+      data: {
+        userId: target.id,
+        dayIndex: 10,
+        dayKey: makeupDayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 1,
+        assetAwarded: 10,
+      },
+    });
+
+    const response = await POST_ADMIN_MAKEUP(
+      adminMakeupRequest(userId, {
+        targetUserId: target.id,
+        dayKey: makeupDayKey,
+      }),
+    );
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({ error: "duplicate-punch" });
+  });
+
+  it("rejects admin global makeup for users outside the admin team", async () => {
+    await resetState();
+    const otherTeam = await prisma.team.create({
+      data: {
+        name: "Other Team",
+        code: "OTHER-TEAM-ADMIN-MAKEUP",
+      },
+    });
+    const outsider = await prisma.user.create({
+      data: {
+        username: "outsider-admin-makeup",
+        password: "not-used",
+        avatarKey: "male1",
+        teamId: otherTeam.id,
+      },
+    });
+
+    const response = await POST_ADMIN_MAKEUP(
+      adminMakeupRequest(userId, {
+        targetUserId: outsider.id,
+        dayKey: "2026-04-10",
+      }),
+    );
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toMatchObject({ error: "target-user-not-found" });
   });
 
   it("rejects a second punch on the same day without double-incrementing coins", async () => {

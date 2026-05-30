@@ -2,7 +2,12 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
-import { deleteTodayPunch, submitTodayPunch, submitYesterdayMakeupPunch } from "@/lib/api";
+import {
+  deleteTodayPunch,
+  submitAdminMakeupPunch,
+  submitTodayPunch,
+  submitYesterdayMakeupPunch,
+} from "@/lib/api";
 import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
@@ -11,7 +16,25 @@ type PunchActionErrors = {
   punch?: string | null;
   undo?: string | null;
   makeup?: string | null;
+  adminMakeup?: string | null;
 };
+
+function getCurrentShanghaiMonthKey() {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+  }).formatToParts(now);
+  const year = parts.find((part) => part.type === "year")?.value ?? String(now.getFullYear());
+  const month = parts.find((part) => part.type === "month")?.value ?? "01";
+
+  return `${year}-${month}`;
+}
+
+function buildDayKey(monthKey: string | undefined, day: number) {
+  return `${monthKey ?? getCurrentShanghaiMonthKey()}-${String(day).padStart(2, "0")}`;
+}
 
 export function HeatmapGrid() {
   const { state, dispatch } = useBoard();
@@ -231,10 +254,65 @@ export function HeatmapGrid() {
     }
   }
 
+  async function handleAdminMakeup(targetUserId: string, targetName: string, dayKey: string) {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    submittingRef.current = true;
+    setSubmitting(true);
+    setErrors((current) => ({ ...current, adminMakeup: null }));
+    const punchEpoch = reservePunchEpoch();
+    dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
+
+    try {
+      const snapshot = await submitAdminMakeupPunch({ targetUserId, dayKey });
+
+      dispatch({
+        type: "SYNC_REMOTE_STATE",
+        snapshot,
+        source: "punch",
+        punchEpoch,
+      });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `admin-makeup-punch-${Date.now()}`,
+          text: `已给 <b>${targetName}</b> 补 ${dayKey} 的健身打卡，固定 +10 银子。`,
+          type: "success",
+          timestamp: new Date(),
+        },
+      });
+      window.dispatchEvent(new Event("activity-events:refresh"));
+      dispatchCalendarRefresh();
+      return true;
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "补卡失败";
+      setErrors((current) => ({ ...current, adminMakeup: message }));
+      dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `admin-makeup-punch-error-${Date.now()}`,
+          text: `补卡失败：${message}`,
+          type: "alert",
+          timestamp: new Date(),
+        },
+      });
+      return false;
+    } finally {
+      setSubmitting(false);
+      submittingRef.current = false;
+    }
+  }
+
   function renderPunchCell(rowIndex: number, index: number) {
     const day = index + 1;
     const status = state.gridData[rowIndex][index];
+    const member = state.members[rowIndex];
     const isCurrentUser = rowIndex === currentUserIndex;
+    const isAdmin = state.currentUser?.isAdmin === true;
+    const dayKey = buildDayKey(state.monthKey, day);
     const cellClassName = [
       "cell",
       "heatmap-cell-day",
@@ -243,6 +321,24 @@ export function HeatmapGrid() {
 
     if (day < state.today) {
       const isYesterday = day === state.today - 1;
+
+      if (status === false && isAdmin && member) {
+        return (
+          <PunchPopup
+            key={day}
+            busy={submitting}
+            error={errors.adminMakeup ?? null}
+            onConfirm={() => handleAdminMakeup(member.id, member.name, dayKey)}
+            triggerContent="补"
+            triggerClassName={`${cellClassName} cell-missed cursor-pointer text-xs font-black text-slate-800 disabled:opacity-50`}
+            title="管理员补卡"
+            description={`给 ${member.name} 补 ${dayKey} 的健身打卡吗？`}
+            helperText="固定补发 +10 银子，不补健身券、EXP、boost 或连签阶梯奖励。"
+            confirmLabel="确认补卡"
+            busyLabel="补卡中..."
+          />
+        );
+      }
 
       if (isYesterday && status === false && isCurrentUser) {
         return (

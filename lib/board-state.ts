@@ -168,6 +168,7 @@ export async function buildBoardSnapshotForUser(
       isAdmin: user.role === "ADMIN",
     },
     activeSeason: activeSeasonSnapshot,
+    monthKey: currentMonthKey,
     today,
     totalDays,
     currentUserId: user.id,

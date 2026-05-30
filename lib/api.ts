@@ -131,6 +131,22 @@ export async function submitYesterdayMakeupPunch(): Promise<BoardSnapshot> {
   return readSnapshot(response);
 }
 
+export async function submitAdminMakeupPunch(input: {
+  targetUserId: string;
+  dayKey: string;
+}): Promise<BoardSnapshot> {
+  const response = await fetch("/api/admin/board/makeup-punch", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  return readSnapshot(response);
+}
+
 async function readCoffeeSnapshot(response: Response): Promise<CoffeeSnapshot> {
   const payload = await readJsonPayload(response, "响应解析失败");
 
