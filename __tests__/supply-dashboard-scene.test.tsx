@@ -187,7 +187,7 @@ describe("supply dashboard static scene", () => {
         supplyDashboardAssetPaths.taskCards.movement,
         supplyDashboardAssetPaths.taskCards.social,
         supplyDashboardAssetPaths.taskCards.learning,
-        "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_topbar_cow_logo.png",
       ]),
     );
     expect(imageSources.join("\n")).not.toMatch(/dashboard-(status|hero|quests|shortcut|announcement)-panel/);
@@ -276,6 +276,7 @@ describe("supply dashboard static scene", () => {
     expect(dialog).not.toBeNull();
     expect(dialog?.textContent).toContain("确认打卡");
     expect(dialog?.textContent).toContain("一句话笔记");
+    expect(dialog?.textContent).toContain("把今天学到的一个东西写成一句话，短到能发群里最好。");
     expect(container.querySelectorAll(".supply-dashboard-quest-card-complete-overlay")).toHaveLength(3);
 
     const cancelButton = Array.from(dialog?.querySelectorAll<HTMLButtonElement>("button") ?? []).find((button) =>

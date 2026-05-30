@@ -22,8 +22,12 @@ export const SUPPLY_UI_LAB_ACTIVE_NON_COIN_REWARD_ITEM_IDS = [
 export type SupplyUiLabActiveNonCoinRewardItemId =
   (typeof SUPPLY_UI_LAB_ACTIVE_NON_COIN_REWARD_ITEM_IDS)[number];
 
-const rewardIcon = (sourceItemId: string) => `/gamification/rewards/icons/${sourceItemId}.png`;
-const generatedItemAsset = (fileName: string) => `/assets/home-scenes/supply/items/${fileName}.webp`;
+const COS_IMAGE_BASE = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images";
+
+const rewardIcon = (sourceItemId: string) =>
+  `${COS_IMAGE_BASE}/share_project_public_gamification_rewards_icons_${sourceItemId}.png`;
+const generatedItemAsset = (fileName: string) =>
+  `${COS_IMAGE_BASE}/share_project_public_assets_home_scenes_supply_items_${fileName.replaceAll("-", "_")}.webp`;
 
 export const SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS = [
   "fitness_leave_coupon",
@@ -102,42 +106,42 @@ export const SUPPLY_UI_LAB_COIN_REWARD_ROWS: SupplyUiLabCoinRewardRow[] = [
     name: "摸鱼津贴",
     amount: 5,
     weightLabel: "权重 15",
-    image: "/gamification/rewards/icons/coins_005.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_005.png",
   },
   {
     rewardId: "coins_010",
     name: "工位补贴",
     amount: 10,
     weightLabel: "权重 12",
-    image: "/gamification/rewards/icons/coins_010.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_010.png",
   },
   {
     rewardId: "coins_020",
     name: "今日没白来",
     amount: 20,
     weightLabel: "权重 10",
-    image: "/gamification/rewards/icons/coins_020.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_020.png",
   },
   {
     rewardId: "coins_040",
     name: "老板没发现",
     amount: 40,
     weightLabel: "权重 5",
-    image: "/gamification/rewards/icons/coins_040.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_040.png",
   },
   {
     rewardId: "coins_080",
     name: "小发一笔",
     amount: 80,
     weightLabel: "权重 2",
-    image: "/gamification/rewards/icons/coins_080.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_080.png",
   },
   {
     rewardId: "coins_120",
     name: "牛马暴富",
     amount: 120,
     weightLabel: "权重 1",
-    image: "/gamification/rewards/icons/coins_120.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_120.png",
   },
 ];
 

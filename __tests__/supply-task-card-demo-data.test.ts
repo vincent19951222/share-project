@@ -1,4 +1,3 @@
-import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import {
   taskCardReviewCards,
@@ -29,14 +28,17 @@ describe("supply task-card demo data", () => {
     ]);
 
     expect(taskCardReviewCards.map((card) => card.image)).toEqual([
-      "/assets/task-cards/illustrations/movement_004-window-heal.webp",
-      "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
-      "/assets/task-cards/illustrations/social_001-small-talk.webp",
-      "/assets/task-cards/illustrations/learning_005-one-note.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_movement_004_window_heal.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_hydration_003_empty_cup.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_social_001_small_talk.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_learning_005_one_note.webp",
     ]);
-    expect(taskCardReviewCards.every((card) => card.image.includes("/assets/task-cards/illustrations/"))).toBe(true);
+    expect(
+      taskCardReviewCards.every((card) =>
+        card.image.includes("share_project_public_assets_task_cards_illustrations_"),
+      ),
+    ).toBe(true);
     expect(taskCardReviewCards.every((card) => !card.image.includes("/raw/"))).toBe(true);
-    expect(taskCardReviewCards.every((card) => existsSync(`public${card.image}`))).toBe(true);
     expect(taskCardReviewCards.every((card) => card.aspectRatio === "3:4")).toBe(true);
   });
 

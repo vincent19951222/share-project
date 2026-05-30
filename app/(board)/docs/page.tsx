@@ -19,17 +19,19 @@ function resolveDocsTab(value: string | string[] | undefined): DocsTabId {
 interface DocsPageProps {
   searchParams: Promise<{
     tab?: string | string[];
+    section?: string | string[];
   }>;
 }
 
 export default async function DocsPage({ searchParams }: DocsPageProps) {
   const params = await searchParams;
   const initialTab = resolveDocsTab(params.tab);
+  const initialSection = Array.isArray(params.section) ? params.section[0] : params.section;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <DocsCenter initialTab={initialTab} />
+        <DocsCenter initialSection={initialSection} initialTab={initialTab} />
       </div>
     </div>
   );

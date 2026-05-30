@@ -124,7 +124,7 @@ describe("home tab density contract", () => {
 
     expect(sceneRule).toMatch(/height:\s*100%/);
     expect(contentRule).toMatch(/height:\s*100%/);
-    expect(contentRule).toMatch(/padding:\s*clamp\(0\.75rem,\s*1\.5vw,\s*1\.25rem\)\s*clamp\(7\.5rem,\s*10vw,\s*12\.5rem\)\s*clamp\(0\.9rem,\s*1\.6vw,\s*1\.35rem\)/);
+    expect(contentRule).toMatch(/padding:\s*clamp\(2\.65rem,\s*4\.4vw,\s*3\.45rem\)\s*clamp\(7\.5rem,\s*10vw,\s*12\.5rem\)\s*clamp\(0\.9rem,\s*1\.6vw,\s*1\.35rem\)/);
     expect(wallSetRule).toMatch(/display:\s*flex/);
     expect(wallSetRule).toMatch(/height:\s*100%/);
     expect(corkRule).toMatch(/flex:\s*1/);

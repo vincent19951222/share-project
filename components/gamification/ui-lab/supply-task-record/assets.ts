@@ -1,24 +1,24 @@
 export const supplyTaskRecordAssetPaths = {
-  profileAvatar: "/avatars/male1.png",
+  profileAvatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png",
   avatars: {
-    sailor: "/avatars/male2.png",
-    deer: "/avatars/female1.png",
-    runner: "/avatars/male3.png",
+    sailor: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male2.png",
+    deer: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_female1.png",
+    runner: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male3.png",
   },
   sidebar: {
-    background: "/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp",
-    hero: "/assets/home-scenes/supply/dashboard/niuma-hero-clean.webp",
+    background: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dashboard_gym_bg.webp",
+    hero: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_niuma_hero_clean.webp",
   },
   rewardIcons: {
-    coins: "/gamification/rewards/icons/coins_020.png",
-    ticket: "/gamification/rewards/icons/task_reroll_coupon.png",
-    coffee: "/gamification/rewards/icons/luckin_coffee_coupon.png",
+    coins: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_020.png",
+    ticket: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png",
+    coffee: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png",
   },
   menuIcons: {
-    today: "/assets/home-scenes/supply/task-record/menu/menu-today.png",
-    draws: "/assets/home-scenes/supply/task-record/menu/menu-draws.png",
-    redemptions: "/assets/home-scenes/supply/task-record/menu/menu-redemptions.png",
-    radar: "/assets/home-scenes/supply/task-record/menu/menu-radar.png",
-    rules: "/assets/home-scenes/supply/task-record/menu/menu-rules.png",
+    today: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_menu_menu_today.png",
+    draws: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_menu_menu_draws.png",
+    redemptions: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_menu_menu_redemptions.png",
+    radar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_menu_menu_radar.png",
+    rules: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_menu_menu_rules.png",
   },
 } as const;

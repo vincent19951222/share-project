@@ -6,8 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DocsPage from "@/app/(board)/docs/page";
 
 vi.mock("@/components/docs-center/DocsCenter", () => ({
-  DocsCenter: ({ initialTab }: { initialTab: string }) => (
-    <div data-testid="docs-center">docs center: {initialTab}</div>
+  DocsCenter: ({ initialSection, initialTab }: { initialSection?: string; initialTab: string }) => (
+    <div data-testid="docs-center">
+      docs center: {initialTab} / {initialSection ?? "none"}
+    </div>
   ),
 }));
 
@@ -46,6 +48,20 @@ describe("DocsPage route", () => {
 
     expect(container.querySelector('[data-testid="docs-center"]')?.textContent).toContain(
       "changelog",
+    );
+  });
+
+  it("passes section query through to the docs shell", async () => {
+    const element = await DocsPage({
+      searchParams: Promise.resolve({ tab: "rules", section: "supply-station-probability" }),
+    });
+
+    await act(async () => {
+      root.render(element);
+    });
+
+    expect(container.querySelector('[data-testid="docs-center"]')?.textContent).toContain(
+      "rules / supply-station-probability",
     );
   });
 

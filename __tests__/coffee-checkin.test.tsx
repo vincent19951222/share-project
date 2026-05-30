@@ -163,7 +163,7 @@ describe("CoffeeCheckin", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "activity-events:refresh" }));
     expect(container.textContent).toContain("我的今日杯数");
     expect(
-      container.querySelector('img[src*="/assets/icons/coffee-pixel.svg"]'),
+      container.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]'),
     ).not.toBeNull();
 
     const removeButton = Array.from(container.querySelectorAll("button")).find((button) =>
@@ -314,13 +314,13 @@ describe("CoffeeCheckin", () => {
     expect(container.textContent).toContain("今天");
 
     expect(
-      container.querySelector('img[src="/assets/home-scenes/coffee/takeaway-cup.webp"]'),
+      container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_takeaway_cup.webp"]'),
     ).not.toBeNull();
     expect(
-      container.querySelector('img[src="/assets/home-scenes/coffee/note-no-coffee-no-gain.webp"]'),
+      container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_note_no_coffee_no_gain.webp"]'),
     ).not.toBeNull();
     expect(
-      container.querySelector('img[src="/assets/home-scenes/coffee/note-but-first-coffee.webp"]'),
+      container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_note_but_first_coffee.webp"]'),
     ).not.toBeNull();
   });
 
@@ -335,7 +335,7 @@ describe("CoffeeCheckin", () => {
     });
 
     const coffeeCalendarIcons = container.querySelectorAll(
-      'img[src*="/assets/icons/coffee-pixel.svg"]',
+      'img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]',
     );
 
     expect(coffeeCalendarIcons.length).toBeGreaterThan(0);

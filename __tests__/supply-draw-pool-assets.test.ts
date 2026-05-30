@@ -2,6 +2,8 @@ import { existsSync, readdirSync, statSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyDrawPoolAssetPaths, supplyDrawPoolMock } from "@/components/gamification/ui-lab/supply-draw-pool/mock-data";
 
+const COS_IMAGE_PREFIX = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/";
+
 const requiredDrawPoolAssets = [
   ["draw-pool-machine.png", 1600 * 1024],
   ["draw-pool-machine.webp", 520 * 1024],
@@ -15,10 +17,6 @@ const generatedDrawPoolAssets = [
   ["draw-button-single.png", 360 * 1024],
   ["draw-button-ten.png", 360 * 1024],
 ] as const;
-
-function publicPath(src: string) {
-  return `public${src}`;
-}
 
 describe("supply draw pool static assets", () => {
   it("ships required final draw-pool assets within size budgets", () => {
@@ -37,24 +35,23 @@ describe("supply draw pool static assets", () => {
     );
   });
 
-  it("references existing reusable dashboard and reward assets", () => {
-    expect(existsSync(publicPath(supplyDrawPoolAssetPaths.background))).toBe(true);
-    expect(existsSync(publicPath(supplyDrawPoolAssetPaths.logo))).toBe(true);
-    expect(existsSync(publicPath(supplyDrawPoolAssetPaths.cowLogo))).toBe(true);
+  it("references uploaded reusable dashboard and reward assets", () => {
+    expect(supplyDrawPoolAssetPaths.background.startsWith(COS_IMAGE_PREFIX)).toBe(true);
+    expect(supplyDrawPoolAssetPaths.logo.startsWith(COS_IMAGE_PREFIX)).toBe(true);
+    expect(supplyDrawPoolAssetPaths.cowLogo.startsWith(COS_IMAGE_PREFIX)).toBe(true);
 
     for (const src of Object.values(supplyDrawPoolAssetPaths.rewardIcons)) {
-      expect(existsSync(publicPath(src)), `${src} should exist`).toBe(true);
+      expect(src.startsWith(COS_IMAGE_PREFIX), `${src} should use COS media`).toBe(true);
     }
   });
 
-  it("uses the optimized WebP machine art in draw-pool view models", () => {
+  it("uses the uploaded optimized WebP machine art in draw-pool view models", () => {
     expect(supplyDrawPoolAssetPaths.drawPool.machine).toBe(
-      "/assets/home-scenes/supply/draw-pool/draw-pool-machine.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/draw-pool-machine.webp",
     );
-    expect(existsSync(publicPath(supplyDrawPoolAssetPaths.drawPool.machine))).toBe(true);
   });
 
-  it("references existing assets for recent drops and local draw results", () => {
+  it("references uploaded assets for recent drops and local draw results", () => {
     const resultSources = [
       ...supplyDrawPoolMock.recentDrops.map((drop) => drop.image),
       ...supplyDrawPoolMock.singleDrawResult.map((result) => result.image),
@@ -62,7 +59,7 @@ describe("supply draw pool static assets", () => {
     ];
 
     for (const src of resultSources) {
-      expect(existsSync(publicPath(src)), `${src} should exist`).toBe(true);
+      expect(src.startsWith(COS_IMAGE_PREFIX), `${src} should use COS media`).toBe(true);
     }
   });
 

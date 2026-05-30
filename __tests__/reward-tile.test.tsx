@@ -30,7 +30,7 @@ describe("RewardTile", () => {
           name="任务换班券"
           rewardTier="utility"
           rarity="uncommon"
-          iconSrc="/gamification/rewards/icons/task_reroll_coupon.png"
+          iconSrc="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png"
           iconAlt="任务换班券"
           quantity={1}
           selected
@@ -47,7 +47,7 @@ describe("RewardTile", () => {
     expect(container.textContent).toContain("R");
     expect(container.textContent).toContain("x1");
     expect(container.textContent).toContain("任务换班券");
-    expect(image?.getAttribute("src")).toBe("/gamification/rewards/icons/task_reroll_coupon.png");
+    expect(image?.getAttribute("src")).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png");
     expect(image?.getAttribute("alt")).toBe("任务换班券");
   });
 

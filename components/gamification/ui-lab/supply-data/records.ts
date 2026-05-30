@@ -17,18 +17,18 @@ export const supplyUiLabRecordDates: SupplyTaskRecordDateOption[] = [
 ];
 
 const rewardIcons = {
-  coins: "/gamification/rewards/icons/coins_020.png",
-  ticket: "/gamification/rewards/icons/task_reroll_coupon.png",
-  coffee: "/gamification/rewards/icons/luckin_coffee_coupon.png",
+  coins: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_020.png",
+  ticket: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png",
+  coffee: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png",
 } as const;
 
 export const supplyUiLabTaskRecordIcons = {
-  movement: "/assets/home-scenes/supply/task-record/icons/task-record-movement.webp",
-  hydration: "/assets/home-scenes/supply/task-record/icons/task-record-hydration.webp",
-  chat: "/assets/home-scenes/supply/task-record/icons/task-record-chat.webp",
-  learning: "/assets/home-scenes/supply/task-record/icons/task-record-learning.webp",
-  draw: "/assets/home-scenes/supply/task-record/icons/task-record-draw.webp",
-  walk: "/assets/home-scenes/supply/task-record/icons/task-record-walk.webp",
+  movement: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_movement.webp",
+  hydration: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_hydration.webp",
+  chat: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_chat.webp",
+  learning: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_learning.webp",
+  draw: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_draw.webp",
+  walk: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_walk.webp",
 } as const;
 
 export const supplyUiLabRecordsByDate: Record<string, SupplyTaskRecordTimelineItem[]> = {
@@ -270,7 +270,7 @@ export const supplyUiLabDrawHistory: SupplyTaskRecordDrawHistoryItem[] = [
 export const supplyUiLabRadarInvites: SupplyTaskRecordInvite[] = [
   {
     id: "invite-sailor",
-    avatar: "/avatars/male2.png",
+    avatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male2.png",
     name: "大力水手",
     message: "邀请你互动",
     timeLabel: "今天 10:20",
@@ -279,7 +279,7 @@ export const supplyUiLabRadarInvites: SupplyTaskRecordInvite[] = [
   },
   {
     id: "invite-deer",
-    avatar: "/avatars/female1.png",
+    avatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_female1.png",
     name: "小鹿同学",
     message: "提醒你一起喝水",
     timeLabel: "今天 09:15",
@@ -288,7 +288,7 @@ export const supplyUiLabRadarInvites: SupplyTaskRecordInvite[] = [
   },
   {
     id: "invite-runner",
-    avatar: "/avatars/male3.png",
+    avatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male3.png",
     name: "跑步阿斌",
     message: "约你晚上散步",
     timeLabel: "昨天 21:47",
@@ -297,7 +297,7 @@ export const supplyUiLabRadarInvites: SupplyTaskRecordInvite[] = [
   },
   {
     id: "invite-coach",
-    avatar: "/avatars/male1.png",
+    avatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png",
     name: "教练老周",
     message: "已回应你的拉伸邀请",
     timeLabel: "昨天 18:20",
@@ -306,7 +306,7 @@ export const supplyUiLabRadarInvites: SupplyTaskRecordInvite[] = [
   },
   {
     id: "invite-expired",
-    avatar: "/avatars/female2.png",
+    avatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_female2.png",
     name: "咖啡同学",
     message: "午后走路邀请已过期",
     timeLabel: "05月15日 14:00",

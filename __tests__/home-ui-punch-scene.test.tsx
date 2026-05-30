@@ -90,13 +90,13 @@ describe("home punch scene", () => {
     expect(content?.querySelector(".activity-stream-empty")).not.toBeNull();
     expect(sceneImageSources).toEqual(
       expect.arrayContaining([
-        "/assets/home-scenes/punch/gym-wall-bg.webp",
-        "/assets/home-scenes/punch/gym-floor-strip.webp",
-        "/assets/home-scenes/punch/poster-no-pain.webp",
-        "/assets/home-scenes/punch/poster-believe.webp",
-        "/assets/home-scenes/punch/stopwatch-keep-going.webp",
-        "/assets/home-scenes/punch/dumbbell-corner.webp",
-        "/assets/home-scenes/punch/towel-bar.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_gym_wall_bg.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_gym_floor_strip.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_poster_no_pain.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_poster_believe.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_stopwatch_keep_going.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_dumbbell_corner.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_towel_bar.webp",
       ]),
     );
   });

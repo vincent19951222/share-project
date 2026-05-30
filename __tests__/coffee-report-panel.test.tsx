@@ -52,9 +52,13 @@ describe("CoffeeReportPanel", () => {
     expect(container.querySelector(".coffee-report-inset-shell")).not.toBeNull();
     expect(container.querySelector(".coffee-report-appendix-head")).not.toBeNull();
     expect(container.querySelector(".coffee-report-visual-center")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-cup-artboard")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-cup-label-copy")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-receipt-artboard")).not.toBeNull();
+    expect(container.querySelector(".coffee-report-receipt-footer")).not.toBeNull();
     expect(container.querySelector(".coffee-report-bars")).not.toBeNull();
-    expect(container.querySelector("img[src='/assets/report-center/coffee-cup-label.png']")).not.toBeNull();
-    expect(container.querySelector("img[src='/assets/report-center/coffee-receipt.png']")).not.toBeNull();
+    expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_report_center_coffee_cup_label.png']")).not.toBeNull();
+    expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_report_center_coffee_receipt.png']")).not.toBeNull();
 
     const zeroCupBar = container.querySelector('[title="18 日 0 杯"]');
 

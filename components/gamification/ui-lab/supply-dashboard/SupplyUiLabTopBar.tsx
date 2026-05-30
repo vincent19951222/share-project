@@ -44,7 +44,7 @@ const supplyUiLabTabs = [
   { id: "task-record", label: "任务记录", icon: "▣", href: "/dashboard/quest" },
 ] as const;
 
-const SUPPLY_UI_LAB_LOGO = "/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png";
+const SUPPLY_UI_LAB_LOGO = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_topbar_cow_logo.png";
 
 export function SupplyUiLabTopBar(props: SupplyUiLabTopBarProps) {
   const { activeLabel, resources } = props;

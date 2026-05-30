@@ -171,7 +171,7 @@ export function Navbar({
             <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
               <div className="h-8 w-8 overflow-hidden rounded-lg border-2 border-slate-800 bg-white shadow-[0_2px_0_0_#1f2937]">
                 <Image
-                  src="/logo.png"
+                  src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_logo.png"
                   alt="脱脂牛马 Logo"
                   width={32}
                   height={32}

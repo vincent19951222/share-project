@@ -1,8 +1,7 @@
-import { existsSync, statSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyBackpackMock } from "@/components/gamification/ui-lab/supply-backpack/mock-data";
 
-const projectPath = (publicPath: string) => `public${decodeURIComponent(publicPath)}`;
+const COS_IMAGE_PREFIX = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/";
 
 describe("supply backpack static assets", () => {
   it("does not expose old cropped prototype or legacy backpack item assets", () => {
@@ -15,7 +14,7 @@ describe("supply backpack static assets", () => {
     expect(serializedMock).not.toMatch(/\/assets\/home-scenes\/supply\/shop\/(?!categories\/)/);
   });
 
-  it("has all catalog-backed inventory and detail assets available", () => {
+  it("uses uploaded catalog-backed inventory and detail assets", () => {
     const inventoryImages = supplyBackpackMock.inventory.slots.flatMap((slot) =>
       slot.type === "item" ? [slot.item.image] : [],
     );
@@ -25,20 +24,15 @@ describe("supply backpack static assets", () => {
     expect(assets).toHaveLength(12);
 
     for (const asset of assets) {
-      const filePath = projectPath(asset);
-      expect(existsSync(filePath), `${filePath} should exist`).toBe(true);
-      expect(statSync(filePath).size, `${filePath} should stay under 100 KB`).toBeLessThanOrEqual(
-        100 * 1024,
-      );
+      expect(asset.startsWith(COS_IMAGE_PREFIX), `${asset} should use COS media`).toBe(true);
     }
   });
 
   it("reuses existing transparent category icon media for the sidebar", () => {
     for (const category of supplyBackpackMock.sidebar.categories) {
       expect(category.iconImage, `${category.id} should use an image icon`).toMatch(
-        /^\/assets\/home-scenes\/supply\/shop\/categories\/.+\.png$/,
+        /share_project_public_assets_home_scenes_supply_shop_categories_category_.+\.png$/,
       );
-      expect(existsSync(projectPath(category.iconImage)), `${category.iconImage} should exist`).toBe(true);
     }
   });
 });

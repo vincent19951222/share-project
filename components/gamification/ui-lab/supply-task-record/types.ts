@@ -37,7 +37,7 @@ export type SupplyTaskRecordTimelineItem = {
     value: string;
     alt: string;
   };
-  reward: {
+  reward?: {
     icon: string;
     label: string;
     amount: string;

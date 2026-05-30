@@ -65,6 +65,7 @@ import type {
   SupplyStationProductionSnapshot,
   SupplyTaskRecordSnapshot,
 } from "@/lib/types";
+import { getAvatarUrl } from "@/lib/avatars";
 
 const BACKPACK_PAGE_SIZE = 20;
 const DIRECT_SOCIAL_ITEM_IDS = new Set([
@@ -102,7 +103,7 @@ function formatResourceValue(value: number, maxValue?: number) {
 }
 
 function avatarPath(avatarKey: string) {
-  return `/avatars/${avatarKey}.png`;
+  return getAvatarUrl(avatarKey);
 }
 
 function getResources(snapshot: SupplyStationProductionSnapshot): SupplyUiLabResource[] {
@@ -446,11 +447,7 @@ function toTimelineItem(row: SupplyTaskRecordSnapshot["timeline"][number]): Supp
           : supplyTaskRecordAssetPaths.menuIcons.redemptions,
       alt: row.title,
     },
-    reward: {
-      icon: category === "draw" ? "券" : "银",
-      label: category === "draw" ? "抽卡" : "记录",
-      amount: "",
-    },
+    reward: category === "draw" ? { icon: "券", label: "抽卡", amount: "" } : undefined,
     status: category === "reward" || category === "draw" ? "claimed" : "completed",
     statusLabel: row.statusLabel,
   };
@@ -506,6 +503,7 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       dimension: dimension.key,
       title: dimension.assignment?.title ?? "今日任务还没生成",
       subtitle: dimension.title,
+      description: dimension.assignment?.description ?? dimension.description,
       image: supplyDashboardAssetPaths.taskCards[dimension.key],
       difficulty: dimension.key === "learning" ? "中" : "轻",
       tags: ["通用"],

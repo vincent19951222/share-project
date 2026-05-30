@@ -12,8 +12,8 @@ describe("shared board CSS", () => {
   it("gives announcement notes a stronger high-contrast visual treatment", () => {
     const css = readFileSync("app/globals.css", "utf8");
 
-    expect(css).toContain("office-wall-bg.webp");
-    expect(css).toContain("cork-board-bg.webp");
+    expect(css).toContain("office_wall_bg.webp");
+    expect(css).toContain("cork_board_bg.webp");
     expect(css).toContain(".shared-board-note-wall");
     expect(css).toContain(".note-announcement-ribbon");
     expect(css).toContain(".note-announcement-rule");
@@ -43,5 +43,18 @@ describe("shared board CSS", () => {
 
     expect(corkBlock).toMatch(/border-radius:\s*1\.\d+rem/);
     expect(composerBlock).toMatch(/border-radius:\s*1\.\d+rem/);
+  });
+
+  it("keeps the mounted sync badge visible and separates composer from cork", () => {
+    const css = readFileSync("app/globals.css", "utf8");
+
+    const contentBlock = css.match(/\.shared-board-content\s*\{[^}]*\}/)?.[0] ?? "";
+    const corkBlock = css.match(/\.shared-board-cork\s*\{[^}]*\}/)?.[0] ?? "";
+    const syncBlock = css.match(/\.shared-board-sync-row\s*\{[^}]*\}/)?.[0] ?? "";
+
+    expect(contentBlock).toContain("clamp(2.65rem, 4.4vw, 3.45rem)");
+    expect(corkBlock).toMatch(/margin-top:\s*clamp\(0\.95rem,\s*1\.6vw,\s*1\.35rem\)/);
+    expect(syncBlock).toContain("top: -1.65rem");
+    expect(corkBlock).not.toMatch(/margin-top:\s*-/);
   });
 });

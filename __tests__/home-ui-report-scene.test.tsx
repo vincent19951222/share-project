@@ -198,12 +198,12 @@ describe("home report scene", () => {
 
     expect(propSources).toEqual(
       expect.arrayContaining([
-        "/assets/home-scenes/report/binder-clip-left.webp",
-        "/assets/home-scenes/report/discipline-note.webp",
-        "/assets/home-scenes/report/no-excuses-note.webp",
-        "/assets/home-scenes/report/bar-chart-note.webp",
-        "/assets/home-scenes/report/stronger-stamp.webp",
-        "/assets/home-scenes/report/focus-marker.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_binder_clip_left.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_discipline_note.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_no_excuses_note.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_bar_chart_note.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_stronger_stamp.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_focus_marker.webp",
       ]),
     );
 
@@ -213,9 +213,9 @@ describe("home report scene", () => {
 
     expect(headerAssetSources).toEqual(
       expect.arrayContaining([
-        "/assets/home-scenes/report/keep-going-stamp.webp",
-        "/assets/home-scenes/report/mini-chart-slip.webp",
-        "/assets/home-scenes/report/vault-safe-yellow.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_keep_going_stamp.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_mini_chart_slip.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_vault_safe_yellow.webp",
       ]),
     );
 

@@ -85,13 +85,14 @@ describe("supply draw pool mock data", () => {
   });
 
   it("keeps draw-pool media isolated while reusing catalog reward art", () => {
-    expect(Object.values(supplyDrawPoolAssetPaths.drawPool).every((path) =>
-      path.startsWith("/assets/home-scenes/supply/draw-pool/"),
+    expect(supplyDrawPoolAssetPaths.drawPool.machine).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/draw-pool-machine.webp");
+    expect(Object.entries(supplyDrawPoolAssetPaths.drawPool).every(([key, path]) =>
+      key === "machine" || path.includes("share_project_public_assets_home_scenes_supply_draw_pool_"),
     )).toBe(true);
-    expect(supplyDrawPoolAssetPaths.rewardIcons.ticket).toBe("/gamification/rewards/icons/task_reroll_coupon.png");
-    expect(supplyDrawPoolAssetPaths.rewardIcons.coins).toBe("/gamification/rewards/icons/coins_120.png");
-    expect(supplyDrawPoolMock.recentDrops.every((drop) => drop.image.startsWith("/"))).toBe(true);
-    expect(supplyDrawPoolMock.singleDrawResult.every((result) => result.image.startsWith("/"))).toBe(true);
-    expect(supplyDrawPoolMock.tenDrawResult.every((result) => result.image.startsWith("/"))).toBe(true);
+    expect(supplyDrawPoolAssetPaths.rewardIcons.ticket).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png");
+    expect(supplyDrawPoolAssetPaths.rewardIcons.coins).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_120.png");
+    expect(supplyDrawPoolMock.recentDrops.every((drop) => drop.image.startsWith("https://"))).toBe(true);
+    expect(supplyDrawPoolMock.singleDrawResult.every((result) => result.image.startsWith("https://"))).toBe(true);
+    expect(supplyDrawPoolMock.tenDrawResult.every((result) => result.image.startsWith("https://"))).toBe(true);
   });
 });

@@ -12,7 +12,7 @@ export default function LoginPage() {
             <div className="font-black text-3xl tracking-tighter flex items-center gap-2 drop-shadow-md">
               <div className="h-10 w-10 overflow-hidden rounded-xl border-2 border-slate-800 bg-white shadow-[0_3px_0_0_#1f2937]">
                 <Image
-                  src="/logo.png"
+                  src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_logo.png"
                   alt="脱脂牛马 Logo"
                   width={40}
                   height={40}

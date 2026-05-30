@@ -1,5 +1,3 @@
-import { existsSync } from "fs";
-import { join } from "path";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -57,14 +55,14 @@ vi.mock("@/components/profile/EditProfileModal", () => ({
 
 const supplyNavContext: SupplyNavContext = {
   resources: [
-    { id: "coins", label: "银子", value: 440, iconImage: "/assets/home-scenes/supply/shared/supply-resource-coins.png" },
-    { id: "ticket", label: "抽奖券", value: 7, iconImage: "/assets/home-scenes/supply/shared/supply-resource-ticket.png" },
+    { id: "coins", label: "银子", value: 440, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png" },
+    { id: "ticket", label: "抽奖券", value: 7, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png" },
     {
       id: "backpack",
       label: "背包",
       value: 12,
       maxValue: 60,
-      iconImage: "/assets/home-scenes/supply/shared/supply-resource-backpack.png",
+      iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
     },
   ],
   profile: { username: "li", avatarKey: "male1" },
@@ -108,16 +106,16 @@ describe("Navbar supply chrome", () => {
         image.getAttribute("src"),
       ),
     ).toEqual([
-      "/assets/home-scenes/supply/nav-icons/supply-nav-status.png",
-      "/assets/home-scenes/supply/nav-icons/supply-nav-shop.png",
-      "/assets/home-scenes/supply/nav-icons/supply-nav-task-record.png",
-      "/assets/home-scenes/supply/nav-icons/supply-nav-backpack.png",
-      "/assets/home-scenes/supply/nav-icons/supply-nav-draw-pool.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_status.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_shop.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_task_record.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_backpack.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_draw_pool.png",
     ]);
     Array.from(container.querySelectorAll<HTMLImageElement>(".app-supply-secondary-tab img")).forEach((image) => {
       const src = image.getAttribute("src");
       expect(src).toBeTruthy();
-      expect(existsSync(join(process.cwd(), "public", src!))).toBe(true);
+      expect(src).toContain("share_project_public_assets_home_scenes_supply_nav_icons_");
     });
     expect(container.querySelector(".app-supply-secondary-tab[aria-current='page']")?.textContent).toContain("我的状态");
   });
@@ -149,7 +147,7 @@ describe("Navbar supply chrome", () => {
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("7");
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("背包");
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("12/60");
-    expect(container.querySelector('img[src="/avatars/male1.png"]')).not.toBeNull();
+    expect(container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png"]')).not.toBeNull();
   });
 
   it("keeps supply assets and the hoverable supply secondary tabs available on regular primary tabs", async () => {

@@ -17,7 +17,7 @@ function DrawPoolTopBar({ data, ticketBalance }: { data: SupplyDrawPoolPreview; 
   return (
     <header className="supply-draw-pool-topbar" aria-label="顶部菜单栏">
       <div className="supply-draw-pool-brand">
-        <Image alt="" height={48} src="/logo.png" unoptimized width={48} />
+        <Image alt="" height={48} src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_logo.png" unoptimized width={48} />
         <strong>牛马补给站</strong>
       </div>
       <div className="supply-draw-pool-top-resources" aria-label="资源余额">

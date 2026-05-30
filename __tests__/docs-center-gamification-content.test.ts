@@ -5,6 +5,8 @@ import {
   getGamificationDocAnchors,
   validateGamificationDocs,
 } from "@/content/docs-center/gamification";
+import { GAMIFICATION_DIMENSIONS } from "@/content/gamification/dimensions";
+import { TASK_CARDS } from "@/content/gamification/task-cards";
 import { GAMIFICATION_PROBABILITY_REQUIRED_FACTS } from "@/lib/gamification/probability-disclosure";
 
 describe("gamification docs content", () => {
@@ -34,6 +36,26 @@ describe("gamification docs content", () => {
 
     for (const fact of GAMIFICATION_PROBABILITY_REQUIRED_FACTS) {
       expect(facts.has(fact)).toBe(true);
+    }
+  });
+
+  it("documents every enabled four-dimension task card from the content config", () => {
+    const documentedCards = gamificationDocs.taskCardGroups.flatMap((group) => group.cards);
+    const enabledCards = TASK_CARDS.filter((card) => card.enabled);
+
+    expect(gamificationDocs.taskCardGroups.map((group) => group.dimensionKey)).toEqual(
+      GAMIFICATION_DIMENSIONS.map((dimension) => dimension.key),
+    );
+    expect(documentedCards.map((card) => card.id)).toEqual(enabledCards.map((card) => card.id));
+
+    for (const taskCard of enabledCards) {
+      expect(documentedCards).toContainEqual(
+        expect.objectContaining({
+          id: taskCard.id,
+          title: taskCard.title,
+          description: taskCard.description,
+        }),
+      );
     }
   });
 

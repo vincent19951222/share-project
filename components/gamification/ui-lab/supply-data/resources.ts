@@ -1,9 +1,9 @@
 import type { SupplyUiLabResource, SupplyUiLabResourceGroupId } from "./types";
 
 export const supplyUiLabResourceIconPaths = {
-  coins: "/assets/home-scenes/supply/shared/supply-resource-coins.png",
-  ticket: "/assets/home-scenes/supply/shared/supply-resource-ticket.png",
-  backpack: "/assets/home-scenes/supply/shared/supply-resource-backpack.png",
+  coins: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png",
+  ticket: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png",
+  backpack: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
 } as const;
 
 const sharedResources: SupplyUiLabResource[] = [

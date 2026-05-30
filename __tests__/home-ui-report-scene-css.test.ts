@@ -148,6 +148,9 @@ describe("home report scene CSS", () => {
     const bodyGridRule = extractSingleRuleBody(rootCss, ".report-analysis-body-grid");
     const todayMarkerRule = extractSingleRuleBody(rootCss, ".report-prototype-today-marker");
     const coffeeInsetRule = extractSingleRuleBody(rootCss, ".coffee-report-inset-shell");
+    const coffeeCupArtboardRule = extractSingleRuleBody(rootCss, ".coffee-report-cup-artboard");
+    const coffeeCupTitleRule = extractSingleRuleBody(rootCss, ".coffee-report-cup-label-title");
+    const coffeeReceiptFooterRule = extractSingleRuleBody(rootCss, ".coffee-report-receipt-footer");
     const weeklyPaperRule = extractSingleRuleBody(rootCss, ".game-weekly-report-paper");
     const weeklyRailRule = extractSingleRuleBody(rootCss, ".game-weekly-report-highlights-rail");
     const adminSheetRule = extractSingleRuleBody(rootCss, ".weekly-report-admin-sheet");
@@ -164,6 +167,9 @@ describe("home report scene CSS", () => {
     expect(coffeeInsetRule).toMatch(/box-shadow:\s*6px 6px 0 rgba\(120,\s*53,\s*15,\s*0\.18\)/);
     expect(coffeeInsetRule).toMatch(/height:\s*auto/);
     expect(coffeeInsetRule).toMatch(/min-height:\s*clamp\(30rem,\s*58vh,\s*36rem\)/);
+    expect(coffeeCupArtboardRule).toMatch(/container-type:\s*inline-size/);
+    expect(coffeeCupTitleRule).toMatch(/white-space:\s*nowrap/);
+    expect(coffeeReceiptFooterRule).toMatch(/grid-template-columns:\s*47% 53%/);
     expect(weeklyPaperRule).toMatch(/border:\s*3px solid #111827/);
     expect(weeklyRailRule).toMatch(/border:\s*4px solid #111827/);
     expect(adminSheetRule).toMatch(/border:\s*4px solid #111827/);

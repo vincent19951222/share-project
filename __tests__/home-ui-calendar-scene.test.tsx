@@ -92,13 +92,13 @@ describe("home calendar scene", () => {
 
     expect(propSources).toEqual(
       expect.arrayContaining([
-        "/assets/home-scenes/calendar/binder-rings-left.webp",
-        "/assets/home-scenes/calendar/binder-clip.webp",
-        "/assets/home-scenes/calendar/highlighter-focus-progress.webp",
-        "/assets/home-scenes/calendar/sticker-just-lift.webp",
-        "/assets/home-scenes/calendar/note-keep-going-purple.webp",
-        "/assets/home-scenes/calendar/calendar-coffee-stamp-paper.webp",
-        "/assets/home-scenes/calendar/calendar-coffee-ring-stain.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_binder_rings_left.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_binder_clip.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_highlighter_focus_progress.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_sticker_just_lift.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_note_keep_going_purple.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_calendar_coffee_stamp_paper.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_calendar_coffee_ring_stain.webp",
       ]),
     );
   });

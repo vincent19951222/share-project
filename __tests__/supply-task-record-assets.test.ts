@@ -1,4 +1,3 @@
-import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyUiLabTaskRecordIcons } from "@/components/gamification/ui-lab/supply-data/records";
 import {
@@ -6,10 +5,10 @@ import {
   supplyTaskRecordMock,
 } from "@/components/gamification/ui-lab/supply-task-record/mock-data";
 
-const publicPath = (assetPath: string) => `public${assetPath}`;
+const COS_IMAGE_PREFIX = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/";
 
 describe("supply task record reused assets", () => {
-  it("keeps reward and avatar assets available", () => {
+  it("uses uploaded reward and avatar assets", () => {
     const requiredAssets = [
       supplyTaskRecordAssetPaths.profileAvatar,
       supplyTaskRecordAssetPaths.rewardIcons.coins,
@@ -20,7 +19,7 @@ describe("supply task record reused assets", () => {
     ];
 
     for (const asset of requiredAssets) {
-      expect(existsSync(publicPath(asset)), asset).toBe(true);
+      expect(asset.startsWith(COS_IMAGE_PREFIX), asset).toBe(true);
     }
   });
 
@@ -35,9 +34,8 @@ describe("supply task record reused assets", () => {
   it("references generated transparent menu icon media", () => {
     for (const item of supplyTaskRecordMock.sidebar.menuItems) {
       expect(item.iconImage, `${item.id} should use an image icon`).toMatch(
-        /^\/assets\/home-scenes\/supply\/task-record\/menu\/.+\.png$/,
+        /share_project_public_assets_home_scenes_supply_task_record_menu_menu_.+\.png$/,
       );
-      expect(existsSync(publicPath(item.iconImage)), `${item.iconImage} should exist`).toBe(true);
     }
   });
 });

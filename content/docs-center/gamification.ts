@@ -1,4 +1,7 @@
 import { GAMIFICATION_PROBABILITY_REQUIRED_FACTS } from "@/lib/gamification/probability-disclosure";
+import { GAMIFICATION_DIMENSIONS } from "@/content/gamification/dimensions";
+import { TASK_CARDS } from "@/content/gamification/task-cards";
+import type { TaskDimensionKey, TaskEffort, TaskScene } from "@/content/gamification/types";
 
 export type GamificationDocTone = "default" | "warning" | "success" | "highlight";
 
@@ -34,6 +37,24 @@ export interface GamificationChangelogEntry {
   tags: string[];
 }
 
+export interface GamificationTaskCardDoc {
+  id: string;
+  title: string;
+  description: string;
+  effortLabel: string;
+  sceneLabel: string;
+  cooldownLabel: string;
+  tags: string[];
+}
+
+export interface GamificationTaskCardGroup {
+  dimensionKey: TaskDimensionKey;
+  title: string;
+  subtitle: string;
+  description: string;
+  cards: GamificationTaskCardDoc[];
+}
+
 export interface GamificationDocsContent {
   updatedAt: string;
   anchors: {
@@ -44,6 +65,7 @@ export interface GamificationDocsContent {
   };
   changelog: GamificationChangelogEntry;
   rules: GamificationRuleBlock[];
+  taskCardGroups: GamificationTaskCardGroup[];
   help: GamificationHelpStep[];
   faq: GamificationFaqItem[];
 }
@@ -70,8 +92,37 @@ export const GAMIFICATION_REQUIRED_RULE_FACTS = [
   ...GAMIFICATION_PROBABILITY_REQUIRED_FACTS,
 ] as const;
 
+const taskEffortLabels = {
+  light: "轻",
+  medium: "中",
+} satisfies Record<TaskEffort, string>;
+
+const taskSceneLabels = {
+  general: "通用",
+  home: "居家",
+  office: "办公室",
+} satisfies Record<TaskScene, string>;
+
+function buildTaskCardGroups(): GamificationTaskCardGroup[] {
+  return GAMIFICATION_DIMENSIONS.map((dimension) => ({
+    dimensionKey: dimension.key,
+    title: dimension.title,
+    subtitle: dimension.subtitle,
+    description: dimension.description,
+    cards: TASK_CARDS.filter((card) => card.enabled && card.dimensionKey === dimension.key).map((card) => ({
+      id: card.id,
+      title: card.title,
+      description: card.description,
+      effortLabel: taskEffortLabels[card.effort],
+      sceneLabel: taskSceneLabels[card.scene],
+      cooldownLabel: `${card.repeatCooldownDays} 天冷却`,
+      tags: card.tags,
+    })),
+  }));
+}
+
 export const gamificationDocs: GamificationDocsContent = {
-  updatedAt: "2026-05-02",
+  updatedAt: "2026-05-29",
   anchors: {
     rules: "supply-station-rules",
     help: "supply-station-help",
@@ -245,6 +296,7 @@ export const gamificationDocs: GamificationDocsContent = {
       tone: "default",
     },
   ],
+  taskCardGroups: buildTaskCardGroups(),
   help: [
     {
       id: "daily-flow",

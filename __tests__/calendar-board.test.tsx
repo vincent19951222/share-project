@@ -177,7 +177,7 @@ describe("CalendarBoard", () => {
       expect(container.textContent).not.toContain("下个月");
       expect(getCoffeeCountText(container, 2)).toBe("2");
       expect(
-        getDayCell(container, 2).querySelectorAll('img[src*="/assets/icons/coffee-pixel.svg"]')
+        getDayCell(container, 2).querySelectorAll('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]')
           .length,
       ).toBe(1);
       expect(container.querySelectorAll("img[alt='咖啡记录']").length).toBe(0);

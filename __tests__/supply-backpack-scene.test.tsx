@@ -155,7 +155,7 @@ describe("SupplyBackpackScene", () => {
     expect(coffeeSlot?.getAttribute("aria-selected")).toBe("true");
     expect(detail?.querySelector("h2")?.textContent).toBe("瑞幸咖啡券");
     expect(detail?.querySelector("img")?.getAttribute("src")).toBe(
-      "/gamification/rewards/icons/luckin_coffee_coupon.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png",
     );
     expect(detail?.textContent).toContain("持有 1");
     expect(detail?.textContent).toContain("真实福利");

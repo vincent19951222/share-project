@@ -75,7 +75,7 @@ describe("SeasonProgressBar", () => {
       container.querySelector("[aria-label='li · 贡献 2 格 · 赛季收入 30 银子']"),
     ).not.toBeNull();
     expect(liAvatar).not.toBeNull();
-    expect(liAvatar?.getAttribute("src")).toBe("/avatars/male1.png");
+    expect(liAvatar?.getAttribute("src")).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png");
   });
 
   it("shows a safe fallback when the season month is invalid", () => {

@@ -37,13 +37,13 @@ export function ReportHeader({ title, summary, teamVault, metrics }: ReportHeade
           </div>
           <div className="report-header-decor-row flex flex-wrap items-end gap-3">
             <img
-              src="/assets/home-scenes/report/keep-going-stamp.webp"
+              src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_keep_going_stamp.webp"
               alt=""
               aria-hidden="true"
               className="report-header-stamp h-16 w-auto shrink-0 rotate-[-6deg] select-none sm:h-20"
             />
             <img
-              src="/assets/home-scenes/report/mini-chart-slip.webp"
+              src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_mini_chart_slip.webp"
               alt=""
               aria-hidden="true"
               className="report-header-mini-chart h-[4.5rem] w-auto shrink-0 rotate-[5deg] select-none sm:h-24"
@@ -71,7 +71,7 @@ export function ReportHeader({ title, summary, teamVault, metrics }: ReportHeade
         <div className="report-header-vault relative flex min-h-full flex-col justify-between rounded-[1.5rem] border-[3px] border-slate-900 bg-[#ffe16a] p-5 text-left shadow-[0_8px_0_0_#111827] lg:text-right">
           <div className="flex items-start justify-between gap-4 lg:flex-row-reverse">
             <img
-              src="/assets/home-scenes/report/vault-safe-yellow.webp"
+              src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_vault_safe_yellow.webp"
               alt=""
               aria-hidden="true"
               className="h-20 w-auto shrink-0 rotate-[4deg] select-none sm:h-24"

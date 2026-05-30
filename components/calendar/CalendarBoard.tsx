@@ -129,37 +129,37 @@ export function CalendarBoard() {
         <div className="calendar-scene-props" aria-hidden="true">
           <img
             className="calendar-prop calendar-prop-rings"
-            src="/assets/home-scenes/calendar/binder-rings-left.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_binder_rings_left.webp"
             alt=""
           />
           <img
             className="calendar-prop calendar-prop-clip"
-            src="/assets/home-scenes/calendar/binder-clip.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_binder_clip.webp"
             alt=""
           />
           <img
             className="calendar-prop calendar-prop-highlighter"
-            src="/assets/home-scenes/calendar/highlighter-focus-progress.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_highlighter_focus_progress.webp"
             alt=""
           />
           <img
             className="calendar-prop calendar-prop-sticker"
-            src="/assets/home-scenes/calendar/sticker-just-lift.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_sticker_just_lift.webp"
             alt=""
           />
           <img
             className="calendar-prop calendar-prop-note"
-            src="/assets/home-scenes/calendar/note-keep-going-purple.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_note_keep_going_purple.webp"
             alt=""
           />
           <img
             className="calendar-prop calendar-prop-stamp"
-            src="/assets/home-scenes/calendar/calendar-coffee-stamp-paper.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_calendar_coffee_stamp_paper.webp"
             alt=""
           />
           <img
             className="calendar-prop calendar-prop-stain"
-            src="/assets/home-scenes/calendar/calendar-coffee-ring-stain.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_calendar_calendar_coffee_ring_stain.webp"
             alt=""
           />
         </div>
@@ -185,7 +185,7 @@ export function CalendarBoard() {
                   <div className="calendar-summary-row">
                     <div className="calendar-summary-chip calendar-summary-chip-workout">
                       <span className="calendar-summary-icon" aria-hidden="true">
-                        <img src="/assets/icons/workout-pixel.svg" alt="" />
+                        <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_workout_pixel.svg" alt="" />
                       </span>
                       <span className="calendar-summary-label">本月练了</span>
                       <strong className="calendar-summary-value">{snapshot.workoutDays}</strong>
@@ -193,7 +193,7 @@ export function CalendarBoard() {
                     </div>
                     <div className="calendar-summary-chip calendar-summary-chip-coffee">
                       <span className="calendar-summary-icon" aria-hidden="true">
-                        <img src="/assets/icons/coffee-pixel.svg" alt="" />
+                        <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg" alt="" />
                       </span>
                       <span className="calendar-summary-label">本月喝了</span>
                       <strong className="calendar-summary-value">{snapshot.coffeeCupTotal}</strong>

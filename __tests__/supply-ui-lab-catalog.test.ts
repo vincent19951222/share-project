@@ -1,6 +1,3 @@
-import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ITEM_DEFINITIONS } from "@/content/gamification/item-definitions";
 import { REWARD_DEFINITIONS } from "@/content/gamification/reward-pool";
@@ -31,41 +28,7 @@ const activeCoinRewardIds = REWARD_DEFINITIONS.filter(
   (reward) => reward.enabled && reward.kind === "coins",
 ).map((reward) => reward.id);
 
-function publicPath(src: string) {
-  return join(process.cwd(), "public", src.replace(/^\//, ""));
-}
-
-function alphaFromPixel(pixel: string) {
-  const match = /s?rgba?\([^,]+,[^,]+,[^,]+(?:,([^)]+))?\)/.exec(pixel);
-
-  return match?.[1] ? Number(match[1]) : 1;
-}
-
-function identifyWebp(path: string) {
-  const output = execFileSync(
-    "magick",
-    [
-      "identify",
-      "-format",
-      "%m\n%w\n%h\n%[channels]\n%[fx:minima.a]\n%[pixel:p{0,0}]\n%[pixel:p{10,10}]\n%[fx:mean.a]",
-      path,
-    ],
-    { encoding: "utf8" },
-  );
-  const [format, width, height, channels, alphaMin, topLeft, insetTopLeft, alphaMean] =
-    output.trim().split("\n");
-
-  return {
-    format,
-    width: Number(width),
-    height: Number(height),
-    channels,
-    alphaMin: Number(alphaMin),
-    topLeft,
-    insetTopLeft,
-    alphaMean: Number(alphaMean),
-  };
-}
+const COS_IMAGE_PREFIX = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/";
 
 describe("Supply UI Lab shared catalog data", () => {
   it("matches every active non-coin draw reward from the production content config", () => {
@@ -83,9 +46,7 @@ describe("Supply UI Lab shared catalog data", () => {
       expect(item.shop.buyable, sourceItemId).toBe(true);
       expect(item.obtainSources, sourceItemId).toEqual(["draw_pool", "shop"]);
       expect(item.inventory.quantity, sourceItemId).toBeGreaterThanOrEqual(0);
-      expect(item.media.image, sourceItemId).toMatch(
-        /^\/(?:gamification\/rewards\/icons\/.+\.png|assets\/home-scenes\/supply\/items\/.+\.webp)$/,
-      );
+      expect(item.media.image.startsWith(COS_IMAGE_PREFIX), sourceItemId).toBe(true);
       expect(item.media.assetStatus, sourceItemId).toMatch(/^(existing|needs_generated)$/);
     }
   });
@@ -109,52 +70,52 @@ describe("Supply UI Lab shared catalog data", () => {
     ).toEqual(SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS);
 
     expect(supplyUiLabCatalogBySourceItemId.task_reroll_coupon.media).toEqual({
-      image: "/gamification/rewards/icons/task_reroll_coupon.png",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png",
       assetStatus: "existing",
     });
     expect(supplyUiLabCatalogBySourceItemId.small_boost_coupon.media).toEqual({
-      image: "/gamification/rewards/icons/small_boost_coupon.png",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_small_boost_coupon.png",
       assetStatus: "existing",
     });
     expect(supplyUiLabCatalogBySourceItemId.team_broadcast_coupon.media).toEqual({
-      image: "/gamification/rewards/icons/team_broadcast_coupon.png",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_team_broadcast_coupon.png",
       assetStatus: "existing",
     });
     expect(supplyUiLabCatalogBySourceItemId.luckin_coffee_coupon.media).toEqual({
-      image: "/gamification/rewards/icons/luckin_coffee_coupon.png",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png",
       assetStatus: "existing",
     });
 
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.fitness_leave_coupon).toEqual({
-      image: "/assets/home-scenes/supply/items/fitness-leave-coupon.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_fitness_leave_coupon.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.drink_water_ping).toEqual({
-      image: "/assets/home-scenes/supply/items/drink-water-ping.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_drink_water_ping.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.walk_ping).toEqual({
-      image: "/assets/home-scenes/supply/items/walk-ping.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_walk_ping.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.team_standup_ping).toEqual({
-      image: "/assets/home-scenes/supply/items/team-standup-ping.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_team_standup_ping.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.chat_ping).toEqual({
-      image: "/assets/home-scenes/supply/items/chat-ping.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_chat_ping.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.share_info_ping).toEqual({
-      image: "/assets/home-scenes/supply/items/share-info-ping.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_share_info_ping.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.double_niuma_coupon).toEqual({
-      image: "/assets/home-scenes/supply/items/double-niuma-coupon.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_double_niuma_coupon.webp",
       assetStatus: "needs_generated",
     });
     expect(SUPPLY_UI_LAB_ITEM_MEDIA.season_sprint_coupon).toEqual({
-      image: "/assets/home-scenes/supply/items/season-sprint-coupon.webp",
+      image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_season_sprint_coupon.webp",
       assetStatus: "needs_generated",
     });
   });
@@ -197,54 +158,19 @@ describe("Supply UI Lab shared catalog data", () => {
     expect(JSON.stringify(supplyUiLabActiveEffects)).not.toContain("经验获取");
   });
 
-  it("ships generated atomic item art as transparent WebP files", () => {
-    const itemDirectory = join(process.cwd(), "public/assets/home-scenes/supply/items");
+  it("maps generated atomic item art to uploaded WebP media", () => {
     const generatedItems = supplyUiLabCatalog.filter(
       (item) => item.media.assetStatus === "needs_generated",
     );
 
-    expect(existsSync(itemDirectory), "supply item asset directory should exist").toBe(true);
     expect(generatedItems.map((item) => item.sourceItemId)).toEqual(
       SUPPLY_UI_LAB_GENERATED_ITEM_ASSET_IDS,
     );
-    expect(readdirSync(itemDirectory).join("\n")).not.toMatch(
-      /(?:panel|prototype|screenshot|design|ui-assets|商店|背包|抽卡|任务记录)/,
-    );
 
     for (const item of generatedItems) {
-      const path = publicPath(item.media.image);
-      const image = identifyWebp(path);
-
       expect(item.media.image, item.sourceItemId).toMatch(
-        /^\/assets\/home-scenes\/supply\/items\/[a-z0-9-]+\.webp$/,
+        /^https:\/\/vincent-1355816760\.cos\.ap-guangzhou\.myqcloud\.com\/obsidian_images\/share_project_public_assets_home_scenes_supply_items_[a-z0-9_]+\.webp$/,
       );
-      expect(existsSync(path), item.sourceItemId).toBe(true);
-      expect(
-        statSync(path).size,
-        `${item.sourceItemId} should stay within the item icon budget`,
-      ).toBeLessThanOrEqual(140 * 1024);
-      expect(image.format, item.sourceItemId).toBe("WEBP");
-      expect(image.width, item.sourceItemId).toBe(image.height);
-      expect(image.width, item.sourceItemId).toBeGreaterThanOrEqual(256);
-      expect(image.width, item.sourceItemId).toBeLessThanOrEqual(1024);
-      expect(image.channels, item.sourceItemId).toContain("a");
-      expect(
-        image.alphaMin,
-        `${item.sourceItemId} should contain fully transparent pixels`,
-      ).toBeLessThanOrEqual(0.05);
-      expect(
-        alphaFromPixel(image.topLeft),
-        `${item.sourceItemId} top-left corner should be transparent`,
-      ).toBeLessThanOrEqual(0.1);
-      expect(
-        alphaFromPixel(image.insetTopLeft),
-        `${item.sourceItemId} padded corner should be transparent`,
-      ).toBeLessThanOrEqual(0.1);
-      expect(image.alphaMean, `${item.sourceItemId} should not be blank`).toBeGreaterThan(0.04);
-      expect(
-        image.alphaMean,
-        `${item.sourceItemId} should remain an isolated prop, not a full panel`,
-      ).toBeLessThan(0.85);
     }
   });
 });

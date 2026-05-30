@@ -83,8 +83,8 @@ describe("SupplyDrawPoolScene", () => {
         supplyDrawPoolAssetPaths.drawPool.capsuleBed,
         supplyDrawPoolAssetPaths.drawPool.guideMascot,
         supplyDrawPoolAssetPaths.cowLogo,
-        "/gamification/rewards/icons/coins_120.png",
-        "/gamification/rewards/icons/task_reroll_coupon.png",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_120.png",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png",
       ]),
     );
   });

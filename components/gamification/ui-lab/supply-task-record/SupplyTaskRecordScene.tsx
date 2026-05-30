@@ -380,6 +380,7 @@ function TaskTimelinePanel({
 
 function TimelineItem({ record }: { record: SupplyTaskRecordTimelineItem }) {
   const eventType = timelineEventTypeByCategory[record.category];
+  const rewardText = record.reward ? [record.reward.label, record.reward.amount].filter(Boolean).join(" ") : "";
 
   return (
     <article
@@ -406,12 +407,12 @@ function TimelineItem({ record }: { record: SupplyTaskRecordTimelineItem }) {
           <h2>{record.title}</h2>
           {record.subtitle ? <p>{record.subtitle}</p> : null}
         </div>
-        <div className="supply-task-record-reward">
-          <b aria-hidden="true">{record.reward.icon}</b>
-          <span>
-            {record.reward.label} {record.reward.amount}
-          </span>
-        </div>
+        {record.reward && rewardText ? (
+          <div className="supply-task-record-reward">
+            <b aria-hidden="true">{record.reward.icon}</b>
+            <span>{rewardText}</span>
+          </div>
+        ) : null}
         <SupplyUiLabStatusBadge tone={timelineStatusTone[record.status]}>{record.statusLabel}</SupplyUiLabStatusBadge>
       </div>
     </article>

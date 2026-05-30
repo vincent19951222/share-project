@@ -6,15 +6,15 @@ import { CoffeeGrid } from "./CoffeeGrid";
 import { CoffeeReceipt } from "./CoffeeReceipt";
 
 const coffeeSceneProps = [
-  { src: "/assets/home-scenes/coffee/takeaway-cup.webp", alt: "", className: "coffee-scene-prop coffee-scene-cup" },
-  { src: "/assets/home-scenes/coffee/note-no-coffee-no-gain.webp", alt: "", className: "coffee-scene-prop coffee-scene-note-left" },
-  { src: "/assets/home-scenes/coffee/note-but-first-coffee.webp", alt: "", className: "coffee-scene-prop coffee-scene-note-right" },
-  { src: "/assets/home-scenes/coffee/sugar-packet.webp", alt: "", className: "coffee-scene-prop coffee-scene-sugar" },
-  { src: "/assets/home-scenes/coffee/coffee-beans.webp", alt: "", className: "coffee-scene-prop coffee-scene-beans-left" },
-  { src: "/assets/home-scenes/coffee/coffee-beans.webp", alt: "", className: "coffee-scene-prop coffee-scene-beans-right" },
-  { src: "/assets/home-scenes/coffee/coffee-ring-stain.webp", alt: "", className: "coffee-scene-prop coffee-scene-ring" },
-  { src: "/assets/home-scenes/coffee/coffee-stamp-paper.webp", alt: "", className: "coffee-scene-prop coffee-scene-stamp" },
-  { src: "/assets/home-scenes/coffee/receipt-clip.webp", alt: "", className: "coffee-scene-prop coffee-scene-clip" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_takeaway_cup.webp", alt: "", className: "coffee-scene-prop coffee-scene-cup" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_note_no_coffee_no_gain.webp", alt: "", className: "coffee-scene-prop coffee-scene-note-left" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_note_but_first_coffee.webp", alt: "", className: "coffee-scene-prop coffee-scene-note-right" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_sugar_packet.webp", alt: "", className: "coffee-scene-prop coffee-scene-sugar" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_coffee_beans.webp", alt: "", className: "coffee-scene-prop coffee-scene-beans-left" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_coffee_beans.webp", alt: "", className: "coffee-scene-prop coffee-scene-beans-right" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_coffee_ring_stain.webp", alt: "", className: "coffee-scene-prop coffee-scene-ring" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_coffee_stamp_paper.webp", alt: "", className: "coffee-scene-prop coffee-scene-stamp" },
+  { src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_coffee_receipt_clip.webp", alt: "", className: "coffee-scene-prop coffee-scene-clip" },
 ] as const;
 
 function CoffeeSceneFrame({ children }: { children: ReactNode }) {

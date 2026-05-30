@@ -23,20 +23,24 @@ function extractBlock(css: string, marker: string) {
 }
 
 describe("docs center CSS", () => {
-  it("adds a restrained docs shell and responsive docs layout", () => {
+  it("adds an official-docs shell and responsive docs layout", () => {
     const css = readFileSync("app/globals.css", "utf8");
     const tabletBlock = extractBlock(css, "@media (max-width: 980px)");
 
-    expect(css).toMatch(/\.docs-center-shell\s*\{[\s\S]*border:\s*1px solid #dbe4ee/);
-    expect(css).toMatch(/\.docs-center-shell\s*\{[\s\S]*box-shadow:\s*0 18px 40px rgba\(15,\s*23,\s*42,\s*0\.06\)/);
-    expect(css).toMatch(/\.docs-center-header\s*\{[\s\S]*border-bottom:\s*1px solid #e2e8f0/);
-    expect(css).toMatch(/\.docs-center-title\s*\{[\s\S]*font-size:\s*clamp\(1\.85rem,\s*3vw,\s*2\.5rem\)/);
-    expect(css).toMatch(/\.docs-center-meta\s*\{[\s\S]*font-size:\s*0\.82rem/);
-    expect(css).toMatch(/\.docs-tab-active\s*\{[\s\S]*border-color:\s*#94a3b8/);
-    expect(css).toMatch(/\.docs-tab-active\s*\{[\s\S]*background-color:\s*#ffffff/);
-    expect(css).toMatch(/\.docs-tab-active\s*\{[\s\S]*box-shadow:\s*inset 0 -2px 0 0 #1f2937/);
+    expect(css).toMatch(/\.docs-center-shell\s*\{[\s\S]*--docs-ink:\s*#18202f/);
+    expect(css).toMatch(/\.docs-center-body\s*\{[\s\S]*grid-template-columns:\s*minmax\(13rem,\s*15rem\)\s+minmax\(0,\s*1fr\)/);
+    expect(css).toMatch(/\.docs-center-sidebar\s*\{[\s\S]*position:\s*sticky/);
+    expect(css).toMatch(/\.docs-center-title\s*\{[\s\S]*font-size:\s*2\.35rem/);
+    expect(css).toMatch(/\.docs-center-title\s*\{[\s\S]*letter-spacing:\s*0/);
+    expect(css).toMatch(/\.docs-nav-primary-active\s*\{[\s\S]*border-color:\s*var\(--docs-ink\)/);
+    expect(css).toMatch(/\.docs-nav-primary-active\s*\{[\s\S]*box-shadow:\s*3px 3px 0 var\(--docs-ink\)/);
+    expect(css).toMatch(/\.docs-nav-children\s*\{/);
+    expect(css).toMatch(/\.docs-nav-child-link\s*\{/);
+    expect(css).toMatch(/\.docs-nav-child-link\[aria-current="page"\]\s*\{/);
+    expect(css).toMatch(/\.docs-rule-group\s*\{/);
+    expect(css).toMatch(/\.docs-probability-table\s*\{/);
     expect(css).toMatch(/\.docs-toc-link\s*\{[\s\S]*font-size:\s*0\.86rem/);
-    expect(css).toMatch(/\.docs-toc-link\s*\{[\s\S]*letter-spacing:\s*normal/);
+    expect(css).toMatch(/\.docs-toc-link\s*\{[\s\S]*letter-spacing:\s*0/);
     expect(css).toMatch(/\.docs-toc-list\s*\{[\s\S]*counter-reset:\s*docs-toc/);
     expect(css).toMatch(/\.docs-toc-list li\s*\{[\s\S]*counter-increment:\s*docs-toc/);
     expect(css).toMatch(
@@ -44,7 +48,8 @@ describe("docs center CSS", () => {
     );
 
     expect(tabletBlock).toMatch(/\.docs-center-body\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
-    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.docs-tabs\s*\{[\s\S]*overflow-x:\s*auto/);
-    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.docs-tabs\s*\{[\s\S]*white-space:\s*nowrap/);
+    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.docs-nav-tree\s*\{[\s\S]*display:\s*grid/);
+    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.docs-nav-primary\s*\{[\s\S]*min-width:\s*0/);
+    expect(css).toMatch(/@media \(max-width:\s*760px\)[\s\S]*\.docs-nav-children\s*\{[\s\S]*max-height:\s*9rem/);
   });
 });

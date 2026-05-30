@@ -3,13 +3,13 @@
 import type { CSSProperties, ImgHTMLAttributes } from "react";
 
 export const assetIconSources = {
-  workout: "/assets/icons/workout-pixel.svg",
-  board: "/assets/icons/board-pixel.svg",
-  coffee: "/assets/icons/coffee-pixel.svg",
-  supply: "/assets/icons/supply-pixel.svg",
-  calendar: "/assets/icons/calendar-pixel.svg",
-  report: "/assets/icons/report-pixel.svg",
-  vaultTrophy: "/assets/icons/vault-trophy-pixel.svg",
+  workout: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_workout_pixel.svg",
+  board: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_board_pixel.svg",
+  coffee: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg",
+  supply: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg",
+  calendar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_calendar_pixel.svg",
+  report: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_report_pixel.svg",
+  vaultTrophy: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_vault_trophy_pixel.svg",
 } as const;
 
 export type AssetIconName = keyof typeof assetIconSources;

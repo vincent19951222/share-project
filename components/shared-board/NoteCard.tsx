@@ -12,9 +12,9 @@ const COLOR_CLASS = {
 } as const;
 
 const PIN_ASSETS = [
-  "/assets/home-scenes/shared-board/pushpin-red.webp",
-  "/assets/home-scenes/shared-board/pushpin-blue.webp",
-  "/assets/home-scenes/shared-board/pushpin-yellow.webp",
+  "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_pushpin_red.webp",
+  "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_pushpin_blue.webp",
+  "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_pushpin_yellow.webp",
 ] as const;
 
 interface NoteCardProps {
@@ -42,7 +42,7 @@ export function NoteCard({ note, deleting = false, onDelete }: NoteCardProps) {
       {shouldTape && (
         <img
           className="note-tape"
-          src="/assets/home-scenes/shared-board/paper-tape.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_paper_tape.webp"
           alt=""
           aria-hidden="true"
         />

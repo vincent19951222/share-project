@@ -126,32 +126,32 @@ export function SharedBoard({ isActive = true }: { isActive?: boolean }) {
 
       <div className="shared-board-props" aria-hidden="true">
         <img
-          src="/assets/home-scenes/shared-board/poster-no-excuses.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_poster_no_excuses.webp"
           alt=""
           className="shared-board-prop shared-board-poster-left"
         />
         <img
-          src="/assets/home-scenes/shared-board/poster-focus-train-win.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_poster_focus_train_win.webp"
           alt=""
           className="shared-board-prop shared-board-poster-right"
         />
         <img
-          src="/assets/home-scenes/shared-board/discipline-note.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_discipline_note.webp"
           alt=""
           className="shared-board-prop shared-board-discipline-note"
         />
         <img
-          src="/assets/home-scenes/shared-board/dumbbell-edge.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_dumbbell_edge.webp"
           alt=""
           className="shared-board-prop shared-board-dumbbell"
         />
         <img
-          src="/assets/home-scenes/shared-board/marker-pen.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_marker_pen.webp"
           alt=""
           className="shared-board-prop shared-board-marker"
         />
         <img
-          src="/assets/home-scenes/shared-board/paperclip.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_paperclip.webp"
           alt=""
           className="shared-board-prop shared-board-paperclip"
         />
@@ -164,7 +164,7 @@ export function SharedBoard({ isActive = true }: { isActive?: boolean }) {
               <SyncStatus state={syncState} />
             </div>
             <img
-              src="/assets/home-scenes/shared-board/clipboard-clip.webp"
+              src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_clipboard_clip.webp"
               alt=""
               className="shared-board-clip"
               aria-hidden="true"

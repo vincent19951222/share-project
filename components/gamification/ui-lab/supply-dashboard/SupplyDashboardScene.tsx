@@ -44,7 +44,7 @@ function toTaskCardPreviewData(quest: SupplyDashboardQuest): SupplyTaskCardPrevi
     dimension: quest.dimension,
     slogan: quest.subtitle,
     title: quest.title,
-    description: "",
+    description: quest.description,
     image: quest.image,
     difficulty: quest.difficulty,
     sceneLabel: (quest.tags[0] ?? "通用") as SupplyTaskCardPreviewData["sceneLabel"],
@@ -333,6 +333,7 @@ function TaskCompletionConfirmDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="supply-dashboard-task-confirm-title"
+        aria-describedby="supply-dashboard-task-confirm-description"
       >
         <div className="supply-dashboard-task-confirm-header">
           <span>今日主线</span>
@@ -345,6 +346,13 @@ function TaskCompletionConfirmDialog({
           <div className="supply-dashboard-task-confirm-copy">
             <p>确认打卡</p>
             <h3 id="supply-dashboard-task-confirm-title">{quest.title}</h3>
+            <div
+              className="supply-dashboard-task-confirm-description"
+              id="supply-dashboard-task-confirm-description"
+            >
+              <span>任务说明</span>
+              <p>{quest.description}</p>
+            </div>
             <div className="supply-dashboard-task-confirm-meta" aria-label="任务信息">
               <span>{quest.subtitle}</span>
               <span>{quest.tags[0] ?? "通用"}</span>

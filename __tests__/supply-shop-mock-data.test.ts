@@ -87,15 +87,17 @@ describe("supply shop mock data", () => {
   });
 
   it("keeps only catalog media paths in the rendered product set", () => {
-    expect(supplyShopAssetPaths.profileAvatar).toBe("/avatars/male1.png");
+    expect(supplyShopAssetPaths.profileAvatar).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png");
     expect(supplyShopMock.products.map((product) => product.image)).toEqual(
       supplyUiLabCatalog.filter((item) => item.shop.buyable).map((item) => item.media.image),
     );
     expect(supplyShopMock.products.map((product) => product.image).join("\n")).not.toMatch(
       /\/assets\/home-scenes\/supply\/shop\//,
     );
-    expect(Object.values(supplyShopAssetPaths.categoryIcons).every((src) => src.includes("/shop/categories/"))).toBe(
-      true,
-    );
+    expect(
+      Object.values(supplyShopAssetPaths.categoryIcons).every((src) =>
+        src.includes("share_project_public_assets_home_scenes_supply_shop_categories_category_"),
+      ),
+    ).toBe(true);
   });
 });

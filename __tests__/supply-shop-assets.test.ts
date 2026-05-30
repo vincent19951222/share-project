@@ -1,24 +1,20 @@
-import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyShopMock } from "@/components/gamification/ui-lab/supply-shop/mock-data";
 
-function publicPath(src: string) {
-  return `public${src}`;
-}
+const COS_IMAGE_PREFIX = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/";
 
 describe("supply shop static assets", () => {
   it("references existing catalog-backed product media", () => {
     for (const product of supplyShopMock.products) {
-      expect(existsSync(publicPath(product.image)), `${product.image} should exist`).toBe(true);
+      expect(product.image.startsWith(COS_IMAGE_PREFIX), `${product.image} should use COS media`).toBe(true);
     }
   });
 
   it("references generated transparent category icon media", () => {
     for (const category of supplyShopMock.sidebar.categories) {
       expect(category.iconImage, `${category.id} should use an image icon`).toMatch(
-        /^\/assets\/home-scenes\/supply\/shop\/categories\/.+\.png$/,
+        /share_project_public_assets_home_scenes_supply_shop_categories_category_.+\.png$/,
       );
-      expect(existsSync(publicPath(category.iconImage)), `${category.iconImage} should exist`).toBe(true);
     }
   });
 

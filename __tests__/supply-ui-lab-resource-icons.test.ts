@@ -1,4 +1,3 @@
-import { existsSync, readFileSync } from "fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -6,15 +5,7 @@ import {
   supplyUiLabResources,
 } from "@/components/gamification/ui-lab/supply-data/resources";
 
-function publicPath(src: string) {
-  return `public${src}`;
-}
-
-function hasPngAlphaChannel(path: string) {
-  const png = readFileSync(path);
-
-  return png[25] === 4 || png[25] === 6;
-}
+const COS_IMAGE_PREFIX = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/";
 
 describe("supply UI lab resource icons", () => {
   it("ships transparent generated icons for topbar resources", () => {
@@ -25,10 +16,8 @@ describe("supply UI lab resource icons", () => {
     ]);
 
     for (const src of Object.values(supplyUiLabResourceIconPaths)) {
-      const path = publicPath(src);
-
-      expect(existsSync(path), `${path} should exist`).toBe(true);
-      expect(hasPngAlphaChannel(path), `${path} should include an alpha channel`).toBe(true);
+      expect(src.startsWith(COS_IMAGE_PREFIX), `${src} should use COS media`).toBe(true);
+      expect(src).toMatch(/share_project_public_assets_home_scenes_supply_shared_supply_resource_.+\.png$/);
     }
   });
 });

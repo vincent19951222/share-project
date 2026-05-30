@@ -26,7 +26,7 @@ export function TeamHeader() {
       <div className="team-header-vault team-header-vault-note flex shrink-0 items-center gap-4">
         <div className="team-header-vault-visual" aria-hidden="true">
           <img
-            src="/assets/home-scenes/punch/vault-safe.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_vault_safe.webp"
             alt=""
             className="h-full w-full object-contain"
           />

@@ -64,14 +64,14 @@ describe("home calendar scene CSS", () => {
   it("styles the calendar tab as a layered desk binder scene", () => {
     const css = readFileSync("app/globals.css", "utf8");
     const sceneRule = extractRuleBody(css, ".calendar-scene");
-    const backgroundRule = extractRuleBody(css, ".calendar-scene-background", /calendar-desk-bg\.webp/);
+    const backgroundRule = extractRuleBody(css, ".calendar-scene-background", /calendar_desk_bg\.webp/);
     const propsRule = extractRuleBody(css, ".calendar-scene-props", /z-index:\s*1/);
     const contentRule = extractRuleBody(css, ".calendar-scene-content");
 
     expect(sceneRule).toMatch(/position:\s*relative/);
     expect(sceneRule).toMatch(/isolation:\s*isolate/);
     expect(sceneRule).toMatch(/border-radius:\s*1\.65rem/);
-    expect(backgroundRule).toMatch(/calendar-desk-bg\.webp/);
+    expect(backgroundRule).toMatch(/calendar_desk_bg\.webp/);
     expect(backgroundRule).toMatch(/z-index:\s*0/);
     expect(backgroundRule).toMatch(/clip-path:\s*inset\(0 round 1\.65rem\)/);
     expect(propsRule).toMatch(/pointer-events:\s*none/);
@@ -86,15 +86,18 @@ describe("home calendar scene CSS", () => {
     const paperRule = extractRuleBody(css, ".calendar-paper-surface");
     const summaryRule = extractRuleBody(css, ".calendar-summary-chip", /border:\s*3px solid #111827/);
     const tableRule = extractRuleBody(css, ".calendar-month-table");
+    const weekdayRule = extractRuleBody(css, ".calendar-weekday");
     const todayRule = extractRuleBody(css, ".calendar-day-cell-today", /background:\s*#fef3c7/);
     const neighborRule = extractRuleBody(css, ".calendar-neighbor-cell");
 
     expect(paperRule).toMatch(/border:\s*4px solid #111827/);
-    expect(paperRule).toMatch(/binder-paper-texture\.webp/);
+    expect(paperRule).toMatch(/binder_paper_texture\.webp/);
     expect(paperRule).toMatch(/overflow:\s*hidden/);
     expect(paperRule).toMatch(/background-clip:\s*padding-box/);
     expect(summaryRule).toMatch(/border:\s*3px solid #111827/);
     expect(tableRule).toMatch(/border:\s*2px solid #d1d5db/);
+    expect(weekdayRule).toMatch(/display:\s*inline-flex/);
+    expect(weekdayRule).toMatch(/white-space:\s*nowrap/);
     expect(todayRule).toMatch(/background:\s*#fef3c7/);
     expect(neighborRule).toMatch(/color:\s*#a3a3a3/);
   });

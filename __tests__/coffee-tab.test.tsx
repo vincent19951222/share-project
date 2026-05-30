@@ -76,7 +76,7 @@ describe("coffee tab navigation", () => {
 
     expect(coffeeButton).toBeDefined();
     expect(
-      coffeeButton!.querySelector('img[src*="/assets/icons/coffee-pixel.svg"]'),
+      coffeeButton!.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]'),
     ).not.toBeNull();
 
     await act(async () => {
@@ -100,7 +100,7 @@ describe("coffee tab navigation", () => {
 
     expect(supplyButton).toBeDefined();
     expect(
-      supplyButton!.querySelector('img[src*="/assets/icons/supply-pixel.svg"]'),
+      supplyButton!.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg"]'),
     ).not.toBeNull();
 
     await act(async () => {
@@ -150,12 +150,12 @@ describe("coffee tab navigation", () => {
       "牛马补给站",
     ]);
     expect(tabIconSources).toEqual([
-      "/assets/icons/workout-pixel.svg",
-      "/assets/icons/board-pixel.svg",
-      "/assets/icons/coffee-pixel.svg",
-      "/assets/icons/calendar-pixel.svg",
-      "/assets/icons/report-pixel.svg",
-      "/assets/icons/supply-pixel.svg",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_workout_pixel.svg",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_board_pixel.svg",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_calendar_pixel.svg",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_report_pixel.svg",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg",
     ]);
   });
 
@@ -204,7 +204,7 @@ describe("coffee tab navigation", () => {
     });
 
     expect(
-      container.querySelector('img[src*="/assets/home-scenes/punch/vault-safe.webp"]'),
+      container.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_vault_safe.webp"]'),
     ).not.toBeNull();
     expect(container.textContent).toContain("全队个人银子总和");
     expect(container.textContent).toContain("个人长期累计资产");

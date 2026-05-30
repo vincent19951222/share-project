@@ -48,31 +48,31 @@ export const supplyNavItems: SupplyNavItem[] = [
   {
     id: "dashboard",
     label: "我的状态",
-    iconImage: "/assets/home-scenes/supply/nav-icons/supply-nav-status.png",
+    iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_status.png",
     route: supplyPanelRoutes.dashboard,
   },
   {
     id: "shop",
     label: "补给商店",
-    iconImage: "/assets/home-scenes/supply/nav-icons/supply-nav-shop.png",
+    iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_shop.png",
     route: supplyPanelRoutes.shop,
   },
   {
     id: "taskRecord",
     label: "任务记录",
-    iconImage: "/assets/home-scenes/supply/nav-icons/supply-nav-task-record.png",
+    iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_task_record.png",
     route: supplyPanelRoutes.taskRecord,
   },
   {
     id: "backpack",
     label: "背包",
-    iconImage: "/assets/home-scenes/supply/nav-icons/supply-nav-backpack.png",
+    iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_backpack.png",
     route: supplyPanelRoutes.backpack,
   },
   {
     id: "drawPool",
     label: "抽奖池",
-    iconImage: "/assets/home-scenes/supply/nav-icons/supply-nav-draw-pool.png",
+    iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_draw_pool.png",
     route: supplyPanelRoutes.drawPool,
   },
 ];

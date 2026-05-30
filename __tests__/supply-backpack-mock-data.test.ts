@@ -22,11 +22,11 @@ describe("supply backpack mock data", () => {
     expect(supplyBackpackMock.sidebar.capacity).toBe("18/60");
     expect(supplyBackpackMock.sidebar.todayEffects).toBe(supplyUiLabActiveEffects);
     expect(supplyBackpackMock.sidebar.categories.map((category) => category.iconImage)).toEqual([
-      "/assets/home-scenes/supply/shop/categories/category-all.png",
-      "/assets/home-scenes/supply/shop/categories/category-boost.png",
-      "/assets/home-scenes/supply/shop/categories/category-task.png",
-      "/assets/home-scenes/supply/shop/categories/category-social.png",
-      "/assets/home-scenes/supply/shop/categories/category-real-world.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shop_categories_category_all.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shop_categories_category_boost.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shop_categories_category_task.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shop_categories_category_social.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shop_categories_category_real_world.png",
     ]);
     expect(supplyBackpackMock.inventory.page).toBe(1);
     expect(supplyBackpackMock.inventory.pageSize).toBe(20);

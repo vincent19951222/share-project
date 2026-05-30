@@ -1,4 +1,3 @@
-import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { TASK_CARDS } from "@/content/gamification/task-cards";
 import type { TaskDimensionKey } from "@/content/gamification/types";
@@ -12,13 +11,13 @@ describe("supply task-card illustrations", () => {
     expect(taskCardIllustrationIds.sort()).toEqual(TASK_CARDS.map((card) => card.id).sort());
   });
 
-  it("ships every mapped illustration file under public assets", () => {
+  it("maps every illustration to uploaded COS media", () => {
     for (const [cardId, assetPath] of Object.entries(taskCardIllustrationById)) {
-      expect(assetPath.startsWith("/assets/task-cards/illustrations/"), `${cardId} should use the illustration folder`).toBe(
+      expect(assetPath.startsWith("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/")).toBe(
         true,
       );
+      expect(assetPath.includes("share_project_public_assets_task_cards_illustrations_"), cardId).toBe(true);
       expect(assetPath.endsWith(".webp"), `${cardId} should use WebP`).toBe(true);
-      expect(existsSync(`public${assetPath}`), `${cardId} illustration should exist`).toBe(true);
     }
   });
 

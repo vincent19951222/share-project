@@ -55,17 +55,17 @@ describe("supply task record mock data", () => {
     ]);
     expect(todayRecords.filter((record) => record.status === "completed")).toHaveLength(4);
     expect(todayRecords.filter((record) => record.status === "claimed")).toHaveLength(3);
-    expect(todayRecords.map((record) => record.reward.label)).toEqual(
+    expect(todayRecords.flatMap((record) => (record.reward ? [record.reward.label] : []))).toEqual(
       expect.arrayContaining(["抽奖券", "运动饮料（R）", "银子"]),
     );
     expect(todayRecords.every((record) => record.icon.type === "image")).toBe(true);
     expect(todayRecords.map((record) => record.icon.value)).toEqual(
       expect.arrayContaining([
-        "/assets/home-scenes/supply/task-record/icons/task-record-movement.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-hydration.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-chat.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-learning.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-draw.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_movement.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_hydration.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_chat.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_learning.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_draw.webp",
       ]),
     );
 
@@ -96,7 +96,11 @@ describe("supply task record mock data", () => {
   });
 
   it("references reused reward and avatar assets", () => {
-    expect(supplyTaskRecordAssetPaths.rewardIcons.coffee).toBe("/gamification/rewards/icons/luckin_coffee_coupon.png");
-    expect(Object.values(supplyTaskRecordAssetPaths.avatars).every((path) => path.startsWith("/avatars/"))).toBe(true);
+    expect(supplyTaskRecordAssetPaths.rewardIcons.coffee).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png");
+    expect(
+      Object.values(supplyTaskRecordAssetPaths.avatars).every((path) =>
+        path.includes("share_project_public_avatars_"),
+      ),
+    ).toBe(true);
   });
 });

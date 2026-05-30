@@ -1,4 +1,3 @@
-import { existsSync } from "fs";
 import { describe, expect, it } from "vitest";
 import { supplyUiLabActiveEffects } from "@/components/gamification/ui-lab/supply-data/effects";
 import {
@@ -52,25 +51,26 @@ describe("supply dashboard mock data", () => {
       "/dashboard/cards",
       "/dashboard/quest",
     ]);
-    expect(supplyDashboardAssetPaths.hero).toBe("/assets/home-scenes/supply/dashboard/niuma-hero.webp");
-    expect(supplyDashboardAssetPaths.levelAvatar).toBe("/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png");
-    expect(supplyDashboardAssetPaths.dockBackpack).toBe("/assets/home-scenes/supply/dashboard/dock-backpack.webp");
-    expect(supplyDashboardAssetPaths.dockSupplyMachine).toBe("/assets/home-scenes/supply/dashboard/dock-supply-machine.webp");
-    expect(supplyDashboardAssetPaths.dockTaskRecord).toBe("/assets/home-scenes/supply/dashboard/dock-task-record.webp");
+    expect(supplyDashboardAssetPaths.hero).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_niuma_hero.webp");
+    expect(supplyDashboardAssetPaths.levelAvatar).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_topbar_cow_logo.png");
+    expect(supplyDashboardAssetPaths.dockBackpack).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dock_backpack.webp");
+    expect(supplyDashboardAssetPaths.dockSupplyMachine).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dock_supply_machine.webp");
+    expect(supplyDashboardAssetPaths.dockTaskRecord).toBe("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dock_task_record.webp");
   });
 
   it("uses pure illustration task-card assets instead of raw full-card screenshots", () => {
     const taskCardPaths = Object.values(supplyDashboardAssetPaths.taskCards);
 
     expect(taskCardPaths).toEqual([
-      "/assets/task-cards/illustrations/hydration_003-empty-cup.webp",
-      "/assets/task-cards/illustrations/movement_004-window-heal.webp",
-      "/assets/task-cards/illustrations/social_001-small-talk.webp",
-      "/assets/task-cards/illustrations/learning_005-one-note.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_hydration_003_empty_cup.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_movement_004_window_heal.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_social_001_small_talk.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_task_cards_illustrations_learning_005_one_note.webp",
     ]);
-    expect(taskCardPaths.every((path) => path.includes("/assets/task-cards/illustrations/"))).toBe(true);
+    expect(taskCardPaths.every((path) => path.includes("share_project_public_assets_task_cards_illustrations_"))).toBe(
+      true,
+    );
     expect(taskCardPaths.every((path) => !path.includes("/raw/"))).toBe(true);
-    expect(taskCardPaths.every((path) => existsSync(`public${path}`))).toBe(true);
     expect(taskCardPaths.join("\n")).not.toContain("/assets/home-scenes/supply/dashboard/quest-");
   });
 });

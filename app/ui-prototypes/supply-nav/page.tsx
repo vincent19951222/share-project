@@ -22,12 +22,12 @@ type SupplyTab = {
 };
 
 const primaryTabs: PrimaryTab[] = [
-  { id: "punch", label: "健身打卡", icon: "/assets/icons/workout-pixel.svg" },
-  { id: "board", label: "共享看板", icon: "/assets/icons/board-pixel.svg" },
-  { id: "coffee", label: "续命咖啡", icon: "/assets/icons/coffee-pixel.svg" },
-  { id: "calendar", label: "牛马日历", icon: "/assets/icons/calendar-pixel.svg" },
-  { id: "report", label: "战报中心", icon: "/assets/icons/report-pixel.svg" },
-  { id: "supply", label: "牛马补给站", icon: "/assets/icons/supply-pixel.svg" },
+  { id: "punch", label: "健身打卡", icon: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_workout_pixel.svg" },
+  { id: "board", label: "共享看板", icon: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_board_pixel.svg" },
+  { id: "coffee", label: "续命咖啡", icon: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg" },
+  { id: "calendar", label: "牛马日历", icon: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_calendar_pixel.svg" },
+  { id: "report", label: "战报中心", icon: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_report_pixel.svg" },
+  { id: "supply", label: "牛马补给站", icon: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg" },
 ];
 
 const supplyTabs: SupplyTab[] = [
@@ -37,7 +37,7 @@ const supplyTabs: SupplyTab[] = [
     icon: "⌂",
     accent: "#fde047",
     summary: "今日主线 3/4，连续打卡 12 天",
-    image: "/assets/home-scenes/supply/dashboard/niuma-hero-clean.webp",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_niuma_hero_clean.webp",
   },
   {
     id: "shop",
@@ -45,7 +45,7 @@ const supplyTabs: SupplyTab[] = [
     icon: "▤",
     accent: "#7dd3fc",
     summary: "限时道具 6 件，训练日志可兑换",
-    image: "/assets/home-scenes/supply/shop/shop-training-log.webp",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shop_shop_training_log.webp",
   },
   {
     id: "taskRecord",
@@ -53,7 +53,7 @@ const supplyTabs: SupplyTab[] = [
     icon: "▣",
     accent: "#86efac",
     summary: "今日完成 3 项，本周累计 19 项",
-    image: "/assets/home-scenes/supply/task-record/menu/menu-today.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_menu_menu_today.png",
   },
   {
     id: "backpack",
@@ -61,7 +61,7 @@ const supplyTabs: SupplyTab[] = [
     icon: "◫",
     accent: "#fca5a5",
     summary: "12 件道具，2 张保护券待使用",
-    image: "/assets/home-scenes/supply/backpack/backpack-dumbbell.webp",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_backpack_backpack_dumbbell.webp",
   },
   {
     id: "drawPool",
@@ -69,7 +69,7 @@ const supplyTabs: SupplyTab[] = [
     icon: "◈",
     accent: "#c4b5fd",
     summary: "奖池刷新中，10 连抽还差 3 张券",
-    image: "/assets/home-scenes/supply/draw-pool/draw-pool-machine.webp",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/draw-pool-machine.webp",
   },
 ];
 
@@ -78,19 +78,19 @@ const assetChips = [
     id: "coins",
     label: "银子",
     value: "440",
-    image: "/assets/home-scenes/supply/shared/supply-resource-coins.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png",
   },
   {
     id: "ticket",
     label: "抽奖券",
     value: "7",
-    image: "/assets/home-scenes/supply/shared/supply-resource-ticket.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png",
   },
   {
     id: "backpack",
     label: "背包",
     value: "12",
-    image: "/assets/home-scenes/supply/shared/supply-resource-backpack.png",
+    image: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
   },
 ];
 
@@ -112,7 +112,7 @@ export default function SupplyNavPrototypePage() {
       <section className={styles.shell} aria-label="共享导航壳补给站原型">
         <nav className={styles.topNav} aria-label="脱脂牛马主导航">
           <a className={styles.brand} href="/dashboard/status" aria-label="脱脂牛马">
-            <img src="/logo.png" alt="" />
+            <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_logo.png" alt="" />
             <span>脱脂牛马</span>
           </a>
 
@@ -149,7 +149,7 @@ export default function SupplyNavPrototypePage() {
               ))}
             </div>
             <button className={styles.profile} type="button" aria-label="li 的用户菜单">
-              <img src="/avatars/male1.png" alt="" />
+              <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png" alt="" />
               <span>li</span>
             </button>
           </div>
@@ -184,14 +184,14 @@ export default function SupplyNavPrototypePage() {
           aria-label={`${activeSupply.label}内容`}
         >
           <div className={styles.stageBackdrop} aria-hidden="true">
-            <img src="/assets/home-scenes/supply/dashboard/dashboard-gym-bg.webp" alt="" />
+            <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dashboard_gym_bg.webp" alt="" />
           </div>
 
           <div className={styles.statusColumn}>
             <article className={styles.vaultPanel}>
               <span className={styles.panelPin} aria-hidden="true" />
               <div>
-                <img src="/assets/home-scenes/punch/vault-safe.webp" alt="" />
+                <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_vault_safe.webp" alt="" />
               </div>
               <section>
                 <h1>{activeSupply.label}</h1>

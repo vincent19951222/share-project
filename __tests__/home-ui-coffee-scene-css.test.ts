@@ -100,11 +100,11 @@ describe("home coffee scene CSS", () => {
     expect(cellRule).toMatch(/flex:\s*0 0 var\(--coffee-grid-cell-size\)/);
     expect(gridBodyRule).toMatch(/padding:\s*0\.65rem var\(--coffee-grid-inline-pad\)/);
     expect(receiptRule).toMatch(/border:\s*4px solid #111827/);
-    expect(receiptRule).toMatch(/background-image:[\s\S]*receipt-paper-texture\.webp/);
+    expect(receiptRule).toMatch(/background-image:[\s\S]*receipt_paper_texture\.webp/);
     expect(feedRule).toMatch(/border:\s*4px solid #111827/);
-    expect(feedRule).toMatch(/background-image:[\s\S]*receipt-paper-texture\.webp/);
+    expect(feedRule).toMatch(/background-image:[\s\S]*receipt_paper_texture\.webp/);
     expect(calendarRule).toMatch(/border:\s*4px solid #111827/);
-    expect(calendarRule).toMatch(/background-image:[\s\S]*receipt-paper-texture\.webp/);
+    expect(calendarRule).toMatch(/background-image:[\s\S]*receipt_paper_texture\.webp/);
     expect(todayColumnRule).toMatch(/background:\s*rgba\(20,\s*184,\s*166,\s*0\.16\)/);
     expect(dialogRule).toMatch(/border:\s*4px solid #111827/);
   });

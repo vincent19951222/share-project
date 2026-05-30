@@ -21,35 +21,83 @@ describe("GamificationDocsSection", () => {
     container.remove();
   });
 
-  it("renders rules, help, faq, and changelog content", () => {
+  it("renders the overview subpage by default", () => {
     act(() => {
       root.render(<GamificationDocsSection />);
     });
 
-    expect(container.textContent).toContain("牛马补给站规则说明上线");
+    expect(container.textContent).toContain("补给站速览");
+    expect(container.textContent).toContain("免费券上限");
+    expect(container.textContent).toContain("库存有效期");
+    expect(container.querySelector("#supply-station-rules")).toBeNull();
+    expect(container.textContent).not.toContain("四维任务卡池");
+    expect(container.querySelector("#supply-station-overview")).not.toBeNull();
+  });
+
+  it("renders the rules map subpage without unrelated long sections", () => {
+    act(() => {
+      root.render(<GamificationDocsSection sectionId="supply-station-rules" />);
+    });
+
+    expect(container.textContent).toContain("规则地图");
     expect(container.textContent).toContain("每天最多两张免费券");
     expect(container.textContent).toContain("十连消耗 10 张券");
     expect(container.textContent).toContain("价格是 40 银子 / 张");
     expect(container.textContent).toContain("健身请假券");
     expect(container.textContent).toContain("瑞幸咖啡券");
     expect(container.textContent).toContain("弱社交");
-    expect(container.textContent).toContain("抽奖概率说明");
+    expect(container.textContent).not.toContain("工位重启");
+    expect(container.querySelectorAll(".docs-rule-group")).toHaveLength(3);
+  });
+
+  it("renders dedicated probability and task-card subpages", () => {
+    act(() => {
+      root.render(<GamificationDocsSection sectionId="supply-station-probability" />);
+    });
+
     expect(container.textContent).toContain("Active 奖池总权重");
     expect(container.textContent).toContain("coin 45 / utility 27 / social 24 / cosmetic 0 / rare 4");
     expect(container.textContent).toContain("直接银子期望 8.75");
     expect(container.textContent).toContain("摸鱼津贴");
     expect(container.textContent).toContain("今日称号");
+    expect(container.querySelector(".docs-probability-table")).not.toBeNull();
+
+    act(() => {
+      root.render(<GamificationDocsSection sectionId="supply-station-task-cards" />);
+    });
+
+    expect(container.textContent).toContain("四维任务卡池");
+    expect(container.textContent).toContain("工位重启");
+    expect(container.textContent).toContain("离开椅子站起来 2 分钟，让身体退出省电模式。");
+    expect(container.textContent).toContain("咖啡债还款");
+    expect(container.textContent).toContain("辛苦了发射");
+    expect(container.textContent).toContain("一句话笔记");
+    expect(container.textContent).not.toContain("Active 奖池总权重");
   });
 
   it("renders stable anchors for docs deep links", () => {
     act(() => {
-      root.render(<GamificationDocsSection />);
+      root.render(<GamificationDocsSection sectionId="supply-station-help" />);
     });
 
-    expect(container.querySelector("#supply-station-rules")).not.toBeNull();
     expect(container.querySelector("#supply-station-help")).not.toBeNull();
+
+    act(() => {
+      root.render(<GamificationDocsSection sectionId="supply-station-faq" />);
+    });
+
     expect(container.querySelector("#supply-station-faq")).not.toBeNull();
+
+    act(() => {
+      root.render(<GamificationDocsSection sectionId="supply-station-changelog" />);
+    });
+
     expect(container.querySelector("#supply-station-changelog")).not.toBeNull();
+
+    act(() => {
+      root.render(<GamificationDocsSection sectionId="supply-station-probability" />);
+    });
+
     expect(container.querySelector("#supply-station-probability")).not.toBeNull();
   });
 });

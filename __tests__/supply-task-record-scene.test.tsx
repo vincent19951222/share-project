@@ -122,6 +122,30 @@ describe("SupplyTaskRecordScene", () => {
     expect(container.textContent).toContain("连续打卡 18 天奖励");
   });
 
+  it("renders timeline rows without a reward pill when reward data is absent", async () => {
+    const activeDateKey = supplyTaskRecordMock.activeDateKey;
+    const [firstRecord] = supplyTaskRecordMock.recordsByDate[activeDateKey];
+    const { reward: _reward, ...recordWithoutReward } = firstRecord;
+
+    await act(async () => {
+      root.render(
+        <SupplyTaskRecordScene
+          data={{
+            ...supplyTaskRecordMock,
+            recordsByDate: {
+              ...supplyTaskRecordMock.recordsByDate,
+              [activeDateKey]: [recordWithoutReward as typeof firstRecord],
+            },
+          }}
+        />,
+      );
+    });
+
+    expect(container.querySelector("[data-testid='task-record-timeline-item']")?.textContent).toContain(firstRecord.title);
+    expect(container.querySelector(".supply-task-record-reward")).toBeNull();
+    expect(container.textContent).not.toContain("银 记录");
+  });
+
   it("switches sidebar modes into full main views", async () => {
     await act(async () => {
       root.render(<SupplyTaskRecordScene data={supplyTaskRecordMock} />);
@@ -237,14 +261,14 @@ describe("SupplyTaskRecordScene", () => {
 
     expect(imageSources).toEqual(
       expect.arrayContaining([
-        "/avatars/male1.png",
-        "/gamification/rewards/icons/task_reroll_coupon.png",
-        "/gamification/rewards/icons/coins_020.png",
-        "/assets/home-scenes/supply/task-record/icons/task-record-movement.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-hydration.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-chat.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-learning.webp",
-        "/assets/home-scenes/supply/task-record/icons/task-record-draw.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_020.png",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_movement.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_hydration.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_chat.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_learning.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_task_record_icons_task_record_draw.webp",
       ]),
     );
 
@@ -258,7 +282,7 @@ describe("SupplyTaskRecordScene", () => {
     });
 
     expect(radarImageSources).toEqual(
-      expect.arrayContaining(["/avatars/male2.png", "/avatars/female1.png", "/avatars/male3.png"]),
+      expect.arrayContaining(["https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male2.png", "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_female1.png", "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male3.png"]),
     );
 
     await clickButtonContaining(container, "兑换记录");
@@ -270,7 +294,7 @@ describe("SupplyTaskRecordScene", () => {
       return optimizedUrl ?? src;
     });
 
-    expect(redemptionImageSources).toContain("/gamification/rewards/icons/luckin_coffee_coupon.png");
+    expect(redemptionImageSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png");
     expect(imageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/task-record\/.*-panel\.png/);
     expect(radarImageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/task-record\/.*-panel\.png/);
     expect(redemptionImageSources.join("\n")).not.toMatch(/\/assets\/home-scenes\/supply\/task-record\/.*-panel\.png/);

@@ -146,9 +146,10 @@ describe("supply production to UI Lab adapters", () => {
     expect(dashboard.dailyQuests[0]).toMatchObject({
       id: "movement",
       title: "屁股离线",
+      description: "找一个理由离开座位走一小圈。",
       completed: true,
     });
-    expect(dashboard.dailyQuests[0].image).toContain("/assets/");
+    expect(dashboard.dailyQuests[0].image).toContain("share_project_public_assets_task_cards_illustrations_");
     expect(dashboard.shortcutLinks.map((link) => link.id)).toEqual([
       "home",
       "backpack",
@@ -158,6 +159,8 @@ describe("supply production to UI Lab adapters", () => {
   });
 
   it("maps secondary panels without mock values", () => {
+    const taskRecord = toSupplyTaskRecordPreview(snapshot);
+
     expect(toSupplyDrawPoolPreview(snapshot).wallet.ticketBalance).toBe(5);
     expect(toSupplyBackpackPreview(snapshot).sidebar.capacity).toBe("17/60");
     expect(toSupplyShopPreview(snapshot).products[0]).toMatchObject({
@@ -166,10 +169,12 @@ describe("supply production to UI Lab adapters", () => {
       price: { amount: 150 },
       ownedQuantity: 3,
     });
-    expect(toSupplyTaskRecordPreview(snapshot).recordsByDate["2026-05-26"][0]).toMatchObject({
+    expect(taskRecord.recordsByDate["2026-05-26"][0]).toMatchObject({
       id: "row-1",
       title: "购买补给",
     });
+    expect(taskRecord.recordsByDate["2026-05-26"][0].reward).toBeUndefined();
+    expect(taskRecord.recordsByDate["2026-05-26"][0].reward?.label).not.toBe("记录");
   });
 
   it("maps available teammates to direct social backpack items", () => {

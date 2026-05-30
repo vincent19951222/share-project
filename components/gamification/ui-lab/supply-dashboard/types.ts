@@ -19,6 +19,7 @@ export type SupplyDashboardQuest = {
   dimension: "movement" | "hydration" | "social" | "learning";
   title: string;
   subtitle: string;
+  description: string;
   image: string;
   difficulty: "轻" | "中";
   tags: string[];

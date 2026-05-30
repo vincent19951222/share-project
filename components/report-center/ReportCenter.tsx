@@ -13,27 +13,27 @@ import { buildReportData } from "./report-data";
 
 const reportSceneProps = [
   {
-    src: "/assets/home-scenes/report/binder-clip-left.webp",
+    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_binder_clip_left.webp",
     className: "left-4 top-2 w-20 sm:left-8 sm:w-24",
   },
   {
-    src: "/assets/home-scenes/report/discipline-note.webp",
+    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_discipline_note.webp",
     className: "left-0 top-28 hidden w-36 sm:block lg:w-40",
   },
   {
-    src: "/assets/home-scenes/report/no-excuses-note.webp",
+    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_no_excuses_note.webp",
     className: "right-3 top-10 hidden w-32 sm:block lg:w-36",
   },
   {
-    src: "/assets/home-scenes/report/bar-chart-note.webp",
+    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_bar_chart_note.webp",
     className: "right-2 top-72 hidden w-28 lg:block xl:w-32",
   },
   {
-    src: "/assets/home-scenes/report/stronger-stamp.webp",
+    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_stronger_stamp.webp",
     className: "bottom-28 left-3 hidden w-28 md:block lg:w-32",
   },
   {
-    src: "/assets/home-scenes/report/focus-marker.webp",
+    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_focus_marker.webp",
     className: "bottom-8 right-2 hidden w-36 md:block lg:w-40",
   },
 ] as const;
@@ -51,7 +51,7 @@ export function ReportCenter() {
       <div className="report-scene relative isolate min-h-full overflow-hidden rounded-[2rem] border-[3px] border-slate-900 bg-[#f7f3e8] shadow-[0_16px_0_0_#111827]">
         <div className="report-scene-background absolute inset-0">
           <img
-            src="/assets/home-scenes/report/editor-desk-bg.webp"
+            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_editor_desk_bg.webp"
             alt=""
             aria-hidden="true"
             className="h-full w-full object-cover opacity-80"

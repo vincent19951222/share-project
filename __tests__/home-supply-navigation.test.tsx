@@ -48,14 +48,14 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
   function createSupplyNavContext() {
     return {
       resources: [
-        { id: "coins", label: "银子", value: 440, iconImage: "/assets/home-scenes/supply/shared/supply-resource-coins.png" },
-        { id: "ticket", label: "抽奖券", value: 7, iconImage: "/assets/home-scenes/supply/shared/supply-resource-ticket.png" },
+        { id: "coins", label: "银子", value: 440, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png" },
+        { id: "ticket", label: "抽奖券", value: 7, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png" },
         {
           id: "backpack",
           label: "背包",
           value: 12,
           maxValue: 60,
-          iconImage: "/assets/home-scenes/supply/shared/supply-resource-backpack.png",
+          iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
         },
       ],
       profile: { username: "li", avatarKey: "male1" },

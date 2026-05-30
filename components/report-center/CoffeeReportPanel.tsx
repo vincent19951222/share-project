@@ -9,8 +9,8 @@ interface CoffeeReportPanelProps {
   error: string | null;
 }
 
-const cupAssetPath = "/assets/report-center/coffee-cup-label.png";
-const receiptAssetPath = "/assets/report-center/coffee-receipt.png";
+const cupAssetPath = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_report_center_coffee_cup_label.png";
+const receiptAssetPath = "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_report_center_coffee_receipt.png";
 const receiptLinePositions = ["41.7%", "49.7%", "57.8%", "66.2%"] as const;
 
 function getCoffeeBarHeight(cups: number, maxCups: number) {
@@ -108,7 +108,7 @@ function CoffeeReceiptScene({
   return (
     <div className="coffee-report-scene relative z-10 mt-2 flex min-h-0 flex-1 items-center justify-center gap-1 py-1 sm:gap-3 xl:gap-2">
       <div className="relative grid min-w-0 flex-[0_1_56%] place-items-center">
-        <div className="relative aspect-[2/3] w-full max-w-[292px]">
+        <div className="coffee-report-cup-artboard">
           <div className="pointer-events-none absolute left-1/2 top-[5%] h-14 w-28 -translate-x-1/2" aria-hidden="true">
             <span className="absolute bottom-0 left-5 h-10 w-2.5 rounded-full bg-white/70 blur-md" />
             <span className="absolute bottom-0 left-12 h-14 w-2.5 rounded-full bg-white/70 blur-md" />
@@ -117,16 +117,16 @@ function CoffeeReceiptScene({
           <img
             src={cupAssetPath}
             alt="像素风外带咖啡杯"
-            className="h-full w-full object-contain [image-rendering:pixelated] drop-shadow-[0_18px_20px_rgba(94,53,19,0.18)]"
+            className="coffee-report-art-image coffee-report-cup-image"
           />
-          <div className="pointer-events-none absolute left-[25%] top-[47.5%] flex min-h-[18%] w-1/2 -rotate-[0.4deg] flex-col justify-center gap-1 px-[4%] text-left text-[#3f250c]">
-            <div className="text-[clamp(9px,0.65vw,12px)] font-black uppercase leading-none tracking-[0.12em] text-amber-700">
+          <div className="coffee-report-cup-label-copy">
+            <div className="coffee-report-cup-label-eyebrow">
               Daily Roast
             </div>
-            <div className="text-[clamp(16px,1.35vw,22px)] font-black leading-tight text-amber-950">
+            <div className="coffee-report-cup-label-title">
               本周咖啡王
             </div>
-            <div className="border-t-2 border-amber-900/25 pt-1 text-[clamp(10px,0.75vw,12px)] font-black leading-snug text-amber-800">
+            <div className="coffee-report-cup-label-meta">
               {weekKing}
             </div>
           </div>
@@ -134,13 +134,13 @@ function CoffeeReceiptScene({
       </div>
 
       <div className="relative min-w-0 flex-[0_1_44%] rotate-[2.2deg] translate-y-2">
-        <div className="relative mx-auto aspect-[2/3] w-full max-w-[238px] [container-type:inline-size]">
+        <div className="coffee-report-receipt-artboard">
           <img
             src={receiptAssetPath}
             alt="咖啡统计小票"
-            className="h-full w-full object-contain [image-rendering:pixelated] drop-shadow-[0_14px_14px_rgba(94,53,19,0.14)]"
+            className="coffee-report-art-image coffee-report-receipt-image"
           />
-          <div className="pointer-events-none absolute inset-0 text-[#3f250c]" aria-label="咖啡统计小票内容">
+          <div className="coffee-report-receipt-copy-layer" aria-label="咖啡统计小票内容">
             <div className="sr-only">{receiptSummary}</div>
             <div className="absolute left-[24.5%] top-[27.2%] flex h-[10.4%] w-[55%] flex-col justify-center px-[3%]">
               <strong className="text-[clamp(11px,6.5cqw,16px)] font-black leading-tight text-amber-950">
@@ -150,7 +150,7 @@ function CoffeeReceiptScene({
             {receiptLines.map((line, index) => (
               <ReceiptLine key={line.label} label={line.label} value={line.value} index={index} />
             ))}
-            <div className="absolute left-[24.4%] top-[78.2%] grid h-[6.4%] w-[49%] grid-cols-2 items-center text-center text-[clamp(7px,4cqw,10px)] font-black text-lime-800">
+            <div className="coffee-report-receipt-footer">
               <span>{coffee.recentDays.at(-1)?.day ?? "今日"} 日</span>
               <span>{error ? "待恢复" : "已入账"}</span>
             </div>

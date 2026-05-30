@@ -106,13 +106,13 @@ describe("shared board note wall scene", () => {
       image.getAttribute("src") ?? "",
     );
 
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/clipboard-clip.webp");
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/poster-no-excuses.webp");
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/poster-focus-train-win.webp");
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/discipline-note.webp");
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/dumbbell-edge.webp");
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/marker-pen.webp");
-    expect(mediaSources).toContain("/assets/home-scenes/shared-board/paperclip.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_clipboard_clip.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_poster_no_excuses.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_poster_focus_train_win.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_discipline_note.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_dumbbell_edge.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_marker_pen.webp");
+    expect(mediaSources).toContain("https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_shared_board_paperclip.webp");
   });
 
   it("keeps scene props outside the content safe area and groups composer with the cork board", async () => {
@@ -154,7 +154,7 @@ describe("shared board note wall scene", () => {
 
     const pin = container.querySelector<HTMLImageElement>(".note-free-yellow .note-pin");
     expect(pin?.getAttribute("src")).toMatch(
-      /^\/assets\/home-scenes\/shared-board\/pushpin-(red|blue|yellow)\.webp$/,
+      /^https:\/\/vincent-1355816760\.cos\.ap-guangzhou\.myqcloud\.com\/obsidian_images\/share_project_public_assets_home_scenes_shared_board_pushpin_(red|blue|yellow)\.webp$/,
     );
 
     expect(container.querySelector(".note-announcement-ribbon")?.textContent).toBe("团队通告");

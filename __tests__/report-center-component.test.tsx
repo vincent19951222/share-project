@@ -266,11 +266,11 @@ describe("ReportCenter", () => {
       expect(container.querySelector(".report-milestones")).not.toBeNull();
       expect(container.querySelector(".report-metric-tile[data-metric-id='completion-rate']")).not.toBeNull();
       expect(container.querySelector(".report-metric-tile[data-metric-id='total-punches']")).not.toBeNull();
-      expect(container.querySelector("img[src='/assets/report-center/coffee-cup-label.png']")).not.toBeNull();
-      expect(container.querySelector("img[src='/assets/report-center/coffee-receipt.png']")).not.toBeNull();
-      expect(container.querySelector("img[src='/assets/home-scenes/report/keep-going-stamp.webp']")).not.toBeNull();
-      expect(container.querySelector("img[src='/assets/home-scenes/report/mini-chart-slip.webp']")).not.toBeNull();
-      expect(container.querySelector("img[src='/assets/home-scenes/report/vault-safe-yellow.webp']")).not.toBeNull();
+      expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_report_center_coffee_cup_label.png']")).not.toBeNull();
+      expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_report_center_coffee_receipt.png']")).not.toBeNull();
+      expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_keep_going_stamp.webp']")).not.toBeNull();
+      expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_mini_chart_slip.webp']")).not.toBeNull();
+      expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_vault_safe_yellow.webp']")).not.toBeNull();
       expect(container.querySelector("svg[aria-label='团队每日打卡人数趋势']")).not.toBeNull();
       expect(container.querySelector(".report-scene-bottom .game-weekly-report-desk")).not.toBeNull();
       expect(container.querySelector(".report-scene-bottom .game-weekly-report-highlights-rail")).not.toBeNull();

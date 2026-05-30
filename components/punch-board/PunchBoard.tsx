@@ -12,39 +12,39 @@ export function PunchBoard() {
     >
       <div className="punch-scene-background" aria-hidden="true">
         <img
-          src="/assets/home-scenes/punch/gym-wall-bg.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_gym_wall_bg.webp"
           alt=""
           className="punch-scene-wall"
         />
         <img
-          src="/assets/home-scenes/punch/gym-floor-strip.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_gym_floor_strip.webp"
           alt=""
           className="punch-scene-floor"
         />
       </div>
       <div className="punch-scene-props" aria-hidden="true">
         <img
-          src="/assets/home-scenes/punch/poster-no-pain.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_poster_no_pain.webp"
           alt=""
           className="punch-scene-poster punch-scene-poster-left"
         />
         <img
-          src="/assets/home-scenes/punch/poster-believe.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_poster_believe.webp"
           alt=""
           className="punch-scene-poster punch-scene-poster-right"
         />
         <img
-          src="/assets/home-scenes/punch/stopwatch-keep-going.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_stopwatch_keep_going.webp"
           alt=""
           className="punch-scene-stopwatch"
         />
         <img
-          src="/assets/home-scenes/punch/dumbbell-corner.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_dumbbell_corner.webp"
           alt=""
           className="punch-scene-dumbbell"
         />
         <img
-          src="/assets/home-scenes/punch/towel-bar.webp"
+          src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_punch_towel_bar.webp"
           alt=""
           className="punch-scene-towel"
         />
