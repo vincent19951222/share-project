@@ -82,6 +82,7 @@ describe("supply dashboard static scene", () => {
     expect(container.querySelector('a[href="#help"]')).toBeNull();
     expect(container.querySelector('a[href="#feedback"]')).toBeNull();
     expect(container.querySelector(".supply-dashboard-streak-card")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-streak-card")?.textContent).not.toContain("🔥");
     expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-hero-image")).not.toBeNull();
     expect(container.querySelector(".supply-dashboard-mobile-hero")).not.toBeNull();
@@ -155,6 +156,7 @@ describe("supply dashboard static scene", () => {
       "secondary",
     );
     expect(container.querySelector(".supply-dashboard-announcement")?.getAttribute("data-priority")).toBe("quiet");
+    expect(container.querySelector(".supply-dashboard-announcement")?.textContent).not.toContain("📣");
     expect(container.querySelector(".supply-dashboard-panel-image")).toBeNull();
     expect(container.textContent).toContain("牛马补给站");
     expect(container.textContent).toContain("我的状态");

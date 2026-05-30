@@ -101,7 +101,7 @@ function CharacterStatusPanel({ data }: { data: SupplyDashboardPreview }) {
       <div className="supply-dashboard-streak-card">
         <span>连续打卡</span>
         <strong>
-          <em aria-hidden="true">🔥</em>
+          <em aria-hidden="true">连</em>
           {data.profile.streakDays}
           <small>天</small>
         </strong>
@@ -428,7 +428,7 @@ function DashboardShortcutDock({
 function TeamAnnouncementBar({ message }: { message: string }) {
   return (
     <aside className="supply-dashboard-announcement" data-priority="quiet" aria-label="团队公告">
-      <span aria-hidden="true">📣</span>
+      <span aria-hidden="true">!</span>
       <p>{message}</p>
     </aside>
   );

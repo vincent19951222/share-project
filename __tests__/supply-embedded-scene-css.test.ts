@@ -118,4 +118,17 @@ describe("supply embedded scene CSS", () => {
 
     expect(assetLabelRule).toMatch(/display:\s*none/);
   });
+
+  it("compacts supply resource chips inside the shared mobile navbar", () => {
+    const mobileBlockStart = css.lastIndexOf("@media (max-width: 640px)");
+    expect(mobileBlockStart).toBeGreaterThanOrEqual(0);
+    const mobileBlock = css.slice(mobileBlockStart, css.indexOf("@media", mobileBlockStart + 1));
+
+    expect(mobileBlock).toMatch(/\.app-supply-assets\s*\{[\s\S]*min-width:\s*0/);
+    expect(mobileBlock).toMatch(/\.app-supply-assets\s*\{[\s\S]*flex:\s*0 1 auto/);
+    expect(mobileBlock).toMatch(/\.app-supply-asset-chip\s*\{[\s\S]*min-height:\s*2\.05rem/);
+    expect(mobileBlock).toMatch(/\.app-supply-asset-chip img\s*\{[\s\S]*width:\s*1\.2rem/);
+    expect(mobileBlock).toMatch(/\.app-supply-asset-chip strong\s*\{[\s\S]*font-size:\s*0\.72rem/);
+    expect(mobileBlock).toMatch(/\.app-supply-asset-chip--backpack strong\s*\{[\s\S]*font-size:\s*0\.68rem/);
+  });
 });
