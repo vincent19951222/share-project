@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 interface AdminPageShellProps {
   opsPanel: ReactNode;
   configPanel: ReactNode;
+  benefitPanel: ReactNode;
   makeupPanel: ReactNode;
   seasonPanel: ReactNode;
 }
@@ -10,6 +11,7 @@ interface AdminPageShellProps {
 export function AdminPageShell({
   opsPanel,
   configPanel,
+  benefitPanel,
   makeupPanel,
   seasonPanel,
 }: AdminPageShellProps) {
@@ -36,6 +38,9 @@ export function AdminPageShell({
             <a className="supply-inline-link" href="#gamification-config">
               配置总览
             </a>
+            <a className="supply-inline-link" href="#admin-release-benefit">
+              版本福利
+            </a>
             <a className="supply-inline-link" href="#admin-makeup">
               全局补卡
             </a>
@@ -50,6 +55,9 @@ export function AdminPageShell({
         </section>
         <section id="gamification-config" className="scroll-mt-4">
           {configPanel}
+        </section>
+        <section id="admin-release-benefit" className="scroll-mt-4">
+          {benefitPanel}
         </section>
         <section id="admin-makeup" className="scroll-mt-4">
           {makeupPanel}

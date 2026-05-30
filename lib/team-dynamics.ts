@@ -12,6 +12,7 @@ export const TEAM_DYNAMIC_TYPES = {
   GAME_BOOST_MILESTONE: "GAME_BOOST_MILESTONE",
   GAME_TEAM_BROADCAST: "GAME_TEAM_BROADCAST",
   GAME_SOCIAL_MOMENT: "GAME_SOCIAL_MOMENT",
+  GAME_RELEASE_BENEFIT: "GAME_RELEASE_BENEFIT",
 } as const;
 
 export type TeamDynamicType =
@@ -106,6 +107,10 @@ const TEAM_DYNAMIC_META: Record<TeamDynamicType, TeamDynamicMeta> = {
   [TEAM_DYNAMIC_TYPES.GAME_SOCIAL_MOMENT]: {
     label: "牛马互动",
     tone: "success",
+  },
+  [TEAM_DYNAMIC_TYPES.GAME_RELEASE_BENEFIT]: {
+    label: "版本福利",
+    tone: "highlight",
   },
 };
 

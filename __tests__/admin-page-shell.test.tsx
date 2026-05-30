@@ -27,6 +27,7 @@ describe("AdminPageShell", () => {
         <AdminPageShell
           opsPanel={<section>运营观察</section>}
           configPanel={<section>配置总览</section>}
+          benefitPanel={<section>版本福利</section>}
           makeupPanel={<section>全局补卡</section>}
           seasonPanel={<section>赛季设置</section>}
         />,
@@ -40,10 +41,12 @@ describe("AdminPageShell", () => {
     expect(container.querySelector('a[href="/"]')?.textContent).toContain("返回主页");
     expect(container.querySelector('a[href="#gamification-ops"]')?.textContent).toContain("运营观察");
     expect(container.querySelector('a[href="#gamification-config"]')?.textContent).toContain("配置总览");
+    expect(container.querySelector('a[href="#admin-release-benefit"]')?.textContent).toContain("版本福利");
     expect(container.querySelector('a[href="#admin-makeup"]')?.textContent).toContain("全局补卡");
     expect(container.querySelector('a[href="#season-admin"]')?.textContent).toContain("赛季设置");
     expect(container.querySelector("#gamification-ops")?.textContent).toContain("运营观察");
     expect(container.querySelector("#gamification-config")?.textContent).toContain("配置总览");
+    expect(container.querySelector("#admin-release-benefit")?.textContent).toContain("版本福利");
     expect(container.querySelector("#admin-makeup")?.textContent).toContain("全局补卡");
     expect(container.querySelector("#season-admin")?.textContent).toContain("赛季设置");
   });

@@ -4,6 +4,7 @@ import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { GamificationConfigObservatory } from "@/components/admin/GamificationConfigObservatory";
 import { GamificationOpsDashboard } from "@/components/admin/GamificationOpsDashboard";
 import { AdminMakeupPunchPanel } from "@/components/admin/AdminMakeupPunchPanel";
+import { AdminReleaseBenefitPanel } from "@/components/admin/AdminReleaseBenefitPanel";
 import { SeasonAdminPanel } from "@/components/admin/SeasonAdminPanel";
 import { buildGamificationConfigObservatorySnapshot } from "@/lib/gamification/config-observatory";
 import { buildGamificationOpsDashboard } from "@/lib/gamification/ops-dashboard";
@@ -37,6 +38,7 @@ export default async function AdminPage() {
     <AdminPageShell
       opsPanel={<GamificationOpsDashboard initialSnapshot={opsSnapshot} />}
       configPanel={<GamificationConfigObservatory initialSnapshot={configSnapshot} />}
+      benefitPanel={<AdminReleaseBenefitPanel memberCount={teamMembers.length} />}
       makeupPanel={
         <AdminMakeupPunchPanel
           members={teamMembers.map((member) => ({
