@@ -124,8 +124,38 @@ describe("home calendar scene CSS", () => {
     expect(
       mobileBlocks.some(
         (block) =>
+          /\.calendar-binder-shell\s*\{[^}]*height:\s*auto/.test(block) &&
+          /\.calendar-paper-surface\s*\{[^}]*height:\s*auto/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
           block.includes(".calendar-summary-chip") &&
           /grid-template-columns:\s*auto auto minmax\(1\.4rem,\s*auto\) auto/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".calendar-scene") &&
+          /margin-top:\s*0/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".calendar-month-grid") &&
+          /grid-auto-rows:\s*minmax\(2\.75rem,\s*2\.75rem\)/.test(block) &&
+          /flex:\s*0 0 auto/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          !block.includes("@media (max-width: 430px)") &&
+          block.includes(".calendar-summary-row") &&
+          /grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/.test(block),
       ),
     ).toBe(true);
     expect(

@@ -4358,11 +4358,12 @@ body {
 
 @media (max-width: 760px) {
   .calendar-board-viewport {
-    padding: 0.65rem;
+    padding: 0.5rem;
   }
 
   .calendar-scene {
-    border-radius: 1.15rem;
+    margin-top: 0;
+    border-radius: 1rem;
   }
 
   .calendar-scene-background,
@@ -4387,21 +4388,28 @@ body {
   }
 
   .calendar-scene-content {
-    padding: 0.55rem;
+    padding: 0.35rem;
   }
 
   .calendar-binder-shell {
-    padding: 0.3rem 0.35rem 0.45rem 0.55rem;
+    height: auto;
+    padding: 0.25rem 0.28rem 0.35rem 0.42rem;
     border-width: 2px;
     border-radius: 1rem;
   }
 
   .calendar-paper-surface {
-    gap: 0.8rem;
-    padding: 0.95rem;
-    padding-left: 1.25rem;
+    height: auto;
+    gap: 0.5rem;
+    padding: 0.72rem;
+    padding-left: 0.85rem;
     border-width: 3px;
     border-radius: 0.9rem;
+  }
+
+  .calendar-header {
+    gap: 0.45rem;
+    padding-bottom: 0.45rem;
   }
 
   .calendar-header-title-row {
@@ -4409,12 +4417,20 @@ body {
     gap: 0.55rem;
   }
 
+  .calendar-header-title {
+    font-size: 1.55rem;
+  }
+
+  .calendar-header-month {
+    font-size: 1rem;
+  }
+
   .calendar-header-divider {
     display: none;
   }
 
   .calendar-header-actions {
-    gap: 0.45rem;
+    gap: 0.4rem;
   }
 
   .calendar-prev-btn,
@@ -4428,19 +4444,19 @@ body {
 
   .calendar-summary-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.45rem;
+    gap: 0.4rem;
   }
 
   .calendar-summary-chip {
     grid-template-columns: auto auto minmax(1.4rem, auto) auto;
     gap: 0.25rem 0.45rem;
-    min-height: 3.4rem;
+    min-height: 2.85rem;
     border-width: 2px;
-    padding: 0.5rem;
+    padding: 0.35rem 0.42rem;
   }
 
   .calendar-summary-value {
-    font-size: 1.65rem;
+    font-size: 1.25rem;
   }
 
   .calendar-summary-unit {
@@ -4448,9 +4464,14 @@ body {
   }
 
   .calendar-summary-icon {
-    width: 2.05rem;
-    height: 2.05rem;
+    width: 1.75rem;
+    height: 1.75rem;
     grid-row: span 2;
+  }
+
+  .calendar-summary-label,
+  .calendar-summary-unit {
+    font-size: 0.72rem;
   }
 
   .calendar-summary-icon img {
@@ -4467,9 +4488,24 @@ body {
     display: none;
   }
 
+  .calendar-grid-section {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .calendar-month-table {
+    height: auto;
+  }
+
+  .calendar-month-grid {
+    flex: 0 0 auto;
+    grid-auto-rows: minmax(2.75rem, 2.75rem);
+    overflow: hidden;
+  }
+
   .calendar-day-cell,
   .calendar-neighbor-cell {
-    min-height: 3.75rem;
+    min-height: 2.75rem;
   }
 
   .calendar-day-cell {
@@ -4509,7 +4545,7 @@ body {
 
 @media (max-width: 430px) {
   .calendar-summary-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
