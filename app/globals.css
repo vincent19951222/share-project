@@ -13296,3 +13296,181 @@ body {
 .supply-draw-pool-scene--embedded .supply-draw-pool-layout {
   height: 100%;
 }
+
+@media (max-width: 768px) {
+  .supply-dashboard-scene--embedded .supply-dashboard-stage {
+    gap: 0.65rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-mobile-hero {
+    order: 1;
+    padding: 0.65rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-panel,
+  .supply-dashboard-scene--embedded .supply-ui-lab-panel.supply-dashboard-quest-panel {
+    order: 2;
+    gap: 0.6rem;
+    border-width: 3px;
+    padding: 0.75rem;
+    box-shadow: 4px 4px 0 rgba(17, 24, 39, 0.78);
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-heading {
+    gap: 0.45rem;
+    padding-bottom: 0.52rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-heading h2 {
+    font-size: 1rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-progress {
+    gap: 0.32rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-progress strong {
+    font-size: 0.72rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    justify-content: stretch;
+    place-items: center;
+    gap: 0.6rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-card-shell {
+    --dashboard-quest-card-width: min(100%, 9rem);
+    width: 100%;
+    max-width: 9.25rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-card.supply-task-card {
+    width: 100%;
+    grid-template-rows: 1.42rem auto minmax(0, 1fr) 1.5rem;
+    gap: 0.24rem;
+    border-width: 2px;
+    padding: 0.42rem;
+    box-shadow: 2px 2px 0 rgba(15, 16, 14, 0.86);
+  }
+
+  .supply-dashboard-scene--embedded .supply-task-card--dashboard .supply-task-card-band {
+    min-height: 1.36rem;
+    border-width: 2px;
+    font-size: 0.58rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-task-card--dashboard h3 {
+    font-size: 0.82rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-task-card--dashboard .supply-task-card-art {
+    border-width: 2px;
+  }
+
+  .supply-dashboard-scene--embedded .supply-task-card-meta--actions {
+    grid-template-columns: minmax(1.1rem, auto) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.16rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-task-card--dashboard .supply-task-card-meta > span,
+  .supply-dashboard-scene--embedded .supply-task-card--dashboard .supply-task-card-action,
+  .supply-dashboard-scene--embedded .supply-task-card--dashboard .supply-task-card-state {
+    font-size: 0.54rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-footer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.55rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-quest-footer button {
+    width: 100%;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-status-panel,
+  .supply-dashboard-scene--embedded .supply-ui-lab-panel.supply-dashboard-status-panel {
+    order: 3;
+    border-width: 3px;
+    padding: 0.72rem;
+    box-shadow: 4px 4px 0 rgba(17, 24, 39, 0.72);
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-dock {
+    order: 4;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-card,
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-card--home,
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-card--backpack,
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-card--draw-pool,
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-card--task-record {
+    min-height: 4.75rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.4rem;
+    border-width: 3px;
+    padding: 0.55rem;
+    box-shadow: 3px 3px 0 rgba(17, 24, 39, 0.78);
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-icon {
+    width: 2.35rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-copy strong {
+    font-size: 0.88rem;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-copy small {
+    font-size: 0.64rem;
+    -webkit-line-clamp: 1;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-shortcut-card i {
+    display: none;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-announcement {
+    order: 5;
+  }
+
+  .supply-dashboard-task-confirm-backdrop {
+    position: fixed;
+    padding: 1rem;
+  }
+
+  .supply-dashboard-task-confirm {
+    width: min(100%, calc(100vw - 2rem));
+    max-height: calc(100svh - 2rem);
+    overflow-y: auto;
+    padding: 0.82rem 0.85rem 0.85rem 1rem;
+  }
+
+  .supply-dashboard-task-confirm-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .supply-dashboard-task-confirm-art {
+    min-height: 8rem;
+    max-height: 12rem;
+  }
+
+  .supply-dashboard-task-confirm-copy h3 {
+    font-size: 1.35rem;
+    line-height: 1.05;
+  }
+
+  .supply-dashboard-task-confirm-actions {
+    position: sticky;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: #fffaf0;
+    padding-top: 0.45rem;
+  }
+}

@@ -129,4 +129,30 @@ describe("Supply UI Lab mobile CSS", () => {
       /text-overflow:\s*ellipsis/,
     );
   });
+
+  it("prioritizes the embedded dashboard task flow on phones", () => {
+    expectMobileRule(".supply-dashboard-scene--embedded .supply-dashboard-stage", /gap:\s*0\.65rem/);
+    expectMobileRule(
+      ".supply-dashboard-scene--embedded .supply-dashboard-quest-panel",
+      [/order:\s*2/, /padding:\s*0\.75rem/],
+    );
+    expectMobileRule(
+      ".supply-dashboard-scene--embedded .supply-dashboard-quest-list",
+      [/grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/, /gap:\s*0\.6rem/],
+    );
+    expectMobileRule(".supply-dashboard-scene--embedded .supply-dashboard-status-panel", /order:\s*3/);
+    expectMobileRule(
+      ".supply-dashboard-scene--embedded .supply-dashboard-shortcut-dock",
+      [/grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/, /gap:\s*0\.55rem/],
+    );
+    expectMobileRule(
+      ".supply-dashboard-scene--embedded .supply-dashboard-shortcut-card",
+      [/min-height:\s*4\.75rem/, /padding:\s*0\.55rem/],
+    );
+    expectMobileRule(
+      ".supply-dashboard-task-confirm",
+      [/max-height:\s*calc\(100svh\s*-\s*2rem\)/, /overflow-y:\s*auto/],
+    );
+    expectMobileRule(".supply-dashboard-task-confirm-body", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  });
 });
