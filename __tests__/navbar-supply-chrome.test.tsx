@@ -178,6 +178,24 @@ describe("Navbar supply chrome", () => {
     expect(container.querySelectorAll(".app-supply-asset-skeleton")).toHaveLength(3);
   });
 
+  it("renders a compact mobile wallet while preserving desktop supply asset chips", async () => {
+    activeTab = "dash";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="dash" supplyNavContext={supplyNavContext} />);
+    });
+
+    const wallet = container.querySelector<HTMLButtonElement>(".app-supply-mobile-wallet");
+    expect(wallet).not.toBeNull();
+    expect(wallet?.getAttribute("aria-label")).toBe("补给站资产：银子 440，抽奖券 7，背包 12/60");
+    expect(wallet?.textContent).toContain("440");
+    expect(wallet?.textContent).toContain("7");
+    expect(wallet?.textContent).toContain("12/60");
+
+    expect(container.querySelectorAll(".app-supply-asset-chip")).toHaveLength(3);
+    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("银子");
+  });
+
   it("keeps the secondary supply tabs reachable while moving from the primary tab to the flyout", async () => {
     vi.useFakeTimers();
     activeTab = "punch";

@@ -145,6 +145,14 @@ export function Navbar({
 
   const mobileNavLabel = mobileTabsOpen ? "收起导航" : "展开导航";
   const showSupplyChrome = activeTab === "supply";
+  const supplyAssetSummary = supplyNavContext
+    ? supplyNavContext.resources
+        .map((resource) => {
+          const valueLabel = resource.maxValue ? `${resource.value}/${resource.maxValue}` : `${resource.value}`;
+          return `${resource.label} ${valueLabel}`;
+        })
+        .join("，")
+    : "加载中";
 
   useEffect(() => {
     if (pendingTab === activeTab) {
@@ -268,6 +276,14 @@ export function Navbar({
               <span aria-hidden="true">{mobileTabsOpen ? "×" : "≡"}</span>
             </button>
             <TeamDynamicsBell />
+            <button
+              type="button"
+              aria-label={`补给站资产：${supplyAssetSummary}`}
+              className="app-supply-mobile-wallet"
+            >
+              <AssetIcon name="supply" className="h-5 w-5 object-contain" />
+              <span>{supplyAssetSummary}</span>
+            </button>
             <div
               aria-busy={!supplyNavContext}
               aria-label={supplyNavContext ? "补给站资产" : "补给站资产加载中"}
