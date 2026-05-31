@@ -144,4 +144,17 @@ describe("supply embedded scene CSS", () => {
     expect(mobileBlock).toMatch(/\.app-supply-mobile-wallet\s*\{[\s\S]*max-width:\s*none/);
     expect(mobileBlock).not.toMatch(/\.app-supply-mobile-wallet span\s*\{[\s\S]*text-overflow:\s*ellipsis/);
   });
+
+  it("centers the mobile nav toggle icon with drawn bars instead of text glyphs", () => {
+    expect(css).toMatch(/\.mobile-nav-toggle\s*\{[\s\S]*display:\s*inline-grid/);
+    expect(css).toMatch(/\.mobile-nav-toggle\s*\{[\s\S]*place-items:\s*center/);
+    expect(css).toMatch(/\.mobile-nav-toggle\s*\{[\s\S]*line-height:\s*0/);
+    expect(css).toMatch(/\.mobile-nav-toggle-icon\s*\{[\s\S]*position:\s*absolute/);
+    expect(css).toMatch(/\.mobile-nav-toggle-icon\s*\{[\s\S]*left:\s*50%/);
+    expect(css).toMatch(/\.mobile-nav-toggle-icon\s*\{[\s\S]*top:\s*50%/);
+    expect(css).toMatch(/\.mobile-nav-toggle-icon\s*\{[\s\S]*transform:\s*translate\(-50%,\s*-50%\)/);
+    expect(css).toMatch(/\.mobile-nav-toggle-icon::before,\s*\.mobile-nav-toggle-icon::after,\s*\.mobile-nav-toggle-icon span\s*\{[\s\S]*top:\s*50%/);
+    expect(css).toMatch(/\.mobile-nav-toggle\[data-state="open"\]\s+\.mobile-nav-toggle-icon::before\s*\{[\s\S]*rotate\(45deg\)/);
+    expect(css).toMatch(/\.mobile-nav-toggle\[data-state="open"\]\s+\.mobile-nav-toggle-icon::after\s*\{[\s\S]*rotate\(-45deg\)/);
+  });
 });

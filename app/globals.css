@@ -555,6 +555,67 @@ body {
   border-color: #f8fafc;
 }
 
+.mobile-nav-toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  line-height: 0;
+}
+
+.mobile-nav-toggle-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 1.05rem;
+  height: 1.05rem;
+  color: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.mobile-nav-toggle-icon::before,
+.mobile-nav-toggle-icon::after,
+.mobile-nav-toggle-icon span {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 1.05rem;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  transition:
+    opacity 120ms ease,
+    transform 160ms ease;
+}
+
+.mobile-nav-toggle-icon::before {
+  transform: translate(-50%, calc(-50% - 0.34rem));
+}
+
+.mobile-nav-toggle-icon span {
+  transform: translate(-50%, -50%);
+}
+
+.mobile-nav-toggle-icon::after {
+  transform: translate(-50%, calc(-50% + 0.34rem));
+}
+
+.mobile-nav-toggle[data-state="open"] .mobile-nav-toggle-icon::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.mobile-nav-toggle[data-state="open"] .mobile-nav-toggle-icon span {
+  opacity: 0;
+}
+
+.mobile-nav-toggle[data-state="open"] .mobile-nav-toggle-icon::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
 .app-supply-secondary-nav {
   position: absolute;
   z-index: 80;

@@ -270,10 +270,13 @@ export function Navbar({
               type="button"
               aria-label={mobileNavLabel}
               aria-expanded={mobileTabsOpen}
+              data-state={mobileTabsOpen ? "open" : "closed"}
               onClick={() => setMobileTabsOpen((open) => !open)}
               className="mobile-nav-toggle flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-800 bg-white text-xl font-black text-slate-800 shadow-[0_3px_0_0_#1f2937] min-[761px]:hidden"
             >
-              <span aria-hidden="true">{mobileTabsOpen ? "×" : "≡"}</span>
+              <span className="mobile-nav-toggle-icon" aria-hidden="true">
+                <span />
+              </span>
             </button>
             <TeamDynamicsBell />
             <div

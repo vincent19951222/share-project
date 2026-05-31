@@ -198,6 +198,28 @@ describe("Navbar supply chrome", () => {
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("银子");
   });
 
+  it("uses a centered drawn icon for the mobile nav toggle in both states", async () => {
+    activeTab = "punch";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
+    });
+
+    const toggle = container.querySelector<HTMLButtonElement>(".mobile-nav-toggle");
+    expect(toggle).not.toBeNull();
+    expect(toggle?.querySelector(".mobile-nav-toggle-icon")).not.toBeNull();
+    expect(toggle?.textContent).not.toContain("≡");
+    expect(toggle?.getAttribute("data-state")).toBe("closed");
+
+    await act(async () => {
+      toggle?.click();
+    });
+
+    expect(toggle?.getAttribute("data-state")).toBe("open");
+    expect(toggle?.querySelector(".mobile-nav-toggle-icon")).not.toBeNull();
+    expect(toggle?.textContent).not.toContain("×");
+  });
+
   it("keeps the secondary supply tabs reachable while moving from the primary tab to the flyout", async () => {
     vi.useFakeTimers();
     activeTab = "punch";
