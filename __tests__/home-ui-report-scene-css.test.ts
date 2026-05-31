@@ -207,6 +207,36 @@ describe("home report scene CSS", () => {
       ),
     ).toBe(true);
     expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".report-header-strip") &&
+          /min-height:\s*0/.test(block) &&
+          /padding:\s*0\.75rem/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".report-header-decor-row") &&
+          /display:\s*none/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".coffee-report-inset-shell") &&
+          /min-height:\s*0/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".game-weekly-report-desk") &&
+          /max-height:\s*42rem/.test(block) &&
+          /overflow-y:\s*auto/.test(block),
+      ),
+    ).toBe(true);
+    expect(
       reducedMotionBlocks.some(
         (block) =>
           block.includes(".report-scene *") &&

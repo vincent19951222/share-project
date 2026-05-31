@@ -3668,7 +3668,7 @@ body {
 
 @media (max-width: 760px) {
   .calendar-board-viewport {
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 
   .calendar-board-shell {
@@ -4358,7 +4358,7 @@ body {
 
 @media (max-width: 760px) {
   .calendar-board-viewport {
-    padding: 0.5rem;
+    padding: 0.75rem;
   }
 
   .calendar-scene {
@@ -6416,7 +6416,8 @@ body {
   .report-scene {
     height: auto;
     min-height: auto;
-    border-radius: 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 0 0 #111827;
   }
 
   .report-scene-background,
@@ -6439,8 +6440,56 @@ body {
     padding: 0.75rem;
   }
 
+  .report-header-strip {
+    min-height: 0;
+    border-width: 3px;
+    border-radius: 1rem;
+    padding: 0.75rem !important;
+    box-shadow: 4px 4px 0 #1f2937;
+  }
+
+  .report-header-strip > .relative.grid {
+    gap: 0.6rem !important;
+  }
+
+  .report-header-strip h1 {
+    font-size: 1.55rem !important;
+    line-height: 1 !important;
+  }
+
+  .report-header-copy {
+    gap: 0.45rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .report-header-copy p {
+    font-size: 0.78rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .report-header-decor-row {
+    display: none !important;
+  }
+
+  .report-header-vault {
+    border-width: 2px !important;
+    border-radius: 0.85rem !important;
+    padding: 0.65rem !important;
+  }
+
+  .report-header-vault img {
+    height: 2.6rem !important;
+  }
+
   .report-scene-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .report-metric-tile {
+    min-height: 4.2rem !important;
+    border-width: 3px;
+    box-shadow: 4px 4px 0 #1f2937;
   }
 
   .report-scene-analysis,
@@ -6454,12 +6503,38 @@ body {
     width: 100%;
   }
 
+  .report-analysis-paper {
+    min-height: 20rem;
+    border-width: 3px;
+    box-shadow: 4px 4px 0 #1f2937;
+  }
+
+  .report-analysis-body-grid {
+    min-height: 12rem;
+  }
+
   .game-weekly-report-metric-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .coffee-report-inset-shell {
     height: auto;
+    min-height: 0;
+    border-width: 3px;
+    box-shadow: 4px 4px 0 rgba(120, 53, 15, 0.18);
+  }
+
+  .coffee-report-scene {
+    min-height: 11rem;
+  }
+
+  .game-weekly-report-desk {
+    max-height: 42rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-width: 3px;
+    box-shadow: 4px 4px 0 #1f2937;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
