@@ -177,6 +177,59 @@ describe("supply production to UI Lab adapters", () => {
     expect(taskRecord.recordsByDate["2026-05-26"][0].reward?.label).not.toBe("记录");
   });
 
+  it("maps recent draw reward ids to their matching catalog media", () => {
+    const drawPool = toSupplyDrawPoolPreview({
+      ...snapshot,
+      drawPool: {
+        ...snapshot.drawPool,
+        lottery: {
+          ...snapshot.drawPool.lottery,
+          recentDraws: [
+            {
+              id: "draw-recent",
+              drawType: "TEN",
+              ticketSpent: 10,
+              coinSpent: 0,
+              guaranteeApplied: false,
+              createdAt: "2026-05-26T08:00:00.000Z",
+              rewards: [
+                {
+                  rewardId: "reward_luckin_coffee",
+                  rewardTier: "rare",
+                  rewardKind: "real_world_redemption",
+                  name: "瑞幸咖啡券",
+                  description: "获得 1 张瑞幸咖啡券。",
+                  effectSummary: "瑞幸咖啡券 x1",
+                },
+                {
+                  rewardId: "reward_double_niuma",
+                  rewardTier: "rare",
+                  rewardKind: "inventory_item",
+                  name: "双倍牛马券",
+                  description: "获得 1 张双倍牛马券。",
+                  effectSummary: "双倍牛马券 x1",
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    expect(drawPool.recentDrops[0]).toMatchObject({
+      name: "瑞幸咖啡券",
+      rarity: "SSR",
+      image:
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee_coupon.png",
+    });
+    expect(drawPool.recentDrops[1]).toMatchObject({
+      name: "双倍牛马券",
+      rarity: "SSR",
+      image:
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_items_double_niuma_coupon.webp",
+    });
+  });
+
   it("maps available teammates to direct social backpack items", () => {
     const socialSnapshot: SupplyStationProductionSnapshot = {
       ...snapshot,

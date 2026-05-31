@@ -327,7 +327,7 @@ const catalogData = {
     sourceRewardId: "reward_luckin_coffee",
     name: "瑞幸咖啡券",
     category: "real_world",
-    rarity: "SR",
+    rarity: "SSR",
     description: "可找管理员线下兑换一杯瑞幸咖啡。",
     effectSummary: "管理员确认后兑换 1 杯瑞幸咖啡",
     useTiming: "manual_redemption",

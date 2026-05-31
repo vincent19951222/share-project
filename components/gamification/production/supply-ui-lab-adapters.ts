@@ -195,8 +195,8 @@ function mapCatalogCategory(category: GamificationBackpackCategory): SupplyUiLab
   return "boost";
 }
 
-function getCatalogItem(itemId: string) {
-  return supplyUiLabCatalog.find((item) => item.sourceItemId === itemId);
+function getCatalogItem(id: string) {
+  return supplyUiLabCatalog.find((item) => item.sourceItemId === id || item.sourceRewardId === id);
 }
 
 function getItemImage(itemId: string, category: GamificationBackpackCategory) {
@@ -522,11 +522,11 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
     shortcutLinks: [
       {
         id: "home",
-        href: "/dashboard/status",
+        href: "/",
         title: "首页",
         subtitle: "查看你的今日状态",
         badge: "",
-        image: null,
+        image: supplyDashboardAssetPaths.dockHome,
       },
       {
         id: "backpack",

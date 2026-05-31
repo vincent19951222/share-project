@@ -114,11 +114,11 @@ export const supplyDashboardMock: SupplyDashboardPreview = {
   shortcutLinks: [
     {
       id: "home",
-      href: "/dashboard/status",
+      href: "/",
       title: "首页",
       subtitle: "查看你的今日状态",
       badge: "",
-      image: null,
+      image: supplyDashboardAssetPaths.dockHome,
     },
     {
       id: "backpack",

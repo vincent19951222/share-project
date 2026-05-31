@@ -4,6 +4,7 @@ export const supplyDashboardAssetPaths = {
   background: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dashboard_gym_bg.webp",
   hero: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_niuma_hero.webp",
   levelAvatar: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_topbar_cow_logo.png",
+  dockHome: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/supply-dashboard-home-checkin-icon-transparent-v3-large.png",
   dockBackpack: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dock_backpack.webp",
   dockSupplyMachine: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dock_supply_machine.webp",
   dockTaskRecord: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_dashboard_dock_task_record.webp",

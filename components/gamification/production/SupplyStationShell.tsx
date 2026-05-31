@@ -254,8 +254,12 @@ export function SupplyStationShell({
   );
 
   const handlePanelNavigation = useCallback((target: "home" | "draw-pool" | "backpack" | "shop" | "task-record") => {
-    const nextPanelByTarget: Record<typeof target, SupplyProductionPanel> = {
-      home: "dashboard",
+    if (target === "home") {
+      onBackToPunch?.();
+      return;
+    }
+
+    const nextPanelByTarget: Record<Exclude<typeof target, "home">, SupplyProductionPanel> = {
       "draw-pool": "drawPool",
       backpack: "backpack",
       shop: "shop",
@@ -263,7 +267,7 @@ export function SupplyStationShell({
     };
 
     selectPanel(nextPanelByTarget[target]);
-  }, [selectPanel]);
+  }, [onBackToPunch, selectPanel]);
 
   const handleTopBarTabNavigation = useCallback((tabId: SupplyUiLabTopBarTabId) => {
     const nextPanelByTab: Record<SupplyUiLabTopBarTabId, SupplyProductionPanel> = {
