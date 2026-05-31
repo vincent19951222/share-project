@@ -175,7 +175,7 @@ export function Navbar({
         }${supplyMenuOpen ? " app-supply-menu-open" : ""}`}
       >
         <div className="flex min-w-0 items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+          <div className="app-top-nav-brand-area flex min-w-0 items-center gap-3 sm:gap-6">
             <div className="font-black text-2xl tracking-tighter flex items-center gap-2">
               <div className="h-8 w-8 overflow-hidden rounded-lg border-2 border-slate-800 bg-white shadow-[0_2px_0_0_#1f2937]">
                 <Image
@@ -265,7 +265,7 @@ export function Navbar({
               </TabBtn>
             </div>
           </div>
-          <div className="relative flex shrink-0 items-center gap-2">
+          <div className="app-top-nav-actions relative flex shrink-0 items-center gap-2">
             <button
               type="button"
               aria-label={mobileNavLabel}
@@ -276,14 +276,6 @@ export function Navbar({
               <span aria-hidden="true">{mobileTabsOpen ? "×" : "≡"}</span>
             </button>
             <TeamDynamicsBell />
-            <button
-              type="button"
-              aria-label={`补给站资产：${supplyAssetSummary}`}
-              className="app-supply-mobile-wallet"
-            >
-              <AssetIcon name="supply" className="h-5 w-5 object-contain" />
-              <span>{supplyAssetSummary}</span>
-            </button>
             <div
               aria-busy={!supplyNavContext}
               aria-label={supplyNavContext ? "补给站资产" : "补给站资产加载中"}
@@ -343,6 +335,14 @@ export function Navbar({
               />
             ) : null}
           </div>
+          <button
+            type="button"
+            aria-label={`补给站资产：${supplyAssetSummary}`}
+            className="app-supply-mobile-wallet"
+          >
+            <AssetIcon name="supply" className="h-5 w-5 object-contain" />
+            <span>{supplyAssetSummary}</span>
+          </button>
         </div>
         {mobileTabsOpen ? (
           <div className="mobile-tab-panel mt-3 flex flex-col gap-2 rounded-[1.5rem] border-4 border-slate-800 bg-white p-3 shadow-[0_8px_0_0_#1f2937] min-[761px]:hidden">

@@ -13474,3 +13474,48 @@ body {
     padding-top: 0.45rem;
   }
 }
+
+@media (max-width: 760px) {
+  .app-top-nav > div:first-child {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "wallet wallet";
+    gap: 0.45rem 0.55rem;
+    min-height: 0;
+  }
+
+  .app-top-nav-brand-area {
+    grid-area: brand;
+    min-width: 0;
+  }
+
+  .app-top-nav-actions {
+    grid-area: actions;
+    justify-content: end;
+    min-width: 0;
+  }
+
+  .app-top-nav .font-black.text-2xl {
+    width: auto;
+    max-width: 9rem;
+    overflow: visible;
+  }
+
+  .app-supply-mobile-wallet {
+    grid-area: wallet;
+    width: 100%;
+    max-width: none;
+    min-height: 44px;
+    justify-content: start;
+    padding-inline: 0.65rem;
+    font-size: clamp(0.72rem, 2.8vw, 0.82rem);
+  }
+
+  .app-supply-mobile-wallet span {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+}

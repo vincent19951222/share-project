@@ -186,7 +186,9 @@ describe("Navbar supply chrome", () => {
     });
 
     const wallet = container.querySelector<HTMLButtonElement>(".app-supply-mobile-wallet");
+    const navShell = container.querySelector(".app-top-nav > div:first-child");
     expect(wallet).not.toBeNull();
+    expect(wallet?.parentElement).toBe(navShell);
     expect(wallet?.getAttribute("aria-label")).toBe("补给站资产：银子 440，抽奖券 7，背包 12/60");
     expect(wallet?.textContent).toContain("440");
     expect(wallet?.textContent).toContain("7");

@@ -131,4 +131,17 @@ describe("supply embedded scene CSS", () => {
     expect(mobileBlock).toMatch(/\.app-supply-asset-chip strong\s*\{[\s\S]*font-size:\s*0\.72rem/);
     expect(mobileBlock).toMatch(/\.app-supply-asset-chip--backpack strong\s*\{[\s\S]*font-size:\s*0\.68rem/);
   });
+
+  it("moves the mobile supply wallet into a full-width navbar row", () => {
+    const mobileBlockStart = css.lastIndexOf("@media (max-width: 760px)");
+    expect(mobileBlockStart).toBeGreaterThanOrEqual(0);
+    const mobileBlock = css.slice(mobileBlockStart, css.indexOf("@media", mobileBlockStart + 1));
+
+    expect(mobileBlock).toMatch(/\.app-top-nav > div:first-child\s*\{[\s\S]*display:\s*grid/);
+    expect(mobileBlock).toMatch(/grid-template-areas:\s*"brand actions"\s*"wallet wallet"/);
+    expect(mobileBlock).toMatch(/\.app-supply-mobile-wallet\s*\{[\s\S]*grid-area:\s*wallet/);
+    expect(mobileBlock).toMatch(/\.app-supply-mobile-wallet\s*\{[\s\S]*width:\s*100%/);
+    expect(mobileBlock).toMatch(/\.app-supply-mobile-wallet\s*\{[\s\S]*max-width:\s*none/);
+    expect(mobileBlock).not.toMatch(/\.app-supply-mobile-wallet span\s*\{[\s\S]*text-overflow:\s*ellipsis/);
+  });
 });
