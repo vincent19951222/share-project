@@ -1,3 +1,5 @@
+import type { DrinkType } from "@/lib/drinks";
+
 export interface Member {
   id: string;
   name: string;
@@ -620,6 +622,51 @@ export interface CoffeeMemberSnapshot {
   id: string;
   name: string;
   avatarKey: string;
+}
+
+export interface DrinkDayCell {
+  cups: number;
+  drinkCounts: Record<DrinkType, number>;
+}
+
+export interface DrinkEventSnapshot {
+  id: string;
+  userId: string;
+  userName: string;
+  avatarKey: string;
+  drinkType: DrinkType;
+  time: string;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface DrinkCountSnapshot {
+  drinkType: DrinkType;
+  count: number;
+}
+
+export interface DrinkKingSnapshot {
+  userId: string;
+  name: string;
+  cups: number;
+}
+
+export interface DrinkSnapshot {
+  members: CoffeeMemberSnapshot[];
+  gridData: DrinkDayCell[][];
+  today: number;
+  totalDays: number;
+  currentUserId: string;
+  todayEvents: DrinkEventSnapshot[];
+  stats: {
+    todayTotalCups: number;
+    todayDrinkers: number;
+    currentUserTodayCups: number;
+    drinkKing: DrinkKingSnapshot | null;
+    favoriteDrink: DrinkCountSnapshot | null;
+    latestDrink: DrinkEventSnapshot | null;
+    drinkCounts: Record<DrinkType, number>;
+  };
 }
 
 export interface CoffeeDayCell {
