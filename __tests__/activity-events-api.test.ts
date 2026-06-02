@@ -180,4 +180,36 @@ describe("/api/activity-events", () => {
       "luo 刚刚打卡，拿下 20 银子",
     ]);
   });
+
+  it("filters drink activity events by kind=drink", async () => {
+    await prisma.activityEvent.deleteMany({ where: { teamId } });
+    await prisma.activityEvent.create({
+      data: {
+        teamId,
+        userId,
+        type: ACTIVITY_EVENT_TYPES.DRINK_ADD,
+        message: "li 在水铺记录 1 杯水，今日累计 1 杯",
+        assetAwarded: null,
+        createdAt: now,
+      },
+    });
+    await prisma.activityEvent.create({
+      data: {
+        teamId,
+        userId,
+        type: ACTIVITY_EVENT_TYPES.COFFEE_ADD,
+        message: "li 续命 1 杯，今日累计 1 杯",
+        assetAwarded: null,
+        createdAt: now,
+      },
+    });
+
+    const response = await GET(request(userId, "?kind=drink"));
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.events.map((event: { text: string }) => event.text)).toEqual([
+      "li 在水铺记录 1 杯水，今日累计 1 杯",
+    ]);
+  });
 });

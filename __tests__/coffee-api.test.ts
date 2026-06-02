@@ -29,6 +29,7 @@ describe("coffee API", () => {
     userId = user.id;
     teamId = user.teamId;
     await prisma.coffeeRecord.deleteMany({ where: { teamId } });
+    await prisma.drinkRecord.deleteMany({ where: { teamId } });
   });
 
   afterAll(async () => {
@@ -47,8 +48,8 @@ describe("coffee API", () => {
 
     const dayKey = getShanghaiDayKey();
     expect(
-      await prisma.coffeeRecord.count({
-        where: { userId, teamId, dayKey, deletedAt: null },
+      await prisma.drinkRecord.count({
+        where: { userId, teamId, dayKey, drinkType: "americano", deletedAt: null },
       }),
     ).toBe(1);
 
@@ -85,10 +86,10 @@ describe("coffee API", () => {
     expect(response.status).toBe(200);
     expect(body.snapshot.stats.currentUserTodayCups).toBe(1);
     expect(
-      await prisma.coffeeRecord.count({ where: { userId, teamId, deletedAt: null } }),
+      await prisma.drinkRecord.count({ where: { userId, teamId, deletedAt: null } }),
     ).toBe(1);
     expect(
-      await prisma.coffeeRecord.count({
+      await prisma.drinkRecord.count({
         where: { userId, teamId, deletedAt: { not: null } },
       }),
     ).toBe(1);

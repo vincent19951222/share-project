@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const kind = request.nextUrl.searchParams.get("kind");
     const typeFilter = getActivityEventTypesByKind(kind);
     const since =
-      kind === "coffee"
+      kind === "coffee" || kind === "drink"
         ? new Date(`${getShanghaiDayKey()}T00:00:00+08:00`)
         : new Date(Date.now() - RECENT_ACTIVITY_WINDOW_MS);
     const events = await prisma.activityEvent.findMany({

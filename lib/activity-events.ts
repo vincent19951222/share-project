@@ -77,6 +77,10 @@ export function getActivityEventTypesByKind(kind: string | null | undefined) {
     return [ACTIVITY_EVENT_TYPES.COFFEE_ADD, ACTIVITY_EVENT_TYPES.COFFEE_REMOVE];
   }
 
+  if (kind === "drink") {
+    return [ACTIVITY_EVENT_TYPES.DRINK_ADD, ACTIVITY_EVENT_TYPES.DRINK_REMOVE];
+  }
+
   return null;
 }
 

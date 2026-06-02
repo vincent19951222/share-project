@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseCookieValue } from "@/lib/auth";
+import { buildCoffeeCompatibleSnapshotForUser } from "@/lib/coffee-compat";
 import {
-  ACTIVITY_EVENT_TYPES,
-  buildCoffeeRemoveActivityMessage,
-} from "@/lib/activity-events";
-import { buildCoffeeSnapshotForUser } from "@/lib/coffee-state";
-import { getShanghaiDayKey } from "@/lib/economy";
+  isDrinkRecordNotFoundError,
+  removeLatestDrinkRecordForUser,
+} from "@/lib/drink-records";
 import { prisma } from "@/lib/prisma";
 
 export async function DELETE(request: NextRequest) {
@@ -25,51 +24,14 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "用户不存在" }, { status: 401 });
     }
 
-    const dayKey = getShanghaiDayKey();
-
     try {
-      await prisma.$transaction(async (tx) => {
-        const latest = await tx.coffeeRecord.findFirst({
-          where: {
-            userId: user.id,
-            teamId: user.teamId,
-            dayKey,
-            deletedAt: null,
-          },
-          orderBy: { createdAt: "desc" },
-          select: { id: true },
-        });
-
-        if (!latest) {
-          throw new Error("COFFEE_NOT_FOUND");
-        }
-
-        await tx.coffeeRecord.update({
-          where: { id: latest.id },
-          data: { deletedAt: new Date() },
-        });
-
-        const totalCups = await tx.coffeeRecord.count({
-          where: {
-            userId: user.id,
-            teamId: user.teamId,
-            dayKey,
-            deletedAt: null,
-          },
-        });
-
-        await tx.activityEvent.create({
-          data: {
-            teamId: user.teamId,
-            userId: user.id,
-            type: ACTIVITY_EVENT_TYPES.COFFEE_REMOVE,
-            message: buildCoffeeRemoveActivityMessage(user.username, totalCups),
-            assetAwarded: null,
-          },
-        });
+      await removeLatestDrinkRecordForUser({
+        user,
+        drinkType: "americano",
+        activityMode: "coffeeCompatibility",
       });
     } catch (error) {
-      if (error instanceof Error && error.message === "COFFEE_NOT_FOUND") {
+      if (isDrinkRecordNotFoundError(error)) {
         return NextResponse.json(
           { error: "今天还没有可撤销的咖啡" },
           { status: 409 },
@@ -78,7 +40,7 @@ export async function DELETE(request: NextRequest) {
 
       throw error;
     }
-    const snapshot = await buildCoffeeSnapshotForUser(user.id);
+    const snapshot = await buildCoffeeCompatibleSnapshotForUser(user.id);
 
     if (!snapshot) {
       return NextResponse.json({ error: "快照生成失败" }, { status: 500 });

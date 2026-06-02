@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildCoffeeSnapshotForUser } from "@/lib/coffee-state";
 import { parseCookieValue } from "@/lib/auth";
+import { buildCoffeeCompatibleSnapshotForUser } from "@/lib/coffee-compat";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
     }
 
-    const snapshot = await buildCoffeeSnapshotForUser(userId);
+    const snapshot = await buildCoffeeCompatibleSnapshotForUser(userId);
 
     if (!snapshot) {
       return NextResponse.json({ error: "用户不存在" }, { status: 401 });
