@@ -3,6 +3,8 @@ export const ACTIVITY_EVENT_TYPES = {
   UNDO_PUNCH: "UNDO_PUNCH",
   COFFEE_ADD: "COFFEE_ADD",
   COFFEE_REMOVE: "COFFEE_REMOVE",
+  DRINK_ADD: "DRINK_ADD",
+  DRINK_REMOVE: "DRINK_REMOVE",
 } as const;
 
 export type ActivityEventType =
@@ -56,6 +58,14 @@ export function buildCoffeeAddActivityMessage(username: string, totalCups: numbe
 
 export function buildCoffeeRemoveActivityMessage(username: string, totalCups: number) {
   return `${username} 撤回 1 杯咖啡，今日累计 ${totalCups} 杯`;
+}
+
+export function buildDrinkAddActivityMessage(username: string, drinkLabel: string, totalCups: number) {
+  return `${username} 在水铺记录 1 杯${drinkLabel}，今日累计 ${totalCups} 杯`;
+}
+
+export function buildDrinkRemoveActivityMessage(username: string, drinkLabel: string, totalCups: number) {
+  return `${username} 撤回 1 杯${drinkLabel}，今日累计 ${totalCups} 杯`;
 }
 
 export function getActivityEventTypesByKind(kind: string | null | undefined) {

@@ -2,6 +2,7 @@ import type {
   BoardSnapshot,
   CalendarMonthSnapshot,
   CoffeeSnapshot,
+  DrinkSnapshot,
   GamificationLotteryDrawSnapshot,
   GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
@@ -9,6 +10,7 @@ import type {
   GamificationWeeklyReportSnapshot,
   SupplyStationProductionSnapshot,
 } from "@/lib/types";
+import type { DrinkType } from "@/lib/drinks";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
 
 export class ApiError extends Error {
@@ -160,6 +162,19 @@ async function readCoffeeSnapshot(response: Response): Promise<CoffeeSnapshot> {
   return payload.snapshot as CoffeeSnapshot;
 }
 
+async function readDrinkSnapshot(response: Response): Promise<DrinkSnapshot> {
+  const payload = await readJsonPayload(response, "响应解析失败");
+
+  if (!response.ok) {
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
+  }
+
+  return payload.snapshot as DrinkSnapshot;
+}
+
 async function readCalendarSnapshot(
   response: Response,
 ): Promise<CalendarMonthSnapshot> {
@@ -197,6 +212,16 @@ export async function fetchCoffeeState(): Promise<CoffeeSnapshot> {
   });
 
   return readCoffeeSnapshot(response);
+}
+
+export async function fetchDrinkState(): Promise<DrinkSnapshot> {
+  const response = await fetch("/api/drinks/state", {
+    method: "GET",
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  return readDrinkSnapshot(response);
 }
 
 export async function fetchCalendarState(
@@ -490,6 +515,37 @@ export async function removeLatestTodayCoffeeCup(): Promise<CoffeeSnapshot> {
   });
 
   return readCoffeeSnapshot(response);
+}
+
+export async function addDrinkRecord(input: {
+  drinkType: DrinkType;
+  note?: string | null;
+}): Promise<DrinkSnapshot> {
+  const response = await fetch("/api/drinks/records", {
+    method: "POST",
+    cache: "no-store",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  return readDrinkSnapshot(response);
+}
+
+export async function removeLatestDrinkRecord(drinkType?: DrinkType): Promise<DrinkSnapshot> {
+  const response = await fetch("/api/drinks/records/latest", {
+    method: "DELETE",
+    cache: "no-store",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(drinkType ? { drinkType } : {}),
+  });
+
+  return readDrinkSnapshot(response);
 }
 
 export async function fetchCurrentWeeklyReportDraft(): Promise<WeeklyReportDraftRecord | null> {
