@@ -2,7 +2,8 @@ import type { CalendarDayCell as CalendarGridDayCell } from "./calendar-data";
 import { AssetIcon } from "@/components/ui/AssetIcon";
 
 export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
-  const hasActivity = cell.workedOut || cell.coffeeCups > 0;
+  const drinkCups = cell.drinkCups ?? cell.coffeeCups;
+  const hasActivity = cell.workedOut || drinkCups > 0;
 
   return (
     <div
@@ -18,14 +19,14 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
           </span>
         ) : null}
       </div>
-      {cell.coffeeCups > 0 ? (
+      {drinkCups > 0 ? (
         <div
-          className="calendar-coffee-count"
-          aria-label={`咖啡 ${cell.coffeeCups} 杯`}
+          className="calendar-coffee-count calendar-drink-count"
+          aria-label={`饮品 ${drinkCups} 杯`}
           role="img"
         >
           <AssetIcon name="coffee" className="calendar-coffee-icon" />
-          <span>{cell.coffeeCups}</span>
+          <span>{drinkCups}</span>
         </div>
       ) : null}
       {!hasActivity ? <span className="calendar-empty-mark" aria-hidden="true" /> : null}

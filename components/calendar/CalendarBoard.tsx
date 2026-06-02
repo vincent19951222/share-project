@@ -121,6 +121,7 @@ export function CalendarBoard() {
 
   const canReturnToCurrentMonth =
     snapshot !== null && snapshot.monthKey !== snapshot.currentMonthKey;
+  const drinkCupTotal = snapshot?.drinkCupTotal ?? snapshot?.coffeeCupTotal ?? 0;
 
   return (
     <section className="calendar-board-viewport absolute inset-0">
@@ -196,7 +197,7 @@ export function CalendarBoard() {
                         <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg" alt="" />
                       </span>
                       <span className="calendar-summary-label">本月喝了</span>
-                      <strong className="calendar-summary-value">{snapshot.coffeeCupTotal}</strong>
+                      <strong className="calendar-summary-value">{drinkCupTotal}</strong>
                       <span className="calendar-summary-unit">杯</span>
                     </div>
                   </div>

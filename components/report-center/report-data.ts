@@ -1,5 +1,5 @@
 import { getShanghaiDayKey } from "@/lib/economy";
-import type { BoardState, CoffeeSnapshot } from "@/lib/types";
+import type { BoardState, DrinkSnapshot } from "@/lib/types";
 
 export const REPORT_METRIC_IDS = {
   completionRate: "completion-rate",
@@ -26,12 +26,14 @@ export interface DailyTrendPoint {
   isLow: boolean;
 }
 
-export interface CoffeeTrendPoint {
+export interface DrinkTrendPoint {
   day: number;
   cups: number;
 }
 
-export interface CoffeeReportData {
+export type CoffeeTrendPoint = DrinkTrendPoint;
+
+export interface DrinkReportData {
   todayTotalCups: number;
   todayDrinkers: number;
   memberCount: number;
@@ -40,9 +42,11 @@ export interface CoffeeReportData {
     name: string;
     cups: number;
   } | null;
-  recentDays: CoffeeTrendPoint[];
+  recentDays: DrinkTrendPoint[];
   roast: string;
 }
+
+export type CoffeeReportData = DrinkReportData;
 
 export interface ReportDaySummary {
   day: number;
@@ -61,6 +65,7 @@ export interface ReportData {
   dailyPoints: DailyTrendPoint[];
   peakDay: ReportDaySummary | null;
   lowDay: ReportDaySummary | null;
+  drink: DrinkReportData;
   coffee: CoffeeReportData;
 }
 
@@ -133,11 +138,11 @@ function getCompletionHelper(completionRate: number) {
   return "先从今天开始补数据。";
 }
 
-function getCoffeeRoast(todayTotalCups: number) {
-  if (todayTotalCups === 0) return "今天全员靠意志力硬撑。";
-  if (todayTotalCups <= 3) return "轻度续命，问题不大。";
-  if (todayTotalCups <= 7) return "办公室空气里开始有咖啡因。";
-  return "本队今日疑似改烧美式。";
+function getDrinkRoast(todayTotalCups: number) {
+  if (todayTotalCups === 0) return "今天水铺还没开张。";
+  if (todayTotalCups <= 3) return "轻度补水，状态在线。";
+  if (todayTotalCups <= 7) return "饮品流水稳稳进账。";
+  return "今日水铺疑似开到爆单。";
 }
 
 function getShanghaiWeekStartDay(now: Date) {
@@ -151,14 +156,14 @@ function getShanghaiWeekStartDay(now: Date) {
   return Math.max(1, day - daysSinceMonday);
 }
 
-function countCoffeeCupsForDay(snapshot: CoffeeSnapshot, day: number) {
+function countDrinkCupsForDay(snapshot: DrinkSnapshot, day: number) {
   return snapshot.gridData.reduce(
     (sum, row) => sum + (row[day - 1]?.cups ?? 0),
     0,
   );
 }
 
-function buildEmptyCoffeeReport(): CoffeeReportData {
+function buildEmptyDrinkReport(): DrinkReportData {
   return {
     todayTotalCups: 0,
     todayDrinkers: 0,
@@ -166,16 +171,16 @@ function buildEmptyCoffeeReport(): CoffeeReportData {
     monthTotalCups: 0,
     weekKing: null,
     recentDays: [],
-    roast: getCoffeeRoast(0),
+    roast: getDrinkRoast(0),
   };
 }
 
-function buildCoffeeReport(
-  snapshot: CoffeeSnapshot | null | undefined,
+function buildDrinkReport(
+  snapshot: DrinkSnapshot | null | undefined,
   now: Date,
-): CoffeeReportData {
+): DrinkReportData {
   if (!snapshot) {
-    return buildEmptyCoffeeReport();
+    return buildEmptyDrinkReport();
   }
 
   const monthTotalCups = snapshot.gridData.reduce(
@@ -205,7 +210,7 @@ function buildCoffeeReport(
       const day = startDay + index;
       return {
         day,
-        cups: countCoffeeCupsForDay(snapshot, day),
+        cups: countDrinkCupsForDay(snapshot, day),
       };
     },
   );
@@ -217,14 +222,14 @@ function buildCoffeeReport(
     monthTotalCups,
     weekKing,
     recentDays,
-    roast: getCoffeeRoast(snapshot.stats.todayTotalCups),
+    roast: getDrinkRoast(snapshot.stats.todayTotalCups),
   };
 }
 
 export function buildReportData(
   state: BoardState,
   now = new Date(),
-  coffeeSnapshot?: CoffeeSnapshot | null,
+  drinkSnapshot?: DrinkSnapshot | null,
 ): ReportData {
   const elapsedDays = clampElapsedDays(state);
   const memberCount = state.members.length;
@@ -260,6 +265,7 @@ export function buildReportData(
   const mostConsistentMember = getLongestStreak(state, elapsedDays);
   const teamVaultTotal = state.teamVaultTotal ?? 0;
   const activeSeason = state.activeSeason ?? null;
+  const drinkReport = buildDrinkReport(drinkSnapshot, now);
 
   return {
     title: getDashboardTitle(now),
@@ -306,6 +312,7 @@ export function buildReportData(
     dailyPoints,
     peakDay,
     lowDay,
-    coffee: buildCoffeeReport(coffeeSnapshot, now),
+    drink: drinkReport,
+    coffee: drinkReport,
   };
 }

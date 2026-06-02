@@ -18,7 +18,8 @@ function buildSnapshot(
     todayDay: monthKey === currentMonthKey ? 23 : null,
     totalDays: 30,
     workoutDays: days.filter((day) => day.workedOut).length,
-    coffeeCupTotal: days.reduce((sum, day) => sum + day.coffeeCups, 0),
+    drinkCupTotal: days.reduce((sum, day) => sum + day.drinkCups, 0),
+    coffeeCupTotal: days.reduce((sum, day) => sum + day.drinkCups, 0),
     days,
   };
 }
@@ -86,8 +87,8 @@ function getReturnButton(container: HTMLElement) {
   return button as HTMLButtonElement;
 }
 
-function getCoffeeCountText(container: HTMLElement, day: number) {
-  const count = getDayCell(container, day).querySelector(".calendar-coffee-count");
+function getDrinkCountText(container: HTMLElement, day: number) {
+  const count = getDayCell(container, day).querySelector(".calendar-drink-count");
 
   expect(count).toBeInstanceOf(HTMLElement);
   return count?.textContent?.trim();
@@ -97,7 +98,7 @@ function getVisibleState(container: HTMLElement) {
   return {
     monthLabel: container.textContent?.match(/20\d{2}年\d{1,2}月/)?.[0] ?? null,
     workoutSummary: container.textContent?.match(/本月练了\s*\d+\s*天/)?.[0] ?? null,
-    coffeeSummary: container.textContent?.match(/本月喝了\s*\d+\s*杯/)?.[0] ?? null,
+    drinkSummary: container.textContent?.match(/本月喝了\s*\d+\s*杯/)?.[0] ?? null,
     buttonLabels: Array.from(container.querySelectorAll("button")).map((button) => button.textContent),
   };
 }
@@ -118,7 +119,7 @@ describe("CalendarBoard", () => {
     vi.unstubAllGlobals();
   });
 
-  it("loads the current month, reuses cached current month data, and renders compact coffee counts", async () => {
+  it("loads the current month, reuses cached current month data, and renders compact drink counts", async () => {
     const currentMonthRequest = deferred<{
       ok: boolean;
       json: () => Promise<{ snapshot: CalendarMonthSnapshot }>;
@@ -153,8 +154,8 @@ describe("CalendarBoard", () => {
         ok: true,
         json: async () => ({
           snapshot: buildSnapshot("2026-04", "2026-04", [
-            { day: 1, workedOut: true, coffeeCups: 0 },
-            { day: 2, workedOut: true, coffeeCups: 2 },
+            { day: 1, workedOut: true, drinkCups: 0, coffeeCups: 0 },
+            { day: 2, workedOut: true, drinkCups: 2, coffeeCups: 2 },
           ]),
         }),
       });
@@ -175,7 +176,8 @@ describe("CalendarBoard", () => {
         ),
       ).toBe(false);
       expect(container.textContent).not.toContain("下个月");
-      expect(getCoffeeCountText(container, 2)).toBe("2");
+      expect(getDrinkCountText(container, 2)).toBe("2");
+      expect(getDayCell(container, 2).querySelector("[aria-label='饮品 2 杯']")).not.toBeNull();
       expect(
         getDayCell(container, 2).querySelectorAll('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]')
           .length,
@@ -212,9 +214,9 @@ describe("CalendarBoard", () => {
         ok: true,
         json: async () => ({
           snapshot: buildSnapshot("2026-03", "2026-04", [
-            { day: 1, workedOut: true, coffeeCups: 0 },
-            { day: 2, workedOut: false, coffeeCups: 2 },
-            { day: 3, workedOut: true, coffeeCups: 1 },
+            { day: 1, workedOut: true, drinkCups: 0, coffeeCups: 0 },
+            { day: 2, workedOut: false, drinkCups: 2, coffeeCups: 2 },
+            { day: 3, workedOut: true, drinkCups: 1, coffeeCups: 1 },
           ]),
         }),
       });
@@ -226,8 +228,8 @@ describe("CalendarBoard", () => {
       expect(container.textContent).toMatch(/本月练了\s*2\s*天/);
       expect(container.textContent).toMatch(/本月喝了\s*3\s*杯/);
       expect(container.textContent).toContain("回到本月");
-      expect(getCoffeeCountText(container, 2)).toBe("2");
-      expect(getCoffeeCountText(container, 3)).toBe("1");
+      expect(getDrinkCountText(container, 2)).toBe("2");
+      expect(getDrinkCountText(container, 3)).toBe("1");
     });
 
     await clickButtonByText(container, "回到本月");
@@ -244,7 +246,7 @@ describe("CalendarBoard", () => {
     });
   });
 
-  it("refreshes the current month snapshot when coffee data changes", async () => {
+  it("refreshes the current month snapshot when drink data changes", async () => {
     const initialRequest = deferred<{
       ok: boolean;
       json: () => Promise<{ snapshot: CalendarMonthSnapshot }>;
@@ -268,7 +270,7 @@ describe("CalendarBoard", () => {
         ok: true,
         json: async () => ({
           snapshot: buildSnapshot("2026-04", "2026-04", [
-            { day: 1, workedOut: false, coffeeCups: 1 },
+            { day: 1, workedOut: false, drinkCups: 1, coffeeCups: 1 },
           ]),
         }),
       });
@@ -277,7 +279,7 @@ describe("CalendarBoard", () => {
 
     await waitFor(() => {
       expect(container.textContent).toMatch(/本月喝了\s*1\s*杯/);
-      expect(getCoffeeCountText(container, 1)).toBe("1");
+      expect(getDrinkCountText(container, 1)).toBe("1");
     });
 
     await act(async () => {
@@ -297,7 +299,7 @@ describe("CalendarBoard", () => {
         ok: true,
         json: async () => ({
           snapshot: buildSnapshot("2026-04", "2026-04", [
-            { day: 1, workedOut: false, coffeeCups: 2 },
+            { day: 1, workedOut: false, drinkCups: 2, coffeeCups: 2 },
           ]),
         }),
       });
@@ -306,7 +308,7 @@ describe("CalendarBoard", () => {
 
     await waitFor(() => {
       expect(container.textContent).toMatch(/本月喝了\s*2\s*杯/);
-      expect(getCoffeeCountText(container, 1)).toBe("2");
+      expect(getDrinkCountText(container, 1)).toBe("2");
     });
   });
 });

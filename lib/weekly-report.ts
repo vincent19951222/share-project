@@ -30,6 +30,7 @@ export interface WeeklyReportSnapshot {
   };
   highlights: {
     topMembers: Array<{ userId: string; label: string; value: string }>;
+    drink?: { userId?: string; label: string; value: string };
     coffee?: { userId?: string; label: string; value: string };
   };
   sections: Array<{

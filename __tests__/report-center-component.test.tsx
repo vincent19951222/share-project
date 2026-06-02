@@ -5,9 +5,9 @@ import { ReportHeader } from "@/components/report-center/ReportHeader";
 import { Milestones } from "@/components/report-center/Milestones";
 import { ReportCenter } from "@/components/report-center/ReportCenter";
 import { REPORT_METRIC_IDS, type ReportData } from "@/components/report-center/report-data";
-import { CoffeeProvider } from "@/lib/coffee-store";
+import { DrinkProvider } from "@/lib/drink-store";
 import { BoardProvider } from "@/lib/store";
-import type { BoardState, CoffeeSnapshot } from "@/lib/types";
+import type { BoardState, DrinkSnapshot } from "@/lib/types";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
@@ -47,7 +47,15 @@ const initialState: BoardState = {
   currentUserId: "u1",
 };
 
-function coffeeSnapshot(): CoffeeSnapshot {
+const emptyDrinkCounts = {
+  water: 0,
+  milkTea: 0,
+  americano: 0,
+  latte: 0,
+  other: 0,
+} as const;
+
+function drinkSnapshot(): DrinkSnapshot {
   return {
     members: [
       { id: "u1", name: "li", avatarKey: "male1" },
@@ -56,19 +64,25 @@ function coffeeSnapshot(): CoffeeSnapshot {
     gridData: [
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 2][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 3, 1][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
     ],
     today: 24,
     totalDays: 30,
     currentUserId: "u1",
+    todayEvents: [],
     stats: {
       todayTotalCups: 3,
       todayDrinkers: 2,
       currentUserTodayCups: 2,
-      coffeeKing: { userId: "u1", name: "li", cups: 2 },
+      drinkKing: { userId: "u1", name: "li", cups: 2 },
+      favoriteDrink: { drinkType: "americano", count: 2 },
+      latestDrink: null,
+      drinkCounts: { ...emptyDrinkCounts, americano: 2 },
     },
   };
 }
@@ -131,11 +145,11 @@ function buildAdminState(): BoardState {
 
 async function renderReportCenter(root: Root, state: BoardState) {
   await act(async () => {
-    root.render(
-      <BoardProvider initialState={state}>
-        <CoffeeProvider>
+      root.render(
+        <BoardProvider initialState={state}>
+        <DrinkProvider>
           <ReportCenter />
-        </CoffeeProvider>
+        </DrinkProvider>
       </BoardProvider>,
     );
   });
@@ -191,8 +205,8 @@ describe("ReportCenter", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((input: RequestInfo | URL) => {
-        if (String(input) === "/api/coffee/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        if (String(input) === "/api/drinks/state") {
+          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
         }
         if (String(input) === "/api/gamification/reports/weekly") {
           return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
@@ -221,7 +235,7 @@ describe("ReportCenter", () => {
     vi.useRealTimers();
   });
 
-  it("renders the lightweight dashboard with a playful coffee report", async () => {
+  it("renders the lightweight dashboard with a playful drink report", async () => {
     await renderReportCenter(root, initialState);
 
     await waitFor(() => {
@@ -232,19 +246,19 @@ describe("ReportCenter", () => {
       expect(container.textContent).toContain("牛马金库");
       expect(container.textContent).toContain("减脂挑战 · 3/5");
       expect(container.textContent).toContain("活跃趋势");
-      expect(container.textContent).toContain("咖啡能量站");
-      expect(container.textContent).toContain("Daily Roast");
+      expect(container.textContent).toContain("牛马水铺");
+      expect(container.textContent).toContain("Daily Sip");
       expect(container.textContent).toContain("牛马补给周报");
       expect(container.textContent).toContain("四维完成率");
       expect(container.textContent).toContain("本周发券");
       expect(container.textContent).toContain("今日全队 3 杯");
-      expect(container.textContent).toContain("续命人数");
+      expect(container.textContent).toContain("饮品人数");
       expect(container.textContent).toContain("2/2");
       expect(container.textContent).toContain("本月累计");
       expect(container.textContent).toContain("13 杯");
       expect(container.textContent).toContain("今日状态");
       expect(container.textContent).toContain("Relax");
-      expect(container.textContent).toContain("本周咖啡王");
+      expect(container.textContent).toContain("本周饮品王");
       expect(container.textContent).toContain("luo · 7 杯");
       expect(container.querySelector(".report-scene")).not.toBeNull();
       expect(container.querySelector(".report-scene-content")).not.toBeNull();
@@ -310,8 +324,8 @@ describe("ReportCenter", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-        if (String(input) === "/api/coffee/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        if (String(input) === "/api/drinks/state") {
+          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
         }
         if (String(input) === "/api/gamification/reports/weekly") {
           return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
@@ -386,8 +400,8 @@ describe("ReportCenter", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-        if (String(input) === "/api/coffee/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        if (String(input) === "/api/drinks/state") {
+          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
         }
         if (String(input) === "/api/gamification/reports/weekly") {
           return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
@@ -458,8 +472,8 @@ describe("ReportCenter", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-        if (String(input) === "/api/coffee/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: coffeeSnapshot() }));
+        if (String(input) === "/api/drinks/state") {
+          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
         }
         if (String(input) === "/api/gamification/reports/weekly") {
           return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));

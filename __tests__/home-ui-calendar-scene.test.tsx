@@ -13,12 +13,13 @@ const snapshot: CalendarMonthSnapshot = {
   todayDay: 28,
   totalDays: 31,
   workoutDays: 12,
+  drinkCupTotal: 18,
   coffeeCupTotal: 18,
   days: [
-    { day: 1, workedOut: true, coffeeCups: 1 },
-    { day: 2, workedOut: true, coffeeCups: 2 },
-    { day: 5, workedOut: false, coffeeCups: 0 },
-    { day: 28, workedOut: true, coffeeCups: 2 },
+    { day: 1, workedOut: true, drinkCups: 1, coffeeCups: 1 },
+    { day: 2, workedOut: true, drinkCups: 2, coffeeCups: 2 },
+    { day: 5, workedOut: false, drinkCups: 0, coffeeCups: 0 },
+    { day: 28, workedOut: true, drinkCups: 2, coffeeCups: 2 },
   ],
 };
 

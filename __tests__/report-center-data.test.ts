@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildReportData } from "@/components/report-center/report-data";
-import type { BoardState, CoffeeSnapshot } from "@/lib/types";
+import type { BoardState, DrinkSnapshot } from "@/lib/types";
 
 function createState(overrides: Partial<BoardState> = {}): BoardState {
   return {
@@ -43,7 +43,15 @@ function createState(overrides: Partial<BoardState> = {}): BoardState {
   };
 }
 
-function createCoffeeSnapshot(): CoffeeSnapshot {
+const emptyDrinkCounts = {
+  water: 0,
+  milkTea: 0,
+  americano: 0,
+  latte: 0,
+  other: 0,
+} as const;
+
+function createDrinkSnapshot(): DrinkSnapshot {
   return {
     members: [
       { id: "u1", name: "li", avatarKey: "male1" },
@@ -53,22 +61,29 @@ function createCoffeeSnapshot(): CoffeeSnapshot {
     gridData: [
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 2][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 3, 1][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
     ],
     today: 24,
     totalDays: 30,
     currentUserId: "u1",
+    todayEvents: [],
     stats: {
       todayTotalCups: 3,
       todayDrinkers: 2,
       currentUserTodayCups: 2,
-      coffeeKing: { userId: "u1", name: "li", cups: 2 },
+      drinkKing: { userId: "u1", name: "li", cups: 2 },
+      favoriteDrink: { drinkType: "americano", count: 2 },
+      latestDrink: null,
+      drinkCounts: { ...emptyDrinkCounts, americano: 2 },
     },
   };
 }
@@ -78,7 +93,7 @@ describe("buildReportData", () => {
     const report = buildReportData(
       createState(),
       new Date("2026-04-24T12:00:00+08:00"),
-      createCoffeeSnapshot(),
+      createDrinkSnapshot(),
     );
 
     expect(report.title).toBe("4月牛马战报");
@@ -100,15 +115,16 @@ describe("buildReportData", () => {
     ]);
     expect(report.peakDay).toEqual({ day: 1, count: 3 });
     expect(report.lowDay).toEqual({ day: 3, count: 0 });
-    expect(report.coffee).toMatchObject({
+    expect(report.drink).toMatchObject({
       todayTotalCups: 3,
       todayDrinkers: 2,
       memberCount: 3,
       monthTotalCups: 14,
       weekKing: { name: "luo", cups: 7 },
-      roast: "轻度续命，问题不大。",
+      roast: "轻度补水，状态在线。",
     });
-    expect(report.coffee.recentDays.map((point) => [point.day, point.cups])).toEqual([
+    expect(report.coffee).toEqual(report.drink);
+    expect(report.drink.recentDays.map((point) => [point.day, point.cups])).toEqual([
       [18, 0],
       [19, 0],
       [20, 3],

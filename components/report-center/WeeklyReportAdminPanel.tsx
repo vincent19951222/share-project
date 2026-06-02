@@ -213,7 +213,7 @@ export function WeeklyReportAdminPanel() {
               </div>
             </div>
             <p className="mt-3 text-sm font-bold leading-relaxed text-slate-600">
-              生成会覆盖你本周最新草稿；发布只推送当前草稿，不会改动打卡、咖啡或赛季数据。
+              生成会覆盖你本周最新草稿；发布只推送当前草稿，不会改动打卡、饮品或赛季数据。
             </p>
           </div>
 

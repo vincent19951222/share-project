@@ -696,6 +696,7 @@ export interface CoffeeSnapshot {
 export interface CalendarDayRecord {
   day: number;
   workedOut: boolean;
+  drinkCups: number;
   coffeeCups: number;
 }
 
@@ -705,6 +706,7 @@ export interface CalendarMonthSnapshot {
   todayDay: number | null;
   totalDays: number;
   workoutDays: number;
+  drinkCupTotal: number;
   coffeeCupTotal: number;
   days: CalendarDayRecord[];
 }

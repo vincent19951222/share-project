@@ -17,7 +17,6 @@ import {
   type SupplyNavContext,
   type SupplyPanelKey,
 } from "@/lib/navigation-routes";
-import { CoffeeProvider } from "@/lib/coffee-store";
 import { DrinkProvider } from "@/lib/drink-store";
 import { useBoard } from "@/lib/store";
 import {
@@ -135,11 +134,7 @@ export function BoardApp({
   }
 
   if (activeTab === "dash") {
-    return (
-      <CoffeeProvider>
-        <DrinkProvider>{pageShell}</DrinkProvider>
-      </CoffeeProvider>
-    );
+    return <DrinkProvider>{pageShell}</DrinkProvider>;
   }
 
   return pageShell;

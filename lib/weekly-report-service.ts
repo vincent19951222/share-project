@@ -104,16 +104,16 @@ function formatTopMembers(
     }));
 }
 
-function formatCoffeeHighlight(
+function formatDrinkHighlight(
   members: Array<{ id: string; username: string }>,
-  coffeeCounts: Map<string, number>,
+  drinkCounts: Map<string, number>,
 ) {
   const leader =
     members
       .map((member) => ({
         userId: member.id,
         username: member.username,
-        cups: coffeeCounts.get(member.id) ?? 0,
+        cups: drinkCounts.get(member.id) ?? 0,
       }))
       .filter((member) => member.cups > 0)
       .sort((left, right) => right.cups - left.cups || left.username.localeCompare(right.username))[0] ??
@@ -125,8 +125,8 @@ function formatCoffeeHighlight(
 
   return {
     userId: leader.userId,
-    label: "续命担当",
-    value: `${leader.username} · ${leader.cups} 杯咖啡`,
+    label: "水铺担当",
+    value: `${leader.username} · ${leader.cups} 杯饮品`,
   };
 }
 
@@ -177,7 +177,7 @@ export async function buildWeeklyReportSnapshot(
   ]);
 
   const memberIds = members.map((member) => member.id);
-  const [punchRecords, coffeeRecords] =
+  const [punchRecords, drinkRecords] =
     memberIds.length === 0
       ? [[], []]
       : await Promise.all([
@@ -195,7 +195,7 @@ export async function buildWeeklyReportSnapshot(
               dayKey: true,
             },
           }),
-          client.coffeeRecord.findMany({
+          client.drinkRecord.findMany({
             where: {
               teamId: input.teamId,
               userId: { in: memberIds },
@@ -219,9 +219,9 @@ export async function buildWeeklyReportSnapshot(
     memberPunchCounts.set(record.userId, (memberPunchCounts.get(record.userId) ?? 0) + 1);
   }
 
-  const coffeeCounts = new Map(memberIds.map((memberId) => [memberId, 0]));
-  for (const record of coffeeRecords) {
-    coffeeCounts.set(record.userId, (coffeeCounts.get(record.userId) ?? 0) + 1);
+  const drinkCounts = new Map(memberIds.map((memberId) => [memberId, 0]));
+  for (const record of drinkRecords) {
+    drinkCounts.set(record.userId, (drinkCounts.get(record.userId) ?? 0) + 1);
   }
 
   const totalPunches = Array.from(dailyPunchCounts.values()).reduce((sum, value) => sum + value, 0);
@@ -250,7 +250,7 @@ export async function buildWeeklyReportSnapshot(
   }, undefined);
 
   const topMembers = formatTopMembers(members, memberPunchCounts);
-  const coffeeHighlight = formatCoffeeHighlight(members, coffeeCounts);
+  const drinkHighlight = formatDrinkHighlight(members, drinkCounts);
   const seasonProgress = activeSeason
     ? {
         filledSlots: activeSeason.filledSlots,
@@ -275,7 +275,8 @@ export async function buildWeeklyReportSnapshot(
     },
     highlights: {
       topMembers,
-      coffee: coffeeHighlight,
+      drink: drinkHighlight,
+      coffee: drinkHighlight,
     },
     sections: [],
   });
@@ -302,12 +303,12 @@ export async function buildWeeklyReportSnapshot(
           : ["本周还没有成员完成有效打卡。"],
     },
     {
-      id: "coffee",
-      title: "咖啡观察",
-      summary: coffeeHighlight?.value ?? "本周暂无续命记录。",
+      id: "drink",
+      title: "水铺观察",
+      summary: drinkHighlight?.value ?? "本周暂无饮品记录。",
       bullets: [
-        `团队本周共喝了 ${Array.from(coffeeCounts.values()).reduce((sum, value) => sum + value, 0)} 杯咖啡`,
-        coffeeHighlight ? `续命担当：${coffeeHighlight.value}` : "续命担当：暂无",
+        `团队本周共喝了 ${Array.from(drinkCounts.values()).reduce((sum, value) => sum + value, 0)} 杯饮品`,
+        drinkHighlight ? `水铺担当：${drinkHighlight.value}` : "水铺担当：暂无",
       ],
     },
   ];
@@ -328,7 +329,8 @@ export async function buildWeeklyReportSnapshot(
     },
     highlights: {
       topMembers,
-      coffee: coffeeHighlight,
+      drink: drinkHighlight,
+      coffee: drinkHighlight,
     },
     sections,
   };

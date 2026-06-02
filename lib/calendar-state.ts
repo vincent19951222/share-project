@@ -100,7 +100,7 @@ export async function buildCalendarMonthSnapshotForUser(
           dayKey: true,
         },
       },
-      coffeeRecords: {
+      drinkRecords: {
         where: {
           dayKey: { startsWith: monthKey },
           deletedAt: null,
@@ -124,14 +124,14 @@ export async function buildCalendarMonthSnapshotForUser(
     }
   }
 
-  const coffeeCupsByDay = new Map<number, number>();
-  for (const record of user.coffeeRecords) {
+  const drinkCupsByDay = new Map<number, number>();
+  for (const record of user.drinkRecords) {
     const day = Number(record.dayKey.slice(8, 10));
     if (!Number.isInteger(day) || day < 1 || day > totalDays) {
       continue;
     }
 
-    coffeeCupsByDay.set(day, (coffeeCupsByDay.get(day) ?? 0) + 1);
+    drinkCupsByDay.set(day, (drinkCupsByDay.get(day) ?? 0) + 1);
   }
 
   const days: CalendarDayRecord[] = Array.from({ length: totalDays }, (_, index) => {
@@ -140,7 +140,8 @@ export async function buildCalendarMonthSnapshotForUser(
     return {
       day,
       workedOut: workedOutDays.has(day),
-      coffeeCups: coffeeCupsByDay.get(day) ?? 0,
+      drinkCups: drinkCupsByDay.get(day) ?? 0,
+      coffeeCups: drinkCupsByDay.get(day) ?? 0,
     };
   });
 
@@ -150,7 +151,8 @@ export async function buildCalendarMonthSnapshotForUser(
     todayDay,
     totalDays,
     workoutDays: workedOutDays.size,
-    coffeeCupTotal: user.coffeeRecords.length,
+    drinkCupTotal: user.drinkRecords.length,
+    coffeeCupTotal: user.drinkRecords.length,
     days,
   };
 }

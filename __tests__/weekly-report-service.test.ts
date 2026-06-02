@@ -70,11 +70,13 @@ function createPunchRecord(userId: string, dayKey: string) {
   };
 }
 
-function createCoffeeRecord(userId: string, dayKey: string, createdAt: string, deletedAt?: string) {
+function createDrinkRecord(userId: string, dayKey: string, createdAt: string, deletedAt?: string) {
   return {
     userId,
     teamId: TEAM_ID,
     dayKey,
+    drinkType: "americano",
+    note: "周报测试饮品",
     createdAt: new Date(createdAt),
     deletedAt: deletedAt ? new Date(deletedAt) : null,
   };
@@ -94,6 +96,7 @@ async function cleanupFixture() {
   await prisma.weeklyReportDraft.deleteMany({ where: { teamId: { in: [TEAM_ID, OUTSIDER_TEAM_ID] } } });
   await prisma.boardNote.deleteMany({ where: { teamId: { in: [TEAM_ID, OUTSIDER_TEAM_ID] } } });
   await prisma.activityEvent.deleteMany({ where: { teamId: { in: [TEAM_ID, OUTSIDER_TEAM_ID] } } });
+  await prisma.drinkRecord.deleteMany({ where: { teamId: { in: [TEAM_ID, OUTSIDER_TEAM_ID] } } });
   await prisma.coffeeRecord.deleteMany({ where: { teamId: { in: [TEAM_ID, OUTSIDER_TEAM_ID] } } });
   await prisma.punchRecord.deleteMany({
     where: { userId: { in: [...USERS.map((user) => user.id), OUTSIDER_ID] } },
@@ -171,22 +174,22 @@ async function seedFixture() {
     ],
   });
 
-  await prisma.coffeeRecord.createMany({
+  await prisma.drinkRecord.createMany({
     data: [
-      createCoffeeRecord(ADMIN_ID, "2026-04-27", "2026-04-27T09:00:00+08:00"),
-      createCoffeeRecord(MEMBER_A_ID, "2026-04-28", "2026-04-28T09:00:00+08:00"),
-      createCoffeeRecord(MEMBER_A_ID, "2026-04-28", "2026-04-28T09:05:00+08:00"),
-      createCoffeeRecord(MEMBER_A_ID, "2026-04-28", "2026-04-28T09:10:00+08:00"),
-      createCoffeeRecord(MEMBER_B_ID, "2026-04-29", "2026-04-29T09:00:00+08:00"),
-      createCoffeeRecord(ADMIN_ID, "2026-04-30", "2026-04-30T09:00:00+08:00"),
-      createCoffeeRecord(
+      createDrinkRecord(ADMIN_ID, "2026-04-27", "2026-04-27T09:00:00+08:00"),
+      createDrinkRecord(MEMBER_A_ID, "2026-04-28", "2026-04-28T09:00:00+08:00"),
+      createDrinkRecord(MEMBER_A_ID, "2026-04-28", "2026-04-28T09:05:00+08:00"),
+      createDrinkRecord(MEMBER_A_ID, "2026-04-28", "2026-04-28T09:10:00+08:00"),
+      createDrinkRecord(MEMBER_B_ID, "2026-04-29", "2026-04-29T09:00:00+08:00"),
+      createDrinkRecord(ADMIN_ID, "2026-04-30", "2026-04-30T09:00:00+08:00"),
+      createDrinkRecord(
         MEMBER_B_ID,
         "2026-04-30",
         "2026-04-30T09:05:00+08:00",
         "2026-04-30T10:05:00+08:00",
       ),
-      createCoffeeRecord(OUTSIDER_ID, "2026-04-28", "2026-04-28T11:00:00+08:00"),
-      createCoffeeRecord(OUTSIDER_ID, "2026-04-29", "2026-04-29T11:30:00+08:00"),
+      createDrinkRecord(OUTSIDER_ID, "2026-04-28", "2026-04-28T11:00:00+08:00"),
+      createDrinkRecord(OUTSIDER_ID, "2026-04-29", "2026-04-29T11:30:00+08:00"),
     ],
   });
 }
@@ -240,19 +243,25 @@ describe("weekly-report service", () => {
             value: "weekly_report_member_b · 1 次有效打卡",
           },
         ],
+        drink: {
+          userId: MEMBER_A_ID,
+          label: "水铺担当",
+          value: "weekly_report_member_a · 3 杯饮品",
+        },
         coffee: {
           userId: MEMBER_A_ID,
-          label: "续命担当",
-          value: "weekly_report_member_a · 3 杯咖啡",
+          label: "水铺担当",
+          value: "weekly_report_member_a · 3 杯饮品",
         },
       },
     });
-    expect(snapshot.sections[2]?.bullets[0]).toBe("团队本周共喝了 6 杯咖啡");
+    expect(snapshot.sections[2]?.title).toBe("水铺观察");
+    expect(snapshot.sections[2]?.bullets[0]).toBe("团队本周共喝了 6 杯饮品");
     expect(snapshot.sections).toHaveLength(3);
     expect(snapshot.sections.map((section) => section.id)).toEqual([
       "overview",
       "members",
-      "coffee",
+      "drink",
     ]);
   });
 
@@ -413,8 +422,8 @@ describe("weekly-report service", () => {
     await prisma.punchRecord.create({
       data: createPunchRecord(MEMBER_B_ID, "2026-04-30"),
     });
-    await prisma.coffeeRecord.create({
-      data: createCoffeeRecord(MEMBER_B_ID, "2026-04-30", "2026-04-30T11:30:00+08:00"),
+    await prisma.drinkRecord.create({
+      data: createDrinkRecord(MEMBER_B_ID, "2026-04-30", "2026-04-30T11:30:00+08:00"),
     });
 
     const latestSnapshot = await buildWeeklyReportSnapshot({

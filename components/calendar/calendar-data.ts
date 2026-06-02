@@ -73,6 +73,7 @@ export interface CalendarDayCell {
   kind: "day";
   day: number;
   workedOut: boolean;
+  drinkCups: number;
   coffeeCups: number;
   isToday: boolean;
 }
@@ -109,12 +110,14 @@ export function buildCalendarGrid(
   const dayCells: CalendarGridCell[] = Array.from({ length: snapshot.totalDays }, (_, index) => {
     const day = index + 1;
     const record = dayRecords.get(day);
+    const drinkCups = record?.drinkCups ?? record?.coffeeCups ?? 0;
 
     return {
       kind: "day",
       day,
       workedOut: record?.workedOut ?? false,
-      coffeeCups: record?.coffeeCups ?? 0,
+      drinkCups,
+      coffeeCups: drinkCups,
       isToday:
         snapshot.monthKey === snapshot.currentMonthKey &&
         snapshot.todayDay !== null &&

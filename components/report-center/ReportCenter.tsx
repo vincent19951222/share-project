@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { useCoffee } from "@/lib/coffee-store";
+import { useDrink } from "@/lib/drink-store";
 import { useBoard } from "@/lib/store";
 import { ReportHeader } from "./ReportHeader";
 import { Milestones } from "./Milestones";
-import { CoffeeReportPanel } from "./CoffeeReportPanel";
+import { DrinkReportPanel } from "./DrinkReportPanel";
 import { GamificationWeeklyReportPanel } from "./GamificationWeeklyReportPanel";
 import { TrendChart } from "./TrendChart";
 import { WeeklyReportAdminPanel } from "./WeeklyReportAdminPanel";
@@ -40,10 +40,10 @@ const reportSceneProps = [
 
 export function ReportCenter() {
   const { state } = useBoard();
-  const coffeeState = useCoffee();
+  const drinkState = useDrink();
   const report = useMemo(
-    () => buildReportData(state, new Date(), coffeeState.snapshot),
-    [coffeeState.snapshot, state],
+    () => buildReportData(state, new Date(), drinkState.snapshot),
+    [drinkState.snapshot, state],
   );
 
   return (
@@ -86,10 +86,10 @@ export function ReportCenter() {
               peakDay={report.peakDay}
               lowDay={report.lowDay}
             />
-            <CoffeeReportPanel
-              coffee={report.coffee}
-              loading={!coffeeState.snapshot && !coffeeState.error}
-              error={coffeeState.error}
+            <DrinkReportPanel
+              drink={report.drink}
+              loading={!drinkState.snapshot && !drinkState.error}
+              error={drinkState.error}
             />
           </div>
           <div className="report-scene-bottom">

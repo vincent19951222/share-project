@@ -45,24 +45,25 @@ describe("calendar-data", () => {
       todayDay: 3,
       totalDays: 5,
       workoutDays: 2,
+      drinkCupTotal: 6,
       coffeeCupTotal: 6,
       days: [
-        { day: 1, workedOut: true, coffeeCups: 0 },
-        { day: 2, workedOut: false, coffeeCups: 2 },
-        { day: 3, workedOut: true, coffeeCups: 4 },
-        { day: 4, workedOut: false, coffeeCups: 0 },
-        { day: 5, workedOut: false, coffeeCups: 0 },
+        { day: 1, workedOut: true, drinkCups: 0, coffeeCups: 0 },
+        { day: 2, workedOut: false, drinkCups: 2, coffeeCups: 2 },
+        { day: 3, workedOut: true, drinkCups: 4, coffeeCups: 4 },
+        { day: 4, workedOut: false, drinkCups: 0, coffeeCups: 0 },
+        { day: 5, workedOut: false, drinkCups: 0, coffeeCups: 0 },
       ],
     };
 
     expect(buildCalendarGrid(snapshot, 2)).toEqual([
       { kind: "neighbor", day: 30, monthRelation: "previous" },
       { kind: "neighbor", day: 31, monthRelation: "previous" },
-      { kind: "day", day: 1, workedOut: true, coffeeCups: 0, isToday: false },
-      { kind: "day", day: 2, workedOut: false, coffeeCups: 2, isToday: false },
-      { kind: "day", day: 3, workedOut: true, coffeeCups: 4, isToday: true },
-      { kind: "day", day: 4, workedOut: false, coffeeCups: 0, isToday: false },
-      { kind: "day", day: 5, workedOut: false, coffeeCups: 0, isToday: false },
+      { kind: "day", day: 1, workedOut: true, drinkCups: 0, coffeeCups: 0, isToday: false },
+      { kind: "day", day: 2, workedOut: false, drinkCups: 2, coffeeCups: 2, isToday: false },
+      { kind: "day", day: 3, workedOut: true, drinkCups: 4, coffeeCups: 4, isToday: true },
+      { kind: "day", day: 4, workedOut: false, drinkCups: 0, coffeeCups: 0, isToday: false },
+      { kind: "day", day: 5, workedOut: false, drinkCups: 0, coffeeCups: 0, isToday: false },
     ]);
   });
 
@@ -73,8 +74,9 @@ describe("calendar-data", () => {
       todayDay: 30,
       totalDays: 30,
       workoutDays: 1,
+      drinkCupTotal: 1,
       coffeeCupTotal: 1,
-      days: [{ day: 30, workedOut: true, coffeeCups: 1 }],
+      days: [{ day: 30, workedOut: true, drinkCups: 1, coffeeCups: 1 }],
     };
 
     const cells = buildCalendarGrid(snapshot, 4);
@@ -96,8 +98,9 @@ describe("calendar-data", () => {
       todayDay: null,
       totalDays: 3,
       workoutDays: 1,
+      drinkCupTotal: 1,
       coffeeCupTotal: 1,
-      days: [{ day: 1, workedOut: false, coffeeCups: 0 }],
+      days: [{ day: 1, workedOut: false, drinkCups: 0, coffeeCups: 0 }],
     };
     const cells = buildCalendarGrid(snapshot, 0);
 
@@ -131,8 +134,9 @@ describe("calendar-data", () => {
       todayDay: 1,
       totalDays: 2,
       workoutDays: 1,
+      drinkCupTotal: 1,
       coffeeCupTotal: 1,
-      days: [{ day: 1, workedOut: true, coffeeCups: 1 }],
+      days: [{ day: 1, workedOut: true, drinkCups: 1, coffeeCups: 1 }],
     };
 
     expect(buildCalendarGrid(snapshot, -2)).toHaveLength(7);
@@ -143,8 +147,8 @@ describe("calendar-data", () => {
       { kind: "neighbor", day: 29, monthRelation: "previous" },
       { kind: "neighbor", day: 30, monthRelation: "previous" },
       { kind: "neighbor", day: 31, monthRelation: "previous" },
-      { kind: "day", day: 1, workedOut: true, coffeeCups: 1, isToday: true },
-      { kind: "day", day: 2, workedOut: false, coffeeCups: 0, isToday: false },
+      { kind: "day", day: 1, workedOut: true, drinkCups: 1, coffeeCups: 1, isToday: true },
+      { kind: "day", day: 2, workedOut: false, drinkCups: 0, coffeeCups: 0, isToday: false },
       { kind: "neighbor", day: 1, monthRelation: "next" },
       { kind: "neighbor", day: 2, monthRelation: "next" },
       { kind: "neighbor", day: 3, monthRelation: "next" },
@@ -155,8 +159,8 @@ describe("calendar-data", () => {
     expect(buildCalendarGrid(snapshot, 2.9)).toEqual([
       { kind: "neighbor", day: 30, monthRelation: "previous" },
       { kind: "neighbor", day: 31, monthRelation: "previous" },
-      { kind: "day", day: 1, workedOut: true, coffeeCups: 1, isToday: true },
-      { kind: "day", day: 2, workedOut: false, coffeeCups: 0, isToday: false },
+      { kind: "day", day: 1, workedOut: true, drinkCups: 1, coffeeCups: 1, isToday: true },
+      { kind: "day", day: 2, workedOut: false, drinkCups: 0, coffeeCups: 0, isToday: false },
       { kind: "neighbor", day: 1, monthRelation: "next" },
       { kind: "neighbor", day: 2, monthRelation: "next" },
       { kind: "neighbor", day: 3, monthRelation: "next" },
@@ -170,10 +174,11 @@ describe("calendar-data", () => {
       todayDay: 29,
       totalDays: 29,
       workoutDays: 1,
+      drinkCupTotal: 2,
       coffeeCupTotal: 2,
       days: [
-        { day: 1, workedOut: true, coffeeCups: 0 },
-        { day: 29, workedOut: false, coffeeCups: 2 },
+        { day: 1, workedOut: true, drinkCups: 0, coffeeCups: 0 },
+        { day: 29, workedOut: false, drinkCups: 2, coffeeCups: 2 },
       ],
     };
 
@@ -182,6 +187,7 @@ describe("calendar-data", () => {
     expect(leapCells[28]).toMatchObject({
       kind: "day",
       day: 29,
+      drinkCups: 2,
       coffeeCups: 2,
       isToday: true,
     });
@@ -192,8 +198,9 @@ describe("calendar-data", () => {
       todayDay: 31,
       totalDays: 31,
       workoutDays: 1,
+      drinkCupTotal: 1,
       coffeeCupTotal: 1,
-      days: [{ day: 31, workedOut: true, coffeeCups: 1 }],
+      days: [{ day: 31, workedOut: true, drinkCups: 1, coffeeCups: 1 }],
     };
 
     const longMonthCells = buildCalendarGrid(longMonthSnapshot, 0);
@@ -202,6 +209,7 @@ describe("calendar-data", () => {
       kind: "day",
       day: 31,
       workedOut: true,
+      drinkCups: 1,
       coffeeCups: 1,
       isToday: true,
     });

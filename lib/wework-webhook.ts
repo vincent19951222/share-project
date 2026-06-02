@@ -88,7 +88,9 @@ export function buildWeeklyReportWeWorkMarkdown(dynamic: WeeklyReportDynamic): s
   const totalPunches = metrics ? getNumber(metrics.totalPunches) : null;
   const fullAttendanceDays = metrics ? getNumber(metrics.fullAttendanceDays) : null;
   const topMember = highlights ? getFirstHighlightValue(highlights.topMembers) : null;
+  const drink = highlights ? asRecord(highlights.drink) : null;
   const coffee = highlights ? asRecord(highlights.coffee) : null;
+  const drinkValue = drink ? getString(drink.value) : null;
   const coffeeValue = coffee ? getString(coffee.value) : null;
   const filledSlots = seasonProgress ? getNumber(seasonProgress.filledSlots) : null;
   const targetSlots = seasonProgress ? getNumber(seasonProgress.targetSlots) : null;
@@ -101,7 +103,7 @@ export function buildWeeklyReportWeWorkMarkdown(dynamic: WeeklyReportDynamic): s
     fullAttendanceDays !== null ? `> 全勤：${fullAttendanceDays} 天` : null,
     filledSlots !== null && targetSlots !== null ? `> 赛季进度：${filledSlots}/${targetSlots}` : null,
     topMember ? `> 高光：${topMember}` : null,
-    coffeeValue ? `> 咖啡：${coffeeValue}` : null,
+    drinkValue ? `> 水铺：${drinkValue}` : coffeeValue ? `> 咖啡：${coffeeValue}` : null,
   ].filter((line): line is string => Boolean(line));
 
   return clampMarkdown(lines.join("\n"));
