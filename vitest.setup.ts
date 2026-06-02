@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { execFileSync } from "child_process";
 import Database from "better-sqlite3";
 
 const projectRoot = process.cwd();
@@ -34,3 +35,12 @@ try {
 } finally {
   db.close();
 }
+
+execFileSync(process.platform === "win32" ? "npx.cmd" : "npx", ["prisma", "db", "push"], {
+  cwd: projectRoot,
+  env: {
+    ...process.env,
+    PRISMA_DB_PATH: testDbPath,
+  },
+  stdio: "ignore",
+});
