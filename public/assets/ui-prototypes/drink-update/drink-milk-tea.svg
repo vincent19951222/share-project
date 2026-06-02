@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 180" role="img" aria-label="milk tea">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="4" dy="5" stdDeviation="0" flood-color="#111827" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M45 35h78l-10 119c-1 12-8 18-20 18H74c-12 0-19-6-20-18Z" fill="#fff" stroke="#fff" stroke-width="18"/>
+    <path d="M91 3h15l-6 75H85Z" fill="#ee965d" stroke="#111827" stroke-width="6"/>
+    <path d="M37 34h92v16H37z" fill="#fffdf7" stroke="#111827" stroke-width="6"/>
+    <path d="M48 50h71l-9 102c-1 10-7 15-17 15H75c-10 0-16-5-17-15Z" fill="#f4a77f" stroke="#111827" stroke-width="6"/>
+    <path d="M55 69h59l-3 38H58Z" fill="#f7c5ac"/>
+    <path d="M61 126c8 0 8 12 0 12s-8-12 0-12Zm20 10c8 0 8 12 0 12s-8-12 0-12Zm23-14c8 0 8 12 0 12s-8-12 0-12Zm-9 27c8 0 8 12 0 12s-8-12 0-12Zm-30 18c8 0 8 12 0 12s-8-12 0-12Z" fill="#111827"/>
+  </g>
+</svg>

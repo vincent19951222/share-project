@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 180" role="img" aria-label="other drink mug">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="4" dy="5" stdDeviation="0" flood-color="#111827" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 37h75c28 4 39 21 31 51-6 23-19 37-39 41-5 25-20 38-45 38-28 0-44-18-48-50L10 65c-2-17 8-28 30-28Z" fill="#fff" stroke="#fff" stroke-width="18"/>
+    <path d="M31 43h75c8 0 14 7 13 15l-8 63c-3 25-20 40-45 40s-42-15-45-40l-8-63c-1-8 6-15 18-15Z" fill="#dad6cc" stroke="#111827" stroke-width="6"/>
+    <path d="M112 69c22 1 30 12 25 31-5 20-16 31-32 33l4-24c8-2 13-8 15-17 2-9-3-14-14-15Z" fill="#ece8de" stroke="#111827" stroke-width="6"/>
+    <ellipse cx="66" cy="52" rx="50" ry="22" fill="#f2efe7" stroke="#111827" stroke-width="6"/>
+    <ellipse cx="66" cy="52" rx="39" ry="12" fill="#3b281a"/>
+    <text x="67" y="125" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="72" font-weight="900" fill="#111827">?</text>
+  </g>
+</svg>
