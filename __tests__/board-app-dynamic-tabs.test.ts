@@ -10,6 +10,7 @@ describe("BoardApp dynamic tab boundaries", () => {
     expect(boardAppSource).toContain('from "@/components/punch-board/PunchBoard"');
     expect(boardAppSource).not.toContain('from "@/components/shared-board/SharedBoard"');
     expect(boardAppSource).not.toContain('from "@/components/coffee-checkin/CoffeeCheckin"');
+    expect(boardAppSource).not.toContain('from "@/components/drink-checkin/DrinkCheckin"');
     expect(boardAppSource).not.toContain('from "@/components/calendar/CalendarBoard"');
     expect(boardAppSource).not.toContain('from "@/components/report-center/ReportCenter"');
     expect(boardAppSource).not.toContain('from "@/components/gamification/SupplyStation"');
@@ -18,10 +19,11 @@ describe("BoardApp dynamic tab boundaries", () => {
   it("defines reusable dynamic tab components and preload helpers", () => {
     expect(dynamicTabsSource).toContain('from "next/dynamic"');
     expect(dynamicTabsSource).toContain("DynamicSharedBoard");
-    expect(dynamicTabsSource).toContain("DynamicCoffeeCheckin");
+    expect(dynamicTabsSource).toContain("DynamicDrinkCheckin");
     expect(dynamicTabsSource).toContain("DynamicCalendarBoard");
     expect(dynamicTabsSource).toContain("DynamicReportCenter");
     expect(dynamicTabsSource).toContain("DynamicSupplyStation");
+    expect(loaderSource).toContain("loadDrinkCheckin");
     expect(loaderSource).toContain("loadSharedBoard");
     expect(loaderSource).toContain("loadSupplyStation");
     expect(loaderSource).toContain("preloadBoardTabComponent");

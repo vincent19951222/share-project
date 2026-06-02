@@ -68,7 +68,7 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
         共享看板
       </section>
     ),
-    DynamicCoffeeCheckin: () => <section data-testid="coffee-checkin">续命咖啡</section>,
+    DynamicDrinkCheckin: () => <section data-testid="drink-checkin">牛马水铺</section>,
     DynamicReportCenter: () => <section data-testid="report-center">战报中心</section>,
     DynamicCalendarBoard: () => <section data-testid="calendar-board">牛马日历</section>,
     DynamicSupplyStation: ({
@@ -109,6 +109,12 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
     },
   };
 });
+
+vi.mock("@/lib/drink-store", () => ({
+  DrinkProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="drink-provider">{children}</div>
+  ),
+}));
 
 vi.mock("@/lib/coffee-store", () => ({
   CoffeeProvider: ({ children }: { children: React.ReactNode }) => (
@@ -169,7 +175,7 @@ describe("Home supply navigation", () => {
     );
     expect(container.querySelector("[data-testid='punch-board']")).toBeNull();
     expect(container.querySelector("[data-testid='shared-board']")).toBeNull();
-    expect(container.querySelector("[data-testid='coffee-checkin']")).toBeNull();
+    expect(container.querySelector("[data-testid='drink-checkin']")).toBeNull();
     expect(container.querySelector("[data-testid='calendar-board']")).toBeNull();
     expect(container.querySelector("[data-testid='report-center']")).toBeNull();
   });
@@ -292,7 +298,7 @@ describe("Home supply navigation", () => {
     expect(dispatchMock).not.toHaveBeenCalledWith({ type: "SET_TAB", tab: "board" });
   });
 
-  it("does not mount the coffee polling provider on tabs that do not read coffee state", async () => {
+  it("does not mount the drink polling provider on tabs that do not read drink state", async () => {
     activeTab = "punch";
     const { default: Home } = await import("@/app/(board)/page");
 
@@ -300,17 +306,17 @@ describe("Home supply navigation", () => {
       root.render(<Home />);
     });
 
-    expect(container.querySelector("[data-testid='coffee-provider']")).toBeNull();
+    expect(container.querySelector("[data-testid='drink-provider']")).toBeNull();
   });
 
-  it("mounts the coffee polling provider only for coffee-backed tabs", async () => {
+  it("mounts the drink polling provider only for drink-backed tabs", async () => {
     const { default: DrinkPage } = await import("@/app/(board)/drink/page");
 
     await act(async () => {
       root.render(<DrinkPage />);
     });
 
-    expect(container.querySelector("[data-testid='coffee-provider']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='drink-provider']")).not.toBeNull();
 
     const { default: ReportPage } = await import("@/app/(board)/report/page");
 
@@ -318,7 +324,7 @@ describe("Home supply navigation", () => {
       root.render(<ReportPage />);
     });
 
-    expect(container.querySelector("[data-testid='coffee-provider']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='drink-provider']")).not.toBeNull();
   });
 
   it("wires the supply station return action back to the punch tab", async () => {

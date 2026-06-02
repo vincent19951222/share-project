@@ -2,7 +2,7 @@ import type { SupplyPanelKey } from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
 export const loadSharedBoard = () => import("@/components/shared-board/SharedBoard").then((mod) => mod.SharedBoard);
-export const loadCoffeeCheckin = () => import("@/components/coffee-checkin/CoffeeCheckin").then((mod) => mod.CoffeeCheckin);
+export const loadDrinkCheckin = () => import("@/components/drink-checkin/DrinkCheckin").then((mod) => mod.DrinkCheckin);
 export const loadCalendarBoard = () => import("@/components/calendar/CalendarBoard").then((mod) => mod.CalendarBoard);
 export const loadReportCenter = () => import("@/components/report-center/ReportCenter").then((mod) => mod.ReportCenter);
 export const loadSupplyStation = () => import("@/components/gamification/SupplyStation").then((mod) => mod.SupplyStation);
@@ -13,7 +13,7 @@ export function preloadBoardTabComponent(tab: AppTab) {
       void loadSharedBoard();
       break;
     case "coffee":
-      void loadCoffeeCheckin();
+      void loadDrinkCheckin();
       break;
     case "calendar":
       void loadCalendarBoard();

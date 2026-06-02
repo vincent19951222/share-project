@@ -220,7 +220,7 @@ export function Navbar({
                 onClick={() => handleTabChange("coffee")}
               >
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
-                续命咖啡
+                牛马水铺
               </TabBtn>
               <TabBtn
                 active={activeTab === "calendar"}
@@ -385,7 +385,7 @@ export function Navbar({
             >
               <span className="flex items-center gap-2">
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
-                续命咖啡
+                牛马水铺
               </span>
             </TabBtn>
             <TabBtn
