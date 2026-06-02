@@ -63,24 +63,24 @@ describe("coffee tab navigation", () => {
     container.remove();
   });
 
-  it("navigates to coffee without dispatching a duplicate tab state update", async () => {
+  it("navigates to the water shop without dispatching a duplicate tab state update", async () => {
     const { Navbar } = await import("@/components/navbar/Navbar");
 
     await act(async () => {
       root.render(<Navbar />);
     });
 
-    const coffeeButton = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("续命咖啡"),
+    const drinkButton = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("牛马水铺"),
     );
 
-    expect(coffeeButton).toBeDefined();
+    expect(drinkButton).toBeDefined();
     expect(
-      coffeeButton!.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]'),
+      drinkButton!.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]'),
     ).not.toBeNull();
 
     await act(async () => {
-      coffeeButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      drinkButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
     expect(dispatch).not.toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe("coffee tab navigation", () => {
     expect(tabLabels).toEqual([
       "健身打卡",
       "共享看板",
-      "续命咖啡",
+      "牛马水铺",
       "牛马日历",
       "战报中心",
       "牛马补给站",
@@ -182,13 +182,13 @@ describe("coffee tab navigation", () => {
     expect(toggleButton?.getAttribute("aria-expanded")).toBe("true");
     expect(container.querySelector(".mobile-tab-panel")).not.toBeNull();
 
-    const coffeeButton = Array.from(container.querySelectorAll(".mobile-tab-panel button")).find(
-      (button) => button.textContent?.includes("续命咖啡"),
+    const drinkButton = Array.from(container.querySelectorAll(".mobile-tab-panel button")).find(
+      (button) => button.textContent?.includes("牛马水铺"),
     );
-    expect(coffeeButton).toBeDefined();
+    expect(drinkButton).toBeDefined();
 
     await act(async () => {
-      coffeeButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      drinkButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
     expect(dispatch).not.toHaveBeenCalled();

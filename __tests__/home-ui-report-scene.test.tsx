@@ -2,7 +2,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReportCenter } from "@/components/report-center/ReportCenter";
-import { CoffeeProvider } from "@/lib/coffee-store";
+import { DrinkProvider } from "@/lib/drink-store";
 import { BoardProvider } from "@/lib/store";
 import type { BoardState } from "@/lib/types";
 
@@ -67,7 +67,15 @@ async function waitFor(assertion: () => void | Promise<void>, attempts = 20) {
   }
 }
 
-function coffeeSnapshot() {
+const emptyDrinkCounts = {
+  water: 0,
+  milkTea: 0,
+  americano: 0,
+  latte: 0,
+  other: 0,
+} as const;
+
+function drinkSnapshot() {
   return {
     members: [
       { id: "u1", name: "li", avatarKey: "male1" },
@@ -76,19 +84,25 @@ function coffeeSnapshot() {
     gridData: [
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 2][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
       Array.from({ length: 30 }, (_, index) => ({
         cups: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 3, 1][index] ?? 0,
+        drinkCounts: emptyDrinkCounts,
       })),
     ],
     today: 24,
     totalDays: 30,
     currentUserId: "u1",
+    todayEvents: [],
     stats: {
       todayTotalCups: 3,
       todayDrinkers: 2,
       currentUserTodayCups: 2,
-      coffeeKing: { userId: "u1", name: "li", cups: 2 },
+      drinkKing: { userId: "u1", name: "li", cups: 2 },
+      favoriteDrink: { drinkType: "americano", count: 2 },
+      latestDrink: null,
+      drinkCounts: { ...emptyDrinkCounts, americano: 2 },
     },
   };
 }
@@ -124,8 +138,8 @@ function weeklySnapshot() {
 
 function createFetchMock() {
   return vi.fn((input: RequestInfo | URL) => {
-    if (String(input) === "/api/coffee/state") {
-      return Promise.resolve(jsonResponse({ snapshot: coffeeSnapshot() }));
+    if (String(input) === "/api/drinks/state") {
+      return Promise.resolve(jsonResponse({ snapshot: drinkSnapshot() }));
     }
     if (String(input) === "/api/gamification/reports/weekly") {
       return Promise.resolve(jsonResponse({ snapshot: weeklySnapshot() }));
@@ -144,9 +158,9 @@ async function renderReportCenter(root: Root, state: BoardState) {
   await act(async () => {
     root.render(
       <BoardProvider initialState={state}>
-        <CoffeeProvider>
+        <DrinkProvider>
           <ReportCenter />
-        </CoffeeProvider>
+        </DrinkProvider>
       </BoardProvider>,
     );
   });

@@ -73,11 +73,11 @@ describe("supply backpack mock data", () => {
       (detail) => detail.itemId === "luckin_coffee_coupon",
     );
 
-    expect(new Set(items.map((item) => item.rarity))).toEqual(new Set(["N", "R", "SR", "SSR"]));
+    expect(new Set(items.map((item) => item.rarity))).toEqual(new Set(["N", "R", "SSR"]));
     expect(items.find((item) => item.id === "luckin_coffee_coupon")).toMatchObject({
       name: "瑞幸咖啡券",
       quantity: 1,
-      rarity: "SR",
+      rarity: "SSR",
       categoryId: "real",
     });
     expect(coffeeDetail).toMatchObject({
