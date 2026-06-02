@@ -17,6 +17,7 @@ model Team {
   seasons        Season[]
   activityEvents ActivityEvent[]
   coffeeRecords  CoffeeRecord[]
+  drinkRecords   DrinkRecord[]
   teamDynamics   TeamDynamic[]
   weeklyReportDrafts WeeklyReportDraft[]
   enterpriseWechatSendLogs EnterpriseWechatSendLog[]
@@ -52,6 +53,7 @@ model User {
   seasonStats           SeasonMemberStat[]
   activityEvents        ActivityEvent[]
   coffeeRecords         CoffeeRecord[]
+  drinkRecords          DrinkRecord[]
   teamDynamicReadStates TeamDynamicReadState[]
   weeklyReportDrafts    WeeklyReportDraft[]
   dailyTaskAssignments  DailyTaskAssignment[]
@@ -507,4 +509,21 @@ model CoffeeRecord {
 
   @@index([teamId, dayKey, createdAt])
   @@index([userId, dayKey, createdAt])
+}
+
+model DrinkRecord {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  teamId    String
+  team      Team      @relation(fields: [teamId], references: [id])
+  dayKey    String
+  drinkType String
+  note      String?
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([teamId, dayKey, createdAt])
+  @@index([userId, dayKey, createdAt])
+  @@index([teamId, drinkType, dayKey])
 }
