@@ -433,6 +433,44 @@ export async function expirePastSocialInvitations(input: {
   });
 }
 
+export async function dismissSocialInvitation(input: { userId: string; invitationId: string }) {
+  const user = await prisma.user.findUnique({
+    where: { id: input.userId },
+    select: { id: true, teamId: true },
+  });
+
+  if (!user) {
+    throw new SocialInvitationError("用户不存在。", "USER_NOT_FOUND", 401);
+  }
+
+  const invitation = await prisma.socialInvitation.findUnique({
+    where: { id: input.invitationId },
+    select: {
+      id: true,
+      teamId: true,
+      recipientUserId: true,
+      status: true,
+    },
+  });
+
+  if (!invitation || invitation.teamId !== user.teamId) {
+    throw new SocialInvitationError("邀请不存在。", "INVITATION_NOT_FOUND", 404);
+  }
+
+  if (invitation.recipientUserId !== user.id) {
+    throw new SocialInvitationError("只有被邀请人可以忽略。", "RESPONDER_NOT_ALLOWED", 403);
+  }
+
+  if (invitation.status !== "PENDING") {
+    throw new SocialInvitationError("邀请已不可忽略。", "INVITATION_CLOSED");
+  }
+
+  return prisma.socialInvitation.update({
+    where: { id: invitation.id },
+    data: { status: "CANCELLED" },
+  });
+}
+
 export async function respondToSocialInvitation(input: {
   userId: string;
   invitationId: string;

@@ -579,6 +579,17 @@ export function SupplyDashboardScene({
               {visibleFeedbackMessage}
             </p>
           ) : null}
+          {data.socialInvitationNotice ? (
+            <button
+              className="supply-dashboard-social-notice"
+              onClick={() => onNavigate?.(data.socialInvitationNotice!.target)}
+              type="button"
+            >
+              <strong>{data.socialInvitationNotice.title}</strong>
+              <span>{data.socialInvitationNotice.message}</span>
+              <em>{data.socialInvitationNotice.actionLabel}</em>
+            </button>
+          ) : null}
           <DashboardShortcutDock data={data} onNavigate={onNavigate} />
           <TeamAnnouncementBar message={data.announcement.message} />
         </section>

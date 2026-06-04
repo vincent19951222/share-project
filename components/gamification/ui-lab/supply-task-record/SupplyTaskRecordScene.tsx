@@ -107,12 +107,14 @@ export function SupplyTaskRecordScene({
   chrome = "standalone",
   data,
   onBackToPunch,
+  onDismissSocialInvitation,
   onRespondSocialInvitation,
   onSelectSupplyTab,
 }: {
   chrome?: "standalone" | "embedded";
   data: SupplyTaskRecordPreview;
   onBackToPunch?: () => void;
+  onDismissSocialInvitation?: (inviteId: string) => void;
   onRespondSocialInvitation?: (inviteId: string) => void;
   onSelectSupplyTab?: (tabId: SupplyUiLabTopBarTabId) => void;
 }) {
@@ -139,6 +141,11 @@ export function SupplyTaskRecordScene({
   function handleRadarInviteAction(inviteId: string, action: "respond" | "ignore") {
     if (action === "respond" && onRespondSocialInvitation) {
       onRespondSocialInvitation(inviteId);
+      return;
+    }
+
+    if (action === "ignore" && onDismissSocialInvitation) {
+      onDismissSocialInvitation(inviteId);
       return;
     }
 

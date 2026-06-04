@@ -12,12 +12,18 @@ export interface SupplyNavResource {
   iconImage: string;
 }
 
+export interface SupplyNavSocialContext {
+  pendingCount: number;
+  latestLabel: string | null;
+}
+
 export interface SupplyNavContext {
   resources: SupplyNavResource[];
   profile: {
     username: string;
     avatarKey: string;
   };
+  social: SupplyNavSocialContext;
 }
 
 export interface SupplyNavItem {

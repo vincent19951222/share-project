@@ -158,6 +158,45 @@ describe("supply production to UI Lab adapters", () => {
     ]);
   });
 
+  it("maps pending received social invitations to dashboard notice and task record badge", () => {
+    const snapshotWithInvite: SupplyStationProductionSnapshot = {
+      ...snapshot,
+      social: {
+        ...snapshot.social,
+        pendingReceivedCount: 1,
+        received: [
+          {
+            id: "invite-water-1",
+            senderUserId: "u2",
+            senderUsername: "luo",
+            recipientUserId: "u1",
+            recipientUsername: "li",
+            invitationType: "DRINK_WATER",
+            status: "PENDING",
+            dayKey: "2026-06-04",
+            message: "喝口水",
+            responseCount: 0,
+            wechatWebhookSentAt: null,
+            respondedAt: null,
+            expiredAt: null,
+            createdAt: "2026-06-04T02:00:00.000Z",
+          },
+        ],
+      },
+    };
+
+    const dashboard = toSupplyDashboardPreview(snapshotWithInvite);
+
+    expect(dashboard.socialInvitationNotice).toEqual({
+      pendingCount: 1,
+      title: "队友邀请待响应",
+      message: "luo 邀请你喝水：喝口水",
+      actionLabel: "去回应",
+      target: "task-record",
+    });
+    expect(dashboard.shortcutLinks.find((link) => link.id === "task-record")?.badge).toBe("1 待回应");
+  });
+
   it("maps secondary panels without mock values", () => {
     const taskRecord = toSupplyTaskRecordPreview(snapshot);
 

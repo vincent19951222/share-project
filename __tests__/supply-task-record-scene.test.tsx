@@ -1,6 +1,6 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SupplyTaskRecordScene } from "@/components/gamification/ui-lab/supply-task-record/SupplyTaskRecordScene";
 import { supplyTaskRecordMock } from "@/components/gamification/ui-lab/supply-task-record/mock-data";
 
@@ -250,6 +250,34 @@ describe("SupplyTaskRecordScene", () => {
     expect(nextPendingInvite?.textContent).toContain("已忽略");
     expect(nextPendingInvite?.querySelectorAll("button")).toHaveLength(0);
     expect(container.querySelector(".supply-task-record-menu button:nth-child(4)")?.textContent).toContain("1");
+  });
+
+  it("delegates ignore actions when dismiss handler is provided", async () => {
+    const onDismissSocialInvitation = vi.fn();
+
+    await act(async () => {
+      root.render(
+        <SupplyTaskRecordScene
+          data={supplyTaskRecordMock}
+          onDismissSocialInvitation={onDismissSocialInvitation}
+        />,
+      );
+    });
+
+    await clickButtonContaining(container, "队友雷达");
+
+    const firstInvite = container.querySelector("[data-testid='task-record-radar-invite']");
+    const ignoreButton = Array.from(firstInvite?.querySelectorAll<HTMLButtonElement>("button") ?? []).find((button) =>
+      button.textContent?.includes("忽略"),
+    );
+
+    await act(async () => {
+      ignoreButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(onDismissSocialInvitation).toHaveBeenCalledWith("invite-sailor");
+    expect(firstInvite?.textContent).toContain("待响应");
+    expect(firstInvite?.textContent).not.toContain("已忽略");
   });
 
   it("uses reused reward and avatar images without panel crops", async () => {

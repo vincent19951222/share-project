@@ -59,6 +59,7 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
         },
       ],
       profile: { username: "li", avatarKey: "male1" },
+      social: { pendingCount: 0, latestLabel: null },
     };
   }
 
@@ -132,6 +133,13 @@ describe("Home supply navigation", () => {
       backpack: { label: "背包", value: 12, maxValue: 60 },
     },
     profile: { username: "li", avatarKey: "male1" },
+    social: {
+      pendingSentCount: 0,
+      pendingReceivedCount: 0,
+      teamWidePendingCount: 0,
+      received: [],
+      teamWide: [],
+    },
   };
 
   beforeEach(() => {
@@ -259,6 +267,13 @@ describe("Home supply navigation", () => {
         backpack: { label: "背包", value: 4, maxValue: 60 },
       },
       profile: { username: "wang", avatarKey: "female1" },
+      social: {
+        pendingSentCount: 0,
+        pendingReceivedCount: 0,
+        teamWidePendingCount: 0,
+        received: [],
+        teamWide: [],
+      },
     });
     const { default: Home } = await import("@/app/(board)/page");
 

@@ -6,6 +6,7 @@ import {
   ApiError,
   claimGamificationLifeTicket,
   completeGamificationTask,
+  dismissSocialInvitation,
   drawGamificationLottery,
   fetchSupplyStationState,
   purchaseGamificationShopItem,
@@ -46,6 +47,7 @@ type SupplyAction =
   | "use-item"
   | "request-redemption"
   | "purchase-shop-item"
+  | "dismiss-social-invitation"
   | "respond-social-invitation";
 
 interface SupplyErrorState {
@@ -130,9 +132,38 @@ export function SupplyStationShell({
     }
   }, [applySnapshot]);
 
+  const refreshSnapshotSilently = useCallback(async () => {
+    try {
+      const nextSnapshot = await fetchSupplyStationState();
+      applySnapshot(nextSnapshot);
+    } catch {
+      // Keep the current snapshot if a background refresh fails.
+    }
+  }, [applySnapshot]);
+
   useEffect(() => {
     void loadSnapshot();
   }, [loadSnapshot]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const refreshIfVisible = () => {
+      if (document.visibilityState === "visible") {
+        void refreshSnapshotSilently();
+      }
+    };
+
+    const timer = window.setInterval(refreshIfVisible, 30_000);
+    document.addEventListener("visibilitychange", refreshIfVisible);
+
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refreshIfVisible);
+    };
+  }, [refreshSnapshotSilently]);
 
   useEffect(() => {
     setActivePanel(initialPanel);
@@ -253,6 +284,16 @@ export function SupplyStationShell({
     [runAction],
   );
 
+  const handleDismissSocialInvitation = useCallback(
+    (invitationId: string) => {
+      void runAction("dismiss-social-invitation", async () => {
+        await dismissSocialInvitation({ invitationId });
+        return "已忽略队友邀请";
+      });
+    },
+    [runAction],
+  );
+
   const handlePanelNavigation = useCallback((target: "home" | "draw-pool" | "backpack" | "shop" | "task-record") => {
     if (target === "home") {
       onBackToPunch?.();
@@ -354,6 +395,7 @@ export function SupplyStationShell({
               chrome="embedded"
               data={toSupplyTaskRecordPreview(snapshot)}
               onBackToPunch={onBackToPunch}
+              onDismissSocialInvitation={handleDismissSocialInvitation}
               onRespondSocialInvitation={handleRespondSocialInvitation}
               onSelectSupplyTab={handleTopBarTabNavigation}
             />

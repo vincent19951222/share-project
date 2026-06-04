@@ -3,6 +3,7 @@ import { seedDatabase } from "@/lib/db-seed";
 import { getShanghaiDayKey } from "@/lib/economy";
 import {
   createSocialInvitationFromItem,
+  dismissSocialInvitation,
   expirePastSocialInvitations,
   respondToSocialInvitation,
   SocialInvitationError,
@@ -248,6 +249,48 @@ describe("gamification social invitations", () => {
     });
     expect(recipient.coins).toBe(10);
     expect(recipient.ticketBalance).toBe(0);
+  });
+
+  it("lets the direct recipient dismiss a pending invitation", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId: senderId, teamId, itemId: "drink_water_ping", quantity: 1 },
+    });
+    const created = await createSocialInvitationFromItem({
+      userId: senderId,
+      itemId: "drink_water_ping",
+      target: { recipientUserId: recipientId },
+      fetchImpl: vi.fn().mockResolvedValue(wechatOk()),
+    });
+
+    const dismissed = await dismissSocialInvitation({
+      userId: recipientId,
+      invitationId: created.invitation.id,
+    });
+
+    expect(dismissed.status).toBe("CANCELLED");
+    const invitation = await prisma.socialInvitation.findUniqueOrThrow({
+      where: { id: created.invitation.id },
+    });
+    expect(invitation.status).toBe("CANCELLED");
+  });
+
+  it("rejects dismissing a direct invitation by anyone except the recipient", async () => {
+    await prisma.inventoryItem.create({
+      data: { userId: senderId, teamId, itemId: "drink_water_ping", quantity: 1 },
+    });
+    const created = await createSocialInvitationFromItem({
+      userId: senderId,
+      itemId: "drink_water_ping",
+      target: { recipientUserId: recipientId },
+      fetchImpl: vi.fn().mockResolvedValue(wechatOk()),
+    });
+
+    await expect(
+      dismissSocialInvitation({ userId: senderId, invitationId: created.invitation.id }),
+    ).rejects.toMatchObject({
+      code: "RESPONDER_NOT_ALLOWED",
+      status: 403,
+    });
   });
 
   it("allows multiple same-team users to respond to a team-wide invitation once each", async () => {

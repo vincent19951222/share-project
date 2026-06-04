@@ -2,6 +2,30 @@ import { supplyUiLabResourceIconPaths } from "@/components/gamification/ui-lab/s
 import type { SupplyNavContext } from "@/lib/navigation-routes";
 import type { SupplyStationProductionSnapshot } from "@/lib/types";
 
+function getInvitationActionLabel(invitationType: string) {
+  if (invitationType === "DRINK_WATER") {
+    return "喝水";
+  }
+
+  if (invitationType === "WALK_AROUND") {
+    return "走一走";
+  }
+
+  return "互动";
+}
+
+function buildLatestSocialLabel(snapshot: SupplyStationProductionSnapshot): string | null {
+  const latest = [...snapshot.social.received, ...snapshot.social.teamWide].find(
+    (invite) => invite.status === "PENDING",
+  );
+
+  if (!latest) {
+    return null;
+  }
+
+  return `${latest.senderUsername ?? "队友"} 邀请你${getInvitationActionLabel(latest.invitationType)}`;
+}
+
 export function buildSupplyNavContext(snapshot: SupplyStationProductionSnapshot): SupplyNavContext {
   return {
     resources: [
@@ -30,6 +54,10 @@ export function buildSupplyNavContext(snapshot: SupplyStationProductionSnapshot)
     profile: {
       username: snapshot.profile.username,
       avatarKey: snapshot.profile.avatarKey,
+    },
+    social: {
+      pendingCount: snapshot.social.pendingReceivedCount + snapshot.social.teamWidePendingCount,
+      latestLabel: buildLatestSocialLabel(snapshot),
     },
   };
 }

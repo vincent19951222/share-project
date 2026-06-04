@@ -66,6 +66,15 @@ const supplyNavContext: SupplyNavContext = {
     },
   ],
   profile: { username: "li", avatarKey: "male1" },
+  social: { pendingCount: 0, latestLabel: null },
+};
+
+const supplyNavContextWithSocial: SupplyNavContext = {
+  ...supplyNavContext,
+  social: {
+    pendingCount: 2,
+    latestLabel: "luo 邀请你喝水",
+  },
 };
 
 describe("Navbar supply chrome", () => {
@@ -148,6 +157,27 @@ describe("Navbar supply chrome", () => {
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("背包");
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("12/60");
     expect(container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png"]')).not.toBeNull();
+  });
+
+  it("surfaces social invitation pending count in supply navigation", async () => {
+    activeTab = "dash";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="dash" supplyNavContext={supplyNavContextWithSocial} />);
+    });
+
+    expect(container.querySelector(".app-supply-social-badge")?.textContent).toBe("2");
+    expect(container.querySelector(".app-supply-primary-tab")?.getAttribute("aria-label")).toContain(
+      "2 个队友邀请待响应",
+    );
+    expect(
+      Array.from(container.querySelectorAll(".app-supply-secondary-tab")).find((tab) =>
+        tab.textContent?.includes("任务记录"),
+      )?.textContent,
+    ).toContain("2");
+    expect(container.querySelector(".app-supply-mobile-wallet")?.getAttribute("aria-label")).toContain(
+      "luo 邀请你喝水",
+    );
   });
 
   it("keeps supply assets and the hoverable supply secondary tabs available on regular primary tabs", async () => {

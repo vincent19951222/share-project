@@ -266,6 +266,33 @@ describe("supply dashboard static scene", () => {
     expect(onClaimRewards).not.toHaveBeenCalled();
   });
 
+  it("opens task record from the social invitation notice", async () => {
+    const onNavigate = vi.fn();
+    const data = {
+      ...supplyDashboardMock,
+      socialInvitationNotice: {
+        pendingCount: 1,
+        title: "队友邀请待响应",
+        message: "luo 邀请你喝水：喝口水",
+        actionLabel: "去回应",
+        target: "task-record" as const,
+      },
+    };
+
+    await act(async () => {
+      root.render(<SupplyDashboardScene data={data} onNavigate={onNavigate} />);
+    });
+
+    expect(container.textContent).toContain("队友邀请待响应");
+    expect(container.textContent).toContain("luo 邀请你喝水");
+
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>(".supply-dashboard-social-notice")?.click();
+    });
+
+    expect(onNavigate).toHaveBeenCalledWith("task-record");
+  });
+
   it("lets the unfinished quest card confirm completion in the local demo", async () => {
     await act(async () => {
       root.render(<SupplyDashboardScene data={supplyDashboardMock} />);

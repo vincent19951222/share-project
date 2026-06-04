@@ -48,6 +48,14 @@ export type SupplyDashboardShortcutLink = {
   image: string | null;
 };
 
+export type SupplyDashboardSocialInvitationNotice = {
+  pendingCount: number;
+  title: string;
+  message: string;
+  actionLabel: string;
+  target: "task-record";
+};
+
 export type SupplyDashboardPreview = {
   profile: {
     username: string;
@@ -81,4 +89,5 @@ export type SupplyDashboardPreview = {
   announcement: {
     message: string;
   };
+  socialInvitationNotice?: SupplyDashboardSocialInvitationNotice;
 };

@@ -479,10 +479,42 @@ function toRadarInvite(invite: SocialInvitationSnapshot): SupplyTaskRecordInvite
   };
 }
 
+function getSocialInvitationActionLabel(invitationType: string) {
+  if (invitationType === "DRINK_WATER") {
+    return "喝水";
+  }
+
+  if (invitationType === "WALK_AROUND") {
+    return "走一走";
+  }
+
+  return "互动";
+}
+
+function getSocialInvitationNotice(snapshot: SupplyStationProductionSnapshot) {
+  const pendingCount = snapshot.social.pendingReceivedCount + snapshot.social.teamWidePendingCount;
+  const latest = [...snapshot.social.received, ...snapshot.social.teamWide].find(
+    (invite) => invite.status === "PENDING",
+  );
+
+  if (pendingCount <= 0 || !latest) {
+    return undefined;
+  }
+
+  return {
+    pendingCount,
+    title: "队友邀请待响应",
+    message: `${latest.senderUsername ?? "队友"} 邀请你${getSocialInvitationActionLabel(latest.invitationType)}：${latest.message}`,
+    actionLabel: "去回应",
+    target: "task-record" as const,
+  };
+}
+
 export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapshot): SupplyDashboardPreview {
   const completedQuestCount = snapshot.dashboard.dailyQuests.filter(
     (dimension) => dimension.assignment?.status === "completed",
   ).length;
+  const socialPendingCount = snapshot.social.pendingReceivedCount + snapshot.social.teamWidePendingCount;
 
   return {
     profile: {
@@ -549,7 +581,7 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
         href: "/dashboard/quest",
         title: "任务记录",
         subtitle: "查看历史任务与奖励",
-        badge: String(snapshot.taskRecord.timeline.length),
+        badge: socialPendingCount > 0 ? `${socialPendingCount} 待回应` : String(snapshot.taskRecord.timeline.length),
         image: supplyDashboardAssetPaths.dockTaskRecord,
       },
     ],
@@ -574,6 +606,7 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
     announcement: {
       message: snapshot.drawPool.lottery.message,
     },
+    socialInvitationNotice: getSocialInvitationNotice(snapshot),
   };
 }
 

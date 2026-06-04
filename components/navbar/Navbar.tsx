@@ -153,6 +153,17 @@ export function Navbar({
         })
         .join("，")
     : "加载中";
+  const socialPendingCount = supplyNavContext?.social.pendingCount ?? 0;
+  const socialPendingLabel =
+    socialPendingCount > 0
+      ? `${socialPendingCount} 个队友邀请待响应${
+          supplyNavContext?.social.latestLabel ? `，${supplyNavContext.social.latestLabel}` : ""
+        }`
+      : "";
+  const supplyTabAriaLabel = socialPendingLabel ? `牛马补给站，${socialPendingLabel}` : "牛马补给站";
+  const supplyAssetAriaLabel = socialPendingLabel
+    ? `补给站资产：${supplyAssetSummary}，${socialPendingLabel}`
+    : `补给站资产：${supplyAssetSummary}`;
 
   useEffect(() => {
     if (pendingTab === activeTab) {
@@ -245,6 +256,7 @@ export function Navbar({
                 战报中心
               </TabBtn>
               <TabBtn
+                aria-label={supplyTabAriaLabel}
                 active={activeTab === "supply"}
                 className="supply-tab app-supply-primary-tab"
                 onBlur={scheduleSupplyMenuClose}
@@ -262,6 +274,7 @@ export function Navbar({
               >
                 <AssetIcon name="supply" className="h-4 w-4 object-contain" />
                 牛马补给站
+                {socialPendingCount > 0 ? <span className="app-supply-social-badge">{socialPendingCount}</span> : null}
               </TabBtn>
             </div>
           </div>
@@ -340,7 +353,7 @@ export function Navbar({
           </div>
           <button
             type="button"
-            aria-label={`补给站资产：${supplyAssetSummary}`}
+            aria-label={supplyAssetAriaLabel}
             className="app-supply-mobile-wallet"
           >
             <AssetIcon name="supply" className="h-5 w-5 object-contain" />
@@ -415,6 +428,7 @@ export function Navbar({
               </span>
             </TabBtn>
             <TabBtn
+              aria-label={supplyTabAriaLabel}
               active={activeTab === "supply"}
               className="mobile-tab-btn supply-tab justify-between"
               pending={pendingTab === "supply"}
@@ -426,6 +440,7 @@ export function Navbar({
                 <AssetIcon name="supply" className="h-4 w-4 object-contain" />
                 牛马补给站
               </span>
+              {socialPendingCount > 0 ? <span className="app-supply-social-badge">{socialPendingCount}</span> : null}
             </TabBtn>
           </div>
         ) : null}
@@ -443,6 +458,11 @@ export function Navbar({
 
               return (
                 <button
+                  aria-label={
+                    item.id === "taskRecord" && socialPendingLabel
+                      ? `${item.label}，${socialPendingLabel}`
+                      : item.label
+                  }
                   aria-current={selected ? "page" : undefined}
                   aria-selected={selected}
                   className={`app-supply-secondary-tab${pendingSupplyPanel === item.id ? " pending" : ""}`}
@@ -455,6 +475,9 @@ export function Navbar({
                 >
                   <img alt="" aria-hidden="true" src={item.iconImage} />
                   {item.label}
+                  {item.id === "taskRecord" && socialPendingCount > 0 ? (
+                    <span className="app-supply-social-badge">{socialPendingCount}</span>
+                  ) : null}
                 </button>
               );
             })}

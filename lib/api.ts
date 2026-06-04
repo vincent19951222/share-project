@@ -419,6 +419,25 @@ export async function respondToSocialInvitation(payload: {
   return readApiResult(response, "social response parse failed");
 }
 
+export async function dismissSocialInvitation(payload: { invitationId: string }): Promise<{
+  snapshot: GamificationStateSnapshot;
+  invitation: {
+    id: string;
+    status: string;
+  };
+}> {
+  const response = await fetch("/api/gamification/social/dismiss", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return readApiResult(response, "忽略队友邀请失败");
+}
+
 async function readRedemptionPayload(response: Response): Promise<{
   redemption: GamificationRedemptionSnapshot;
   inventory?: { itemId: string; quantity: number };

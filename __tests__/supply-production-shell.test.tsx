@@ -203,6 +203,7 @@ describe("SupplyStationShell", () => {
     container.remove();
     vi.unstubAllGlobals();
     vi.resetModules();
+    vi.useRealTimers();
   });
 
   it("loads the production supply state on mount", async () => {
@@ -451,6 +452,114 @@ describe("SupplyStationShell", () => {
         expect.objectContaining({ id: "backpack", value: 3, maxValue: 60 }),
       ]),
     );
+  });
+
+  it("refreshes visible supply state in the background for received social invitations", async () => {
+    vi.useFakeTimers();
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "visible",
+    });
+    const emptySocial = {
+      status: "active" as const,
+      pendingSentCount: 0,
+      pendingReceivedCount: 0,
+      teamWidePendingCount: 0,
+      sent: [],
+      received: [],
+      teamWide: [],
+      recentResponses: [],
+      availableRecipients: [],
+      message: "ready",
+    };
+    const nextSocial = buildSnapshot().social;
+
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot({ social: emptySocial }) }))
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot({ social: nextSocial }) })),
+    );
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell />);
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(container.textContent).not.toContain("队友邀请待响应");
+
+    await act(async () => {
+      vi.advanceTimersByTime(30_000);
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(container.textContent).toContain("队友邀请待响应");
+  });
+
+  it("dismisses a social invitation and refreshes the production snapshot", async () => {
+    const emptySocial = {
+      status: "active" as const,
+      pendingSentCount: 0,
+      pendingReceivedCount: 0,
+      teamWidePendingCount: 0,
+      sent: [],
+      received: [],
+      teamWide: [],
+      recentResponses: [],
+      availableRecipients: [],
+      message: "ready",
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            invitation: { id: "social-received-1", status: "CANCELLED" },
+            snapshot: buildSnapshot({ social: emptySocial }),
+          }),
+        )
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot({ social: emptySocial }) })),
+    );
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell initialPanel="taskRecord" />);
+    });
+    await flush();
+
+    await act(async () => {
+      Array.from(container.querySelectorAll<HTMLButtonElement>("button"))
+        .find((button) => button.textContent?.includes("队友雷达"))
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await act(async () => {
+      Array.from(container.querySelectorAll<HTMLButtonElement>("button"))
+        .find((button) => button.textContent?.includes("忽略"))
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      "/api/gamification/social/dismiss",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ invitationId: "social-received-1" }),
+      }),
+    );
+    expect(fetch).toHaveBeenNthCalledWith(
+      3,
+      "/api/gamification/supply/state",
+      expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
+    );
+    expect(container.textContent).toContain("已忽略队友邀请");
   });
 
   it("keeps the legacy SupplyStation export on the production shell", async () => {
