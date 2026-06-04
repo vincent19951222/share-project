@@ -3,6 +3,7 @@ import {
   buildDrinkRecordIdFromCoffeeRecordId,
   mapCoffeeRecordToDrinkRecord,
 } from "@/scripts/drink-backfill-utils";
+import { verifyDrinkRecordBackfill } from "@/scripts/verify-drink-record-backfill";
 
 describe("drink record coffee backfill", () => {
   it("maps legacy coffee records to stable americano drink records", () => {
@@ -26,5 +27,40 @@ describe("drink record coffee backfill", () => {
       createdAt: new Date("2026-06-02T01:30:00.000Z"),
       deletedAt: null,
     });
+  });
+
+  it("verifies each migrated drink record against its legacy coffee source", async () => {
+    const coffeeRecord = {
+      id: "coffee_123",
+      userId: "user_1",
+      teamId: "team_1",
+      dayKey: "2026-06-02",
+      createdAt: new Date("2026-06-02T01:30:00.000Z"),
+      deletedAt: null,
+    };
+    const fakeClient = {
+      coffeeRecord: {
+        findMany: async () => [coffeeRecord],
+      },
+      drinkRecord: {
+        findUnique: async ({ where }: { where: { id: string } }) =>
+          where.id === "drink_coffee_123"
+            ? {
+                id: "drink_coffee_123",
+                userId: "user_2",
+                teamId: "team_1",
+                dayKey: "2026-06-02",
+                drinkType: "americano",
+                note: "历史咖啡记录",
+                createdAt: new Date("2026-06-02T01:30:00.000Z"),
+                deletedAt: null,
+              }
+            : null,
+      },
+    };
+
+    await expect(verifyDrinkRecordBackfill(fakeClient)).rejects.toThrow(
+      "Backfill mismatch for coffee_123: userId",
+    );
   });
 });

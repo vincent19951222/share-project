@@ -21,7 +21,7 @@ interface DrinkContextType {
   snapshot: DrinkSnapshot | null;
   busy: boolean;
   error: string | null;
-  confirmDrink: (input: { drinkType: DrinkType; note?: string | null }) => Promise<void>;
+  confirmDrink: (input: { drinkType: DrinkType; note?: string | null }) => Promise<boolean>;
   removeLatestDrink: (drinkType?: DrinkType) => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -72,8 +72,10 @@ export function DrinkProvider({ children }: { children: ReactNode }) {
       setSnapshot(await action());
       dispatchCalendarRefresh();
       window.dispatchEvent(new Event("activity-events:refresh"));
+      return true;
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "操作失败");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -123,7 +125,9 @@ export function DrinkProvider({ children }: { children: ReactNode }) {
         busy,
         error,
         confirmDrink: (input) => runMutation(() => addDrinkRecord(input)),
-        removeLatestDrink: (drinkType) => runMutation(() => removeLatestDrinkRecord(drinkType)),
+        removeLatestDrink: async (drinkType) => {
+          await runMutation(() => removeLatestDrinkRecord(drinkType));
+        },
         refresh,
       }}
     >

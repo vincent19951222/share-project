@@ -8,7 +8,12 @@ interface DrinkTeamGridProps {
 }
 
 export function DrinkTeamGrid({ snapshot }: DrinkTeamGridProps) {
-  const visibleDays = Array.from({ length: Math.min(snapshot.totalDays, 7) }, (_, index) => index + 1);
+  const lastVisibleDay = Math.max(1, Math.min(snapshot.today, snapshot.totalDays));
+  const firstVisibleDay = Math.max(1, lastVisibleDay - 6);
+  const visibleDays = Array.from(
+    { length: lastVisibleDay - firstVisibleDay + 1 },
+    (_, index) => firstVisibleDay + index,
+  );
 
   return (
     <section className="rounded-[8px] border-4 border-slate-950 bg-[#fffdf7] p-5 shadow-[8px_8px_0_rgba(15,23,42,0.24)]">

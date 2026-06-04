@@ -10,7 +10,7 @@ interface DrinkReceiptProps {
   snapshot: DrinkSnapshot;
   busy: boolean;
   error: string | null;
-  onConfirmDrink: (input: { drinkType: DrinkType; note?: string | null }) => Promise<void>;
+  onConfirmDrink: (input: { drinkType: DrinkType; note?: string | null }) => Promise<boolean>;
   onRemoveDrink: (drinkType?: DrinkType) => Promise<void>;
 }
 
@@ -60,7 +60,10 @@ export function DrinkReceipt({
   const [pendingEntry, setPendingEntry] = useState<PendingEntry | null>(null);
 
   const visibleEvents = snapshot.todayEvents.slice(-5).reverse();
-  const latestDrink = snapshot.stats.latestDrink;
+  const latestDrink =
+    snapshot.todayEvents
+      .filter((event) => event.userId === snapshot.currentUserId)
+      .at(-1) ?? null;
   const dailyGoal = 8;
   const totalCount = snapshot.stats.currentUserTodayCups;
   const remainingCups = Math.max(dailyGoal - totalCount, 0);
@@ -94,11 +97,14 @@ export function DrinkReceipt({
       return;
     }
 
-    await onConfirmDrink({
+    const confirmed = await onConfirmDrink({
       drinkType: pendingEntry.drinkType,
       note: pendingEntry.note,
     });
-    setPendingEntry(null);
+
+    if (confirmed) {
+      setPendingEntry(null);
+    }
   }
 
   return (

@@ -2,6 +2,8 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DrinkCheckin } from "@/components/drink-checkin/DrinkCheckin";
+import { DrinkReceipt } from "@/components/drink-checkin/DrinkReceipt";
+import { DrinkTeamGrid } from "@/components/drink-checkin/DrinkTeamGrid";
 import { DrinkProvider } from "@/lib/drink-store";
 import type { DrinkSnapshot } from "@/lib/types";
 
@@ -144,5 +146,135 @@ describe("DrinkCheckin", () => {
         body: JSON.stringify({ drinkType: "water", note: "测试备注" }),
       }),
     );
+  });
+
+  it("keeps the confirmation ticket open when drink submission fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        const method = init?.method ?? "GET";
+
+        if (url === "/api/drinks/state" && method === "GET") {
+          return Promise.resolve(createJsonResponse({ snapshot }));
+        }
+
+        if (url === "/api/drinks/records" && method === "POST") {
+          return Promise.resolve(createJsonResponse({ error: "水铺暂时离线" }, false, 500));
+        }
+
+        if (url === "/api/activity-events?kind=drink") {
+          return Promise.resolve(createJsonResponse({ events: [] }));
+        }
+
+        throw new Error(`Unexpected fetch: ${method} ${url}`);
+      }),
+    );
+
+    await act(async () => {
+      root.render(
+        <DrinkProvider>
+          <DrinkCheckin />
+        </DrinkProvider>,
+      );
+      await Promise.resolve();
+    });
+
+    const addWater = container.querySelector<HTMLButtonElement>('button[aria-label="增加一杯水"]');
+    await act(async () => {
+      addWater?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const confirm = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认入账"),
+    );
+    await act(async () => {
+      confirm?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("确认记录一杯");
+    expect(container.textContent).toContain("水铺暂时离线");
+  });
+
+  it("shows the current user's latest drink in the receipt sidebar", async () => {
+    const teamLatestSnapshot: DrinkSnapshot = {
+      ...updatedSnapshot,
+      todayEvents: [
+        {
+          id: "mine",
+          userId: "u1",
+          userName: "li",
+          avatarKey: "male1",
+          drinkType: "water",
+          time: "08:42",
+          note: "我的水",
+          createdAt: "2026-06-02T00:42:00.000Z",
+        },
+        {
+          id: "other",
+          userId: "u2",
+          userName: "luo",
+          avatarKey: "male2",
+          drinkType: "latte",
+          time: "09:10",
+          note: "队友拿铁",
+          createdAt: "2026-06-02T01:10:00.000Z",
+        },
+      ],
+      stats: {
+        ...updatedSnapshot.stats,
+        latestDrink: {
+          id: "other",
+          userId: "u2",
+          userName: "luo",
+          avatarKey: "male2",
+          drinkType: "latte",
+          time: "09:10",
+          note: "队友拿铁",
+          createdAt: "2026-06-02T01:10:00.000Z",
+        },
+      },
+    };
+
+    await act(async () => {
+      root.render(
+        <DrinkReceipt
+          snapshot={teamLatestSnapshot}
+          busy={false}
+          error={null}
+          onConfirmDrink={async () => true}
+          onRemoveDrink={async () => {}}
+        />,
+      );
+    });
+
+    const statusSidebar = container.querySelector("aside");
+    expect(statusSidebar?.textContent).toContain("我的水");
+    expect(statusSidebar?.textContent).not.toContain("队友拿铁");
+  });
+
+  it("renders the latest 7 drink days including today in the team grid", async () => {
+    const gridSnapshot: DrinkSnapshot = {
+      ...snapshot,
+      today: 12,
+      totalDays: 30,
+      members: [{ id: "u1", name: "li", avatarKey: "male1" }],
+      gridData: [
+        Array.from({ length: 30 }, (_, index) => ({
+          cups: index === 11 ? 2 : 0,
+          drinkCounts: { water: index === 11 ? 2 : 0, milkTea: 0, americano: 0, latte: 0, other: 0 },
+        })),
+      ],
+    };
+
+    await act(async () => {
+      root.render(<DrinkTeamGrid snapshot={gridSnapshot} />);
+    });
+
+    expect(container.textContent).toContain("6日");
+    expect(container.textContent).toContain("今天");
+    expect(container.textContent).toContain("2");
+    expect(container.textContent).not.toContain("1日2日3日");
   });
 });
