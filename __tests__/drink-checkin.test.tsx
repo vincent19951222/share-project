@@ -81,6 +81,39 @@ describe("DrinkCheckin", () => {
     vi.unstubAllGlobals();
   });
 
+  it("uses an internal vertical scroll container inside the fixed board tab panel", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input);
+
+        if (url === "/api/drinks/state") {
+          return Promise.resolve(createJsonResponse({ snapshot }));
+        }
+
+        if (url === "/api/activity-events?kind=drink") {
+          return Promise.resolve(createJsonResponse({ events: [] }));
+        }
+
+        throw new Error(`Unexpected fetch: ${url}`);
+      }),
+    );
+
+    await act(async () => {
+      root.render(
+        <DrinkProvider>
+          <DrinkCheckin />
+        </DrinkProvider>,
+      );
+      await Promise.resolve();
+    });
+
+    const main = container.querySelector("main");
+    expect(main?.className).toContain("h-full");
+    expect(main?.className).toContain("overflow-y-auto");
+    expect(main?.className).toContain("overflow-x-hidden");
+  });
+
   it("opens a confirmation ticket and posts the edited drink note", async () => {
     vi.stubGlobal(
       "fetch",

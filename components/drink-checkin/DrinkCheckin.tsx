@@ -47,7 +47,7 @@ export function DrinkCheckin() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7eddc] bg-[linear-gradient(rgba(255,253,247,0.72),rgba(247,237,220,0.88))] px-4 py-6 text-slate-950 sm:px-8">
+    <main className="h-full min-h-0 overflow-y-auto overflow-x-hidden bg-[#f7eddc] bg-[linear-gradient(rgba(255,253,247,0.72),rgba(247,237,220,0.88))] px-4 py-6 text-slate-950 sm:px-8">
       <div className="mx-auto grid max-w-[1390px] gap-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
