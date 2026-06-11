@@ -4728,6 +4728,460 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
+.fitness-ticket-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 201;
+  overflow-y: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+.fitness-ticket-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(253, 224, 71, 0.18), transparent 32%),
+    rgba(5, 5, 5, 0.58);
+  cursor: pointer;
+}
+
+.fitness-ticket-modal-dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: calc(100dvh - clamp(2rem, 6vw, 5rem));
+  place-items: center;
+}
+
+.fitness-ticket-frame {
+  --fitness-ticket-ink: #111111;
+  --fitness-ticket-paper: #fff9e9;
+  --fitness-ticket-yellow: #ffd735;
+  --fitness-ticket-yellow-deep: #e5b91d;
+  --fitness-ticket-shadow: #050505;
+  --fitness-ticket-muted: #4b4b42;
+  width: min(calc(100vw - clamp(2rem, 8vw, 6rem)), clamp(40rem, 46vw, 45rem));
+  border: 4px solid var(--fitness-ticket-shadow);
+  background: var(--fitness-ticket-shadow);
+  color: var(--fitness-ticket-ink);
+  box-shadow:
+    0 14px 0 rgba(0, 0, 0, 0.42),
+    0 24px 36px rgba(0, 0, 0, 0.34);
+  clip-path: polygon(
+    1.5% 0,
+    98.5% 0,
+    99.2% 4.5%,
+    100% 4.5%,
+    100% 95.5%,
+    99.2% 95.5%,
+    98.5% 100%,
+    1.5% 100%,
+    0.8% 95.5%,
+    0 95.5%,
+    0 4.5%,
+    0.8% 4.5%
+  );
+}
+
+.fitness-ticket-card {
+  position: relative;
+  margin: 6px;
+  min-height: auto;
+  padding: clamp(0.875rem, 1.25vw, 1.125rem);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(112, 93, 55, 0.08), transparent 20%),
+    radial-gradient(circle at 83% 20%, rgba(112, 93, 55, 0.09), transparent 22%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(var(--fitness-ticket-paper), #fff5da 78%, #f8e8c4);
+  background-size:
+    auto,
+    auto,
+    18px 18px,
+    auto;
+  clip-path: inherit;
+}
+
+.fitness-ticket-card::before,
+.fitness-ticket-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 1.5rem;
+  height: 3.25rem;
+  border: 4px solid var(--fitness-ticket-shadow);
+  border-radius: 999px;
+  background: #16120e;
+  transform: translateY(-50%);
+}
+
+.fitness-ticket-card::before {
+  left: -1.25rem;
+}
+
+.fitness-ticket-card::after {
+  right: -1.25rem;
+}
+
+.fitness-ticket-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(2.5rem, 1fr) auto minmax(2.5rem, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.5rem, 1.1vw, 0.875rem);
+  min-height: 3.25rem;
+}
+
+.fitness-ticket-header h1 {
+  margin: 0;
+  font-size: clamp(1.875rem, 3vw, 2.75rem);
+  font-weight: 1000;
+  letter-spacing: 0;
+  line-height: 0.95;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.fitness-ticket-title-rule {
+  height: 6px;
+  border-top: 3px solid var(--fitness-ticket-ink);
+  border-bottom: 2px dashed var(--fitness-ticket-ink);
+}
+
+.fitness-ticket-close {
+  display: grid;
+  width: clamp(2.75rem, 3.5vw, 3rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 3px solid var(--fitness-ticket-ink);
+  border-radius: 7px;
+  background: #fffdf6;
+  box-shadow: 3px 4px 0 var(--fitness-ticket-shadow);
+  color: var(--fitness-ticket-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(1.75rem, 2.7vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fitness-ticket-body {
+  display: grid;
+  grid-template-columns: minmax(13.25rem, 0.82fr) minmax(14rem, 1fr);
+  gap: clamp(0.75rem, 1.25vw, 1.125rem);
+  margin-top: clamp(0.625rem, 1vw, 0.875rem);
+  padding-bottom: clamp(0.75rem, 1.2vw, 1rem);
+  border-bottom: 4px dashed var(--fitness-ticket-ink);
+}
+
+.fitness-ticket-controls {
+  display: grid;
+  align-content: start;
+  gap: clamp(0.5rem, 0.9vw, 0.75rem);
+  padding-right: clamp(0.625rem, 1.25vw, 1rem);
+  border-right: 4px dashed var(--fitness-ticket-ink);
+}
+
+.fitness-ticket-field {
+  display: grid;
+  gap: 7px;
+}
+
+.fitness-ticket-field h2,
+.fitness-ticket-panel-header h2 {
+  margin: 0;
+  font-size: clamp(1rem, 1.18vw, 1.125rem);
+  font-weight: 1000;
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+.fitness-ticket-field h2 span {
+  color: var(--fitness-ticket-muted);
+  font-size: 0.78em;
+}
+
+.fitness-ticket-segment-grid,
+.fitness-ticket-parts-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.fitness-ticket-segment-grid,
+.fitness-ticket-parts-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fitness-ticket-option,
+.fitness-ticket-option-active {
+  min-height: clamp(2.75rem, 3.4vw, 3rem);
+  border: 3px solid var(--fitness-ticket-ink);
+  border-radius: 7px;
+  box-shadow: 2px 4px 0 var(--fitness-ticket-shadow);
+  color: var(--fitness-ticket-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.9375rem, 1vw, 1rem);
+  font-weight: 1000;
+  letter-spacing: 0;
+  line-height: 1;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
+}
+
+.fitness-ticket-option {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.fitness-ticket-option-active {
+  background: linear-gradient(180deg, #ffe972, var(--fitness-ticket-yellow));
+  box-shadow: 2px 4px 0 var(--fitness-ticket-shadow), inset 0 2px 0 rgba(255, 255, 255, 0.48);
+}
+
+.fitness-ticket-option:disabled,
+.fitness-ticket-option-active:disabled,
+.fitness-ticket-close:disabled,
+.fitness-ticket-cancel:disabled,
+.fitness-ticket-confirm:disabled,
+.fitness-ticket-duration button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.fitness-ticket-option:active,
+.fitness-ticket-option-active:active,
+.fitness-ticket-close:active,
+.fitness-ticket-cancel:active,
+.fitness-ticket-confirm:active,
+.fitness-ticket-duration button:active {
+  transform: translate(3px, 4px);
+  box-shadow: 1px 2px 0 var(--fitness-ticket-shadow);
+}
+
+.fitness-ticket-duration {
+  display: grid;
+  grid-template-columns: 2.875rem minmax(0, 1fr) 2.875rem;
+  gap: 7px;
+  align-items: stretch;
+}
+
+.fitness-ticket-duration button,
+.fitness-ticket-duration output {
+  display: flex;
+  min-height: clamp(2.75rem, 3.2vw, 2.875rem);
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--fitness-ticket-ink);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 2px 4px 0 var(--fitness-ticket-shadow);
+  color: var(--fitness-ticket-ink);
+  font: inherit;
+  font-weight: 1000;
+}
+
+.fitness-ticket-duration button {
+  cursor: pointer;
+  font-size: clamp(1.375rem, 2.2vw, 1.625rem);
+  line-height: 1;
+}
+
+.fitness-ticket-duration output {
+  gap: 8px;
+  font-size: clamp(0.9375rem, 1vw, 1rem);
+}
+
+.fitness-ticket-duration strong {
+  font-size: clamp(1.625rem, 2.3vw, 1.875rem);
+  line-height: 1;
+}
+
+.fitness-ticket-duration span {
+  margin-top: 6px;
+}
+
+.fitness-ticket-muscle-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  gap: 10px;
+}
+
+.fitness-ticket-panel-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fitness-ticket-panel-header p {
+  margin: 0;
+  max-width: 52%;
+  color: #7a3b00;
+  font-size: clamp(0.6875rem, 0.9vw, 0.8125rem);
+  font-weight: 1000;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.fitness-ticket-muscle-map {
+  display: grid;
+  min-height: 11.5rem;
+  place-items: center;
+}
+
+.fitness-ticket-muscle-map img {
+  display: block;
+  width: min(100%, 22.5rem);
+  max-height: 14.75rem;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 0 rgba(0, 0, 0, 0.13));
+}
+
+.fitness-ticket-helper,
+.fitness-ticket-error {
+  margin: 0.5rem clamp(0.875rem, 3vw, 2.25rem) 0;
+  font-size: clamp(0.75rem, 0.9vw, 0.8125rem);
+  font-weight: 1000;
+  line-height: 1.35;
+}
+
+.fitness-ticket-helper {
+  color: #5a4a21;
+}
+
+.fitness-ticket-error {
+  color: #c2410c;
+}
+
+.fitness-ticket-footer {
+  display: grid;
+  grid-template-columns: minmax(8.75rem, 0.76fr) minmax(11rem, 1fr);
+  gap: clamp(0.875rem, 3vw, 2rem);
+  align-items: center;
+  padding: clamp(0.75rem, 1.25vw, 1rem) clamp(0.875rem, 3vw, 2.25rem) 0;
+}
+
+.fitness-ticket-cancel,
+.fitness-ticket-confirm {
+  min-height: clamp(3rem, 4vw, 3.5rem);
+  border: 3px solid var(--fitness-ticket-ink);
+  border-radius: 8px;
+  box-shadow: 4px 6px 0 var(--fitness-ticket-shadow);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(1.25rem, 2vw, 1.625rem);
+  font-weight: 1000;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.fitness-ticket-cancel {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.fitness-ticket-confirm {
+  background: linear-gradient(180deg, #ffe96d, var(--fitness-ticket-yellow-deep));
+}
+
+@media (max-width: 920px) {
+  .fitness-ticket-modal-layer {
+    padding: 0.625rem;
+  }
+
+  .fitness-ticket-modal-dialog {
+    display: block;
+    min-height: auto;
+  }
+
+  .fitness-ticket-card {
+    min-height: auto;
+    padding: 1.125rem;
+  }
+
+  .fitness-ticket-header {
+    grid-template-columns: 1fr auto;
+    gap: 0.875rem;
+    min-height: 4.125rem;
+  }
+
+  .fitness-ticket-title-rule {
+    display: none;
+  }
+
+  .fitness-ticket-header h1 {
+    text-align: left;
+    white-space: normal;
+  }
+
+  .fitness-ticket-body {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1.125rem;
+  }
+
+  .fitness-ticket-controls {
+    padding-right: 0;
+    padding-bottom: 1.5rem;
+    border-right: 0;
+    border-bottom: 4px dashed var(--fitness-ticket-ink);
+  }
+
+  .fitness-ticket-muscle-map {
+    min-height: 16.25rem;
+  }
+
+  .fitness-ticket-muscle-map img {
+    width: 100%;
+    height: 13.75rem;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .fitness-ticket-panel-header {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .fitness-ticket-panel-header p {
+    max-width: none;
+    text-align: left;
+  }
+
+  .fitness-ticket-helper,
+  .fitness-ticket-error {
+    margin-inline: 0;
+  }
+
+  .fitness-ticket-footer {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.5rem 0 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .fitness-ticket-segment-grid,
+  .fitness-ticket-parts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fitness-ticket-duration {
+    grid-template-columns: 3.5rem minmax(0, 1fr) 3.5rem;
+    gap: 9px;
+  }
+
+  .fitness-ticket-cancel,
+  .fitness-ticket-confirm {
+    min-height: 4.5rem;
+  }
+}
+
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 15px);
