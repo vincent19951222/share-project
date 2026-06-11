@@ -272,3 +272,76 @@ export async function createDefaultWorkoutForPunch(
     payload: buildDefaultWorkoutPayload(),
   });
 }
+
+type WorkoutBackfillDb = {
+  punchRecord: Prisma.TransactionClient["punchRecord"];
+  workoutRecord: Prisma.TransactionClient["workoutRecord"];
+  $transaction: <T>(fn: (tx: Prisma.TransactionClient) => Promise<T>) => Promise<T>;
+};
+
+export async function backfillDefaultWorkoutRecords({ prisma }: { prisma: WorkoutBackfillDb }) {
+  const legacyPunches = await prisma.punchRecord.findMany({
+    where: {
+      punched: true,
+    },
+    select: {
+      id: true,
+      userId: true,
+      dayKey: true,
+      user: {
+        select: {
+          teamId: true,
+        },
+      },
+      workoutRecord: {
+        select: {
+          id: true,
+        },
+      },
+    },
+    orderBy: [{ dayKey: "asc" }, { createdAt: "asc" }],
+  });
+
+  let created = 0;
+  let skipped = 0;
+
+  for (const punch of legacyPunches) {
+    if (punch.workoutRecord) {
+      skipped += 1;
+      continue;
+    }
+
+    const didCreate = await prisma.$transaction(async (tx) => {
+      const existingWorkout = await tx.workoutRecord.findUnique({
+        where: { punchRecordId: punch.id },
+        select: { id: true },
+      });
+
+      if (existingWorkout) {
+        return false;
+      }
+
+      await createDefaultWorkoutForPunch({
+        tx,
+        userId: punch.userId,
+        teamId: punch.user.teamId,
+        punchRecordId: punch.id,
+        dayKey: punch.dayKey,
+      });
+
+      return true;
+    });
+
+    if (didCreate) {
+      created += 1;
+    } else {
+      skipped += 1;
+    }
+  }
+
+  return {
+    scanned: legacyPunches.length,
+    created,
+    skipped,
+  };
+}
