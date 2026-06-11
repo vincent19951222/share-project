@@ -18,6 +18,7 @@ model Team {
   activityEvents ActivityEvent[]
   coffeeRecords  CoffeeRecord[]
   drinkRecords   DrinkRecord[]
+  workoutRecords WorkoutRecord[]
   teamDynamics   TeamDynamic[]
   weeklyReportDrafts WeeklyReportDraft[]
   enterpriseWechatSendLogs EnterpriseWechatSendLog[]
@@ -49,6 +50,7 @@ model User {
   teamId                String
   team                  Team                   @relation(fields: [teamId], references: [id])
   punchRecords          PunchRecord[]
+  workoutRecords        WorkoutRecord[]
   boardNotes            BoardNote[]
   seasonStats           SeasonMemberStat[]
   activityEvents        ActivityEvent[]
@@ -438,9 +440,42 @@ model PunchRecord {
   countedForSeasonSlot       Boolean  @default(false)
   createdAt                  DateTime @default(now())
   adminMakeupLedger          AdminMakeupPunchLedger?
+  workoutRecord              WorkoutRecord?
 
   @@unique([userId, dayKey])
   @@index([boostItemUseRecordId])
+}
+
+model WorkoutRecord {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  teamId          String
+  team            Team           @relation(fields: [teamId], references: [id])
+  punchRecordId   String         @unique
+  punchRecord     PunchRecord    @relation(fields: [punchRecordId], references: [id], onDelete: Cascade)
+  dayKey          String
+  trainingType    String
+  durationMinutes Int?
+  entries         WorkoutEntry[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([userId, dayKey])
+  @@index([teamId, dayKey])
+}
+
+model WorkoutEntry {
+  id              String        @id @default(cuid())
+  workoutRecordId String
+  workoutRecord   WorkoutRecord @relation(fields: [workoutRecordId], references: [id], onDelete: Cascade)
+  category        String
+  code            String
+  label           String
+  createdAt       DateTime      @default(now())
+
+  @@unique([workoutRecordId, category, code])
+  @@index([category, code])
 }
 
 model AdminMakeupPunchLedger {
