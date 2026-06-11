@@ -40,6 +40,14 @@ function readState(container: HTMLDivElement) {
   return JSON.parse(container.querySelector("[data-testid='state']")!.textContent ?? "{}");
 }
 
+function pageText() {
+  return document.body.textContent ?? "";
+}
+
+function pageButtons() {
+  return Array.from(document.body.querySelectorAll("button"));
+}
+
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (reason?: unknown) => void;
@@ -202,11 +210,14 @@ describe("HeatmapGrid punch flow", () => {
       plusButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    expect(pageText()).toContain("今日训练小票");
+    expect(pageText()).toContain("今日训练部位肌肉图");
+
+    const confirmButton = pageButtons().find((button) =>
       button.textContent?.includes("确认打卡"),
     );
     expect(confirmButton).toBeDefined();
-    expect(container.textContent).toContain("获得 1 张健身券");
+    expect(pageText()).toContain("获得 1 张健身券");
 
     await act(async () => {
       confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -215,7 +226,18 @@ describe("HeatmapGrid punch flow", () => {
 
     const stateBeforeResponse = readState(container);
 
-    expect(fetch).toHaveBeenCalledWith("/api/board/punch", expect.objectContaining({ method: "POST" }));
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/board/punch",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          trainingType: "both",
+          cardioItem: "treadmill",
+          strengthParts: ["chest", "shoulder", "glutes"],
+          durationMinutes: 60,
+        }),
+      }),
+    );
     expect(stateBeforeResponse.gridData[0][0]).toBe(false);
     expect(stateBeforeResponse.logs).toHaveLength(0);
 
@@ -273,7 +295,7 @@ describe("HeatmapGrid punch flow", () => {
       plusButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    const confirmButton = pageButtons().find((button) =>
       button.textContent?.includes("确认打卡"),
     );
 
@@ -288,8 +310,8 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterFailure.logs).toHaveLength(1);
     expect(stateAfterFailure.logs[0].type).toBe("alert");
     expect(stateAfterFailure.logs[0].text).toContain("今天已经打过卡了");
-    expect(container.textContent).toContain("今天已经打过卡了");
-    expect(container.textContent).toContain("确认打卡今天吗？");
+    expect(pageText()).toContain("今天已经打过卡了");
+    expect(pageText()).toContain("今日训练小票");
   });
 
   it("waits for the server snapshot before undoing today's punch and adds a rollback log", async () => {
@@ -350,10 +372,10 @@ describe("HeatmapGrid punch flow", () => {
       punchedCellButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(container.textContent).toContain("撤销今天打卡");
-    expect(container.textContent).toContain("未使用的健身券");
+    expect(pageText()).toContain("撤销今天打卡");
+    expect(pageText()).toContain("未使用的健身券");
 
-    const undoButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    const undoButton = pageButtons().find((button) =>
       button.textContent?.includes("确认撤销"),
     );
     expect(undoButton).toBeDefined();
@@ -458,7 +480,7 @@ describe("HeatmapGrid punch flow", () => {
       punchedCellButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const undoButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    const undoButton = pageButtons().find((button) =>
       button.textContent?.includes("确认撤销"),
     );
     expect(undoButton).toBeDefined();
@@ -473,7 +495,7 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterFailure.gridData[0][0]).toBe(true);
     expect(stateAfterFailure.logs[0].type).toBe("alert");
     expect(stateAfterFailure.logs[0].text).toContain("健身券已经花掉了");
-    expect(container.textContent).toContain("今天打卡送出的健身券已经花掉了，不能撤销打卡。");
+    expect(pageText()).toContain("今天打卡送出的健身券已经花掉了，不能撤销打卡。");
   });
 
   it("shows a makeup entry on the current user's missed yesterday cell", async () => {
@@ -551,9 +573,9 @@ describe("HeatmapGrid punch flow", () => {
       makeupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(container.textContent).toContain("补昨天打卡");
+    expect(pageText()).toContain("补昨天打卡");
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    const confirmButton = pageButtons().find((button) =>
       button.textContent?.includes("确认补签"),
     );
     expect(confirmButton).toBeDefined();
@@ -633,9 +655,9 @@ describe("HeatmapGrid punch flow", () => {
       makeupButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(container.textContent).toContain("补昨天打卡");
+    expect(pageText()).toContain("补昨天打卡");
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    const confirmButton = pageButtons().find((button) =>
       button.textContent?.includes("确认补签"),
     );
     expect(confirmButton).toBeDefined();
@@ -650,8 +672,8 @@ describe("HeatmapGrid punch flow", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(readState(container).gridData[0][0]).toBe(false);
-    expect(container.textContent).toContain("补昨天打卡");
-    expect(container.textContent).toContain("昨天补签窗口已关闭");
+    expect(pageText()).toContain("补昨天打卡");
+    expect(pageText()).toContain("昨天补签窗口已关闭");
   });
 
   it("lets admins make up any member's missed past cell from the heatmap", async () => {
@@ -693,10 +715,10 @@ describe("HeatmapGrid punch flow", () => {
       adminMakeupButtons.at(-1)!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(container.textContent).toContain("管理员补卡");
-    expect(container.textContent).toContain("给 Luo 补 2026-04-02 的健身打卡吗？");
+    expect(pageText()).toContain("管理员补卡");
+    expect(pageText()).toContain("给 Luo 补 2026-04-02 的健身打卡吗？");
 
-    const confirmButton = Array.from(container.querySelectorAll("button")).find((button) =>
+    const confirmButton = pageButtons().find((button) =>
       button.textContent?.includes("确认补卡"),
     );
     expect(confirmButton).toBeDefined();

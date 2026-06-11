@@ -11,6 +11,7 @@ import {
 import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
 import { getAvatarUrl } from "@/lib/avatars";
+import type { WorkoutTicketPayload } from "@/lib/workouts";
 
 type PunchActionErrors = {
   punch?: string | null;
@@ -98,8 +99,13 @@ export function HeatmapGrid() {
     }
   }, [state.today]);
 
-  async function handlePunchConfirm() {
+  async function handlePunchConfirm(payload?: WorkoutTicketPayload) {
     if (submittingRef.current) {
+      return false;
+    }
+
+    if (!payload) {
+      setErrors((current) => ({ ...current, punch: "训练小票信息缺失" }));
       return false;
     }
 
@@ -110,7 +116,7 @@ export function HeatmapGrid() {
     dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
 
     try {
-      const snapshot = await submitTodayPunch();
+      const snapshot = await submitTodayPunch(payload);
 
       dispatch({
         type: "SYNC_REMOTE_STATE",
@@ -373,6 +379,7 @@ export function HeatmapGrid() {
       return (
         <PunchPopup
           key={day}
+          variant="fitness-ticket"
           busy={submitting}
           error={errors.punch ?? null}
           onConfirm={handlePunchConfirm}

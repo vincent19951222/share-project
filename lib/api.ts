@@ -12,6 +12,7 @@ import type {
 } from "@/lib/types";
 import type { DrinkType } from "@/lib/drinks";
 import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
+import type { WorkoutTicketPayload } from "@/lib/workouts";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -95,14 +96,14 @@ export async function fetchBoardState(): Promise<BoardSnapshot> {
   return readSnapshot(response);
 }
 
-export async function submitTodayPunch(): Promise<BoardSnapshot> {
+export async function submitTodayPunch(payload: WorkoutTicketPayload): Promise<BoardSnapshot> {
   const response = await fetch("/api/board/punch", {
     method: "POST",
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify(payload),
   });
 
   return readSnapshot(response);
