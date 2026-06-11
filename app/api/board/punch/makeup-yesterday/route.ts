@@ -9,6 +9,7 @@ import {
   getNextPunchStreak,
   getShanghaiDayKey,
 } from "@/lib/economy";
+import { createDefaultWorkoutForPunch } from "@/lib/workouts";
 
 class MakeupNotAllowedError extends Error {
   constructor(message = "makeup-not-allowed") {
@@ -210,7 +211,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        await tx.punchRecord.create({
+        const punch = await tx.punchRecord.create({
           data: {
             userId: user.id,
             seasonId: seasonForLedger.id,
@@ -222,6 +223,14 @@ export async function POST(request: NextRequest) {
             assetAwarded: yesterdayReward,
             countedForSeasonSlot: countsForSeasonSlot,
           },
+        });
+
+        await createDefaultWorkoutForPunch({
+          tx,
+          userId: user.id,
+          teamId: user.teamId,
+          punchRecordId: punch.id,
+          dayKey: yesterdayDayKey,
         });
 
         const existingStat = await tx.seasonMemberStat.findUnique({

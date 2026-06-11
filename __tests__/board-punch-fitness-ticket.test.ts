@@ -7,14 +7,21 @@ import { getShanghaiDayKey } from "@/lib/economy";
 import { seedDatabase } from "@/lib/db-seed";
 import { prisma } from "@/lib/prisma";
 
-function request(method: "POST" | "DELETE", userId?: string) {
+const validWorkoutPayload = {
+  trainingType: "both",
+  cardioItem: "elliptical",
+  strengthParts: ["chest", "abs"],
+  durationMinutes: 60,
+} as const;
+
+function request(method: "POST" | "DELETE", userId?: string, body: unknown = validWorkoutPayload) {
   return new NextRequest("http://localhost/api/board/punch", {
     method,
     headers: {
       "Content-Type": "application/json",
       ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify(method === "POST" ? body : {}),
   });
 }
 
@@ -133,6 +140,7 @@ describe("fitness punch ticket hook", () => {
     });
 
     expect(todayPunch).toBeNull();
+    await expect(prisma.workoutRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(0);
     expect(user.ticketBalance).toBe(0);
     expect(revokeLedger).toMatchObject({
       delta: -1,

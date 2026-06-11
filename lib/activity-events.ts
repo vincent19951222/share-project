@@ -36,12 +36,19 @@ export interface ActivityEventWithUser {
   };
 }
 
-export function buildPunchActivityMessage(username: string, reward: number, boostLabel?: string | null) {
+export function buildPunchActivityMessage(
+  username: string,
+  reward: number,
+  boostLabel?: string | null,
+  workoutSummary?: string | null,
+) {
+  const workoutText = workoutSummary ? `，${workoutSummary}` : "";
+
   if (boostLabel) {
-    return `${username} 刚刚打卡，拿下 ${reward} 银子，${boostLabel}生效`;
+    return `${username} 刚刚打卡${workoutText}，拿下 ${reward} 银子，${boostLabel}生效`;
   }
 
-  return `${username} 刚刚打卡，拿下 ${reward} 银子`;
+  return `${username} 刚刚打卡${workoutText}，拿下 ${reward} 银子`;
 }
 
 export function buildUndoPunchActivityMessage(username: string, consumedBoostLabel?: string | null) {

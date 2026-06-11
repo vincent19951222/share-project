@@ -5,6 +5,7 @@ import { buildBoardSnapshotForUser, getCurrentBoardDay } from "@/lib/board-state
 import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 import { isAdminUser, loadCurrentUser } from "@/lib/session";
+import { createDefaultWorkoutForPunch } from "@/lib/workouts";
 
 const ADMIN_MAKEUP_REWARD = 10;
 const SHANGHAI_DAY_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -253,6 +254,14 @@ export async function POST(request: NextRequest) {
             seasonContributionAwarded,
             countedForSeasonSlot: Boolean(seasonForLedger && countsForSeasonSlot),
           },
+        });
+
+        await createDefaultWorkoutForPunch({
+          tx,
+          userId: target.id,
+          teamId: admin.teamId,
+          punchRecordId: punch.id,
+          dayKey,
         });
 
         await tx.user.update({

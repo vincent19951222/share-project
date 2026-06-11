@@ -32,6 +32,12 @@ import {
 } from "@/lib/high-value-push";
 import { TEAM_DYNAMIC_TYPES } from "@/lib/team-dynamics";
 import { createOrReuseTeamDynamic } from "@/lib/team-dynamics-service";
+import {
+  buildWorkoutSummary,
+  createWorkoutForPunch,
+  parseWorkoutTicketPayload,
+  type WorkoutTicketPayload,
+} from "@/lib/workouts";
 
 const STREAK_MILESTONES = new Set([7, 14, 30]);
 
@@ -67,6 +73,22 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "invalid-workout-payload" }, { status: 400 });
+    }
+
+    const parsedWorkout = parseWorkoutTicketPayload(body);
+
+    if (!parsedWorkout.ok) {
+      return NextResponse.json({ error: parsedWorkout.error }, { status: 400 });
+    }
+
+    const workoutPayload: WorkoutTicketPayload = parsedWorkout.payload;
+    const workoutSummary = buildWorkoutSummary(workoutPayload);
 
     const now = new Date();
     const today = getCurrentBoardDay(now);
@@ -221,6 +243,14 @@ export async function POST(request: NextRequest) {
             countedForSeasonSlot: Boolean(seasonForLedger && countsForSeasonSlot),
           },
         });
+        await createWorkoutForPunch({
+          tx,
+          userId: user.id,
+          teamId: user.teamId,
+          punchRecordId: punch.id,
+          dayKey: todayDayKey,
+          payload: workoutPayload,
+        });
         const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
 
         await grantFitnessPunchExperience({
@@ -293,6 +323,7 @@ export async function POST(request: NextRequest) {
               user.username,
               boostSettlement.assetAwarded,
               boostSettlement.boostLabel,
+              workoutSummary,
             ),
             assetAwarded: boostSettlement.assetAwarded,
             createdAt: now,
@@ -528,6 +559,20 @@ export async function DELETE(request: NextRequest) {
 
         if (!todayPunch) {
           throw new TodayPunchNotFoundError();
+        }
+
+        const todayWorkout = await tx.workoutRecord.findUnique({
+          where: { punchRecordId: todayPunch.id },
+          select: { id: true },
+        });
+
+        if (todayWorkout) {
+          await tx.workoutEntry.deleteMany({
+            where: { workoutRecordId: todayWorkout.id },
+          });
+          await tx.workoutRecord.delete({
+            where: { id: todayWorkout.id },
+          });
         }
 
         const grantLedger = shouldGrantFitnessPunchTicket(todayPunch)

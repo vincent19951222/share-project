@@ -9,14 +9,21 @@ import { getCurrentBoardDay } from "@/lib/board-state";
 import { getPreviousShanghaiDayKey, getShanghaiDayKey } from "@/lib/economy";
 import { createCookieValue } from "@/lib/auth";
 
-function request(method: "POST" | "DELETE", userId?: string) {
+const validWorkoutPayload = {
+  trainingType: "both",
+  cardioItem: "elliptical",
+  strengthParts: ["chest", "abs"],
+  durationMinutes: 60,
+} as const;
+
+function request(method: "POST" | "DELETE", userId?: string, body: unknown = validWorkoutPayload) {
   return new NextRequest("http://localhost/api/board/punch", {
     method,
     headers: {
       "Content-Type": "application/json",
       ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify(method === "POST" ? body : {}),
   });
 }
 
@@ -90,6 +97,12 @@ describe("/api/board/punch", () => {
     await prisma.adminMakeupPunchLedger.deleteMany({
       where: {
         teamId: user.teamId,
+      },
+    });
+    await prisma.workoutEntry.deleteMany();
+    await prisma.workoutRecord.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
       },
     });
     await prisma.punchRecord.deleteMany({
@@ -245,8 +258,60 @@ describe("/api/board/punch", () => {
       },
       orderBy: { createdAt: "desc" },
     });
-    expect(activity.message).toBe("li 刚刚打卡，拿下 20 银子");
+    expect(activity.message).toBe("li 刚刚打卡，椭圆机 + 胸 / 腹 · 60 分钟，拿下 20 银子");
     expect(activity.assetAwarded).toBe(20);
+  });
+
+  it("creates structured workout rows for today's punch payload", async () => {
+    await resetState();
+
+    const response = await POST(request("POST", userId));
+    expect(response.status).toBe(200);
+
+    const punch = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const workout = await prisma.workoutRecord.findUniqueOrThrow({
+      where: { punchRecordId: punch.id },
+      include: { entries: { orderBy: [{ category: "asc" }, { code: "asc" }] } },
+    });
+
+    expect(workout).toMatchObject({
+      userId,
+      teamId: user.teamId,
+      punchRecordId: punch.id,
+      dayKey: todayDayKey,
+      trainingType: "both",
+      durationMinutes: 60,
+    });
+    expect(workout.entries.map((entry) => [entry.category, entry.code, entry.label])).toEqual([
+      ["cardio", "elliptical", "椭圆机"],
+      ["strength", "abs", "腹"],
+      ["strength", "chest", "胸"],
+    ]);
+
+    const activity = await prisma.activityEvent.findFirstOrThrow({
+      where: { userId, type: "PUNCH" },
+      orderBy: { createdAt: "desc" },
+    });
+    expect(activity.message).toContain("椭圆机 + 胸 / 腹 · 60 分钟");
+  });
+
+  it("rejects invalid workout payloads before creating today's punch", async () => {
+    await resetState();
+
+    const response = await POST(request("POST", userId, {
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: [],
+      durationMinutes: 60,
+    }));
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: "invalid-workout-payload" });
+    await expect(prisma.punchRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(0);
+    await expect(prisma.workoutRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(0);
   });
 
   it("settles a pending fitness boost when the real punch is created", async () => {
@@ -757,6 +822,23 @@ describe("/api/board/punch", () => {
     expect(record.assetAwarded).toBe(20);
     expect(record.streakAfterPunch).toBe(2);
     expect(record.countedForSeasonSlot).toBe(true);
+    const workout = await prisma.workoutRecord.findUniqueOrThrow({
+      where: { punchRecordId: record.id },
+      include: { entries: true },
+    });
+
+    expect(workout).toMatchObject({
+      userId,
+      dayKey: yesterdayDayKey,
+      trainingType: "cardio",
+      durationMinutes: null,
+    });
+    expect(workout.entries).toHaveLength(1);
+    expect(workout.entries[0]).toMatchObject({
+      category: "cardio",
+      code: "treadmill",
+      label: "跑步机",
+    });
     expect(after.coins).toBe(before.coins + 20);
     expect(after.currentStreak).toBe(2);
     expect(after.lastPunchDayKey).toBe(yesterdayDayKey);
@@ -1012,6 +1094,23 @@ describe("/api/board/punch", () => {
     );
 
     expect(record.punchType).toBe("admin-makeup");
+    const workout = await prisma.workoutRecord.findUniqueOrThrow({
+      where: { punchRecordId: record.id },
+      include: { entries: true },
+    });
+
+    expect(workout).toMatchObject({
+      userId: target.id,
+      dayKey: makeupDayKey,
+      trainingType: "cardio",
+      durationMinutes: null,
+    });
+    expect(workout.entries).toHaveLength(1);
+    expect(workout.entries[0]).toMatchObject({
+      category: "cardio",
+      code: "treadmill",
+      label: "跑步机",
+    });
     expect(record.assetAwarded).toBe(10);
     expect(record.baseAssetAwarded).toBe(10);
     expect(record.boostAssetBonus).toBe(0);
@@ -1125,6 +1224,7 @@ describe("/api/board/punch", () => {
     });
 
     expect(records).toHaveLength(1);
+    await expect(prisma.workoutRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(1);
     expect(after.coins).toBe(middle.coins);
     expect(after.coins).toBe(before.coins + 10);
   });
@@ -1458,6 +1558,24 @@ describe("/api/board/punch", () => {
       currentStreak: 4,
       nextReward: 50,
     });
+  });
+
+  it("deletes workout rows when today's punch is undone", async () => {
+    await resetState();
+
+    const punchResponse = await POST(request("POST", userId));
+    expect(punchResponse.status).toBe(200);
+
+    const punch = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    await expect(prisma.workoutRecord.count({ where: { punchRecordId: punch.id } })).resolves.toBe(1);
+
+    const undoResponse = await DELETE(request("DELETE", userId));
+    expect(undoResponse.status).toBe(200);
+
+    await expect(prisma.workoutRecord.count({ where: { punchRecordId: punch.id } })).resolves.toBe(0);
+    await expect(prisma.workoutEntry.count()).resolves.toBe(0);
   });
 
   it("undoes today's season punch and rolls back season income plus progress", async () => {
