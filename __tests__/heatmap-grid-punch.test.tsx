@@ -372,11 +372,12 @@ describe("HeatmapGrid punch flow", () => {
       punchedCellButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(pageText()).toContain("撤销今天打卡");
-    expect(pageText()).toContain("未使用的健身券");
+    expect(pageText()).toContain("今日训练小票");
+    expect(pageText()).toContain("保存后只更新今天的训练明细，不重复发健身券。");
+    expect(pageText()).toContain("撤销打卡");
 
     const undoButton = pageButtons().find((button) =>
-      button.textContent?.includes("确认撤销"),
+      button.textContent?.includes("撤销打卡"),
     );
     expect(undoButton).toBeDefined();
 
@@ -481,7 +482,7 @@ describe("HeatmapGrid punch flow", () => {
     });
 
     const undoButton = pageButtons().find((button) =>
-      button.textContent?.includes("确认撤销"),
+      button.textContent?.includes("撤销打卡"),
     );
     expect(undoButton).toBeDefined();
 
@@ -496,6 +497,76 @@ describe("HeatmapGrid punch flow", () => {
     expect(stateAfterFailure.logs[0].type).toBe("alert");
     expect(stateAfterFailure.logs[0].text).toContain("健身券已经花掉了");
     expect(pageText()).toContain("今天打卡送出的健身券已经花掉了，不能撤销打卡。");
+  });
+
+  it("opens today's punched current-user cell as an editable workout ticket", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        snapshot: {
+          ...createSnapshot({
+            gridData: [[true, null], [false, null]],
+            currentUserTodayWorkout: {
+              trainingType: "both",
+              cardioItem: "treadmill",
+              strengthParts: ["chest"],
+              durationMinutes: 60,
+            },
+          }),
+        },
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const punchedState: BoardState = {
+      ...initialState,
+      gridData: [[true, null], [false, null]],
+      currentUserTodayWorkout: {
+        trainingType: "both",
+        cardioItem: "treadmill",
+        strengthParts: ["chest"],
+        durationMinutes: 60,
+      },
+    };
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={punchedState}>
+          <HeatmapGrid />
+          <Probe />
+        </BoardProvider>,
+      );
+    });
+
+    const punchedButton = Array.from(container.querySelectorAll("button")).find((button) => button.textContent?.trim() === "✓");
+
+    await act(async () => {
+      punchedButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(document.body.textContent).toContain("今日训练小票");
+    expect(document.body.textContent).toContain("保存修改");
+    expect(document.body.textContent).toContain("撤销打卡");
+    expect(document.body.textContent).toContain("胸");
+
+    const absButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.trim() === "腹");
+    const saveButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("保存修改"));
+
+    await act(async () => {
+      absButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      saveButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/board/punch", expect.objectContaining({
+      method: "PATCH",
+      body: JSON.stringify({
+        trainingType: "both",
+        cardioItem: "treadmill",
+        strengthParts: ["chest", "abs"],
+        durationMinutes: 60,
+      }),
+    }));
   });
 
   it("shows a makeup entry on the current user's missed yesterday cell", async () => {

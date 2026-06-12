@@ -7,6 +7,7 @@ import {
   submitAdminMakeupPunch,
   submitTodayPunch,
   submitYesterdayMakeupPunch,
+  updateTodayWorkout,
 } from "@/lib/api";
 import { dispatchCalendarRefresh } from "@/lib/calendar-refresh";
 import { PunchPopup } from "@/components/ui/PunchPopup";
@@ -15,6 +16,7 @@ import type { WorkoutTicketPayload } from "@/lib/workouts";
 
 type PunchActionErrors = {
   punch?: string | null;
+  edit?: string | null;
   undo?: string | null;
   makeup?: string | null;
   adminMakeup?: string | null;
@@ -145,6 +147,63 @@ export function HeatmapGrid() {
         log: {
           id: `punch-error-${Date.now()}`,
           text: `打卡失败：${message}`,
+          type: "alert",
+          timestamp: new Date(),
+        },
+      });
+      return false;
+    } finally {
+      setSubmitting(false);
+      submittingRef.current = false;
+    }
+  }
+
+  async function handleWorkoutUpdate(payload?: WorkoutTicketPayload) {
+    if (submittingRef.current) {
+      return false;
+    }
+
+    if (!payload) {
+      setErrors((current) => ({ ...current, edit: "训练小票信息缺失" }));
+      return false;
+    }
+
+    submittingRef.current = true;
+    setSubmitting(true);
+    setErrors((current) => ({ ...current, edit: null }));
+    const punchEpoch = reservePunchEpoch();
+    dispatch({ type: "BEGIN_PUNCH_SYNC", punchEpoch });
+
+    try {
+      const snapshot = await updateTodayWorkout(payload);
+
+      dispatch({
+        type: "SYNC_REMOTE_STATE",
+        snapshot,
+        source: "punch",
+        punchEpoch,
+      });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `workout-update-${Date.now()}`,
+          text: "<b>你</b> 已更新今日训练小票，服务器状态已同步。",
+          type: "highlight",
+          timestamp: new Date(),
+        },
+      });
+      window.dispatchEvent(new Event("activity-events:refresh"));
+      dispatchCalendarRefresh();
+      return true;
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "保存失败";
+      setErrors((current) => ({ ...current, edit: message }));
+      dispatch({ type: "END_PUNCH_SYNC", punchEpoch });
+      dispatch({
+        type: "ADD_LOG",
+        log: {
+          id: `workout-update-error-${Date.now()}`,
+          text: `保存训练小票失败：${message}`,
           type: "alert",
           timestamp: new Date(),
         },
@@ -393,16 +452,19 @@ export function HeatmapGrid() {
       return (
         <PunchPopup
           key={day}
+          variant="fitness-ticket"
           busy={submitting}
-          error={errors.undo ?? null}
-          onConfirm={handlePunchUndo}
+          error={errors.edit ?? errors.undo ?? null}
+          onConfirm={handleWorkoutUpdate}
+          onDangerAction={handlePunchUndo}
+          dangerLabel="撤销打卡"
+          dangerBusyLabel="撤销中..."
           triggerContent="✓"
           triggerClassName={`${cellClassName} cell-punched cursor-pointer disabled:opacity-50`}
-          title="撤销今天打卡"
-          description="确认撤销今天的打卡吗？"
-          helperText="撤销后会回滚今天获得的银子、连签、赛季进度和未使用的健身券。"
-          confirmLabel="确认撤销"
-          busyLabel="撤销中..."
+          initialWorkoutPayload={state.currentUserTodayWorkout ?? null}
+          helperText="保存后只更新今天的训练明细，不重复发健身券。"
+          confirmLabel="保存修改"
+          busyLabel="保存中..."
         />
       );
     }
