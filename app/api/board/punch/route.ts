@@ -36,6 +36,7 @@ import {
   buildWorkoutSummary,
   createWorkoutForPunch,
   parseWorkoutTicketPayload,
+  replaceWorkoutForPunch,
   type WorkoutTicketPayload,
 } from "@/lib/workouts";
 
@@ -502,6 +503,83 @@ export async function POST(request: NextRequest) {
 
     if (pushTasks.length > 0) {
       await Promise.allSettled(pushTasks);
+    }
+
+    return buildSnapshotResponse(user.id, now);
+  } catch {
+    return NextResponse.json({ error: "server-error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const userId = parseCookieValue(request.cookies.get("userId")?.value);
+
+    if (!userId) {
+      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "invalid-workout-payload" }, { status: 400 });
+    }
+
+    const parsedWorkout = parseWorkoutTicketPayload(body);
+
+    if (!parsedWorkout.ok) {
+      return NextResponse.json({ error: parsedWorkout.error }, { status: 400 });
+    }
+
+    const workoutPayload: WorkoutTicketPayload = parsedWorkout.payload;
+    const now = new Date();
+    const todayDayKey = getShanghaiDayKey(now);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        teamId: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "user-not-found" }, { status: 401 });
+    }
+
+    const didUpdate = await prisma.$transaction(async (tx) => {
+      const todayPunch = await tx.punchRecord.findUnique({
+        where: {
+          userId_dayKey: {
+            userId: user.id,
+            dayKey: todayDayKey,
+          },
+        },
+        select: {
+          id: true,
+          punched: true,
+        },
+      });
+
+      if (!todayPunch?.punched) {
+        return false;
+      }
+
+      await replaceWorkoutForPunch({
+        tx,
+        userId: user.id,
+        teamId: user.teamId,
+        punchRecordId: todayPunch.id,
+        dayKey: todayDayKey,
+        payload: workoutPayload,
+      });
+
+      return true;
+    });
+
+    if (!didUpdate) {
+      return NextResponse.json({ error: "today-punch-not-found" }, { status: 404 });
     }
 
     return buildSnapshotResponse(user.id, now);

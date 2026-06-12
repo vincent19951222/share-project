@@ -109,6 +109,19 @@ export async function submitTodayPunch(payload: WorkoutTicketPayload): Promise<B
   return readSnapshot(response);
 }
 
+export async function updateTodayWorkout(payload: WorkoutTicketPayload): Promise<BoardSnapshot> {
+  const response = await fetch("/api/board/punch", {
+    method: "PATCH",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return readSnapshot(response);
+}
+
 export async function deleteTodayPunch(): Promise<BoardSnapshot> {
   const response = await fetch("/api/board/punch", {
     method: "DELETE",

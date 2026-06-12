@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { DELETE, POST } from "@/app/api/board/punch/route";
+import { DELETE, PATCH, POST } from "@/app/api/board/punch/route";
 import { POST as POST_ADMIN_MAKEUP } from "@/app/api/admin/board/makeup-punch/route";
 import { POST as POST_MAKEUP_YESTERDAY } from "@/app/api/board/punch/makeup-yesterday/route";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +24,17 @@ function request(method: "POST" | "DELETE", userId?: string, body: unknown = val
       ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
     },
     body: JSON.stringify(method === "POST" ? body : {}),
+  });
+}
+
+function patchRequest(userId?: string, body: unknown = validWorkoutPayload) {
+  return new NextRequest("http://localhost/api/board/punch", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(userId ? { Cookie: `userId=${createCookieValue(userId)}` } : {}),
+    },
+    body: JSON.stringify(body),
   });
 }
 
@@ -312,6 +323,99 @@ describe("/api/board/punch", () => {
     await expect(response.json()).resolves.toMatchObject({ error: "invalid-workout-payload" });
     await expect(prisma.punchRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(0);
     await expect(prisma.workoutRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(0);
+  });
+
+  it("updates today's workout ticket without granting another reward", async () => {
+    await resetState();
+
+    const punchResponse = await POST(request("POST", userId));
+    expect(punchResponse.status).toBe(200);
+
+    const beforeUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const beforeTicketLedgers = await prisma.lotteryTicketLedger.count({ where: { userId } });
+    const beforePunchCount = await prisma.punchRecord.count({ where: { userId, dayKey: todayDayKey } });
+    const beforeActivityCount = await prisma.activityEvent.count({ where: { userId, type: "PUNCH" } });
+
+    const response = await PATCH(patchRequest(userId, {
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: ["shoulder", "abs"],
+      durationMinutes: 50,
+    }));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    const afterUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const workout = await prisma.workoutRecord.findFirstOrThrow({
+      where: { userId, dayKey: todayDayKey },
+      include: { entries: { orderBy: [{ category: "asc" }, { code: "asc" }] } },
+    });
+
+    expect(afterUser.coins).toBe(beforeUser.coins);
+    expect(afterUser.ticketBalance).toBe(beforeUser.ticketBalance);
+    expect(afterUser.currentStreak).toBe(beforeUser.currentStreak);
+    expect(await prisma.lotteryTicketLedger.count({ where: { userId } })).toBe(beforeTicketLedgers);
+    expect(await prisma.punchRecord.count({ where: { userId, dayKey: todayDayKey } })).toBe(beforePunchCount);
+    expect(await prisma.activityEvent.count({ where: { userId, type: "PUNCH" } })).toBe(beforeActivityCount);
+    expect(workout).toMatchObject({
+      trainingType: "strength",
+      durationMinutes: 50,
+    });
+    expect(workout.entries.map((entry) => [entry.category, entry.code, entry.label])).toEqual([
+      ["strength", "abs", "腹"],
+      ["strength", "shoulder", "肩"],
+    ]);
+    expect(body.snapshot.currentUserTodayWorkout).toEqual({
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: ["shoulder", "abs"],
+      durationMinutes: 50,
+    });
+  });
+
+  it("rejects workout ticket edits before today's punch exists", async () => {
+    await resetState();
+
+    const response = await PATCH(patchRequest(userId, {
+      trainingType: "cardio",
+      cardioItem: "treadmill",
+      strengthParts: [],
+      durationMinutes: 40,
+    }));
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toMatchObject({ error: "today-punch-not-found" });
+    await expect(prisma.workoutRecord.count({ where: { userId, dayKey: todayDayKey } })).resolves.toBe(0);
+  });
+
+  it("rejects invalid workout ticket edits without changing the stored workout", async () => {
+    await resetState();
+
+    const punchResponse = await POST(request("POST", userId));
+    expect(punchResponse.status).toBe(200);
+    const beforeWorkout = await prisma.workoutRecord.findFirstOrThrow({
+      where: { userId, dayKey: todayDayKey },
+      include: { entries: { orderBy: [{ category: "asc" }, { code: "asc" }] } },
+    });
+
+    const response = await PATCH(patchRequest(userId, {
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: [],
+      durationMinutes: 50,
+    }));
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: "invalid-workout-payload" });
+    const afterWorkout = await prisma.workoutRecord.findUniqueOrThrow({
+      where: { id: beforeWorkout.id },
+      include: { entries: { orderBy: [{ category: "asc" }, { code: "asc" }] } },
+    });
+    expect(afterWorkout.trainingType).toBe(beforeWorkout.trainingType);
+    expect(afterWorkout.durationMinutes).toBe(beforeWorkout.durationMinutes);
+    expect(afterWorkout.entries.map((entry) => [entry.category, entry.code])).toEqual(
+      beforeWorkout.entries.map((entry) => [entry.category, entry.code]),
+    );
   });
 
   it("settles a pending fitness boost when the real punch is created", async () => {
