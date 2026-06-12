@@ -11,11 +11,15 @@ import type {
 type FitnessPunchTicketProps = {
   onCancel?: () => void;
   onConfirm?: (payload: WorkoutTicketPayload) => Promise<boolean> | boolean;
+  initialPayload?: WorkoutTicketPayload | null;
   busy?: boolean;
   error?: string | null;
   helperText?: string;
   confirmLabel?: string;
   busyLabel?: string;
+  dangerLabel?: string;
+  dangerBusyLabel?: string;
+  onDangerAction?: () => Promise<boolean> | boolean;
 };
 
 const trainingTypes: Array<{ id: TrainingType; label: string }> = [
@@ -39,6 +43,13 @@ const strengthParts: Array<{ id: StrengthPart; label: string }> = [
   { id: "abs", label: "腹" },
 ];
 
+const defaultTicketPayload: WorkoutTicketPayload = {
+  trainingType: "both",
+  cardioItem: "treadmill",
+  strengthParts: ["chest", "shoulder", "glutes"],
+  durationMinutes: 60,
+};
+
 function togglePart(parts: StrengthPart[], part: StrengthPart) {
   if (parts.includes(part)) {
     return parts.filter((item) => item !== part);
@@ -50,20 +61,25 @@ function togglePart(parts: StrengthPart[], part: StrengthPart) {
 export function FitnessPunchTicket({
   onCancel,
   onConfirm,
+  initialPayload = null,
   busy = false,
   error = null,
   helperText = "确认后会记为今日健身打卡，并获得 1 张健身券。",
   confirmLabel = "确认打卡",
   busyLabel = "提交中...",
+  dangerLabel,
+  dangerBusyLabel = "处理中...",
+  onDangerAction,
 }: FitnessPunchTicketProps) {
-  const [trainingType, setTrainingType] = useState<TrainingType>("both");
-  const [cardioItem, setCardioItem] = useState<CardioItem>("treadmill");
-  const [selectedParts, setSelectedParts] = useState<StrengthPart[]>(["chest", "shoulder", "glutes"]);
-  const [duration, setDuration] = useState(60);
-  const trainingTypeRef = useRef(trainingType);
-  const cardioItemRef = useRef(cardioItem);
-  const selectedPartsRef = useRef(selectedParts);
-  const durationRef = useRef(duration);
+  const startingPayload = initialPayload ?? defaultTicketPayload;
+  const [trainingType, setTrainingType] = useState<TrainingType>(startingPayload.trainingType);
+  const [cardioItem, setCardioItem] = useState<CardioItem>(startingPayload.cardioItem ?? "treadmill");
+  const [selectedParts, setSelectedParts] = useState<StrengthPart[]>(startingPayload.strengthParts);
+  const [duration, setDuration] = useState(startingPayload.durationMinutes);
+  const trainingTypeRef = useRef(startingPayload.trainingType);
+  const cardioItemRef = useRef<CardioItem>(startingPayload.cardioItem ?? "treadmill");
+  const selectedPartsRef = useRef(startingPayload.strengthParts);
+  const durationRef = useRef(startingPayload.durationMinutes);
   const requiresStrengthPart = trainingType === "strength" || trainingType === "both";
   const isSelectionValid = !requiresStrengthPart || selectedParts.length > 0;
 
@@ -115,6 +131,18 @@ export function FitnessPunchTicket({
     }
 
     const ok = await onConfirm(buildPayload());
+
+    if (ok) {
+      onCancel?.();
+    }
+  }
+
+  async function handleDangerAction() {
+    if (busy || !onDangerAction) {
+      return;
+    }
+
+    const ok = await onDangerAction();
 
     if (ok) {
       onCancel?.();
@@ -232,6 +260,16 @@ export function FitnessPunchTicket({
         <p className="fitness-ticket-helper">{helperText}</p>
 
         <footer className="fitness-ticket-footer">
+          {onDangerAction && dangerLabel ? (
+            <button
+              className="fitness-ticket-cancel fitness-ticket-danger"
+              type="button"
+              disabled={busy}
+              onClick={handleDangerAction}
+            >
+              {busy ? dangerBusyLabel : dangerLabel}
+            </button>
+          ) : null}
           <button className="fitness-ticket-cancel" type="button" disabled={busy} onClick={onCancel}>
             取消
           </button>

@@ -4945,6 +4945,7 @@ body {
 .fitness-ticket-option-active:disabled,
 .fitness-ticket-close:disabled,
 .fitness-ticket-cancel:disabled,
+.fitness-ticket-danger:disabled,
 .fitness-ticket-confirm:disabled,
 .fitness-ticket-duration button:disabled {
   cursor: not-allowed;
@@ -4955,6 +4956,7 @@ body {
 .fitness-ticket-option-active:active,
 .fitness-ticket-close:active,
 .fitness-ticket-cancel:active,
+.fitness-ticket-danger:active,
 .fitness-ticket-confirm:active,
 .fitness-ticket-duration button:active {
   transform: translate(3px, 4px);
@@ -5081,6 +5083,11 @@ body {
 
 .fitness-ticket-cancel {
   background: rgba(255, 255, 255, 0.92);
+}
+
+.fitness-ticket-danger {
+  background: #fff1f2;
+  color: #9f1239;
 }
 
 .fitness-ticket-confirm {

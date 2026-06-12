@@ -18,6 +18,10 @@ interface PunchPopupProps {
   helperText?: string;
   confirmLabel?: string;
   busyLabel?: string;
+  initialWorkoutPayload?: WorkoutTicketPayload | null;
+  onDangerAction?: () => Promise<boolean> | boolean;
+  dangerLabel?: string;
+  dangerBusyLabel?: string;
 }
 
 export function PunchPopup({
@@ -32,6 +36,10 @@ export function PunchPopup({
   helperText = "确认后会直接记为今日健身打卡。",
   confirmLabel = "确认打卡",
   busyLabel = "提交中...",
+  initialWorkoutPayload = null,
+  onDangerAction,
+  dangerLabel,
+  dangerBusyLabel = "处理中...",
 }: PunchPopupProps) {
   const [show, setShow] = useState(false);
 
@@ -70,6 +78,10 @@ export function PunchPopup({
             helperText={helperText}
             confirmLabel={confirmLabel}
             busyLabel={busyLabel}
+            initialPayload={initialWorkoutPayload}
+            onDangerAction={onDangerAction}
+            dangerLabel={dangerLabel}
+            dangerBusyLabel={dangerBusyLabel}
             onCancel={() => !busy && setShow(false)}
             onConfirm={onConfirm}
           />

@@ -161,6 +161,81 @@ describe("PunchPopup", () => {
     expect(document.body.querySelector(".fitness-ticket-modal-layer")?.parentElement).toBe(document.body);
   });
 
+  it("prefills the fitness ticket from an existing workout payload", async () => {
+    const onConfirm = vi.fn().mockResolvedValue(true);
+
+    await act(async () => {
+      root.render(
+        <PunchPopup
+          onConfirm={onConfirm}
+          variant="fitness-ticket"
+          confirmLabel="保存修改"
+          initialWorkoutPayload={{
+            trainingType: "strength",
+            cardioItem: null,
+            strengthParts: ["back", "abs"],
+            durationMinutes: 50,
+          }}
+        />,
+      );
+    });
+
+    const trigger = Array.from(container.querySelectorAll("button")).find((button) => button.textContent?.trim() === "+");
+
+    await act(async () => {
+      trigger!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(pageText()).toContain("背 / 腹");
+    expect(pageText()).toContain("50");
+
+    const confirmButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("保存修改"));
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(onConfirm).toHaveBeenCalledWith({
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: ["back", "abs"],
+      durationMinutes: 50,
+    });
+  });
+
+  it("runs the fitness ticket danger action and closes on success", async () => {
+    const onConfirm = vi.fn().mockResolvedValue(true);
+    const onDangerAction = vi.fn().mockResolvedValue(true);
+
+    await act(async () => {
+      root.render(
+        <PunchPopup
+          onConfirm={onConfirm}
+          variant="fitness-ticket"
+          onDangerAction={onDangerAction}
+          dangerLabel="撤销打卡"
+        />,
+      );
+    });
+
+    const trigger = Array.from(container.querySelectorAll("button")).find((button) => button.textContent?.trim() === "+");
+
+    await act(async () => {
+      trigger!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const dangerButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("撤销打卡"));
+
+    await act(async () => {
+      dangerButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(onDangerAction).toHaveBeenCalledTimes(1);
+    expect(pageText()).not.toContain("今日训练小票");
+  });
+
   it("keeps the dialog open and shows inline error when async confirm fails", async () => {
     const onConfirm = vi.fn().mockResolvedValue(false);
 
