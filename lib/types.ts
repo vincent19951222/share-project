@@ -1,4 +1,5 @@
 import type { DrinkType } from "@/lib/drinks";
+import type { WorkoutTicketPayload } from "@/lib/workouts";
 
 export interface Member {
   id: string;
@@ -727,6 +728,7 @@ export interface BoardSnapshot {
   currentUser?: CurrentUserSnapshot;
   activeSeason?: ActiveSeasonSnapshot | null;
   monthKey?: string;
+  currentUserTodayWorkout?: WorkoutTicketPayload | null;
   /** @deprecated Kept only while the UI migrates to teamVaultTotal. */
   teamCoins?: number;
   /** @deprecated Kept only while the UI migrates to activeSeason target slots. */

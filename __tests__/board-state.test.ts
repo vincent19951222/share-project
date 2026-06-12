@@ -160,6 +160,57 @@ describe("board-state", () => {
     expect(snapshot).toBeNull();
   });
 
+  it("includes the current user's today workout payload when today's punch has a workout", async () => {
+    const fixedNow = new Date("2026-04-18T09:00:00+08:00");
+    const todayDayKey = "2026-04-18";
+    await prisma.punchRecord.deleteMany({ where: { userId, dayKey: todayDayKey } });
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const punch = await prisma.punchRecord.create({
+      data: {
+        userId,
+        seasonId: null,
+        dayIndex: getCurrentBoardDay(fixedNow),
+        dayKey: todayDayKey,
+        punched: true,
+        punchType: "default",
+        streakAfterPunch: 1,
+        assetAwarded: 10,
+        countedForSeasonSlot: false,
+      },
+    });
+    await prisma.workoutRecord.create({
+      data: {
+        userId,
+        teamId: user.teamId,
+        punchRecordId: punch.id,
+        dayKey: todayDayKey,
+        trainingType: "both",
+        durationMinutes: 60,
+        entries: {
+          create: [
+            { category: "cardio", code: "elliptical", label: "椭圆机" },
+            { category: "strength", code: "chest", label: "胸" },
+            { category: "strength", code: "abs", label: "腹" },
+          ],
+        },
+      },
+    });
+
+    try {
+      const snapshot = await buildBoardSnapshotForUser(userId, fixedNow);
+
+      expect(snapshot?.currentUserTodayWorkout).toEqual({
+        trainingType: "both",
+        cardioItem: "elliptical",
+        strengthParts: ["chest", "abs"],
+        durationMinutes: 60,
+      });
+    } finally {
+      await prisma.punchRecord.deleteMany({ where: { userId, dayKey: todayDayKey } });
+    }
+  });
+
   it("ignores an active season from a different month", async () => {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
