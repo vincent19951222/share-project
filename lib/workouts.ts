@@ -224,6 +224,19 @@ export function buildWorkoutSummary(payload: WorkoutCreatePayload): string {
 }
 
 type WorkoutTx = Pick<Prisma.TransactionClient, "workoutRecord">;
+type WorkoutReplaceTx = Pick<Prisma.TransactionClient, "workoutRecord">;
+
+type StoredWorkoutEntry = {
+  category: string;
+  code: string;
+  label: string;
+};
+
+type StoredWorkoutRecord = {
+  trainingType: string;
+  durationMinutes: number | null;
+  entries: StoredWorkoutEntry[];
+};
 
 export async function createWorkoutForPunch({
   tx,
@@ -255,6 +268,77 @@ export async function createWorkoutForPunch({
       trainingType: payload.trainingType,
       durationMinutes: payload.durationMinutes,
       entries: {
+        create: entries,
+      },
+    },
+    include: {
+      entries: true,
+    },
+  });
+}
+
+export function mapWorkoutRecordToTicketPayload(
+  workout: StoredWorkoutRecord | null,
+): WorkoutTicketPayload | null {
+  if (!workout) {
+    return null;
+  }
+
+  const cardioEntry = workout.entries.find(
+    (entry) => entry.category === "cardio" && isCardioItem(entry.code),
+  );
+  const strengthParts = STRENGTH_PARTS.filter((part) =>
+    workout.entries.some((entry) => entry.category === "strength" && entry.code === part),
+  );
+  const parsed = parseWorkoutTicketPayload({
+    trainingType: workout.trainingType,
+    cardioItem: cardioEntry?.code ?? null,
+    strengthParts,
+    durationMinutes: workout.durationMinutes ?? 60,
+  });
+
+  return parsed.ok ? parsed.payload : null;
+}
+
+export async function replaceWorkoutForPunch({
+  tx,
+  userId,
+  teamId,
+  punchRecordId,
+  dayKey,
+  payload,
+}: {
+  tx: WorkoutReplaceTx;
+  userId: string;
+  teamId: string;
+  punchRecordId: string;
+  dayKey: string;
+  payload: WorkoutCreatePayload;
+}) {
+  if (!isValidWorkoutCreatePayload(payload)) {
+    throw new Error("invalid-workout-payload");
+  }
+
+  const entries = buildWorkoutEntries(payload);
+
+  return tx.workoutRecord.upsert({
+    where: { punchRecordId },
+    create: {
+      userId,
+      teamId,
+      punchRecordId,
+      dayKey,
+      trainingType: payload.trainingType,
+      durationMinutes: payload.durationMinutes,
+      entries: {
+        create: entries,
+      },
+    },
+    update: {
+      trainingType: payload.trainingType,
+      durationMinutes: payload.durationMinutes,
+      entries: {
+        deleteMany: {},
         create: entries,
       },
     },

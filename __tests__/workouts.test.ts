@@ -4,7 +4,9 @@ import {
   buildWorkoutEntries,
   buildWorkoutSummary,
   createWorkoutForPunch,
+  mapWorkoutRecordToTicketPayload,
   parseWorkoutTicketPayload,
+  replaceWorkoutForPunch,
 } from "@/lib/workouts";
 
 describe("workout helpers", () => {
@@ -222,5 +224,99 @@ describe("workout helpers", () => {
     })).rejects.toThrow("invalid-workout-payload");
 
     expect(create).not.toHaveBeenCalled();
+  });
+
+  it("maps a stored workout record back to a ticket payload", () => {
+    const payload = mapWorkoutRecordToTicketPayload({
+      trainingType: "both",
+      durationMinutes: 70,
+      entries: [
+        { category: "strength", code: "abs", label: "腹" },
+        { category: "cardio", code: "swim", label: "游泳" },
+        { category: "strength", code: "chest", label: "胸" },
+      ],
+    });
+
+    expect(payload).toEqual({
+      trainingType: "both",
+      cardioItem: "swim",
+      strengthParts: ["chest", "abs"],
+      durationMinutes: 70,
+    });
+  });
+
+  it("uses a 60 minute UI default when stored duration is unknown", () => {
+    const payload = mapWorkoutRecordToTicketPayload({
+      trainingType: "cardio",
+      durationMinutes: null,
+      entries: [
+        { category: "cardio", code: "treadmill", label: "跑步机" },
+      ],
+    });
+
+    expect(payload).toEqual({
+      trainingType: "cardio",
+      cardioItem: "treadmill",
+      strengthParts: [],
+      durationMinutes: 60,
+    });
+  });
+
+  it("returns null when stored workout entries cannot form a valid ticket payload", () => {
+    expect(mapWorkoutRecordToTicketPayload({
+      trainingType: "both",
+      durationMinutes: 60,
+      entries: [
+        { category: "strength", code: "abs", label: "腹" },
+      ],
+    })).toBeNull();
+  });
+
+  it("replaces an existing workout by punch id", async () => {
+    const upsert = vi.fn().mockResolvedValue({ id: "workout-1", entries: [] });
+
+    await replaceWorkoutForPunch({
+      tx: { workoutRecord: { upsert } } as never,
+      userId: "user-1",
+      teamId: "team-1",
+      punchRecordId: "punch-1",
+      dayKey: "2026-06-12",
+      payload: {
+        trainingType: "strength",
+        cardioItem: null,
+        strengthParts: ["chest", "shoulder"],
+        durationMinutes: 50,
+      },
+    });
+
+    expect(upsert).toHaveBeenCalledWith({
+      where: { punchRecordId: "punch-1" },
+      create: {
+        userId: "user-1",
+        teamId: "team-1",
+        punchRecordId: "punch-1",
+        dayKey: "2026-06-12",
+        trainingType: "strength",
+        durationMinutes: 50,
+        entries: {
+          create: [
+            { category: "strength", code: "chest", label: "胸" },
+            { category: "strength", code: "shoulder", label: "肩" },
+          ],
+        },
+      },
+      update: {
+        trainingType: "strength",
+        durationMinutes: 50,
+        entries: {
+          deleteMany: {},
+          create: [
+            { category: "strength", code: "chest", label: "胸" },
+            { category: "strength", code: "shoulder", label: "肩" },
+          ],
+        },
+      },
+      include: { entries: true },
+    });
   });
 });
