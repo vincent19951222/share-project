@@ -22,33 +22,58 @@ type FitnessPunchTicketProps = {
   onDangerAction?: () => Promise<boolean> | boolean;
 };
 
-const trainingTypes: Array<{ id: TrainingType; label: string }> = [
-  { id: "cardio", label: "有氧" },
-  { id: "strength", label: "力量" },
-  { id: "both", label: "都有" },
-];
-
 const cardioItems: Array<{ id: CardioItem; label: string }> = [
   { id: "treadmill", label: "跑步机" },
   { id: "elliptical", label: "椭圆机" },
+  { id: "bike", label: "单车" },
   { id: "swim", label: "游泳" },
 ];
 
 const strengthParts: Array<{ id: StrengthPart; label: string }> = [
-  { id: "chest", label: "胸" },
-  { id: "back", label: "背" },
-  { id: "shoulder", label: "肩" },
-  { id: "glutes", label: "臀" },
-  { id: "legs", label: "腿" },
-  { id: "abs", label: "腹" },
+  { id: "chest", label: "胸部" },
+  { id: "back", label: "背部" },
+  { id: "shoulder", label: "肩部" },
+  { id: "arms", label: "手臂" },
+  { id: "abs", label: "腹部" },
+  { id: "legs", label: "腿部" },
 ];
 
 const defaultTicketPayload: WorkoutTicketPayload = {
-  trainingType: "both",
+  trainingType: "cardio",
   cardioItem: "treadmill",
-  strengthParts: ["chest", "shoulder", "glutes"],
+  strengthParts: [],
   durationMinutes: 60,
 };
+
+function deriveTrainingType(cardioItem: CardioItem | null, parts: StrengthPart[]): TrainingType | null {
+  if (cardioItem && parts.length > 0) {
+    return "both";
+  }
+
+  if (cardioItem) {
+    return "cardio";
+  }
+
+  if (parts.length > 0) {
+    return "strength";
+  }
+
+  return null;
+}
+
+function deriveTrainingTypeLabels(cardioItem: CardioItem | null, parts: StrengthPart[]) {
+  const labels: string[] = [];
+
+  if (cardioItem) {
+    labels.push("有氧");
+  }
+
+  if (parts.length > 0) {
+    labels.push("力量");
+  }
+
+  return labels.length > 0 ? labels : ["未选择"];
+}
 
 function togglePart(parts: StrengthPart[], part: StrengthPart) {
   if (parts.includes(part)) {
@@ -58,39 +83,54 @@ function togglePart(parts: StrengthPart[], part: StrengthPart) {
   return [...parts, part];
 }
 
+function StrengthPartIcon({ part }: { part: StrengthPart }) {
+  return (
+    <img
+      className="fitness-ticket-part-icon"
+      data-strength-part-icon={part}
+      src={`/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons/${part}.png`}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+    />
+  );
+}
+
 export function FitnessPunchTicket({
   onCancel,
   onConfirm,
   initialPayload = null,
   busy = false,
   error = null,
-  helperText = "确认后会记为今日健身打卡，并获得 1 张健身券。",
+  helperText = "确认后会记录今日健身打卡，并同步训练数据。",
   confirmLabel = "确认打卡",
   busyLabel = "提交中...",
   dangerLabel,
   dangerBusyLabel = "处理中...",
   onDangerAction,
 }: FitnessPunchTicketProps) {
+  const hasDangerAction = Boolean(onDangerAction && dangerLabel);
   const startingPayload = initialPayload ?? defaultTicketPayload;
-  const [trainingType, setTrainingType] = useState<TrainingType>(startingPayload.trainingType);
-  const [cardioItem, setCardioItem] = useState<CardioItem>(startingPayload.cardioItem ?? "treadmill");
+  const [cardioItem, setCardioItem] = useState<CardioItem | null>(startingPayload.cardioItem);
   const [selectedParts, setSelectedParts] = useState<StrengthPart[]>(startingPayload.strengthParts);
   const [duration, setDuration] = useState(startingPayload.durationMinutes);
-  const trainingTypeRef = useRef(startingPayload.trainingType);
-  const cardioItemRef = useRef<CardioItem>(startingPayload.cardioItem ?? "treadmill");
+  const cardioItemRef = useRef<CardioItem | null>(startingPayload.cardioItem);
   const selectedPartsRef = useRef(startingPayload.strengthParts);
   const durationRef = useRef(startingPayload.durationMinutes);
-  const requiresStrengthPart = trainingType === "strength" || trainingType === "both";
-  const isSelectionValid = !requiresStrengthPart || selectedParts.length > 0;
+  const trainingType = deriveTrainingType(cardioItem, selectedParts);
+  const trainingTypeSummaryLabels = deriveTrainingTypeLabels(cardioItem, selectedParts);
+  const isSelectionValid = trainingType !== null;
 
   const selectedPartText = useMemo(
     () =>
       strengthParts
         .filter((part) => selectedParts.includes(part.id))
         .map((part) => part.label)
-        .join(" / "),
+        .join("、"),
     [selectedParts],
   );
+  const selectedCardioText = cardioItems.find((item) => item.id === cardioItem)?.label ?? "未选择";
+  const selectedPartSummaryText = selectedPartText || "未选择";
 
   function changeDuration(delta: number) {
     const nextDuration = Math.min(180, Math.max(10, durationRef.current + delta));
@@ -99,14 +139,11 @@ export function FitnessPunchTicket({
     setDuration(nextDuration);
   }
 
-  function selectTrainingType(nextTrainingType: TrainingType) {
-    trainingTypeRef.current = nextTrainingType;
-    setTrainingType(nextTrainingType);
-  }
-
   function selectCardioItem(nextCardioItem: CardioItem) {
-    cardioItemRef.current = nextCardioItem;
-    setCardioItem(nextCardioItem);
+    const nextSelection = cardioItemRef.current === nextCardioItem ? null : nextCardioItem;
+
+    cardioItemRef.current = nextSelection;
+    setCardioItem(nextSelection);
   }
 
   function toggleSelectedPart(part: StrengthPart) {
@@ -116,21 +153,29 @@ export function FitnessPunchTicket({
     setSelectedParts(nextParts);
   }
 
-  function buildPayload(): WorkoutTicketPayload {
+  function buildPayload(): WorkoutTicketPayload | null {
+    const nextTrainingType = deriveTrainingType(cardioItemRef.current, selectedPartsRef.current);
+
+    if (!nextTrainingType) {
+      return null;
+    }
+
     return {
-      trainingType: trainingTypeRef.current,
-      cardioItem: trainingTypeRef.current === "strength" ? null : cardioItemRef.current,
-      strengthParts: trainingTypeRef.current === "cardio" ? [] : selectedPartsRef.current,
+      trainingType: nextTrainingType,
+      cardioItem: nextTrainingType === "strength" ? null : cardioItemRef.current,
+      strengthParts: nextTrainingType === "cardio" ? [] : selectedPartsRef.current,
       durationMinutes: durationRef.current,
     };
   }
 
   async function handleConfirm() {
-    if (busy || !onConfirm || !isSelectionValid) {
+    const payload = buildPayload();
+
+    if (busy || !onConfirm || !payload) {
       return;
     }
 
-    const ok = await onConfirm(buildPayload());
+    const ok = await onConfirm(payload);
 
     if (ok) {
       onCancel?.();
@@ -170,30 +215,17 @@ export function FitnessPunchTicket({
         <div className="fitness-ticket-body">
           <section className="fitness-ticket-controls" aria-label="训练选项">
             <div className="fitness-ticket-field">
-              <h2>训练类型</h2>
-              <div className="fitness-ticket-segment-grid">
-                {trainingTypes.map((item) => (
-                  <button
-                    key={item.id}
-                    className={item.id === trainingType ? "fitness-ticket-option-active" : "fitness-ticket-option"}
-                    type="button"
-                    disabled={busy}
-                    onClick={() => selectTrainingType(item.id)}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+              <div className="fitness-ticket-section-heading">
+                <span className="fitness-ticket-section-marker">A</span>
+                <h2>有氧项目</h2>
               </div>
-            </div>
-
-            <div className="fitness-ticket-field">
-              <h2>有氧项目</h2>
-              <div className="fitness-ticket-segment-grid">
+              <div className="fitness-ticket-cardio-grid">
                 {cardioItems.map((item) => (
                   <button
                     key={item.id}
                     className={item.id === cardioItem ? "fitness-ticket-option-active" : "fitness-ticket-option"}
                     type="button"
+                    aria-pressed={item.id === cardioItem}
                     disabled={busy}
                     onClick={() => selectCardioItem(item.id)}
                   >
@@ -204,28 +236,36 @@ export function FitnessPunchTicket({
             </div>
 
             <div className="fitness-ticket-field">
-              <h2>力量部位</h2>
-              <div className="fitness-ticket-parts-grid">
+              <div className="fitness-ticket-section-heading">
+                <span className="fitness-ticket-section-marker">B</span>
+                <h2>今日重点部位</h2>
+              </div>
+              <div className="fitness-ticket-strength-grid">
                 {strengthParts.map((item) => (
                   <button
                     key={item.id}
                     className={
                       selectedParts.includes(item.id)
-                        ? "fitness-ticket-option-active"
-                        : "fitness-ticket-option"
+                        ? "fitness-ticket-strength-card fitness-ticket-option-active"
+                        : "fitness-ticket-strength-card fitness-ticket-option"
                     }
                     type="button"
+                    aria-pressed={selectedParts.includes(item.id)}
                     disabled={busy}
                     onClick={() => toggleSelectedPart(item.id)}
                   >
-                    {item.label}
+                    <StrengthPartIcon part={item.id} />
+                    <span>{item.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="fitness-ticket-field">
-              <h2>训练时长 <span>可选</span></h2>
+              <div className="fitness-ticket-section-heading">
+                <span className="fitness-ticket-section-marker">C</span>
+                <h2>训练时长 <span>可选</span></h2>
+              </div>
               <div className="fitness-ticket-duration" aria-label="训练时长">
                 <button type="button" disabled={busy} onClick={() => changeDuration(-10)} aria-label="减少训练时长">
                   −
@@ -239,28 +279,36 @@ export function FitnessPunchTicket({
                 </button>
               </div>
             </div>
-          </section>
 
-          <section className="fitness-ticket-muscle-panel" aria-label="今日训练部位肌肉图">
-            <div className="fitness-ticket-panel-header">
-              <h2>今日训练部位肌肉图</h2>
-              <p>{selectedPartText || "未选择力量部位"}</p>
-            </div>
-            <div className="fitness-ticket-muscle-map">
-              <img
-                src="/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.png"
-                alt="今日训练部位肌肉图"
-              />
+            <div className="fitness-ticket-workout-summary" aria-live="polite">
+              <span><strong>有氧：</strong>{selectedCardioText}</span>
+              <i aria-hidden="true">•</i>
+              <span><strong>部位：</strong>{selectedPartSummaryText}</span>
+              <i aria-hidden="true">•</i>
+              <span><strong>时长：</strong>{duration}分钟</span>
+              <div
+                className={`fitness-ticket-training-summary${
+                  trainingType ? "" : " fitness-ticket-training-summary-empty"
+                }`}
+                aria-label="训练类型摘要"
+              >
+                <span>训练类型</span>
+                <div className="fitness-ticket-training-summary-tags">
+                  {trainingTypeSummaryLabels.map((label) => (
+                    <strong key={label}>{label}</strong>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
         </div>
 
         {error ? <p className="fitness-ticket-error">{error}</p> : null}
-        {!isSelectionValid ? <p className="fitness-ticket-error">至少选择一个力量部位</p> : null}
+        {!isSelectionValid ? <p className="fitness-ticket-error">至少选择一个有氧项目或力量部位</p> : null}
         <p className="fitness-ticket-helper">{helperText}</p>
 
-        <footer className="fitness-ticket-footer">
-          {onDangerAction && dangerLabel ? (
+        <footer className={`fitness-ticket-footer${hasDangerAction ? " fitness-ticket-footer-editing" : ""}`}>
+          {hasDangerAction ? (
             <button
               className="fitness-ticket-cancel fitness-ticket-danger"
               type="button"

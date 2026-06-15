@@ -1,0 +1,29 @@
+.prototype {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(10, 10, 10, 0.18), rgba(10, 10, 10, 0.38)),
+    url("/assets/home-scenes/punch/gym-wall-bg.webp") center / cover fixed,
+    #24201b;
+  color: #111111;
+  overflow-x: hidden;
+  padding: clamp(14px, 2vw, 26px);
+}
+
+.stage {
+  display: grid;
+  min-height: calc(100vh - clamp(28px, 4vw, 52px));
+  place-items: center;
+}
+
+@media (max-width: 920px) {
+  .prototype {
+    min-height: auto;
+    overflow: visible;
+    padding: 10px;
+  }
+
+  .stage {
+    display: block;
+    min-height: auto;
+  }
+}

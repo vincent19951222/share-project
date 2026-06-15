@@ -211,7 +211,10 @@ describe("HeatmapGrid punch flow", () => {
     });
 
     expect(pageText()).toContain("今日训练小票");
-    expect(pageText()).toContain("今日训练部位肌肉图");
+    expect(pageText()).toContain("今日重点部位");
+    expect(pageText()).toContain("单车");
+    expect(document.body.querySelectorAll("[data-strength-part-icon]")).toHaveLength(6);
+    expect(document.body.querySelector('img[alt="今日训练部位肌肉图"]')).toBeNull();
 
     const confirmButton = pageButtons().find((button) =>
       button.textContent?.includes("确认打卡"),
@@ -231,9 +234,9 @@ describe("HeatmapGrid punch flow", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
-          trainingType: "both",
+          trainingType: "cardio",
           cardioItem: "treadmill",
-          strengthParts: ["chest", "shoulder", "glutes"],
+          strengthParts: [],
           durationMinutes: 60,
         }),
       }),
@@ -547,9 +550,9 @@ describe("HeatmapGrid punch flow", () => {
     expect(document.body.textContent).toContain("今日训练小票");
     expect(document.body.textContent).toContain("保存修改");
     expect(document.body.textContent).toContain("撤销打卡");
-    expect(document.body.textContent).toContain("胸");
+    expect(document.body.textContent).toContain("胸部");
 
-    const absButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.trim() === "腹");
+    const absButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.trim() === "腹部");
     const saveButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("保存修改"));
 
     await act(async () => {

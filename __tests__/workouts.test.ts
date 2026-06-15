@@ -69,7 +69,7 @@ describe("workout helpers", () => {
 
     expect(parseWorkoutTicketPayload({
       trainingType: "cardio",
-      cardioItem: "bike",
+      cardioItem: "rowing",
       strengthParts: [],
       durationMinutes: 60,
     })).toEqual({ ok: false, error: "invalid-workout-payload" });
@@ -86,6 +86,40 @@ describe("workout helpers", () => {
       strengthParts: [],
       durationMinutes: "60",
     })).toEqual({ ok: false, error: "invalid-workout-payload" });
+  });
+
+  it("accepts stationary bike as a cardio workout", () => {
+    const parsed = parseWorkoutTicketPayload({
+      trainingType: "cardio",
+      cardioItem: "bike",
+      strengthParts: [],
+      durationMinutes: 60,
+    });
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) throw new Error(parsed.error);
+
+    expect(buildWorkoutEntries(parsed.payload)).toEqual([
+      { category: "cardio", code: "bike", label: "单车" },
+    ]);
+    expect(buildWorkoutSummary(parsed.payload)).toBe("单车 · 60 分钟");
+  });
+
+  it("accepts arms as a strength workout part", () => {
+    const parsed = parseWorkoutTicketPayload({
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: ["arms"],
+      durationMinutes: 40,
+    });
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) throw new Error(parsed.error);
+
+    expect(buildWorkoutEntries(parsed.payload)).toEqual([
+      { category: "strength", code: "arms", label: "手臂" },
+    ]);
+    expect(buildWorkoutSummary(parsed.payload)).toBe("手臂 · 40 分钟");
   });
 
   it("accepts supported duration boundaries for cardio workouts", () => {
