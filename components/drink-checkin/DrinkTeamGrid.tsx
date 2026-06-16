@@ -16,7 +16,7 @@ export function DrinkTeamGrid({ snapshot }: DrinkTeamGridProps) {
   );
 
   return (
-    <section className="rounded-[8px] border-4 border-slate-950 bg-[#fffdf7] p-5 shadow-[8px_8px_0_rgba(15,23,42,0.24)]">
+    <section className="drink-team-board rounded-[8px] border-4 border-slate-950 bg-[#fffdf7] p-5 shadow-[8px_8px_0_rgba(15,23,42,0.24)]">
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase text-cyan-700">Team Hydration Board</p>
@@ -27,8 +27,8 @@ export function DrinkTeamGrid({ snapshot }: DrinkTeamGridProps) {
         </span>
       </header>
 
-      <div className="overflow-x-auto">
-        <div className="min-w-[720px] space-y-2">
+      <div className="drink-team-scroll overflow-x-auto">
+        <div className="drink-team-table min-w-[720px] space-y-2">
           <div className="grid grid-cols-[150px_repeat(7,minmax(60px,1fr))] gap-2 text-xs font-black text-slate-500">
             <span>成员</span>
             {visibleDays.map((day) => (

@@ -145,6 +145,21 @@ describe("home calendar scene CSS", () => {
     expect(
       mobileBlocks.some(
         (block) =>
+          block.includes(".calendar-board-viewport") &&
+          /overflow-y:\s*auto/.test(block) &&
+          /overflow-x:\s*hidden/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".calendar-month-table") &&
+          /min-width:\s*0/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
           block.includes(".calendar-month-grid") &&
           /grid-auto-rows:\s*minmax\(2\.75rem,\s*2\.75rem\)/.test(block) &&
           /flex:\s*0 0 auto/.test(block),

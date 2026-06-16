@@ -155,4 +155,22 @@ describe("Supply UI Lab mobile CSS", () => {
     );
     expectMobileRule(".supply-dashboard-task-confirm-body", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
   });
+
+  it("contains every embedded production panel inside the phone viewport", () => {
+    for (const selector of [
+      ".supply-dashboard-scene--embedded",
+      ".supply-shop-scene--embedded",
+      ".supply-task-record-scene--embedded",
+      ".supply-backpack-scene--embedded",
+      ".supply-draw-pool-scene--embedded",
+    ]) {
+      expectMobileRule(selector, [/max-width:\s*100%/, /overflow-x:\s*hidden/]);
+    }
+
+    expectMobileRule(".supply-backpack-content", [/width:\s*100%/, /min-width:\s*0/, /max-width:\s*100%/]);
+    expectMobileRule(".supply-backpack-shell", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expectMobileRule(".supply-shop-scene--embedded .supply-shop-shell", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expectMobileRule(".supply-task-record-scene--embedded .supply-task-record-shell", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expectMobileRule(".supply-draw-pool-scene--embedded .supply-draw-pool-layout", /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  });
 });

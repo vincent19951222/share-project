@@ -47,8 +47,8 @@ export function DrinkCheckin() {
   }
 
   return (
-    <main className="h-full min-h-0 overflow-y-auto overflow-x-hidden bg-[#f7eddc] bg-[linear-gradient(rgba(255,253,247,0.72),rgba(247,237,220,0.88))] px-4 py-6 text-slate-950 sm:px-8">
-      <div className="mx-auto grid max-w-[1390px] gap-6">
+    <main className="drink-checkin-shell h-full min-h-0 overflow-y-auto overflow-x-hidden bg-[#f7eddc] bg-[linear-gradient(rgba(255,253,247,0.72),rgba(247,237,220,0.88))] px-4 py-6 text-slate-950 sm:px-8">
+      <div className="drink-checkin-content mx-auto grid max-w-[1390px] gap-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-normal text-cyan-700">Niuma Water Shop</p>
@@ -69,7 +69,7 @@ export function DrinkCheckin() {
           onRemoveDrink={removeLatestDrink}
         />
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="drink-checkin-secondary-grid grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <DrinkTeamGrid snapshot={snapshot} />
           <DrinkActivityFeed />
         </div>

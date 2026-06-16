@@ -188,6 +188,13 @@ describe("home report scene CSS", () => {
     expect(mobileBoardRule).toMatch(/padding:\s*0\.75rem/);
     expect(
       mobileBlocks.some(
+        (block) =>
+          block.includes(".report-board") &&
+          /overflow-x:\s*hidden/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
         (block) => block.includes(".report-scene-props") && /opacity:\s*0\.45/.test(block),
       ),
     ).toBe(true);
@@ -217,6 +224,21 @@ describe("home report scene CSS", () => {
     expect(
       mobileBlocks.some(
         (block) =>
+          block.includes(".report-metric-body .text-4xl") &&
+          /font-size:\s*clamp\(1\.25rem,\s*5vw,\s*1\.65rem\)/.test(block) &&
+          /overflow-wrap:\s*anywhere/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".report-metric-body .text-xs") &&
+          /letter-spacing:\s*0/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
           block.includes(".report-header-decor-row") &&
           /display:\s*none/.test(block),
       ),
@@ -234,6 +256,13 @@ describe("home report scene CSS", () => {
           block.includes(".game-weekly-report-desk") &&
           /max-height:\s*42rem/.test(block) &&
           /overflow-y:\s*auto/.test(block),
+      ),
+    ).toBe(true);
+    expect(
+      mobileBlocks.some(
+        (block) =>
+          block.includes(".game-weekly-report-desk") &&
+          /max-height:\s*none/.test(block),
       ),
     ).toBe(true);
     expect(

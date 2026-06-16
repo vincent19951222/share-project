@@ -112,6 +112,8 @@ describe("DrinkCheckin", () => {
     expect(main?.className).toContain("h-full");
     expect(main?.className).toContain("overflow-y-auto");
     expect(main?.className).toContain("overflow-x-hidden");
+    expect(container.querySelector(".drink-checkin-shell")).not.toBeNull();
+    expect(container.querySelector(".drink-checkin-content")).not.toBeNull();
   });
 
   it("opens a confirmation ticket and posts the edited drink note", async () => {
@@ -309,5 +311,8 @@ describe("DrinkCheckin", () => {
     expect(container.textContent).toContain("今天");
     expect(container.textContent).toContain("2");
     expect(container.textContent).not.toContain("1日2日3日");
+    expect(container.querySelector(".drink-team-board")).not.toBeNull();
+    expect(container.querySelector(".drink-team-scroll")).not.toBeNull();
+    expect(container.querySelector(".drink-team-table")).not.toBeNull();
   });
 });

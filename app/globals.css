@@ -7113,6 +7113,7 @@ body {
     inset: auto;
     height: auto;
     overflow: visible;
+    overflow-x: hidden;
     padding: 0.75rem;
   }
 
@@ -14280,5 +14281,278 @@ body {
     overflow: visible;
     text-overflow: clip;
     white-space: nowrap;
+  }
+}
+
+/* Mobile-only adaptation layer. Keep desktop defaults above as the source of truth. */
+@media (max-width: 760px) {
+  html {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  body {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100svh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .board-tab-stage {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .board-tab-panel-active {
+    position: relative;
+    inset: auto;
+    min-height: 100%;
+  }
+
+  .app-top-nav {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 60;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .app-top-nav > div:first-child {
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "wallet wallet";
+  }
+
+  .app-top-nav-brand-area,
+  .app-top-nav-actions {
+    min-width: 0;
+  }
+
+  .app-supply-mobile-wallet {
+    grid-area: wallet;
+    width: 100%;
+    max-width: none;
+    min-height: 44px;
+  }
+
+  .mobile-tab-panel {
+    max-height: calc(100svh - 6.5rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-supply-secondary-nav {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-supply-secondary-rail {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .app-supply-secondary-tab {
+    flex: 0 0 auto;
+    min-height: 44px;
+  }
+
+  .punch-board-shell {
+    position: relative;
+    inset: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .punch-scene-content {
+    padding-inline: 0;
+    gap: 0.75rem;
+  }
+
+  .heatmap-mobile-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .activity-stream-list {
+    padding-inline: 0.75rem;
+  }
+
+  .shared-board-scene {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  .shared-board-content {
+    width: 100%;
+    padding-inline: 0.75rem;
+  }
+
+  .shared-board-composer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shared-board-note-wall,
+  .note-masonry {
+    column-count: 1;
+    gap: 0.85rem;
+  }
+
+  .drink-checkin-shell {
+    padding: 0.75rem;
+    overflow-x: hidden;
+  }
+
+  .drink-checkin-content {
+    width: 100%;
+    max-width: 100%;
+    gap: 0.85rem;
+  }
+
+  .drink-checkin-secondary-grid {
+    gap: 0.75rem;
+  }
+
+  .drink-team-board {
+    padding: 0.85rem;
+  }
+
+  .drink-team-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .drink-team-table {
+    min-width: 38rem;
+  }
+
+  .calendar-board-viewport {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+
+  .calendar-scene,
+  .calendar-binder-shell,
+  .calendar-paper-surface {
+    max-width: 100%;
+  }
+
+  .calendar-binder-shell {
+    width: 100%;
+  }
+
+  .calendar-month-table {
+    min-width: 0;
+  }
+
+  .calendar-month-grid {
+    overflow-y: visible;
+  }
+
+  .report-scene,
+  .report-scene-content,
+  .report-scene-analysis,
+  .report-scene-bottom {
+    max-width: 100%;
+  }
+
+  .game-weekly-report-desk {
+    max-height: none;
+    overflow-x: hidden;
+  }
+
+  .report-metric-body {
+    min-width: 0;
+    gap: 0.2rem !important;
+    padding: 0.5rem !important;
+  }
+
+  .report-metric-body .text-xs {
+    font-size: 0.62rem !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .report-metric-body .text-4xl {
+    font-size: clamp(1.25rem, 5vw, 1.65rem) !important;
+    line-height: 1.05 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .report-metric-body p {
+    font-size: 0.68rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .team-dynamics-page {
+    max-width: 100%;
+    padding: 0.85rem;
+  }
+
+  .team-dynamics-page .quest-btn,
+  .team-dynamic-filter {
+    min-height: 44px;
+  }
+
+  .docs-center-shell {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .docs-tab {
+    min-width: min(11.5rem, 80vw);
+  }
+
+  .docs-tabs {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 768px) {
+  .supply-dashboard-scene--embedded,
+  .supply-shop-scene--embedded,
+  .supply-task-record-scene--embedded,
+  .supply-backpack-scene--embedded,
+  .supply-draw-pool-scene--embedded {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-content,
+  .supply-shop-scene--embedded .supply-shop-content,
+  .supply-task-record-scene--embedded .supply-task-record-content,
+  .supply-backpack-scene--embedded .supply-backpack-content,
+  .supply-draw-pool-scene--embedded .supply-draw-pool-content,
+  .supply-backpack-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .supply-dashboard-scene--embedded .supply-dashboard-stage,
+  .supply-shop-scene--embedded .supply-shop-shell,
+  .supply-task-record-scene--embedded .supply-task-record-shell,
+  .supply-backpack-scene--embedded .supply-backpack-shell,
+  .supply-draw-pool-scene--embedded .supply-draw-pool-layout,
+  .supply-backpack-shell {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
