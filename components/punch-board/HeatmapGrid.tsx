@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { reservePunchEpoch, useBoard } from "@/lib/store";
 import {
   deleteTodayPunch,
@@ -47,6 +47,9 @@ export function HeatmapGrid() {
   const desktopScrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const currentUserIndex = state.members.findIndex((member) => member.id === state.currentUserId);
+  const desktopHeatmapStyle = {
+    "--heatmap-desktop-body-height": `${state.members.length * 3.75}rem`,
+  } as CSSProperties;
 
   useLayoutEffect(() => {
     const scrollLeft = (state.today - 2) * 60;
@@ -478,7 +481,10 @@ export function HeatmapGrid() {
 
   return (
     <>
-      <main className="heatmap-shell heatmap-training-panel heatmap-desktop-shell flex-1 w-full soft-card flex relative overflow-hidden">
+      <main
+        className="heatmap-shell heatmap-training-panel heatmap-desktop-shell flex-1 w-full soft-card flex relative overflow-hidden"
+        style={desktopHeatmapStyle}
+      >
         <div className="heatmap-members-column heatmap-member-rail w-28 border-r-2 border-slate-100 flex flex-col bg-white z-10 shrink-0 rounded-l-[1.25rem]">
           <div className="heatmap-members-heading h-10 border-b-2 border-slate-100 bg-slate-50 flex items-center justify-center font-bold text-xs text-sub rounded-tl-[1.25rem]">
             MEMBERS

@@ -150,6 +150,22 @@ describe("HeatmapGrid punch flow", () => {
     expect(container.querySelectorAll(".heatmap-mobile-member")).toHaveLength(5);
   });
 
+  it("sizes the desktop heatmap from the rendered member count", async () => {
+    const sevenMemberState = createMembersState(7);
+
+    await act(async () => {
+      root.render(
+        <BoardProvider initialState={sevenMemberState}>
+          <HeatmapGrid />
+        </BoardProvider>,
+      );
+    });
+
+    const desktopShell = container.querySelector<HTMLElement>(".heatmap-desktop-shell");
+
+    expect(desktopShell?.style.getPropertyValue("--heatmap-desktop-body-height")).toBe("26.25rem");
+  });
+
   it("centers today's mobile column using the rendered date column", async () => {
     originalClientWidthDescriptor = Object.getOwnPropertyDescriptor(
       HTMLElement.prototype,

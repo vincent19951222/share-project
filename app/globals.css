@@ -955,6 +955,11 @@ body {
   backdrop-filter: blur(2px);
 }
 
+.punch-board-shell {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 .coffee-scene {
   position: relative;
   isolation: isolate;
@@ -1598,8 +1603,15 @@ body {
 .heatmap-training-panel {
   --heatmap-desktop-header-height: 2.5rem;
   --heatmap-desktop-row-height: 3.75rem;
+  --heatmap-desktop-body-height: var(--heatmap-desktop-row-height);
+  --heatmap-desktop-content-height: calc(var(--heatmap-desktop-body-height) + 1rem);
   border-color: #111827;
   background: rgba(255, 255, 255, 0.9);
+}
+
+.heatmap-desktop-shell {
+  flex: 0 0 auto;
+  min-height: calc(var(--heatmap-desktop-header-height) + var(--heatmap-desktop-content-height));
 }
 
 .heatmap-member-rail {
@@ -1621,6 +1633,12 @@ body {
 .heatmap-days-header {
   flex: 0 0 var(--heatmap-desktop-header-height);
   height: var(--heatmap-desktop-header-height);
+}
+
+.heatmap-members-list,
+.heatmap-grid-body {
+  flex: 0 0 var(--heatmap-desktop-content-height);
+  min-height: var(--heatmap-desktop-content-height);
 }
 
 .heatmap-members-list,

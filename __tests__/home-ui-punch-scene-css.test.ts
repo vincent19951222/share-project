@@ -46,6 +46,7 @@ function extractRuleBody(css: string, selector: string) {
 describe("home punch scene CSS", () => {
   it("styles the punch scene as a framed gym shell with readable foreground panels", () => {
     const css = readFileSync("app/globals.css", "utf8");
+    const shellRule = extractRuleBody(css, ".punch-board-shell {");
     const propsRule = extractRuleBody(css, ".punch-scene-props {");
     const contentRule = extractRuleBody(css, ".punch-scene-content");
     const cardRule = extractRuleBody(css, ".punch-scene .soft-card");
@@ -57,6 +58,8 @@ describe("home punch scene CSS", () => {
 
     expect(css).toMatch(/\.punch-scene\s*\{[\s\S]*isolation:\s*isolate/);
     expect(css).toMatch(/\.punch-scene\s*\{[\s\S]*padding:\s*clamp\(0\.75rem,\s*1\.5vw,\s*1\.25rem\)/);
+    expect(shellRule).toMatch(/overflow-y:\s*auto/);
+    expect(shellRule).toMatch(/overflow-x:\s*hidden/);
     expect(propsRule).toMatch(/z-index:\s*1/);
     expect(contentRule).toMatch(/min-height:\s*0/);
     expect(contentRule).toMatch(/position:\s*relative/);
@@ -96,11 +99,13 @@ describe("home punch scene CSS", () => {
   it("styles the heatmap as a gym training tracker", () => {
     const css = readFileSync("app/globals.css", "utf8");
     const panelRule = extractRuleBody(css, ".heatmap-training-panel");
+    const desktopShellRule = extractRuleBody(css, ".heatmap-desktop-shell");
     const railRule = extractRuleBody(css, ".heatmap-member-rail");
     const rulerRule = extractRuleBody(css, ".heatmap-day-ruler");
     const trackRule = extractRuleBody(css, ".heatmap-grid-track");
     const headingRule = extractRuleBody(css, ".heatmap-members-heading,\n.heatmap-days-header");
-    const rowStackRule = extractRuleBody(css, ".heatmap-members-list,\n.heatmap-grid-rows");
+    const rowStackRule = extractRuleBody(css, ".heatmap-members-list,\n.heatmap-grid-body");
+    const rowContentRule = extractRuleBody(css, ".heatmap-members-list,\n.heatmap-grid-rows");
     const rowRule = extractRuleBody(css, ".heatmap-member-item,\n.heatmap-grid-row");
     const todayCellRule = extractRuleBody(css, ".heatmap-cell-today");
     const todayButtonRule = extractRuleBody(css, ".heatmap-cell-today.my-punch-btn");
@@ -109,8 +114,11 @@ describe("home punch scene CSS", () => {
 
     expect(panelRule).toMatch(/--heatmap-desktop-header-height:\s*2\.5rem/);
     expect(panelRule).toMatch(/--heatmap-desktop-row-height:\s*3\.75rem/);
+    expect(panelRule).toMatch(/--heatmap-desktop-content-height:\s*calc\(var\(--heatmap-desktop-body-height\) \+ 1rem\)/);
     expect(panelRule).toMatch(/border-color:\s*#111827/);
     expect(panelRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.9\)/);
+    expect(desktopShellRule).toMatch(/flex:\s*0 0 auto/);
+    expect(desktopShellRule).toMatch(/min-height:\s*calc\(var\(--heatmap-desktop-header-height\) \+ var\(--heatmap-desktop-content-height\)\)/);
     expect(railRule).toMatch(/border-right:\s*3px solid #111827/);
     expect(railRule).toMatch(/background:\s*#fef3c7/);
     expect(rulerRule).toMatch(/background:\s*#111827/);
@@ -120,7 +128,9 @@ describe("home punch scene CSS", () => {
     expect(trackRule).not.toMatch(/background-size/);
     expect(headingRule).toMatch(/flex:\s*0 0 var\(--heatmap-desktop-header-height\)/);
     expect(headingRule).toMatch(/height:\s*var\(--heatmap-desktop-header-height\)/);
-    expect(rowStackRule).toMatch(/justify-content:\s*flex-start/);
+    expect(rowStackRule).toMatch(/flex:\s*0 0 var\(--heatmap-desktop-content-height\)/);
+    expect(rowStackRule).toMatch(/min-height:\s*var\(--heatmap-desktop-content-height\)/);
+    expect(rowContentRule).toMatch(/justify-content:\s*flex-start/);
     expect(rowRule).toMatch(/flex:\s*0 0 var\(--heatmap-desktop-row-height\)/);
     expect(rowRule).toMatch(/height:\s*var\(--heatmap-desktop-row-height\)/);
     expect(todayCellRule).toMatch(/background:\s*#fef08a/);
