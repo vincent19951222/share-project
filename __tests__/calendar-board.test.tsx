@@ -167,6 +167,11 @@ describe("CalendarBoard", () => {
       expect(container.textContent).toContain("2026年4月");
       expect(container.textContent).toMatch(/本月练了\s*2\s*天/);
       expect(container.textContent).toMatch(/本月喝了\s*2\s*杯/);
+      expect(
+        container.querySelector(
+          '.calendar-summary-chip-coffee img[src="/assets/calendar/drink-pixel-16bit-v1.png"]',
+        ),
+      ).not.toBeNull();
       expect(container.textContent).toContain("回到本月");
       expect(container.querySelectorAll("button")).toHaveLength(2);
       expect(getReturnButton(container).disabled).toBe(true);
@@ -179,7 +184,7 @@ describe("CalendarBoard", () => {
       expect(getDrinkCountText(container, 2)).toBe("2");
       expect(getDayCell(container, 2).querySelector("[aria-label='饮品 2 杯']")).not.toBeNull();
       expect(
-        getDayCell(container, 2).querySelectorAll('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg"]')
+        getDayCell(container, 2).querySelectorAll('img[src="/assets/calendar/drink-pixel-16bit-v1.png"]')
           .length,
       ).toBe(1);
       expect(container.querySelectorAll("img[alt='咖啡记录']").length).toBe(0);

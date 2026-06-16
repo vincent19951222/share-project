@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { buildDrinkEvent, drinkNoteOptions, pickDrinkNote, type DrinkEvent, type DrinkId } from "./drink-entry";
+import {
+  buildDrinkEvent,
+  drinkNoteOptions,
+  pickDrinkNote,
+  type DrinkEvent,
+  type DrinkId,
+} from "./drink-entry";
 import styles from "./DrinkUpdatePrototype.module.css";
 
 type Drink = {
@@ -127,13 +133,17 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
-const calendarDays = ["06-01 今天", "06-02 周二", "06-03 周三", "06-04 周四", "06-05 周五", "06-06 周六", "06-07 周日"];
-
-const quickNotes = [
-  "喝够 8 杯水",
-  "少喝奶茶",
-  "早点起床",
+const calendarDays = [
+  "06-01 今天",
+  "06-02 周二",
+  "06-03 周三",
+  "06-04 周四",
+  "06-05 周五",
+  "06-06 周六",
+  "06-07 周日",
 ];
+
+const quickNotes = ["喝够 8 杯水", "少喝奶茶", "早点起床"];
 
 function getCurrentTime() {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -164,7 +174,13 @@ function countEvents(events: DrinkEvent[]) {
   );
 }
 
-function DrinkMiniIcon({ drink, tiny = false }: { drink: Drink; tiny?: boolean }) {
+function DrinkMiniIcon({
+  drink,
+  tiny = false,
+}: {
+  drink: Drink;
+  tiny?: boolean;
+}) {
   return (
     <span
       className={`${styles.drinkMiniIcon} ${tiny ? styles.drinkMiniIconTiny : ""}`}
@@ -182,7 +198,15 @@ function DrinkMiniIcon({ drink, tiny = false }: { drink: Drink; tiny?: boolean }
   );
 }
 
-function ResourcePill({ icon, value, label }: { icon: string; value: string; label: string }) {
+function ResourcePill({
+  icon,
+  value,
+  label,
+}: {
+  icon: string;
+  value: string;
+  label: string;
+}) {
   return (
     <span className={styles.resourcePill} aria-label={`${label} ${value}`}>
       <img src={icon} alt="" />
@@ -209,7 +233,11 @@ export default function DrinkUpdatePrototypePage() {
   const remainingCups = Math.max(dailyGoal - totalCount, 0);
   const favoriteDrink = drinks
     .map((drink) => ({ drink, count: counts[drink.id] }))
-    .sort((left, right) => right.count - left.count || drinks.indexOf(left.drink) - drinks.indexOf(right.drink))[0];
+    .sort(
+      (left, right) =>
+        right.count - left.count ||
+        drinks.indexOf(left.drink) - drinks.indexOf(right.drink),
+    )[0];
 
   function openDrinkConfirmation(drinkId: DrinkId) {
     setPendingEntry({
@@ -254,7 +282,10 @@ export default function DrinkUpdatePrototypePage() {
         <nav className={styles.topNav} aria-label="脱脂牛马主导航">
           <a className={styles.brand} href="/drink" aria-label="脱脂牛马">
             <span className={styles.brandIcon}>
-              <img src="/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png" alt="" />
+              <img
+                src="/assets/home-scenes/supply/shared/supply-topbar-cow-logo.png"
+                alt=""
+              />
             </span>
             <span>牛马水铺</span>
           </a>
@@ -263,8 +294,16 @@ export default function DrinkUpdatePrototypePage() {
             {navItems.map((item) => (
               <a
                 aria-current={item.label === "牛马水铺" ? "page" : undefined}
-                className={item.label === "牛马水铺" ? styles.navTabActive : styles.navTab}
-                href={item.label === "牛马水铺" ? "/ui-prototypes/drink-update" : "#"}
+                className={
+                  item.label === "牛马水铺"
+                    ? styles.navTabActive
+                    : styles.navTab
+                }
+                href={
+                  item.label === "牛马水铺"
+                    ? "/ui-prototypes/drink-update"
+                    : "#"
+                }
                 key={item.label}
               >
                 <span aria-hidden="true">{item.icon}</span>
@@ -274,30 +313,68 @@ export default function DrinkUpdatePrototypePage() {
           </div>
 
           <div className={styles.navTools} aria-label="个人入口">
-            <button type="button" aria-label="菜单" className={styles.circleTool}>
+            <button
+              type="button"
+              aria-label="菜单"
+              className={styles.circleTool}
+            >
               <span />
               <span />
               <span />
             </button>
-            <button type="button" aria-label="通知" className={`${styles.circleTool} ${styles.bellTool}`}>
-              ♧
-              <span aria-hidden="true">1</span>
+            <button
+              type="button"
+              aria-label="通知"
+              className={`${styles.circleTool} ${styles.bellTool}`}
+            >
+              ♧<span aria-hidden="true">1</span>
             </button>
-            <ResourcePill icon="/assets/home-scenes/supply/shared/supply-resource-coins.png" label="银子" value="960" />
-            <ResourcePill icon="/assets/home-scenes/supply/shared/supply-resource-ticket.png" label="券" value="1" />
-            <ResourcePill icon="/assets/home-scenes/supply/shared/supply-resource-backpack.png" label="背包" value="10/60" />
-            <button type="button" aria-label="li 的用户菜单" className={styles.avatarButton}>
+            <ResourcePill
+              icon="/assets/home-scenes/supply/shared/supply-resource-coins.png"
+              label="银子"
+              value="960"
+            />
+            <ResourcePill
+              icon="/assets/home-scenes/supply/shared/supply-resource-ticket.png"
+              label="券"
+              value="1"
+            />
+            <ResourcePill
+              icon="/assets/home-scenes/supply/shared/supply-resource-backpack.png"
+              label="背包"
+              value="10/60"
+            />
+            <button
+              type="button"
+              aria-label="li 的用户菜单"
+              className={styles.avatarButton}
+            >
               <img src="/avatars/male1.png" alt="" />
             </button>
           </div>
         </nav>
 
         <div className={styles.stage}>
-          <img className={`${styles.floatAsset} ${styles.noCoffeeNote}`} src="/assets/home-scenes/coffee/note-no-coffee-no-gain.webp" alt="" />
-          <img className={`${styles.floatAsset} ${styles.coffeeCup}`} src="/assets/home-scenes/coffee/takeaway-cup.webp" alt="" />
-          <img className={`${styles.floatAsset} ${styles.beans}`} src="/assets/home-scenes/coffee/coffee-beans.webp" alt="" />
+          <img
+            className={`${styles.floatAsset} ${styles.noCoffeeNote}`}
+            src="/assets/home-scenes/coffee/note-no-coffee-no-gain.webp"
+            alt=""
+          />
+          <img
+            className={`${styles.floatAsset} ${styles.coffeeCup}`}
+            src="/assets/home-scenes/coffee/takeaway-cup.webp"
+            alt=""
+          />
+          <img
+            className={`${styles.floatAsset} ${styles.beans}`}
+            src="/assets/home-scenes/coffee/coffee-beans.webp"
+            alt=""
+          />
 
-          <aside className={`${styles.paperProp} ${styles.receiptProp}`} aria-hidden="true">
+          <aside
+            className={`${styles.paperProp} ${styles.receiptProp}`}
+            aria-hidden="true"
+          >
             <strong>牛马水铺小票</strong>
             <span>今日状态</span>
             <span>续命中 ☕</span>
@@ -306,31 +383,51 @@ export default function DrinkUpdatePrototypePage() {
             <i />
           </aside>
 
-          <aside className={`${styles.paperProp} ${styles.yellowProp}`} aria-hidden="true">
+          <aside
+            className={`${styles.paperProp} ${styles.yellowProp}`}
+            aria-hidden="true"
+          >
             <span>多喝水</span>
             <span>少内耗！</span>
             <b>⌣</b>
           </aside>
 
-          <aside className={`${styles.paperProp} ${styles.goalProp}`} aria-hidden="true">
+          <aside
+            className={`${styles.paperProp} ${styles.goalProp}`}
+            aria-hidden="true"
+          >
             <strong>今日小目标</strong>
             {quickNotes.map((note, index) => (
-              <span key={note}>{index === 0 ? "☑" : "☐"} {note}</span>
+              <span key={note}>
+                {index === 0 ? "☑" : "☐"} {note}
+              </span>
             ))}
           </aside>
 
-          <header className={styles.pageTitle} aria-labelledby="drink-prototype-title">
-            <span aria-hidden="true" className={styles.sparkles}>✦</span>
+          <header
+            className={styles.pageTitle}
+            aria-labelledby="drink-prototype-title"
+          >
+            <span aria-hidden="true" className={styles.sparkles}>
+              ✦
+            </span>
             <h1 id="drink-prototype-title">今天喝点什么</h1>
-            <span aria-hidden="true" className={styles.titleArrow}>↘</span>
+            <span aria-hidden="true" className={styles.titleArrow}>
+              ↘
+            </span>
           </header>
 
-          <section className={styles.receiptWorkbench} aria-label="今日水铺小票">
+          <section
+            className={styles.receiptWorkbench}
+            aria-label="今天喝点什么"
+          >
             <div className={styles.receiptMain}>
               <header className={styles.receiptHeader}>
                 <div className={styles.ticketTitle}>
-                  <span aria-hidden="true" className={styles.receiptIcon}>▤</span>
-                  <h2>今日水铺小票</h2>
+                  <span aria-hidden="true" className={styles.receiptIcon}>
+                    ▤
+                  </span>
+                  <h2>今天喝点什么</h2>
                 </div>
               </header>
 
@@ -364,8 +461,16 @@ export default function DrinkUpdatePrototypePage() {
                         >
                           -
                         </button>
-                        <strong aria-label={`${drink.label}今日${count}${drink.unit}`}>{count}</strong>
-                        <button type="button" aria-label={`增加一${drink.unit}${drink.label}`} onClick={() => openDrinkConfirmation(drink.id)}>
+                        <strong
+                          aria-label={`${drink.label}今日${count}${drink.unit}`}
+                        >
+                          {count}
+                        </strong>
+                        <button
+                          type="button"
+                          aria-label={`增加一${drink.unit}${drink.label}`}
+                          onClick={() => openDrinkConfirmation(drink.id)}
+                        >
                           +
                         </button>
                       </div>
@@ -378,9 +483,17 @@ export default function DrinkUpdatePrototypePage() {
                 <strong>今日喝了</strong>
                 <div>
                   {events.map((event) => (
-                    <DrinkMiniIcon drink={drinkById(event.drinkId)} key={event.id} />
+                    <DrinkMiniIcon
+                      drink={drinkById(event.drinkId)}
+                      key={event.id}
+                    />
                   ))}
-                  <button type="button" className={styles.addDashed} onClick={() => openDrinkConfirmation("water")} aria-label="快速记录一杯水">
+                  <button
+                    type="button"
+                    className={styles.addDashed}
+                    onClick={() => openDrinkConfirmation("water")}
+                    aria-label="快速记录一杯水"
+                  >
                     +
                   </button>
                 </div>
@@ -393,12 +506,25 @@ export default function DrinkUpdatePrototypePage() {
                 <strong>水铺营业中</strong>
               </header>
 
-              <section className={styles.statsHero} aria-label={`今日总杯数 ${totalCount}`}>
+              <section
+                className={styles.statsHero}
+                aria-label={`今日总杯数 ${totalCount}`}
+              >
                 <span>今日总杯数</span>
                 <strong>{totalCount}</strong>
-                <div className={styles.goalTally} aria-label={`8 杯目标，已完成 ${Math.min(totalCount, dailyGoal)} 杯`}>
+                <div
+                  className={styles.goalTally}
+                  aria-label={`8 杯目标，已完成 ${Math.min(totalCount, dailyGoal)} 杯`}
+                >
                   {Array.from({ length: dailyGoal }).map((_, index) => (
-                    <i className={index < totalCount ? styles.tallyDotFilled : styles.tallyDot} key={index} />
+                    <i
+                      className={
+                        index < totalCount
+                          ? styles.tallyDotFilled
+                          : styles.tallyDot
+                      }
+                      key={index}
+                    />
                   ))}
                 </div>
               </section>
@@ -419,7 +545,10 @@ export default function DrinkUpdatePrototypePage() {
                 )}
               </section>
 
-              <section className={styles.miniLeaderboard} aria-label="饮品小排行">
+              <section
+                className={styles.miniLeaderboard}
+                aria-label="饮品小排行"
+              >
                 <span className={styles.statsLabel}>饮品小排行</span>
                 {drinks
                   .map((drink) => ({ drink, count: counts[drink.id] }))
@@ -437,7 +566,11 @@ export default function DrinkUpdatePrototypePage() {
               </section>
 
               <footer className={styles.stateTape}>
-                <span>{remainingCups > 0 ? `距离 8 杯还差 ${remainingCups} 杯` : "今日水铺目标达成"}</span>
+                <span>
+                  {remainingCups > 0
+                    ? `距离 8 杯还差 ${remainingCups} 杯`
+                    : "今日水铺目标达成"}
+                </span>
               </footer>
             </aside>
           </section>
@@ -445,13 +578,24 @@ export default function DrinkUpdatePrototypePage() {
           <section className={styles.logTable} aria-label="今日饮品流水">
             <header>
               <div className={styles.ticketTitle}>
-                <span aria-hidden="true" className={styles.receiptIcon}>▤</span>
+                <span aria-hidden="true" className={styles.receiptIcon}>
+                  ▤
+                </span>
                 <h2>今日饮品流水</h2>
               </div>
-              <button type="button" onClick={() => openDrinkConfirmation("water")}>+ 记录一杯</button>
+              <button
+                type="button"
+                onClick={() => openDrinkConfirmation("water")}
+              >
+                + 记录一杯
+              </button>
             </header>
 
-            <div className={styles.logGrid} role="table" aria-label="今日饮品流水表">
+            <div
+              className={styles.logGrid}
+              role="table"
+              aria-label="今日饮品流水表"
+            >
               <div className={styles.logHead} role="row">
                 <span role="columnheader">时间</span>
                 <span role="columnheader">饮品</span>
@@ -471,7 +615,9 @@ export default function DrinkUpdatePrototypePage() {
                     </span>
                     <span role="cell">1 杯</span>
                     <span role="cell">{event.note}</span>
-                    <span role="cell" aria-label="开心">☺</span>
+                    <span role="cell" aria-label="开心">
+                      ☺
+                    </span>
                   </div>
                 );
               })}
@@ -487,7 +633,9 @@ export default function DrinkUpdatePrototypePage() {
                 role="dialog"
               >
                 <header>
-                  <span aria-hidden="true" className={styles.entryModalIcon}>▤</span>
+                  <span aria-hidden="true" className={styles.entryModalIcon}>
+                    ▤
+                  </span>
                   <div>
                     <p>牛马水铺入账</p>
                     <h2 id="drink-entry-title">确认记录一杯</h2>
@@ -504,7 +652,12 @@ export default function DrinkUpdatePrototypePage() {
                       value={pendingEntry.drinkId}
                       onChange={(event) =>
                         setPendingEntry((current) =>
-                          current ? { ...current, drinkId: event.target.value as DrinkId } : current,
+                          current
+                            ? {
+                                ...current,
+                                drinkId: event.target.value as DrinkId,
+                              }
+                            : current,
                         )
                       }
                     >
@@ -541,7 +694,9 @@ export default function DrinkUpdatePrototypePage() {
                     value={pendingEntry.note}
                     onChange={(event) =>
                       setPendingEntry((current) =>
-                        current ? { ...current, note: event.target.value } : current,
+                        current
+                          ? { ...current, note: event.target.value }
+                          : current,
                       )
                     }
                   />
@@ -553,7 +708,9 @@ export default function DrinkUpdatePrototypePage() {
                       key={note}
                       type="button"
                       onClick={() =>
-                        setPendingEntry((current) => (current ? { ...current, note } : current))
+                        setPendingEntry((current) =>
+                          current ? { ...current, note } : current,
+                        )
                       }
                     >
                       {note}
@@ -605,22 +762,40 @@ export default function DrinkUpdatePrototypePage() {
               </button>
             </div>
 
-            <div className={styles.teamCalendar} role="table" aria-label="团队饮品月历">
+            <div
+              className={styles.teamCalendar}
+              role="table"
+              aria-label="团队饮品月历"
+            >
               <div className={styles.calendarHeader} role="row">
                 <span role="columnheader">成员</span>
                 {calendarDays.map((day) => (
-                  <span role="columnheader" key={day}>{day}</span>
+                  <span role="columnheader" key={day}>
+                    {day}
+                  </span>
                 ))}
               </div>
 
               {teamMembers.map((member) => (
-                <div className={styles.calendarRow} role="row" key={`${member.name}-calendar`}>
+                <div
+                  className={styles.calendarRow}
+                  role="row"
+                  key={`${member.name}-calendar`}
+                >
                   <span role="rowheader">
                     <img src={member.avatar} alt="" />
                     {member.name}
                   </span>
                   {member.days.map((dayTotal, index) => (
-                    <span className={dayTotal > 0 ? styles.calendarCellFilled : styles.calendarCell} role="cell" key={`${member.name}-${index}`}>
+                    <span
+                      className={
+                        dayTotal > 0
+                          ? styles.calendarCellFilled
+                          : styles.calendarCell
+                      }
+                      role="cell"
+                      key={`${member.name}-${index}`}
+                    >
                       {dayTotal > 0 ? dayTotal : ""}
                     </span>
                   ))}

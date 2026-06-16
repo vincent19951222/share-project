@@ -49,18 +49,6 @@ export function DrinkCheckin() {
   return (
     <main className="drink-checkin-shell h-full min-h-0 overflow-y-auto overflow-x-hidden bg-[#f7eddc] bg-[linear-gradient(rgba(255,253,247,0.72),rgba(247,237,220,0.88))] px-4 py-6 text-slate-950 sm:px-8">
       <div className="drink-checkin-content mx-auto grid max-w-[1390px] gap-6">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-black uppercase tracking-normal text-cyan-700">Niuma Water Shop</p>
-            <h1 className="text-4xl font-black leading-none tracking-normal sm:text-5xl">
-              今天喝点什么
-            </h1>
-          </div>
-          <div className="rounded-full border-2 border-slate-950 bg-white px-4 py-2 text-sm font-black shadow-[4px_4px_0_rgba(15,23,42,0.24)]">
-            今日总杯数 {snapshot.stats.todayTotalCups}
-          </div>
-        </header>
-
         <DrinkReceipt
           snapshot={snapshot}
           busy={busy}

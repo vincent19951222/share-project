@@ -181,7 +181,7 @@ describe("/api/activity-events", () => {
     ]);
   });
 
-  it("filters drink activity events by kind=drink", async () => {
+  it("includes coffee compatibility events in the drink activity feed", async () => {
     await prisma.activityEvent.deleteMany({ where: { teamId } });
     await prisma.activityEvent.create({
       data: {
@@ -200,7 +200,7 @@ describe("/api/activity-events", () => {
         type: ACTIVITY_EVENT_TYPES.COFFEE_ADD,
         message: "li 续命 1 杯，今日累计 1 杯",
         assetAwarded: null,
-        createdAt: now,
+        createdAt: new Date(now.getTime() - 1000),
       },
     });
 
@@ -210,6 +210,7 @@ describe("/api/activity-events", () => {
     expect(response.status).toBe(200);
     expect(payload.events.map((event: { text: string }) => event.text)).toEqual([
       "li 在水铺记录 1 杯水，今日累计 1 杯",
+      "li 续命 1 杯，今日累计 1 杯",
     ]);
   });
 });

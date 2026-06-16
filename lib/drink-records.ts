@@ -5,7 +5,7 @@ import {
   buildDrinkAddActivityMessage,
   buildDrinkRemoveActivityMessage,
 } from "@/lib/activity-events";
-import { drinkCatalog, type DrinkType } from "@/lib/drinks";
+import { drinkCatalog, isDrinkType, type DrinkType } from "@/lib/drinks";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 
@@ -136,7 +136,8 @@ export async function removeLatestDrinkRecordForUser(input: {
         deletedAt: null,
       },
     });
-    const removedDrinkType = input.drinkType ?? (latest.drinkType as DrinkType);
+    const removedDrinkType =
+      input.drinkType ?? (isDrinkType(latest.drinkType) ? latest.drinkType : "other");
     const activity = buildRemoveActivity(input.activityMode, input.user, removedDrinkType, totalCups);
 
     await tx.activityEvent.create({

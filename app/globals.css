@@ -1596,6 +1596,8 @@ body {
 }
 
 .heatmap-training-panel {
+  --heatmap-desktop-header-height: 2.5rem;
+  --heatmap-desktop-row-height: 3.75rem;
   border-color: #111827;
   background: rgba(255, 255, 255, 0.9);
 }
@@ -1613,6 +1615,24 @@ body {
 
 .heatmap-grid-track {
   background-color: rgba(255, 255, 255, 0.58);
+}
+
+.heatmap-members-heading,
+.heatmap-days-header {
+  flex: 0 0 var(--heatmap-desktop-header-height);
+  height: var(--heatmap-desktop-header-height);
+}
+
+.heatmap-members-list,
+.heatmap-grid-rows {
+  justify-content: flex-start;
+  gap: 0;
+}
+
+.heatmap-member-item,
+.heatmap-grid-row {
+  flex: 0 0 var(--heatmap-desktop-row-height);
+  height: var(--heatmap-desktop-row-height);
 }
 
 .heatmap-day-today {

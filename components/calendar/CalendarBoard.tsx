@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchCalendarState } from "@/lib/api";
 import { CALENDAR_REFRESH_EVENT } from "@/lib/calendar-refresh";
 import type { CalendarMonthSnapshot } from "@/lib/types";
+import { AssetIcon } from "@/components/ui/AssetIcon";
 import { CalendarGrid } from "./CalendarGrid";
 import { CalendarHeader } from "./CalendarHeader";
 import { formatCalendarMonthLabel, getPreviousMonthKey } from "./calendar-data";
@@ -194,7 +195,7 @@ export function CalendarBoard() {
                     </div>
                     <div className="calendar-summary-chip calendar-summary-chip-coffee">
                       <span className="calendar-summary-icon" aria-hidden="true">
-                        <img src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg" alt="" />
+                        <AssetIcon name="drink" />
                       </span>
                       <span className="calendar-summary-label">本月喝了</span>
                       <strong className="calendar-summary-value">{drinkCupTotal}</strong>

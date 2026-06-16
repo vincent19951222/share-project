@@ -25,7 +25,7 @@ export function CalendarDayCell({ cell }: { cell: CalendarGridDayCell }) {
           aria-label={`饮品 ${drinkCups} 杯`}
           role="img"
         >
-          <AssetIcon name="coffee" className="calendar-coffee-icon" />
+          <AssetIcon name="drink" className="calendar-coffee-icon" />
           <span>{drinkCups}</span>
         </div>
       ) : null}

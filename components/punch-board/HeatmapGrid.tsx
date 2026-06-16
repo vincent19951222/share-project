@@ -524,7 +524,7 @@ export function HeatmapGrid() {
             })}
           </div>
           <div className="heatmap-grid-body heatmap-grid-track flex-1 py-2 px-4 w-max relative">
-            <div className="flex flex-col justify-between h-full relative z-10">
+            <div className="heatmap-grid-rows flex flex-col justify-between h-full relative z-10">
               {state.members.map((member, rowIndex) => (
                 <div key={member.id} className="heatmap-grid-row flex gap-3 h-12 items-center">
                   {Array.from({ length: state.totalDays }, (_, index) => renderPunchCell(rowIndex, index))}

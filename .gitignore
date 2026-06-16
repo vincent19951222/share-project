@@ -9,6 +9,8 @@
 .codex/
 .codex-dev-*.log
 .worktrees/
+.agents/
+skills-lock.json
 
 # Superpowers local config
 .superpowers/
@@ -45,3 +47,5 @@ prisma/dev.db.bak-*
 design/female*.png
 design/male*.png
 docs/roadmap.md
+tmp/imagegen/
+public/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-parts/

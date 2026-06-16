@@ -7,8 +7,9 @@ import { DrinkTeamGrid } from "@/components/drink-checkin/DrinkTeamGrid";
 import { DrinkProvider } from "@/lib/drink-store";
 import type { DrinkSnapshot } from "@/lib/types";
 
-(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
-  true;
+(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 function createJsonResponse(body: unknown, ok = true, status = 200) {
   return { ok, status, json: async () => body };
@@ -16,7 +17,14 @@ function createJsonResponse(body: unknown, ok = true, status = 200) {
 
 const snapshot: DrinkSnapshot = {
   members: [{ id: "u1", name: "li", avatarKey: "male1" }],
-  gridData: [[{ cups: 0, drinkCounts: { water: 0, milkTea: 0, americano: 0, latte: 0, other: 0 } }]],
+  gridData: [
+    [
+      {
+        cups: 0,
+        drinkCounts: { water: 0, milkTea: 0, americano: 0, latte: 0, other: 0 },
+      },
+    ],
+  ],
   today: 1,
   totalDays: 1,
   currentUserId: "u1",
@@ -114,6 +122,9 @@ describe("DrinkCheckin", () => {
     expect(main?.className).toContain("overflow-x-hidden");
     expect(container.querySelector(".drink-checkin-shell")).not.toBeNull();
     expect(container.querySelector(".drink-checkin-content")).not.toBeNull();
+    expect(container.textContent).not.toContain("正在打印今日水铺小票");
+    expect(container.textContent).not.toContain("今日总杯数");
+    expect(container.textContent).toContain("今天喝点什么");
   });
 
   it("opens a confirmation ticket and posts the edited drink note", async () => {
@@ -128,7 +139,9 @@ describe("DrinkCheckin", () => {
         }
 
         if (url === "/api/drinks/records" && method === "POST") {
-          return Promise.resolve(createJsonResponse({ snapshot: updatedSnapshot }));
+          return Promise.resolve(
+            createJsonResponse({ snapshot: updatedSnapshot }),
+          );
         }
 
         if (url === "/api/activity-events?kind=drink") {
@@ -148,7 +161,9 @@ describe("DrinkCheckin", () => {
       await Promise.resolve();
     });
 
-    const addWater = container.querySelector<HTMLButtonElement>('button[aria-label="增加一杯水"]');
+    const addWater = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="增加一杯水"]',
+    );
     expect(addWater).not.toBeNull();
 
     await act(async () => {
@@ -157,7 +172,9 @@ describe("DrinkCheckin", () => {
 
     expect(container.textContent).toContain("确认记录一杯");
 
-    const textarea = container.querySelector<HTMLTextAreaElement>('textarea[name="drink-note"]');
+    const textarea = container.querySelector<HTMLTextAreaElement>(
+      'textarea[name="drink-note"]',
+    );
     expect(textarea).not.toBeNull();
 
     await act(async () => {
@@ -165,8 +182,8 @@ describe("DrinkCheckin", () => {
       textarea!.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
-    const confirm = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("确认入账"),
+    const confirm = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.includes("确认入账"),
     );
 
     await act(async () => {
@@ -195,7 +212,9 @@ describe("DrinkCheckin", () => {
         }
 
         if (url === "/api/drinks/records" && method === "POST") {
-          return Promise.resolve(createJsonResponse({ error: "水铺暂时离线" }, false, 500));
+          return Promise.resolve(
+            createJsonResponse({ error: "水铺暂时离线" }, false, 500),
+          );
         }
 
         if (url === "/api/activity-events?kind=drink") {
@@ -215,13 +234,15 @@ describe("DrinkCheckin", () => {
       await Promise.resolve();
     });
 
-    const addWater = container.querySelector<HTMLButtonElement>('button[aria-label="增加一杯水"]');
+    const addWater = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="增加一杯水"]',
+    );
     await act(async () => {
       addWater?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    const confirm = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("确认入账"),
+    const confirm = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.includes("确认入账"),
     );
     await act(async () => {
       confirm?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -285,6 +306,8 @@ describe("DrinkCheckin", () => {
     });
 
     const statusSidebar = container.querySelector("aside");
+    expect(statusSidebar?.textContent).toContain("我的水");
+    expect(statusSidebar?.textContent).not.toContain("队友拿铁");
     expect(container.querySelector(".drink-receipt-layout")).not.toBeNull();
     expect(container.querySelector(".drink-receipt-card")).not.toBeNull();
     expect(container.querySelector(".drink-options-grid")).not.toBeNull();
@@ -293,8 +316,6 @@ describe("DrinkCheckin", () => {
     expect(container.querySelector(".drink-option-image")).not.toBeNull();
     expect(container.querySelector(".drink-option-controls")).not.toBeNull();
     expect(container.querySelector(".drink-status-card")).not.toBeNull();
-    expect(statusSidebar?.textContent).toContain("我的水");
-    expect(statusSidebar?.textContent).not.toContain("队友拿铁");
   });
 
   it("renders the latest 7 drink days including today in the team grid", async () => {
@@ -306,7 +327,13 @@ describe("DrinkCheckin", () => {
       gridData: [
         Array.from({ length: 30 }, (_, index) => ({
           cups: index === 11 ? 2 : 0,
-          drinkCounts: { water: index === 11 ? 2 : 0, milkTea: 0, americano: 0, latte: 0, other: 0 },
+          drinkCounts: {
+            water: index === 11 ? 2 : 0,
+            milkTea: 0,
+            americano: 0,
+            latte: 0,
+            other: 0,
+          },
         })),
       ],
     };

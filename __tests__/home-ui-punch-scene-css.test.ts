@@ -99,11 +99,16 @@ describe("home punch scene CSS", () => {
     const railRule = extractRuleBody(css, ".heatmap-member-rail");
     const rulerRule = extractRuleBody(css, ".heatmap-day-ruler");
     const trackRule = extractRuleBody(css, ".heatmap-grid-track");
+    const headingRule = extractRuleBody(css, ".heatmap-members-heading,\n.heatmap-days-header");
+    const rowStackRule = extractRuleBody(css, ".heatmap-members-list,\n.heatmap-grid-rows");
+    const rowRule = extractRuleBody(css, ".heatmap-member-item,\n.heatmap-grid-row");
     const todayCellRule = extractRuleBody(css, ".heatmap-cell-today");
     const todayButtonRule = extractRuleBody(css, ".heatmap-cell-today.my-punch-btn");
     const mobileBlock = extractBlock(css, "@media (max-width: 760px)");
     const mobileMemberRule = extractRuleBody(mobileBlock, ".heatmap-mobile-member {");
 
+    expect(panelRule).toMatch(/--heatmap-desktop-header-height:\s*2\.5rem/);
+    expect(panelRule).toMatch(/--heatmap-desktop-row-height:\s*3\.75rem/);
     expect(panelRule).toMatch(/border-color:\s*#111827/);
     expect(panelRule).toMatch(/background:\s*rgba\(255,\s*255,\s*255,\s*0\.9\)/);
     expect(railRule).toMatch(/border-right:\s*3px solid #111827/);
@@ -113,6 +118,11 @@ describe("home punch scene CSS", () => {
     expect(trackRule).toMatch(/background-color:\s*rgba\(255,\s*255,\s*255,\s*0\.58\)/);
     expect(trackRule).not.toMatch(/background-image/);
     expect(trackRule).not.toMatch(/background-size/);
+    expect(headingRule).toMatch(/flex:\s*0 0 var\(--heatmap-desktop-header-height\)/);
+    expect(headingRule).toMatch(/height:\s*var\(--heatmap-desktop-header-height\)/);
+    expect(rowStackRule).toMatch(/justify-content:\s*flex-start/);
+    expect(rowRule).toMatch(/flex:\s*0 0 var\(--heatmap-desktop-row-height\)/);
+    expect(rowRule).toMatch(/height:\s*var\(--heatmap-desktop-row-height\)/);
     expect(todayCellRule).toMatch(/background:\s*#fef08a/);
     expect(todayCellRule).toMatch(/border-color:\s*#fde047/);
     expect(todayButtonRule).toMatch(/background:\s*#111827/);

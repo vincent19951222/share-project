@@ -5,6 +5,7 @@ import { POST } from "@/app/api/drinks/records/route";
 import { GET } from "@/app/api/drinks/state/route";
 import { createCookieValue } from "@/lib/auth";
 import { seedDatabase } from "@/lib/db-seed";
+import { getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 
 function request(url: string, userId?: string, method = "GET", body?: unknown) {
@@ -90,5 +91,30 @@ describe("drink API", () => {
     expect(response.status).toBe(200);
     expect(payload.snapshot.stats.drinkCounts.water).toBe(0);
     expect(payload.snapshot.stats.drinkCounts.latte).toBe(1);
+  });
+
+  it("soft-deletes the latest drink without a type even when legacy data has an unknown type", async () => {
+    await prisma.drinkRecord.create({
+      data: {
+        userId,
+        teamId,
+        dayKey: getShanghaiDayKey(),
+        drinkType: "legacy-coffee",
+        note: "legacy import",
+      },
+    });
+
+    const response = await DELETE(request("/api/drinks/records/latest", userId, "DELETE"));
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.snapshot.stats.currentUserTodayCups).toBe(0);
+    await expect(
+      prisma.drinkRecord.findFirstOrThrow({
+        where: { userId, teamId, drinkType: "legacy-coffee" },
+      }),
+    ).resolves.toMatchObject({
+      deletedAt: expect.any(Date),
+    });
   });
 });
