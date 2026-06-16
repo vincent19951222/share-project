@@ -14419,18 +14419,84 @@ body {
   .drink-checkin-content {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     gap: 0.85rem;
+    overflow-x: hidden;
   }
 
-  .drink-checkin-secondary-grid {
+  .drink-checkin-content > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .drink-receipt-layout {
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .drink-receipt-card {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0.85rem;
+  }
+
+  .drink-receipt-header {
+    align-items: flex-start;
     gap: 0.75rem;
   }
 
+  .drink-options-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .drink-option-card {
+    min-width: 0;
+    padding: 0.65rem;
+  }
+
+  .drink-option-art {
+    max-height: 9rem;
+    overflow: hidden;
+  }
+
+  .drink-option-image {
+    max-width: 7.5rem;
+    max-height: 7.5rem;
+  }
+
+  .drink-option-controls {
+    grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
+  }
+
+  .drink-checkin-secondary-grid {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    max-width: 100%;
+    gap: 0.75rem;
+  }
+
+  .drink-checkin-secondary-grid > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .drink-status-card {
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.85rem;
+  }
+
   .drink-team-board {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
     padding: 0.85rem;
   }
 
   .drink-team-scroll {
+    width: 100%;
     max-width: 100%;
     overflow-x: auto;
     overscroll-behavior-x: contain;

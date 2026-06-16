@@ -109,9 +109,9 @@ export function DrinkReceipt({
 
   return (
     <>
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]" aria-label="今日水铺小票">
-        <div className="rounded-[8px] border-4 border-slate-950 bg-[#fffdf7] p-5 shadow-[8px_8px_0_rgba(15,23,42,0.28)]">
-          <header className="mb-5 flex items-center justify-between gap-4">
+      <section className="drink-receipt-layout grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]" aria-label="今日水铺小票">
+        <div className="drink-receipt-card rounded-[8px] border-4 border-slate-950 bg-[#fffdf7] p-5 shadow-[8px_8px_0_rgba(15,23,42,0.28)]">
+          <header className="drink-receipt-header mb-5 flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-black uppercase text-cyan-700">Niuma Water Shop</p>
               <h1 className="text-3xl font-black leading-none text-slate-950">今日水铺小票</h1>
@@ -126,24 +126,24 @@ export function DrinkReceipt({
             </button>
           </header>
 
-          <div className="grid gap-4 md:grid-cols-5">
+          <div className="drink-options-grid grid gap-4 md:grid-cols-5">
             {drinkItems.map((drink) => {
               const count = snapshot.stats.drinkCounts[drink.type];
 
               return (
                 <article
-                  className="relative rounded-[8px] border-4 border-slate-950 bg-white p-3 shadow-[5px_5px_0_rgba(15,23,42,0.18)]"
+                  className="drink-option-card relative rounded-[8px] border-4 border-slate-950 bg-white p-3 shadow-[5px_5px_0_rgba(15,23,42,0.18)]"
                   key={drink.type}
                   style={drinkStyle(drink)}
                 >
                   <h2 className="text-lg font-black text-slate-950">{drink.label}</h2>
-                  <div className="my-3 grid aspect-square place-items-center rounded-[8px] border-2 border-slate-200 bg-[var(--drink-soft)]">
-                    <img src={drink.asset} alt="" className="h-[76%] w-[76%] object-contain" />
+                  <div className="drink-option-art my-3 grid aspect-square place-items-center rounded-[8px] border-2 border-slate-200 bg-[var(--drink-soft)]">
+                    <img src={drink.asset} alt="" className="drink-option-image h-[76%] w-[76%] object-contain" />
                   </div>
                   <span className="absolute right-2 top-2 rounded-full border-2 border-slate-950 bg-white px-2 py-1 text-xs font-black">
                     x{count}
                   </span>
-                  <div className="grid grid-cols-[38px_1fr_38px] items-center gap-2">
+                  <div className="drink-option-controls grid grid-cols-[38px_1fr_38px] items-center gap-2">
                     <button
                       type="button"
                       aria-label={`减少一杯${drink.label}`}
@@ -191,7 +191,7 @@ export function DrinkReceipt({
           </div>
         </div>
 
-        <aside className="rounded-[8px] border-4 border-slate-950 bg-cyan-50 p-5 shadow-[8px_8px_0_rgba(15,23,42,0.22)]">
+        <aside className="drink-status-card rounded-[8px] border-4 border-slate-950 bg-cyan-50 p-5 shadow-[8px_8px_0_rgba(15,23,42,0.22)]">
           <header className="mb-4">
             <span className="text-xs font-black uppercase text-cyan-700">今日状态</span>
             <h2 className="text-2xl font-black text-slate-950">水铺营业中</h2>

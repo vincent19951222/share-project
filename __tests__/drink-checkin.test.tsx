@@ -285,6 +285,14 @@ describe("DrinkCheckin", () => {
     });
 
     const statusSidebar = container.querySelector("aside");
+    expect(container.querySelector(".drink-receipt-layout")).not.toBeNull();
+    expect(container.querySelector(".drink-receipt-card")).not.toBeNull();
+    expect(container.querySelector(".drink-options-grid")).not.toBeNull();
+    expect(container.querySelector(".drink-option-card")).not.toBeNull();
+    expect(container.querySelector(".drink-option-art")).not.toBeNull();
+    expect(container.querySelector(".drink-option-image")).not.toBeNull();
+    expect(container.querySelector(".drink-option-controls")).not.toBeNull();
+    expect(container.querySelector(".drink-status-card")).not.toBeNull();
     expect(statusSidebar?.textContent).toContain("我的水");
     expect(statusSidebar?.textContent).not.toContain("队友拿铁");
   });

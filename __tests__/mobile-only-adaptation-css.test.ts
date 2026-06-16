@@ -184,11 +184,59 @@ describe("mobile-only adaptation CSS", () => {
     expectMobileRule(".drink-checkin-content", [
       /width:\s*100%/,
       /max-width:\s*100%/,
+      /min-width:\s*0/,
+      /overflow-x:\s*hidden/,
     ]);
-    expectMobileRule(".drink-checkin-secondary-grid", [
+    expectMobileRule(".drink-checkin-content > *", [
+      /min-width:\s*0/,
+      /max-width:\s*100%/,
+    ]);
+    expectMobileRule(".drink-receipt-layout", [
+      /grid-template-columns:\s*minmax\(0,\s*1fr\)/,
+      /max-width:\s*100%/,
+    ]);
+    expectMobileRule(".drink-receipt-card", [
+      /min-width:\s*0/,
+      /max-width:\s*100%/,
+      /overflow:\s*hidden/,
+    ]);
+    expectMobileRule(".drink-options-grid", [
+      /grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/,
       /gap:\s*0\.75rem/,
     ]);
+    expectMobileRule(".drink-option-card", [
+      /min-width:\s*0/,
+      /padding:\s*0\.65rem/,
+    ]);
+    expectMobileRule(".drink-option-art", [
+      /max-height:\s*9rem/,
+      /overflow:\s*hidden/,
+    ]);
+    expectMobileRule(".drink-option-image", [
+      /max-width:\s*7\.5rem/,
+      /max-height:\s*7\.5rem/,
+    ]);
+    expectMobileRule(".drink-checkin-secondary-grid", [
+      /grid-template-columns:\s*minmax\(0,\s*1fr\)/,
+      /min-width:\s*0/,
+      /max-width:\s*100%/,
+      /gap:\s*0\.75rem/,
+    ]);
+    expectMobileRule(".drink-checkin-secondary-grid > *", [
+      /min-width:\s*0/,
+      /max-width:\s*100%/,
+    ]);
+    expectMobileRule(".drink-status-card", [
+      /min-width:\s*0/,
+      /max-width:\s*100%/,
+    ]);
+    expectMobileRule(".drink-team-board", [
+      /min-width:\s*0/,
+      /max-width:\s*100%/,
+      /overflow:\s*hidden/,
+    ]);
     expectMobileRule(".drink-team-scroll", [
+      /width:\s*100%/,
       /max-width:\s*100%/,
       /overflow-x:\s*auto/,
     ]);
