@@ -164,6 +164,7 @@ export async function buildDrinkSnapshotForUser(
     gridData,
     today,
     totalDays,
+    monthKey: currentMonthKey,
     currentUserId: user.id,
     todayEvents,
     stats: {

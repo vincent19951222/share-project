@@ -6,10 +6,11 @@ import {
   buildDrinkRemoveActivityMessage,
 } from "@/lib/activity-events";
 import { drinkCatalog, isDrinkType, type DrinkType } from "@/lib/drinks";
-import { getShanghaiDayKey } from "@/lib/economy";
+import { getPreviousShanghaiDayKey, getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 
 export const DRINK_RECORD_NOT_FOUND = "DRINK_RECORD_NOT_FOUND";
+export const DRINK_MAKEUP_NOT_ALLOWED = "DRINK_MAKEUP_NOT_ALLOWED";
 
 export type DrinkActivityMode = "drink" | "coffeeCompatibility";
 
@@ -23,11 +24,44 @@ export function isDrinkRecordNotFoundError(error: unknown) {
   return error instanceof Error && error.message === DRINK_RECORD_NOT_FOUND;
 }
 
-function buildAddActivity(mode: DrinkActivityMode, user: DrinkMutationUser, drinkType: DrinkType, totalCups: number) {
+export function isDrinkMakeupNotAllowedError(error: unknown) {
+  return error instanceof Error && error.message === DRINK_MAKEUP_NOT_ALLOWED;
+}
+
+function resolveDrinkRecordDayKey(dayKey: string | undefined, now = new Date()) {
+  const todayDayKey = getShanghaiDayKey(now);
+
+  if (!dayKey) {
+    return todayDayKey;
+  }
+
+  const yesterdayDayKey = getPreviousShanghaiDayKey(todayDayKey);
+
+  if (dayKey !== yesterdayDayKey || dayKey.slice(0, 7) !== todayDayKey.slice(0, 7)) {
+    throw new Error(DRINK_MAKEUP_NOT_ALLOWED);
+  }
+
+  return dayKey;
+}
+
+function buildAddActivity(
+  mode: DrinkActivityMode,
+  user: DrinkMutationUser,
+  drinkType: DrinkType,
+  totalCups: number,
+  isMakeup: boolean,
+) {
   if (mode === "coffeeCompatibility") {
     return {
       type: ACTIVITY_EVENT_TYPES.COFFEE_ADD,
       message: buildCoffeeAddActivityMessage(user.username, totalCups),
+    };
+  }
+
+  if (isMakeup) {
+    return {
+      type: ACTIVITY_EVENT_TYPES.DRINK_ADD,
+      message: `${user.username} 补记了昨天 1 杯${drinkCatalog[drinkType].label}，当日累计 ${totalCups} 杯`,
     };
   }
 
@@ -60,10 +94,13 @@ export async function createDrinkRecordForUser(input: {
   user: DrinkMutationUser;
   drinkType: DrinkType;
   note?: string | null;
+  dayKey?: string;
   activityMode: DrinkActivityMode;
 }) {
   await prisma.$transaction(async (tx) => {
-    const dayKey = getShanghaiDayKey();
+    const now = new Date();
+    const todayDayKey = getShanghaiDayKey(now);
+    const dayKey = resolveDrinkRecordDayKey(input.dayKey, now);
 
     await tx.drinkRecord.create({
       data: {
@@ -83,7 +120,13 @@ export async function createDrinkRecordForUser(input: {
         deletedAt: null,
       },
     });
-    const activity = buildAddActivity(input.activityMode, input.user, input.drinkType, totalCups);
+    const activity = buildAddActivity(
+      input.activityMode,
+      input.user,
+      input.drinkType,
+      totalCups,
+      dayKey !== todayDayKey,
+    );
 
     await tx.activityEvent.create({
       data: {

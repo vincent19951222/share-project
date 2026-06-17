@@ -657,6 +657,7 @@ export interface DrinkSnapshot {
   gridData: DrinkDayCell[][];
   today: number;
   totalDays: number;
+  monthKey?: string;
   currentUserId: string;
   todayEvents: DrinkEventSnapshot[];
   stats: {

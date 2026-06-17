@@ -58,7 +58,12 @@ export function DrinkCheckin() {
         />
 
         <div className="drink-checkin-secondary-grid grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <DrinkTeamGrid snapshot={snapshot} />
+          <DrinkTeamGrid
+            snapshot={snapshot}
+            busy={busy}
+            error={error}
+            onMakeupDrink={confirmDrink}
+          />
           <DrinkActivityFeed />
         </div>
       </div>

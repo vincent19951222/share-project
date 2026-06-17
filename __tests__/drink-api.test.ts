@@ -1,11 +1,11 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { DELETE } from "@/app/api/drinks/records/latest/route";
 import { POST } from "@/app/api/drinks/records/route";
 import { GET } from "@/app/api/drinks/state/route";
 import { createCookieValue } from "@/lib/auth";
 import { seedDatabase } from "@/lib/db-seed";
-import { getShanghaiDayKey } from "@/lib/economy";
+import { getPreviousShanghaiDayKey, getShanghaiDayKey } from "@/lib/economy";
 import { prisma } from "@/lib/prisma";
 
 function request(url: string, userId?: string, method = "GET", body?: unknown) {
@@ -35,6 +35,10 @@ describe("drink API", () => {
 
   afterAll(async () => {
     await prisma.$disconnect();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("rejects unauthenticated drink requests", async () => {
@@ -67,6 +71,60 @@ describe("drink API", () => {
     ).resolves.toMatchObject({
       note: "奶茶续命，快乐加倍",
     });
+  });
+
+  it("creates a drink record for yesterday when a makeup day key is provided", async () => {
+    const fixedNow = new Date("2026-06-17T09:00:00+08:00");
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(fixedNow);
+    const yesterdayDayKey = getPreviousShanghaiDayKey(getShanghaiDayKey());
+
+    const response = await POST(
+      request("/api/drinks/records", userId, "POST", {
+        drinkType: "latte",
+        note: "昨天忘记记了",
+        dayKey: yesterdayDayKey,
+      }),
+    );
+    const payload = await response.json();
+    const yesterdayDay = Number(yesterdayDayKey.slice(8, 10));
+
+    expect(response.status).toBe(200);
+    expect(payload.snapshot.stats.currentUserTodayCups).toBe(0);
+    expect(payload.snapshot.gridData[0][yesterdayDay - 1].drinkCounts.latte).toBe(1);
+    await expect(
+      prisma.drinkRecord.findFirstOrThrow({
+        where: { userId, teamId, drinkType: "latte", deletedAt: null },
+      }),
+    ).resolves.toMatchObject({
+      dayKey: yesterdayDayKey,
+      note: "昨天忘记记了",
+    });
+  });
+
+  it("rejects explicit drink day keys outside yesterday", async () => {
+    const fixedNow = new Date("2026-06-17T09:00:00+08:00");
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(fixedNow);
+    const todayDayKey = getShanghaiDayKey();
+    const twoDaysAgo = getPreviousShanghaiDayKey(getPreviousShanghaiDayKey(todayDayKey));
+
+    const todayResponse = await POST(
+      request("/api/drinks/records", userId, "POST", {
+        drinkType: "water",
+        dayKey: todayDayKey,
+      }),
+    );
+    const olderResponse = await POST(
+      request("/api/drinks/records", userId, "POST", {
+        drinkType: "water",
+        dayKey: twoDaysAgo,
+      }),
+    );
+
+    expect(todayResponse.status).toBe(409);
+    expect(olderResponse.status).toBe(409);
+    await expect(prisma.drinkRecord.count({ where: { userId, teamId } })).resolves.toBe(0);
   });
 
   it("rejects unsupported drink types", async () => {

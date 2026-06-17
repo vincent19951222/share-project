@@ -87,6 +87,7 @@ describe("DrinkCheckin", () => {
     act(() => root.unmount());
     container.remove();
     vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it("uses an internal vertical scroll container inside the fixed board tab panel", async () => {
@@ -349,5 +350,156 @@ describe("DrinkCheckin", () => {
     expect(container.querySelector(".drink-team-board")).not.toBeNull();
     expect(container.querySelector(".drink-team-scroll")).not.toBeNull();
     expect(container.querySelector(".drink-team-table")).not.toBeNull();
+
+    const headerCells = Array.from(
+      container.querySelectorAll<HTMLSpanElement>(".drink-team-table > div:first-child > span"),
+    );
+    expect(headerCells.at(1)?.className).toContain("text-center");
+  });
+
+  it("keeps yesterday's current-user grid cell content as the cup count while making it clickable", async () => {
+    const gridSnapshot: DrinkSnapshot = {
+      ...snapshot,
+      today: 17,
+      totalDays: 30,
+      members: [{ id: "u1", name: "li", avatarKey: "male1" }],
+      gridData: [
+        Array.from({ length: 30 }, (_, index) => ({
+          cups: index === 15 ? 2 : 0,
+          drinkCounts: {
+            water: index === 15 ? 2 : 0,
+            milkTea: 0,
+            americano: 0,
+            latte: 0,
+            other: 0,
+          },
+        })),
+      ],
+    };
+
+    await act(async () => {
+      root.render(
+        <DrinkTeamGrid
+          snapshot={gridSnapshot}
+          busy={false}
+          error={null}
+          onMakeupDrink={async () => true}
+        />,
+      );
+    });
+
+    const yesterdayCell = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="补记 16日 水铺记录"]',
+    );
+
+    expect(container.textContent).toContain("昨天");
+    expect(yesterdayCell).not.toBeNull();
+    expect(yesterdayCell?.textContent).toBe("2");
+  });
+
+  it("keeps an empty yesterday current-user grid cell clickable without adding label text", async () => {
+    const onMakeupDrink = vi.fn().mockResolvedValue(true);
+    const gridSnapshot: DrinkSnapshot = {
+      ...snapshot,
+      today: 17,
+      totalDays: 30,
+      members: [{ id: "u1", name: "li", avatarKey: "male1" }],
+      gridData: [
+        Array.from({ length: 30 }, () => ({
+          cups: 0,
+          drinkCounts: {
+            water: 0,
+            milkTea: 0,
+            americano: 0,
+            latte: 0,
+            other: 0,
+          },
+        })),
+      ],
+    };
+
+    await act(async () => {
+      root.render(
+        <DrinkTeamGrid
+          snapshot={gridSnapshot}
+          busy={false}
+          error={null}
+          onMakeupDrink={onMakeupDrink}
+        />,
+      );
+    });
+
+    const yesterdayCell = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="补记 16日 水铺记录"]',
+    );
+    expect(yesterdayCell).not.toBeNull();
+    expect(yesterdayCell?.textContent).toBe("");
+
+    await act(async () => {
+      yesterdayCell?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("补记昨天水铺");
+  });
+
+  it("opens a yesterday makeup dialog from the current user's drink grid cell", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-06-12T09:00:00+08:00"));
+    const onMakeupDrink = vi.fn().mockResolvedValue(true);
+    const gridSnapshot: DrinkSnapshot = {
+      ...snapshot,
+      today: 12,
+      totalDays: 30,
+      members: [{ id: "u1", name: "li", avatarKey: "male1" }],
+      gridData: [
+        Array.from({ length: 30 }, () => ({
+          cups: 0,
+          drinkCounts: {
+            water: 0,
+            milkTea: 0,
+            americano: 0,
+            latte: 0,
+            other: 0,
+          },
+        })),
+      ],
+    };
+
+    await act(async () => {
+      root.render(
+        <DrinkTeamGrid
+          snapshot={gridSnapshot}
+          busy={false}
+          error={null}
+          onMakeupDrink={onMakeupDrink}
+        />,
+      );
+    });
+
+    const yesterdayCell = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="补记 11日 水铺记录"]',
+    );
+    expect(yesterdayCell).not.toBeNull();
+
+    await act(async () => {
+      yesterdayCell?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("补记昨天水铺");
+
+    const confirm = Array.from(container.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("确认补记"),
+    );
+
+    await act(async () => {
+      confirm?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(onMakeupDrink).toHaveBeenCalledWith({
+      drinkType: "water",
+      note: expect.any(String),
+      dayKey: "2026-06-11",
+    });
   });
 });

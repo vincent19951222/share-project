@@ -34,9 +34,9 @@ describe("drink API helpers", () => {
     );
 
     await expect(fetchDrinkState()).resolves.toEqual(drinkSnapshot);
-    await expect(addDrinkRecord({ drinkType: "water", note: "早起一杯" })).resolves.toEqual(
-      drinkSnapshot,
-    );
+    await expect(
+      addDrinkRecord({ drinkType: "water", note: "早起一杯", dayKey: "2026-06-16" }),
+    ).resolves.toEqual(drinkSnapshot);
     await expect(removeLatestDrinkRecord("water")).resolves.toEqual(drinkSnapshot);
 
     expect(fetch).toHaveBeenCalledWith("/api/drinks/state", expect.objectContaining({ method: "GET" }));
@@ -44,7 +44,7 @@ describe("drink API helpers", () => {
       "/api/drinks/records",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ drinkType: "water", note: "早起一杯" }),
+        body: JSON.stringify({ drinkType: "water", note: "早起一杯", dayKey: "2026-06-16" }),
       }),
     );
     expect(fetch).toHaveBeenCalledWith(

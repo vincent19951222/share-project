@@ -553,6 +553,7 @@ export async function removeLatestTodayCoffeeCup(): Promise<CoffeeSnapshot> {
 export async function addDrinkRecord(input: {
   drinkType: DrinkType;
   note?: string | null;
+  dayKey?: string;
 }): Promise<DrinkSnapshot> {
   const response = await fetch("/api/drinks/records", {
     method: "POST",

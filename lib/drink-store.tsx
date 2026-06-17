@@ -21,7 +21,11 @@ interface DrinkContextType {
   snapshot: DrinkSnapshot | null;
   busy: boolean;
   error: string | null;
-  confirmDrink: (input: { drinkType: DrinkType; note?: string | null }) => Promise<boolean>;
+  confirmDrink: (input: {
+    drinkType: DrinkType;
+    note?: string | null;
+    dayKey?: string;
+  }) => Promise<boolean>;
   removeLatestDrink: (drinkType?: DrinkType) => Promise<void>;
   refresh: () => Promise<void>;
 }
