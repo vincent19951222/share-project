@@ -169,7 +169,7 @@ describe("CalendarBoard", () => {
       expect(container.textContent).toMatch(/本月喝了\s*2\s*杯/);
       expect(
         container.querySelector(
-          '.calendar-summary-chip-coffee img[src="/assets/calendar/drink-pixel-16bit-v1.png"]',
+          '.calendar-summary-chip-coffee img[src="/assets/calendar/drink-pixel-16bit-v1.webp"]',
         ),
       ).not.toBeNull();
       expect(container.textContent).toContain("回到本月");
@@ -184,7 +184,7 @@ describe("CalendarBoard", () => {
       expect(getDrinkCountText(container, 2)).toBe("2");
       expect(getDayCell(container, 2).querySelector("[aria-label='饮品 2 杯']")).not.toBeNull();
       expect(
-        getDayCell(container, 2).querySelectorAll('img[src="/assets/calendar/drink-pixel-16bit-v1.png"]')
+        getDayCell(container, 2).querySelectorAll('img[src="/assets/calendar/drink-pixel-16bit-v1.webp"]')
           .length,
       ).toBe(1);
       expect(container.querySelectorAll("img[alt='咖啡记录']").length).toBe(0);

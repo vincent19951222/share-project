@@ -24,7 +24,7 @@ describe("FitnessMuscleMap", () => {
     container.remove();
   });
 
-  it("renders the original static png illustration", () => {
+  it("renders the remote static webp illustration", () => {
     act(() => {
       root.render(<FitnessMuscleMap cardioActive={true} selectedParts={["chest"]} />);
     });
@@ -33,7 +33,7 @@ describe("FitnessMuscleMap", () => {
 
     expect(image).not.toBeNull();
     expect(image?.getAttribute("src")).toBe(
-      "/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.png",
+      "/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.webp",
     );
     expect(container.querySelector('svg[aria-label="今日训练部位肌肉图"]')).toBeNull();
     expect(container.querySelector("[data-muscle-part]")).toBeNull();

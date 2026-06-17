@@ -45,6 +45,9 @@ const defaultTicketPayload: WorkoutTicketPayload = {
   durationMinutes: 60,
 };
 
+const strengthPartIconBasePath =
+  "/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons";
+
 function deriveTrainingType(cardioItem: CardioItem | null, parts: StrengthPart[]): TrainingType | null {
   if (cardioItem && parts.length > 0) {
     return "both";
@@ -88,7 +91,7 @@ function StrengthPartIcon({ part }: { part: StrengthPart }) {
     <img
       className="fitness-ticket-part-icon"
       data-strength-part-icon={part}
-      src={`/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons/${part}.png`}
+      src={`${strengthPartIconBasePath}/${part}.webp`}
       alt=""
       aria-hidden="true"
       draggable={false}

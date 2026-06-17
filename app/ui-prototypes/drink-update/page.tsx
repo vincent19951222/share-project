@@ -32,7 +32,7 @@ const drinks: Drink[] = [
   {
     id: "water",
     label: "水",
-    asset: "/assets/ui-prototypes/drink-update/generated/drink-water.png",
+    asset: "/assets/ui-prototypes/drink-update/generated/drink-water.webp",
     color: "#4fb8d6",
     softColor: "#e8f8fc",
     textColor: "#0087a6",
@@ -41,7 +41,7 @@ const drinks: Drink[] = [
   {
     id: "milkTea",
     label: "奶茶",
-    asset: "/assets/ui-prototypes/drink-update/generated/drink-milk-tea.png",
+    asset: "/assets/ui-prototypes/drink-update/generated/drink-milk-tea.webp",
     color: "#ef7f8f",
     softColor: "#fff1ee",
     textColor: "#e96f83",
@@ -50,7 +50,7 @@ const drinks: Drink[] = [
   {
     id: "americano",
     label: "美式",
-    asset: "/assets/ui-prototypes/drink-update/generated/drink-americano.png",
+    asset: "/assets/ui-prototypes/drink-update/generated/drink-americano.webp",
     color: "#7a5438",
     softColor: "#fff3df",
     textColor: "#76411f",
@@ -59,7 +59,7 @@ const drinks: Drink[] = [
   {
     id: "latte",
     label: "拿铁",
-    asset: "/assets/ui-prototypes/drink-update/generated/drink-latte.png",
+    asset: "/assets/ui-prototypes/drink-update/generated/drink-latte.webp",
     color: "#ef9d36",
     softColor: "#fff4dd",
     textColor: "#e4841b",
@@ -68,7 +68,7 @@ const drinks: Drink[] = [
   {
     id: "other",
     label: "其他",
-    asset: "/assets/ui-prototypes/drink-update/generated/drink-other.png",
+    asset: "/assets/ui-prototypes/drink-update/generated/drink-other.webp",
     color: "#8f948e",
     softColor: "#f4f3ed",
     textColor: "#555555",

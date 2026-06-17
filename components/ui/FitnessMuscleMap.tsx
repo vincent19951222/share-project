@@ -7,7 +7,7 @@ type FitnessMuscleMapProps = {
   selectedParts: StrengthPart[];
 };
 
-const muscleMapSrc = "/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.png";
+const muscleMapSrc = "/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.webp";
 
 export function FitnessMuscleMap(_props: FitnessMuscleMapProps) {
   return (

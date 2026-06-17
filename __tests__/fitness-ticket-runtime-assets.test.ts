@@ -20,20 +20,28 @@ describe("fitness ticket runtime assets", () => {
     expect(globalsCss).toContain(".fitness-ticket-confirm");
   });
 
-  it("uses the original png illustration for the muscle map", () => {
-    expect(muscleMapSource).toContain("muscle-map.png");
+  it("uses the local webp illustration for the muscle map", () => {
+    expect(muscleMapSource).toContain("muscle-map.webp");
     expect(muscleMapSource).not.toContain("data-muscle-part");
     expect(muscleMapSource).not.toContain("<svg");
     expect(
-      existsSync(join(projectRoot, "public/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.png")),
+      existsSync(join(projectRoot, "public/assets/ui-prototypes/fitness-punch-ticket/generated/muscle-map.webp")),
     ).toBe(true);
   });
 
-  it("ships generated png icons for every visible strength part", () => {
+  it("ships generated webp icons for every visible strength part", () => {
+    const ticketSource = readFileSync(
+      join(projectRoot, "components/ui/FitnessPunchTicket.tsx"),
+      "utf8",
+    );
+
+    expect(ticketSource).toContain("/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons");
+    expect(ticketSource).toContain("${part}.webp");
+
     for (const part of ["chest", "back", "shoulder", "arms", "abs", "legs"]) {
       expect(
         existsSync(
-          join(projectRoot, `public/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons/${part}.png`),
+          join(projectRoot, `public/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons/${part}.webp`),
         ),
       ).toBe(true);
     }
