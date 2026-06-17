@@ -88,10 +88,10 @@ describe("workout helpers", () => {
     })).toEqual({ ok: false, error: "invalid-workout-payload" });
   });
 
-  it("accepts stationary bike as a cardio workout", () => {
+  it("accepts walking as a cardio workout and rejects the old bike parameter", () => {
     const parsed = parseWorkoutTicketPayload({
       trainingType: "cardio",
-      cardioItem: "bike",
+      cardioItem: "walk",
       strengthParts: [],
       durationMinutes: 60,
     });
@@ -100,9 +100,15 @@ describe("workout helpers", () => {
     if (!parsed.ok) throw new Error(parsed.error);
 
     expect(buildWorkoutEntries(parsed.payload)).toEqual([
-      { category: "cardio", code: "bike", label: "单车" },
+      { category: "cardio", code: "walk", label: "散步" },
     ]);
-    expect(buildWorkoutSummary(parsed.payload)).toBe("单车 · 60 分钟");
+    expect(buildWorkoutSummary(parsed.payload)).toBe("散步 · 60 分钟");
+    expect(parseWorkoutTicketPayload({
+      trainingType: "cardio",
+      cardioItem: "bike",
+      strengthParts: [],
+      durationMinutes: 60,
+    })).toEqual({ ok: false, error: "invalid-workout-payload" });
   });
 
   it("accepts arms as a strength workout part", () => {

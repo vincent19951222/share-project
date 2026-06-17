@@ -228,7 +228,8 @@ describe("HeatmapGrid punch flow", () => {
 
     expect(pageText()).toContain("今日训练小票");
     expect(pageText()).toContain("今日重点部位");
-    expect(pageText()).toContain("单车");
+    expect(pageText()).toContain("散步");
+    expect(pageText()).not.toContain("单车");
     expect(document.body.querySelectorAll("[data-strength-part-icon]")).toHaveLength(6);
     expect(document.body.querySelector('img[alt="今日训练部位肌肉图"]')).toBeNull();
 

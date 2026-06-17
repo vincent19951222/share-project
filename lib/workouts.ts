@@ -1,7 +1,7 @@
 import type { Prisma } from "@/lib/generated/prisma/client";
 
 export const TRAINING_TYPES = ["cardio", "strength", "both"] as const;
-export const CARDIO_ITEMS = ["treadmill", "elliptical", "bike", "swim"] as const;
+export const CARDIO_ITEMS = ["treadmill", "elliptical", "walk", "swim"] as const;
 export const STRENGTH_PARTS = ["chest", "back", "shoulder", "arms", "glutes", "legs", "abs"] as const;
 
 export type TrainingType = (typeof TRAINING_TYPES)[number];
@@ -33,7 +33,7 @@ export type WorkoutParseResult =
 const cardioLabels: Record<CardioItem, string> = {
   treadmill: "跑步机",
   elliptical: "椭圆机",
-  bike: "单车",
+  walk: "散步",
   swim: "游泳",
 };
 

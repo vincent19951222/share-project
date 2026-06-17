@@ -96,7 +96,8 @@ describe("PunchPopup", () => {
 
     expect(pageText()).toContain("今日训练小票");
     expect(pageText()).toContain("有氧项目");
-    expect(pageText()).toContain("单车");
+    expect(pageText()).toContain("散步");
+    expect(pageText()).not.toContain("单车");
     expect(pageText()).toContain("今日重点部位");
     expect(pageText()).toContain("胸部");
     expect(pageText()).toContain("手臂");
@@ -127,7 +128,7 @@ describe("PunchPopup", () => {
     expect(findModalButton("都有")).toBeUndefined();
     expectTrainingTypeSummaryLabels(["有氧"]);
     expectModalButtonActive("跑步机", true);
-    expectModalButtonActive("单车", false);
+    expectModalButtonActive("散步", false);
     expectModalButtonActive("胸部", false);
     expect(workoutSummaryText()).toContain("有氧：跑步机");
     expect(workoutSummaryText()).toContain("部位：未选择");
@@ -150,7 +151,7 @@ describe("PunchPopup", () => {
     });
   });
 
-  it("forwards the selected bike cardio payload from the fitness ticket variant", async () => {
+  it("forwards the selected walking cardio payload from the fitness ticket variant", async () => {
     const onConfirm = vi.fn().mockResolvedValue(true);
 
     await act(async () => {
@@ -164,10 +165,10 @@ describe("PunchPopup", () => {
     });
 
     await act(async () => {
-      findModalButton("单车")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      findModalButton("散步")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(workoutSummaryText()).toContain("有氧：单车");
+    expect(workoutSummaryText()).toContain("有氧：散步");
 
     const confirmButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("确认打卡"));
 
@@ -178,7 +179,7 @@ describe("PunchPopup", () => {
 
     expect(onConfirm).toHaveBeenCalledWith({
       trainingType: "cardio",
-      cardioItem: "bike",
+      cardioItem: "walk",
       strengthParts: [],
       durationMinutes: 60,
     });
