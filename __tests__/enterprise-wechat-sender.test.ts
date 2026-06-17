@@ -9,6 +9,7 @@ import {
 } from "@/lib/integrations/enterprise-wechat";
 
 const originalWebhook = process.env.ENTERPRISE_WECHAT_WEBHOOK_URL;
+const originalLegacyWebhook = process.env.WEWORK_WEBHOOK_URL;
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -38,6 +39,11 @@ describe("enterprise wechat sender", () => {
       delete process.env.ENTERPRISE_WECHAT_WEBHOOK_URL;
     } else {
       process.env.ENTERPRISE_WECHAT_WEBHOOK_URL = originalWebhook;
+    }
+    if (originalLegacyWebhook === undefined) {
+      delete process.env.WEWORK_WEBHOOK_URL;
+    } else {
+      process.env.WEWORK_WEBHOOK_URL = originalLegacyWebhook;
     }
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
@@ -133,6 +139,25 @@ describe("enterprise wechat sender", () => {
     });
     expect(log.status).toBe("SENT");
     expect(JSON.stringify(log)).not.toContain("test-key");
+  });
+
+  it("keeps the legacy wework webhook env var working", async () => {
+    process.env.WEWORK_WEBHOOK_URL =
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=legacy-key";
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ errcode: 0, errmsg: "ok" }));
+
+    const result = await sendEnterpriseWechatMessage({
+      teamId,
+      purpose: "MANUAL_TEST",
+      message: { type: "text", content: "hello legacy env" },
+      fetchImpl: fetchMock,
+    });
+
+    expect(result).toMatchObject({ ok: true, status: "SENT" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=legacy-key",
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 
   it("fails when enterprise wechat does not return errcode zero", async () => {

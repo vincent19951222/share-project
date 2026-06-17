@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { LoginForm } from "@/components/login/LoginForm";
 
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   return (
     <main className="w-full h-full flex items-center justify-center">

@@ -63,7 +63,12 @@ function normalizeMessageContent(content: string): string {
 }
 
 function resolveWebhookUrl(override?: string): string {
-  return override?.trim() || process.env.ENTERPRISE_WECHAT_WEBHOOK_URL?.trim() || "";
+  return (
+    override?.trim() ||
+    process.env.ENTERPRISE_WECHAT_WEBHOOK_URL?.trim() ||
+    process.env.WEWORK_WEBHOOK_URL?.trim() ||
+    ""
+  );
 }
 
 function buildPayload(message: EnterpriseWechatMessage) {

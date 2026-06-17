@@ -18,7 +18,12 @@ export const DAILY_WEWORK_REMINDER_CONTENT = "记得每日健身打卡和咖啡�
 const MAX_MARKDOWN_LENGTH = 3800;
 
 function resolveWebhookUrl(override?: string): string {
-  return override?.trim() || process.env.ENTERPRISE_WECHAT_WEBHOOK_URL?.trim() || "";
+  return (
+    override?.trim() ||
+    process.env.ENTERPRISE_WECHAT_WEBHOOK_URL?.trim() ||
+    process.env.WEWORK_WEBHOOK_URL?.trim() ||
+    ""
+  );
 }
 
 async function readWeWorkError(response: Response): Promise<string | null> {

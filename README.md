@@ -66,10 +66,10 @@ npm run build
 
 ```env
 DATABASE_URL="file:/E:/data/share-project/prod.db"
-WEWORK_WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..."
+ENTERPRISE_WECHAT_WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..."
 ```
 
-`WEWORK_WEBHOOK_URL` 为可选配置。配置后，管理员发布本周战报时会自动向对应企业微信群机器人推送 markdown 周报；未配置时发布流程正常完成，只跳过企业微信推送。
+`ENTERPRISE_WECHAT_WEBHOOK_URL` 为可选配置。配置后，管理员发布本周战报时会自动向对应企业微信群机器人推送 markdown 周报；未配置时发布流程正常完成，只跳过企业微信推送。兼容历史变量名 `WEWORK_WEBHOOK_URL`，但新部署优先使用 `ENTERPRISE_WECHAT_WEBHOOK_URL`。
 
 每日 13:40 的企业微信提醒复用同一个 webhook，发送内容为“记得每日健身打卡和咖啡打卡”。生产机可用 Windows 计划任务触发：
 

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DAILY_WEWORK_REMINDER_CONTENT,
   pushDailyReminderToWeWork,
@@ -37,6 +37,11 @@ function createJsonResponse(body: unknown, status = 200) {
 }
 
 describe("wework webhook", () => {
+  afterEach(() => {
+    delete process.env.ENTERPRISE_WECHAT_WEBHOOK_URL;
+    delete process.env.WEWORK_WEBHOOK_URL;
+  });
+
   it("skips daily reminders when no webhook url is configured", async () => {
     const fetchMock = vi.fn();
 
@@ -75,6 +80,20 @@ describe("wework webhook", () => {
       msgtype: "text",
       text: { content: DAILY_WEWORK_REMINDER_CONTENT },
     });
+  });
+
+  it("keeps the legacy wework webhook env var working for daily reminders", async () => {
+    process.env.WEWORK_WEBHOOK_URL =
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=legacy-daily-key";
+    const fetchMock = vi.fn().mockResolvedValue(createJsonResponse({ errcode: 0, errmsg: "ok" }));
+
+    const result = await pushDailyReminderToWeWork({ fetchImpl: fetchMock });
+
+    expect(result).toEqual({ status: "sent" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=legacy-daily-key",
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 
   it("skips weekly report pushes when no webhook url is configured", async () => {
