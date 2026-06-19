@@ -111,28 +111,6 @@ async function waitFor(assertion: () => void | Promise<void>, attempts = 20) {
   }
 }
 
-function gameWeeklySnapshot() {
-  return {
-    teamId: "team_1",
-    weekStartDayKey: "2026-04-20",
-    weekEndDayKey: "2026-04-26",
-    generatedAt: "2026-04-26T02:00:00.000Z",
-    published: false,
-    publishedDynamicId: null,
-    metrics: {},
-    metricCards: [
-      { key: "task-rate", label: "四维完成率", value: "50%", helper: "28/56 个任务完成", tone: "default" },
-      { key: "tickets-earned", label: "本周发券", value: "10", helper: "健身 5 · 四维 4 · 补券 1", tone: "highlight" },
-      { key: "draws", label: "抽奖次数", value: "3", helper: "单抽 2 · 十连 1", tone: "success" },
-      { key: "social-response", label: "弱社交响应", value: "100%", helper: "2/2 个邀请有回应", tone: "success" },
-    ],
-    summaryCards: [
-      { key: "rhythm", title: "补给站节奏", body: "本周四维任务完成率 50%。", tone: "default" },
-    ],
-    highlights: [],
-  };
-}
-
 function buildAdminState(): BoardState {
   return {
     ...initialState,
@@ -208,16 +186,6 @@ describe("ReportCenter", () => {
         if (String(input) === "/api/drinks/state") {
           return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
         }
-        if (String(input) === "/api/gamification/reports/weekly") {
-          return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
-        }
-        if (String(input) === "/api/reports/weekly/draft") {
-          return Promise.resolve(createJsonResponse({ draft: null }));
-        }
-        if (String(input) === "/api/reports/weekly/publish") {
-          return Promise.resolve(createJsonResponse({ dynamic: { id: "weekly-dynamic-1" } }));
-        }
-
         throw new Error(`Unexpected fetch call: ${String(input)}`);
       }),
     );
@@ -248,9 +216,6 @@ describe("ReportCenter", () => {
       expect(container.textContent).toContain("活跃趋势");
       expect(container.textContent).toContain("牛马水铺");
       expect(container.textContent).toContain("Daily Sip");
-      expect(container.textContent).toContain("牛马补给周报");
-      expect(container.textContent).toContain("四维完成率");
-      expect(container.textContent).toContain("本周发券");
       expect(container.textContent).toContain("今日全队 3 杯");
       expect(container.textContent).toContain("饮品人数");
       expect(container.textContent).toContain("2/2");
@@ -286,10 +251,13 @@ describe("ReportCenter", () => {
       expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_mini_chart_slip.webp']")).not.toBeNull();
       expect(container.querySelector("img[src='https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_vault_safe_yellow.webp']")).not.toBeNull();
       expect(container.querySelector("svg[aria-label='团队每日打卡人数趋势']")).not.toBeNull();
-      expect(container.querySelector(".report-scene-bottom .game-weekly-report-desk")).not.toBeNull();
-      expect(container.querySelector(".report-scene-bottom .game-weekly-report-highlights-rail")).not.toBeNull();
+      expect(container.querySelector(".report-scene-bottom")).toBeNull();
+      expect(container.querySelector(".report-scene-admin")).toBeNull();
     });
 
+    expect(container.textContent).not.toContain("牛马补给周报");
+    expect(container.textContent).not.toContain("本周高光");
+    expect(container.textContent).not.toContain("本周周报");
     expect(container.textContent).not.toContain("气氛组播报");
     expect(container.textContent).not.toContain("OCTOBER REPORT");
     expect(container.textContent).not.toContain("+12,450");
@@ -297,210 +265,17 @@ describe("ReportCenter", () => {
     expect(container.textContent).not.toContain("10.01");
   });
 
-  it("shows weekly report admin actions only for admins", async () => {
+  it("does not render removed weekly report workflows for admins", async () => {
     await renderReportCenter(root, buildAdminState());
 
     await waitFor(() => {
-      expect(container.textContent).toContain("本周周报");
-      expect(container.textContent).toContain("还没生成本周草稿");
-      expect(findButton(container, "生成本周周报")).toBeTruthy();
-      expect(findButton(container, "发布到团队动态")).toBeTruthy();
-      expect(container.querySelector(".report-scene-admin .weekly-report-admin-sheet")).not.toBeNull();
-      expect(container.querySelector(".report-scene-admin .weekly-report-admin-proof-sheet")).not.toBeNull();
-    });
-  });
-
-  it("hides the weekly report admin panel from regular members", async () => {
-    await renderReportCenter(root, initialState);
-
-    await waitFor(() => {
+      expect(container.textContent).toContain("4月牛马战报");
+      expect(container.textContent).not.toContain("牛马补给周报");
       expect(container.textContent).not.toContain("本周周报");
       expect(findButton(container, "生成本周周报")).toBeUndefined();
       expect(findButton(container, "发布到团队动态")).toBeUndefined();
-    });
-  });
-
-  it("renders generated weekly draft summary and week range for admins", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-        if (String(input) === "/api/drinks/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
-        }
-        if (String(input) === "/api/gamification/reports/weekly") {
-          return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
-        }
-        if (String(input) === "/api/reports/weekly/draft" && (!init?.method || init.method === "GET")) {
-          return Promise.resolve(createJsonResponse({ draft: null }));
-        }
-        if (String(input) === "/api/reports/weekly/draft" && init?.method === "POST") {
-          return Promise.resolve(
-            createJsonResponse({
-              draft: {
-                id: "draft-1",
-                teamId: "team-1",
-                createdByUserId: "u1",
-                weekStartDayKey: "2026-04-27",
-                summary: "本周打卡 9 次，全勤 2 天，赛季进度 3/5。",
-                createdAt: "2026-04-30T10:00:00.000+08:00",
-                updatedAt: "2026-04-30T10:00:00.000+08:00",
-                snapshot: {
-                  version: 1,
-                  weekStartDayKey: "2026-04-27",
-                  weekEndDayKey: "2026-04-30",
-                  generatedAt: "2026-04-30T10:00:00.000+08:00",
-                  generatedByUserId: "u1",
-                  summary: "本周打卡 9 次，全勤 2 天，赛季进度 3/5。",
-                  metrics: {
-                    totalPunches: 9,
-                    fullAttendanceDays: 2,
-                    seasonProgress: {
-                      filledSlots: 3,
-                      targetSlots: 5,
-                      status: "ACTIVE",
-                    },
-                  },
-                  highlights: {
-                    topMembers: [],
-                  },
-                  sections: [],
-                },
-              },
-            }),
-          );
-        }
-        if (String(input) === "/api/reports/weekly/publish") {
-          return Promise.resolve(createJsonResponse({ dynamic: { id: "weekly-dynamic-1" } }));
-        }
-
-        throw new Error(`Unexpected fetch call: ${String(input)} ${init?.method ?? "GET"}`);
-      }),
-    );
-
-    await renderReportCenter(root, buildAdminState());
-
-    await waitFor(() => {
-      expect(findButton(container, "生成本周周报")).toBeTruthy();
-    });
-
-    const generateButton = findButton(container, "生成本周周报");
-
-    await act(async () => {
-      generateButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain("已生成草稿");
-      expect(container.textContent).toContain("本周打卡 9 次，全勤 2 天，赛季进度 3/5。");
-      expect(container.textContent).toContain("2026.04.27 - 2026.04.30");
-    });
-  });
-
-  it("shows neutral publish confirmation after publishing a weekly draft", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-        if (String(input) === "/api/drinks/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
-        }
-        if (String(input) === "/api/gamification/reports/weekly") {
-          return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
-        }
-        if (String(input) === "/api/reports/weekly/draft" && (!init?.method || init.method === "GET")) {
-          return Promise.resolve(
-            createJsonResponse({
-              draft: {
-                id: "draft-1",
-                teamId: "team-1",
-                createdByUserId: "u1",
-                weekStartDayKey: "2026-04-27",
-                summary: "这是一份待发布草稿。",
-                createdAt: "2026-04-30T10:00:00.000+08:00",
-                updatedAt: "2026-04-30T10:00:00.000+08:00",
-                snapshot: {
-                  version: 1,
-                  weekStartDayKey: "2026-04-27",
-                  weekEndDayKey: "2026-04-30",
-                  generatedAt: "2026-04-30T10:00:00.000+08:00",
-                  generatedByUserId: "u1",
-                  summary: "这是一份待发布草稿。",
-                  metrics: {
-                    totalPunches: 9,
-                    fullAttendanceDays: 2,
-                    seasonProgress: null,
-                  },
-                  highlights: {
-                    topMembers: [],
-                  },
-                  sections: [],
-                },
-              },
-            }),
-          );
-        }
-        if (String(input) === "/api/reports/weekly/publish") {
-          return Promise.resolve(createJsonResponse({ dynamic: { id: "weekly-dynamic-1" } }));
-        }
-
-        throw new Error(`Unexpected fetch call: ${String(input)} ${init?.method ?? "GET"}`);
-      }),
-    );
-
-    await renderReportCenter(root, buildAdminState());
-
-    await waitFor(() => {
-      expect(container.querySelector(".report-scene-admin")).not.toBeNull();
-    });
-
-    const adminPanel = container.querySelector(".report-scene-admin");
-    const publishButton = Array.from(adminPanel?.querySelectorAll("button") ?? []).find((button) =>
-      button.textContent?.includes("发布到团队动态"),
-    );
-
-    await act(async () => {
-      publishButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-
-    await waitFor(() => {
-      expect(container.textContent).toContain("已发布到团队动态");
-      expect(container.textContent).toContain("团队动态记录号 weekly-dynamic-1");
-      expect(container.textContent).toContain("周报已发布到团队动态");
-    });
-  });
-
-  it("keeps admin draft status in a pending-confirmation state when the initial draft load fails", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-        if (String(input) === "/api/drinks/state") {
-          return Promise.resolve(createJsonResponse({ snapshot: drinkSnapshot() }));
-        }
-        if (String(input) === "/api/gamification/reports/weekly") {
-          return Promise.resolve(createJsonResponse({ snapshot: gameWeeklySnapshot() }));
-        }
-        if (String(input) === "/api/reports/weekly/draft" && (!init?.method || init.method === "GET")) {
-          return Promise.resolve({
-            ok: false,
-            status: 500,
-            json: async () => ({ error: "草稿服务暂时不可用" }),
-          });
-        }
-        if (String(input) === "/api/reports/weekly/publish") {
-          return Promise.resolve(createJsonResponse({ dynamic: { id: "weekly-dynamic-1" } }));
-        }
-
-        throw new Error(`Unexpected fetch call: ${String(input)} ${init?.method ?? "GET"}`);
-      }),
-    );
-
-    await renderReportCenter(root, buildAdminState());
-
-    await waitFor(() => {
-      expect(container.textContent).toContain("草稿服务暂时不可用");
-      expect(container.textContent).toContain("草稿状态待确认");
-      expect(container.textContent).toContain("状态待确认");
-      expect(container.textContent).toContain("草稿拉取失败，请先重试或重新生成后再发布。");
-      expect(container.textContent).not.toContain("还没生成本周草稿");
+      expect(container.querySelector(".report-scene-bottom")).toBeNull();
+      expect(container.querySelector(".report-scene-admin")).toBeNull();
     });
   });
 

@@ -198,12 +198,12 @@ describe("home report scene", () => {
       expect(container.querySelector(".report-header-copy")).not.toBeNull();
       expect(container.querySelector(".report-header-vault")).not.toBeNull();
       expect(container.querySelector(".report-scene-analysis")).not.toBeNull();
-      expect(container.querySelector(".report-scene-bottom")).not.toBeNull();
-      expect(container.querySelector(".report-scene-admin")).not.toBeNull();
+      expect(container.querySelector(".report-scene-bottom")).toBeNull();
+      expect(container.querySelector(".report-scene-admin")).toBeNull();
       expect(container.querySelector(".report-milestones")).not.toBeNull();
       expect(container.textContent).toContain("4月牛马战报");
-      expect(container.textContent).toContain("本周高光");
-      expect(container.textContent).toContain("本周周报");
+      expect(container.textContent).not.toContain("本周高光");
+      expect(container.textContent).not.toContain("本周周报");
     });
 
     const propSources = Array.from(container.querySelectorAll(".report-scene-props img")).map((image) =>

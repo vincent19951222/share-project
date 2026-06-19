@@ -139,7 +139,7 @@ describe("home report scene CSS", () => {
     expect(contentRule).toMatch(/padding-inline:\s*clamp\(7\.5rem,\s*10vw,\s*12\.5rem\)/);
   });
 
-  it("styles the report paper surfaces, inset appendix, and admin proof sheet", () => {
+  it("styles the report paper surfaces and inset appendix", () => {
     const css = normalizeCss(readFileSync("app/globals.css", "utf8"));
     const rootCss = stripMediaBlocks(css);
     const headerRule = extractSingleRuleBody(rootCss, ".report-header-strip");
@@ -151,9 +151,6 @@ describe("home report scene CSS", () => {
     const coffeeCupArtboardRule = extractSingleRuleBody(rootCss, ".coffee-report-cup-artboard");
     const coffeeCupTitleRule = extractSingleRuleBody(rootCss, ".coffee-report-cup-label-title");
     const coffeeReceiptFooterRule = extractSingleRuleBody(rootCss, ".coffee-report-receipt-footer");
-    const weeklyPaperRule = extractSingleRuleBody(rootCss, ".game-weekly-report-paper");
-    const weeklyRailRule = extractSingleRuleBody(rootCss, ".game-weekly-report-highlights-rail");
-    const adminSheetRule = extractSingleRuleBody(rootCss, ".weekly-report-admin-sheet");
 
     expect(headerRule).toMatch(/border:\s*4px solid #111827/);
     expect(headerRule).toMatch(/box-shadow:\s*6px 6px 0 #1f2937/);
@@ -170,9 +167,9 @@ describe("home report scene CSS", () => {
     expect(coffeeCupArtboardRule).toMatch(/container-type:\s*inline-size/);
     expect(coffeeCupTitleRule).toMatch(/white-space:\s*nowrap/);
     expect(coffeeReceiptFooterRule).toMatch(/grid-template-columns:\s*47% 53%/);
-    expect(weeklyPaperRule).toMatch(/border:\s*3px solid #111827/);
-    expect(weeklyRailRule).toMatch(/border:\s*4px solid #111827/);
-    expect(adminSheetRule).toMatch(/border:\s*4px solid #111827/);
+    expect(rootCss).not.toContain(".game-weekly-report-paper");
+    expect(rootCss).not.toContain(".game-weekly-report-highlights-rail");
+    expect(rootCss).not.toContain(".weekly-report-admin-sheet");
   });
 
   it("includes responsive and reduced-motion coverage for the report scene", () => {
@@ -250,21 +247,7 @@ describe("home report scene CSS", () => {
           /min-height:\s*0/.test(block),
       ),
     ).toBe(true);
-    expect(
-      mobileBlocks.some(
-        (block) =>
-          block.includes(".game-weekly-report-desk") &&
-          /max-height:\s*42rem/.test(block) &&
-          /overflow-y:\s*auto/.test(block),
-      ),
-    ).toBe(true);
-    expect(
-      mobileBlocks.some(
-        (block) =>
-          block.includes(".game-weekly-report-desk") &&
-          /max-height:\s*none/.test(block),
-      ),
-    ).toBe(true);
+    expect(mobileCss).not.toContain(".game-weekly-report-desk");
     expect(
       reducedMotionBlocks.some(
         (block) =>

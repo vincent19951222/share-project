@@ -6,9 +6,7 @@ import { useBoard } from "@/lib/store";
 import { ReportHeader } from "./ReportHeader";
 import { Milestones } from "./Milestones";
 import { DrinkReportPanel } from "./DrinkReportPanel";
-import { GamificationWeeklyReportPanel } from "./GamificationWeeklyReportPanel";
 import { TrendChart } from "./TrendChart";
-import { WeeklyReportAdminPanel } from "./WeeklyReportAdminPanel";
 import { buildReportData } from "./report-data";
 
 const reportSceneProps = [
@@ -92,14 +90,6 @@ export function ReportCenter() {
               error={drinkState.error}
             />
           </div>
-          <div className="report-scene-bottom">
-            <GamificationWeeklyReportPanel isAdmin={state.currentUser?.isAdmin ?? false} />
-          </div>
-          {state.currentUser?.isAdmin ? (
-            <div className="report-scene-admin">
-              <WeeklyReportAdminPanel />
-            </div>
-          ) : null}
         </div>
       </div>
     </div>

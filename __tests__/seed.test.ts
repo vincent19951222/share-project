@@ -35,14 +35,6 @@ describe("seedDatabase", () => {
     });
     const fixtureTeamDynamicIds = fixtureTeamDynamics.map((item) => item.id);
 
-    await prisma.weeklyReportDraft.deleteMany({
-      where: {
-        OR: [
-          { createdByUserId: { in: fixtureUserIds } },
-          { teamId: { in: fixtureTeamIds } },
-        ],
-      },
-    });
     await prisma.socialInvitationResponse.deleteMany({
       where: {
         OR: [

@@ -29,12 +29,12 @@ describe("enterprise wechat persistence", () => {
     const log = await prisma.enterpriseWechatSendLog.create({
       data: {
         teamId,
-        purpose: "WEEKLY_REPORT",
+        purpose: "TEAM_BROADCAST",
         messageType: "markdown",
         status: "SENT",
         contentPreview: "preview",
-        targetType: "WeeklyReport",
-        targetId: "draft-1",
+        targetType: "TeamBroadcast",
+        targetId: "broadcast-1",
         httpStatus: 200,
         wechatErrcode: 0,
         wechatErrmsg: "ok",

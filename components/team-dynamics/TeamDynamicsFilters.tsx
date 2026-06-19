@@ -7,7 +7,6 @@ const FILTER_OPTIONS: Array<{ value: TeamDynamicFilterType; label: string }> = [
   { value: "ALL", label: "全部类型" },
   { value: TEAM_DYNAMIC_TYPES.SEASON_STARTED, label: "赛季" },
   { value: TEAM_DYNAMIC_TYPES.SEASON_TARGET_REACHED, label: "里程碑" },
-  { value: TEAM_DYNAMIC_TYPES.WEEKLY_REPORT_CREATED, label: "周报" },
   { value: TEAM_DYNAMIC_TYPES.STREAK_MILESTONE, label: "连签" },
 ];
 

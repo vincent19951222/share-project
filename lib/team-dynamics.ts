@@ -1,5 +1,4 @@
 export const TEAM_DYNAMIC_TYPES = {
-  WEEKLY_REPORT_CREATED: "WEEKLY_REPORT_CREATED",
   SEASON_STARTED: "SEASON_STARTED",
   SEASON_TARGET_REACHED: "SEASON_TARGET_REACHED",
   SEASON_ENDED: "SEASON_ENDED",
@@ -32,7 +31,7 @@ export interface TeamDynamicMeta {
 
 export interface TeamDynamicListItem {
   id: string;
-  type: TeamDynamicType;
+  type: TeamDynamicType | string;
   title: string;
   summary: string;
   occurredAt: string;
@@ -56,10 +55,6 @@ export interface NormalizedTeamDynamicsQuery {
 }
 
 const TEAM_DYNAMIC_META: Record<TeamDynamicType, TeamDynamicMeta> = {
-  [TEAM_DYNAMIC_TYPES.WEEKLY_REPORT_CREATED]: {
-    label: "周报",
-    tone: "highlight",
-  },
   [TEAM_DYNAMIC_TYPES.SEASON_STARTED]: {
     label: "赛季",
     tone: "default",
@@ -141,6 +136,13 @@ export function normalizeTeamDynamicsQuery(
   };
 }
 
-export function getTeamDynamicMeta(type: TeamDynamicType): TeamDynamicMeta {
-  return TEAM_DYNAMIC_META[type];
+export function getTeamDynamicMeta(type: TeamDynamicType | string): TeamDynamicMeta {
+  if (isTeamDynamicType(type)) {
+    return TEAM_DYNAMIC_META[type];
+  }
+
+  return {
+    label: "动态",
+    tone: "default",
+  };
 }

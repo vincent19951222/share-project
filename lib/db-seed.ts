@@ -57,10 +57,6 @@ export async function seedDatabase(): Promise<void> {
     where: { teamId: team.id },
   });
 
-  await prisma.weeklyReportDraft.deleteMany({
-    where: { teamId: team.id },
-  });
-
   await prisma.socialInvitationResponse.deleteMany({
     where: { teamId: team.id },
   });
@@ -213,9 +209,6 @@ export async function seedDatabase(): Promise<void> {
     await prisma.activityEvent.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.drinkRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
     await prisma.coffeeRecord.deleteMany({ where: { userId: { in: extraUserIds } } });
-    await prisma.weeklyReportDraft.deleteMany({
-      where: { createdByUserId: { in: extraUserIds } },
-    });
     await prisma.socialInvitationResponse.deleteMany({
       where: { responderUserId: { in: extraUserIds } },
     });

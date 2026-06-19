@@ -173,7 +173,7 @@ describe("home tab density contract", () => {
     expect(summaryRule).toMatch(/min-height:\s*3\.45rem/);
   });
 
-  it("lets the report scene scroll instead of clipping the report, coffee, and bottom sheets", () => {
+  it("lets the report scene scroll without clipping the report and coffee sections", () => {
     const css = readFileSync("app/globals.css", "utf8");
     const reportSource = readFileSync("components/report-center/ReportCenter.tsx", "utf8");
     const trendSource = readFileSync("components/report-center/TrendChart.tsx", "utf8");
@@ -185,14 +185,11 @@ describe("home tab density contract", () => {
     const contentRule = extractRuleBody(css, ".report-scene-content");
     const metricsRule = extractRuleBody(css, ".report-scene-metrics");
     const analysisRule = extractRuleBody(css, ".report-scene-analysis");
-    const bottomRule = extractRuleBody(css, ".report-scene-bottom");
     const paperRule = extractRuleBody(css, ".report-analysis-paper");
     const frameRule = extractRuleBody(css, ".report-analysis-editorial-frame");
     const bodyGridRule = extractRuleBody(css, ".report-analysis-body-grid");
     const chartFrameRule = extractRuleBody(css, ".report-chart-frame");
     const coffeeRule = extractRuleBody(css, ".coffee-report-inset-shell");
-    const weeklyRule = extractRuleBody(css, ".game-weekly-report-desk");
-    const adminRule = extractRuleBody(css, ".weekly-report-admin-sheet");
 
     expect(reportSource).toContain('className="report-board absolute inset-0');
     expect(trendSource).not.toContain("xl:col-span-2");
@@ -215,10 +212,6 @@ describe("home tab density contract", () => {
     expect(analysisRule).toMatch(/grid-template-columns:\s*minmax\(0,\s*1\.62fr\)\s*minmax\(280px,\s*0\.88fr\)/);
     expect(analysisRule).toMatch(/min-height:\s*auto/);
     expect(analysisRule).toMatch(/overflow:\s*visible/);
-    expect(bottomRule).toMatch(/display:\s*grid/);
-    expect(bottomRule).toMatch(/grid-template-columns:\s*minmax\(0,\s*1fr\)/);
-    expect(bottomRule).toMatch(/min-height:\s*auto/);
-    expect(bottomRule).toMatch(/overflow:\s*visible/);
     expect(paperRule).toMatch(/min-height:\s*clamp\(30rem,\s*58vh,\s*36rem\)/);
     expect(frameRule).toMatch(/height:\s*auto/);
     expect(bodyGridRule).toMatch(/flex:\s*1/);
@@ -228,8 +221,7 @@ describe("home tab density contract", () => {
     expect(chartFrameRule).toMatch(/min-height:\s*18rem/);
     expect(coffeeRule).toMatch(/height:\s*auto/);
     expect(coffeeRule).toMatch(/min-height:\s*clamp\(30rem,\s*58vh,\s*36rem\)/);
-    expect(weeklyRule).toMatch(/height:\s*auto/);
-    expect(weeklyRule).toMatch(/overflow:\s*visible/);
-    expect(adminRule).toMatch(/min-height:\s*auto/);
+    expect(reportSource).not.toContain("report-scene-bottom");
+    expect(reportSource).not.toContain("report-scene-admin");
   });
 });

@@ -29,7 +29,6 @@ describe("enterprise wechat sender", () => {
     await prisma.enterpriseWechatPushEvent.deleteMany({ where: { teamId } });
     delete process.env.ENTERPRISE_WECHAT_WEBHOOK_URL;
     delete process.env.WEWORK_WEBHOOK_URL;
-    delete process.env.WEWORK_WEEKLY_REPORT_WEBHOOK_URL;
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -118,17 +117,17 @@ describe("enterprise wechat sender", () => {
   });
 
   it("sends markdown and writes a sent log without storing the webhook key", async () => {
-    process.env.ENTERPRISE_WECHAT_WEBHOOK_URL =
+      process.env.ENTERPRISE_WECHAT_WEBHOOK_URL =
       "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=test-key";
 
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ errcode: 0, errmsg: "ok" }));
 
     const result = await sendEnterpriseWechatMessage({
       teamId,
-      purpose: "WEEKLY_REPORT",
+      purpose: "TEAM_BROADCAST",
       message: formatEnterpriseWechatMarkdown({
-        title: "Weekly report",
-        lines: ["9 punches this week"],
+        title: "Team broadcast",
+        lines: ["drink water today"],
       }),
       fetchImpl: fetchMock,
     });

@@ -20,7 +20,6 @@ model Team {
   drinkRecords   DrinkRecord[]
   workoutRecords WorkoutRecord[]
   teamDynamics   TeamDynamic[]
-  weeklyReportDrafts WeeklyReportDraft[]
   enterpriseWechatSendLogs EnterpriseWechatSendLog[]
   enterpriseWechatPushEvents EnterpriseWechatPushEvent[]
   dailyTaskAssignments DailyTaskAssignment[]
@@ -57,7 +56,6 @@ model User {
   coffeeRecords         CoffeeRecord[]
   drinkRecords          DrinkRecord[]
   teamDynamicReadStates TeamDynamicReadState[]
-  weeklyReportDrafts    WeeklyReportDraft[]
   dailyTaskAssignments  DailyTaskAssignment[]
   lotteryTicketLedgers  LotteryTicketLedger[]
   inventoryItems        InventoryItem[]
@@ -74,22 +72,6 @@ model User {
   administeredMakeupPunches AdminMakeupPunchLedger[] @relation("AdminMakeupPunchAdmin")
   targetedMakeupPunches AdminMakeupPunchLedger[] @relation("AdminMakeupPunchTarget")
   createdAt             DateTime               @default(now())
-}
-
-model WeeklyReportDraft {
-  id              String   @id @default(cuid())
-  teamId          String
-  team            Team     @relation(fields: [teamId], references: [id])
-  createdByUserId String
-  createdByUser   User     @relation(fields: [createdByUserId], references: [id])
-  weekStartDayKey String
-  summary         String
-  payloadJson     String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@unique([teamId, createdByUserId, weekStartDayKey])
-  @@index([teamId, weekStartDayKey, updatedAt])
 }
 
 model EnterpriseWechatSendLog {

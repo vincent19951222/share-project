@@ -40,7 +40,6 @@ export type EnterpriseWechatSendResult =
 export type EnterpriseWechatSendPurpose =
   | "MANUAL_TEST"
   | "WEAK_SOCIAL_INVITATION"
-  | "WEEKLY_REPORT"
   | "TEAM_BROADCAST"
   | "TEAM_MILESTONE";
 

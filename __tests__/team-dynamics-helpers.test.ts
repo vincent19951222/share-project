@@ -28,11 +28,15 @@ describe("team-dynamics helpers", () => {
     expect(query.limit).toBe(TEAM_DYNAMICS_PAGE_LIMIT);
   });
 
-  it("returns readable meta for report and season cards", () => {
-    expect(getTeamDynamicMeta(TEAM_DYNAMIC_TYPES.WEEKLY_REPORT_CREATED)).toMatchObject({
-      label: "周报",
-      tone: "highlight",
-    });
+  it("ignores removed weekly report filters", () => {
+    const query = normalizeTeamDynamicsQuery(
+      new URLSearchParams("view=page&type=WEEKLY_REPORT_CREATED"),
+    );
+
+    expect(query.type).toBe("ALL");
+  });
+
+  it("returns readable meta for active dynamic cards", () => {
     expect(getTeamDynamicMeta(TEAM_DYNAMIC_TYPES.SEASON_TARGET_REACHED)).toMatchObject({
       label: "赛季里程碑",
       tone: "success",
