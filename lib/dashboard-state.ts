@@ -96,13 +96,11 @@ export async function buildDashboardMonthSnapshotForUser(
   const days: DashboardDayRecord[] = baseSnapshot.days.map((dayRecord) => {
     const workout = workoutByDay.get(dayRecord.day);
     const drinkCounts = drinkCountsByDay.get(dayRecord.day) ?? createEmptyDrinkCounts();
-    const strengthParts =
-      workout?.entries
-        .filter((entry) => entry.category === "strength")
-        .map((entry) => entry.code)
-        .filter((code): code is typeof STRENGTH_PARTS[number] =>
-          (STRENGTH_PARTS as readonly string[]).includes(code),
-        ) ?? [];
+    const strengthParts = STRENGTH_PARTS.filter((part) =>
+      workout?.entries.some(
+        (entry) => entry.category === "strength" && entry.code === part,
+      ),
+    );
     const cardioEntry = workout?.entries.find((entry) => entry.category === "cardio");
 
     return {
