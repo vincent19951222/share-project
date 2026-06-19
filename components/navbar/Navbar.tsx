@@ -212,17 +212,6 @@ export function Navbar({
                 健身打卡
               </TabBtn>
               <TabBtn
-                active={activeTab === "board"}
-                className="board-tab"
-                pending={pendingTab === "board"}
-                onFocus={() => prefetchAppTab("board")}
-                onMouseEnter={() => prefetchAppTab("board")}
-                onClick={() => handleTabChange("board")}
-              >
-                <AssetIcon name="board" className="h-4 w-4 object-contain" />
-                共享看板
-              </TabBtn>
-              <TabBtn
                 active={activeTab === "coffee"}
                 className="coffee-tab"
                 pending={pendingTab === "coffee"}
@@ -232,6 +221,17 @@ export function Navbar({
               >
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
                 牛马水铺
+              </TabBtn>
+              <TabBtn
+                active={activeTab === "board"}
+                className="board-tab"
+                pending={pendingTab === "board"}
+                onFocus={() => prefetchAppTab("board")}
+                onMouseEnter={() => prefetchAppTab("board")}
+                onClick={() => handleTabChange("board")}
+              >
+                <AssetIcon name="board" className="h-4 w-4 object-contain" />
+                共享看板
               </TabBtn>
               <TabBtn
                 active={activeTab === "calendar"}
@@ -376,19 +376,6 @@ export function Navbar({
               </span>
             </TabBtn>
             <TabBtn
-              active={activeTab === "board"}
-              className="mobile-tab-btn board-tab justify-between"
-              pending={pendingTab === "board"}
-              onFocus={() => prefetchAppTab("board")}
-              onMouseEnter={() => prefetchAppTab("board")}
-              onClick={() => handleTabChange("board")}
-            >
-              <span className="flex items-center gap-2">
-                <AssetIcon name="board" className="h-4 w-4 object-contain" />
-                共享看板
-              </span>
-            </TabBtn>
-            <TabBtn
               active={activeTab === "coffee"}
               className="mobile-tab-btn coffee-tab justify-between"
               pending={pendingTab === "coffee"}
@@ -399,6 +386,19 @@ export function Navbar({
               <span className="flex items-center gap-2">
                 <AssetIcon name="coffee" className="h-4 w-4 object-contain" />
                 牛马水铺
+              </span>
+            </TabBtn>
+            <TabBtn
+              active={activeTab === "board"}
+              className="mobile-tab-btn board-tab justify-between"
+              pending={pendingTab === "board"}
+              onFocus={() => prefetchAppTab("board")}
+              onMouseEnter={() => prefetchAppTab("board")}
+              onClick={() => handleTabChange("board")}
+            >
+              <span className="flex items-center gap-2">
+                <AssetIcon name="board" className="h-4 w-4 object-contain" />
+                共享看板
               </span>
             </TabBtn>
             <TabBtn

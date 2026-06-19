@@ -98,6 +98,31 @@ describe("Navbar supply chrome", () => {
     vi.useRealTimers();
   });
 
+  it("keeps the drink tab second in desktop and mobile primary navigation", async () => {
+    activeTab = "punch";
+
+    await act(async () => {
+      root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
+    });
+
+    const expectedOrder = ["健身打卡", "牛马水铺", "共享看板", "牛马日历", "战报中心", "牛马补给站"];
+    expect(
+      Array.from(container.querySelectorAll(".home-tab-strip .tab-btn")).map((button) =>
+        button.textContent?.trim(),
+      ),
+    ).toEqual(expectedOrder);
+
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>(".mobile-nav-toggle")?.click();
+    });
+
+    expect(
+      Array.from(container.querySelectorAll(".mobile-tab-panel .tab-btn")).map((button) =>
+        button.textContent?.trim(),
+      ),
+    ).toEqual(expectedOrder);
+  });
+
   it("renders the supply secondary tabs when the supply primary tab is active", async () => {
     await act(async () => {
       root.render(<Navbar activeSupplyPanel="dashboard" activeTabOverride="supply" supplyNavContext={supplyNavContext} />);
