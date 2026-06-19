@@ -2,16 +2,15 @@ import type {
   BoardSnapshot,
   CalendarMonthSnapshot,
   CoffeeSnapshot,
+  DashboardPeriod,
+  DashboardSnapshot,
   DrinkSnapshot,
   GamificationLotteryDrawSnapshot,
   GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
-  GamificationWeeklyReportPublishResult,
-  GamificationWeeklyReportSnapshot,
   SupplyStationProductionSnapshot,
 } from "@/lib/types";
 import type { DrinkType } from "@/lib/drinks";
-import type { WeeklyReportSnapshot } from "@/lib/weekly-report";
 import type { WorkoutTicketPayload } from "@/lib/workouts";
 
 export class ApiError extends Error {
@@ -22,29 +21,6 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.status = status;
   }
-}
-
-export interface WeeklyReportDraftRecord {
-  id: string;
-  teamId: string;
-  createdByUserId: string;
-  weekStartDayKey: string;
-  summary: string;
-  createdAt: string;
-  updatedAt: string;
-  snapshot: WeeklyReportSnapshot;
-}
-
-export interface WeeklyReportPublishResult {
-  id: string;
-}
-
-interface WeeklyReportDraftEnvelope {
-  draft: WeeklyReportDraftRecord | null;
-}
-
-interface WeeklyReportPublishEnvelope {
-  dynamic: WeeklyReportPublishResult;
 }
 
 async function readJsonPayload(
@@ -204,6 +180,19 @@ async function readCalendarSnapshot(
   return payload.snapshot as CalendarMonthSnapshot;
 }
 
+async function readDashboardSnapshot(response: Response): Promise<DashboardSnapshot> {
+  const payload = await readJsonPayload(response, "响应解析失败");
+
+  if (!response.ok) {
+    throw new ApiError(
+      typeof payload.error === "string" ? payload.error : "请求失败",
+      response.status,
+    );
+  }
+
+  return payload.snapshot as DashboardSnapshot;
+}
+
 async function readGamificationSnapshot(
   response: Response,
 ): Promise<GamificationStateSnapshot> {
@@ -252,6 +241,15 @@ export async function fetchCalendarState(
   return readCalendarSnapshot(response);
 }
 
+export async function fetchDashboardState(period: DashboardPeriod): Promise<DashboardSnapshot> {
+  const response = await fetch(`/api/dashboard/state?period=${period}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  return readDashboardSnapshot(response);
+}
+
 export async function fetchGamificationState(): Promise<GamificationStateSnapshot> {
   const response = await fetch("/api/gamification/state", {
     cache: "no-store",
@@ -271,42 +269,6 @@ export async function fetchSupplyStationState(): Promise<SupplyStationProduction
   }>(response, "获取牛马补给站失败");
 
   return payload.snapshot;
-}
-
-export async function fetchGamificationWeeklyReport(
-  weekStartDayKey?: string,
-): Promise<GamificationWeeklyReportSnapshot> {
-  const search = weekStartDayKey
-    ? `?${new URLSearchParams({ weekStart: weekStartDayKey }).toString()}`
-    : "";
-  const response = await fetch(`/api/gamification/reports/weekly${search}`, {
-    cache: "no-store",
-    credentials: "same-origin",
-  });
-  const payload = await readApiResult<{
-    snapshot: GamificationWeeklyReportSnapshot;
-  }>(response, "获取牛马补给周报失败");
-
-  return payload.snapshot;
-}
-
-export async function publishGamificationWeeklyReportRequest(input: {
-  weekStartDayKey: string;
-  sendEnterpriseWechat: boolean;
-}): Promise<GamificationWeeklyReportPublishResult> {
-  const response = await fetch("/api/gamification/reports/weekly/publish", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(input),
-  });
-  const payload = await readApiResult<{
-    result: GamificationWeeklyReportPublishResult;
-  }>(response, "发布牛马补给周报失败");
-
-  return payload.result;
 }
 
 async function postGamificationAction(
@@ -580,47 +542,4 @@ export async function removeLatestDrinkRecord(drinkType?: DrinkType): Promise<Dr
   });
 
   return readDrinkSnapshot(response);
-}
-
-export async function fetchCurrentWeeklyReportDraft(): Promise<WeeklyReportDraftRecord | null> {
-  const response = await fetch("/api/reports/weekly/draft", {
-    cache: "no-store",
-    credentials: "same-origin",
-  });
-
-  const payload = await readApiResult<WeeklyReportDraftEnvelope>(response, "获取本周周报草稿失败");
-  return payload.draft ?? null;
-}
-
-export async function generateCurrentWeeklyReportDraft(): Promise<WeeklyReportDraftRecord> {
-  const response = await fetch("/api/reports/weekly/draft", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  });
-
-  const payload = await readApiResult<WeeklyReportDraftEnvelope>(response, "生成本周周报失败");
-
-  if (!payload.draft) {
-    throw new ApiError("生成本周周报失败", response.status);
-  }
-
-  return payload.draft;
-}
-
-export async function publishCurrentWeeklyReportDraft(): Promise<WeeklyReportPublishResult> {
-  const response = await fetch("/api/reports/weekly/publish", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  });
-
-  const payload = await readApiResult<WeeklyReportPublishEnvelope>(response, "发布本周周报失败");
-  return payload.dynamic;
 }
