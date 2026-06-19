@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   DynamicCalendarBoard,
+  DynamicDashboardBoard,
   DynamicDrinkCheckin,
   DynamicReportCenter,
   DynamicSharedBoard,
@@ -106,7 +107,7 @@ export function BoardApp({
           />
         );
       case "calendar":
-        return <DynamicCalendarBoard />;
+        return <DynamicDashboardBoard />;
       case "dash":
         return <DynamicReportCenter />;
       default:

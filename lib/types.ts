@@ -1,5 +1,5 @@
 import type { DrinkType } from "@/lib/drinks";
-import type { WorkoutTicketPayload } from "@/lib/workouts";
+import type { CardioItem, StrengthPart, TrainingType, WorkoutTicketPayload } from "@/lib/workouts";
 
 export interface Member {
   id: string;
@@ -332,92 +332,6 @@ export interface SupplyStationProductionSnapshot {
   redemptions: GamificationRedemptionSectionSnapshot;
 }
 
-export interface GamificationWeeklyReportMetric {
-  key: string;
-  label: string;
-  value: string;
-  helper: string;
-  tone: "default" | "success" | "warning" | "highlight";
-}
-
-export interface GamificationWeeklyReportCard {
-  key: string;
-  title: string;
-  body: string;
-  tone: "default" | "success" | "warning" | "highlight";
-}
-
-export interface GamificationWeeklyReportHighlight {
-  id: string;
-  title: string;
-  summary: string;
-  sourceType: string;
-  sourceId: string;
-  occurredAt: string;
-}
-
-export interface GamificationWeeklyReportMetrics {
-  teamMemberCount: number;
-  daysInWindow: number;
-  expectedTaskCount: number;
-  completedTaskCount: number;
-  taskCompletionRate: number;
-  allFourCompletionDays: number;
-  fitnessTicketsEarned: number;
-  lifeTicketsEarned: number;
-  paidTicketsBought: number;
-  ticketsSpent: number;
-  netTicketChange: number;
-  drawCount: number;
-  singleDrawCount: number;
-  tenDrawCount: number;
-  coinSpent: number;
-  coinRewarded: number;
-  rareRewardCount: number;
-  realWorldRewardCount: number;
-  itemUseCount: number;
-  boostUseCount: number;
-  boostAssetBonusTotal: number;
-  boostSeasonBonusTotal: number;
-  leaveCouponUseCount: number;
-  pendingItemUseCount: number;
-  expiredItemUseCount: number;
-  socialInvitationCount: number;
-  directInvitationCount: number;
-  teamInvitationCount: number;
-  socialResponseCount: number;
-  socialResponseRate: number;
-  gameDynamicCount: number;
-  rarePrizeDynamicCount: number;
-  boostDynamicCount: number;
-  socialMomentDynamicCount: number;
-}
-
-export interface GamificationWeeklyReportSnapshot {
-  teamId: string;
-  weekStartDayKey: string;
-  weekEndDayKey: string;
-  generatedAt: string;
-  published: boolean;
-  publishedDynamicId: string | null;
-  metrics: GamificationWeeklyReportMetrics;
-  metricCards: GamificationWeeklyReportMetric[];
-  summaryCards: GamificationWeeklyReportCard[];
-  highlights: GamificationWeeklyReportHighlight[];
-}
-
-export interface GamificationWeeklyReportPublishResult {
-  snapshot: GamificationWeeklyReportSnapshot;
-  teamDynamic: {
-    status: "CREATED" | "EXISTING";
-    id: string;
-  };
-  wechat: {
-    status: "NOT_REQUESTED" | "SENT" | "SKIPPED" | "FAILED";
-    failureReason?: string;
-  };
-}
-
 export type GamificationOpsRiskSeverity = "ok" | "watch" | "risk";
 
 export interface GamificationOpsWindow {
@@ -711,6 +625,69 @@ export interface CalendarMonthSnapshot {
   drinkCupTotal: number;
   coffeeCupTotal: number;
   days: CalendarDayRecord[];
+}
+
+export type DashboardPeriod = "month" | "year";
+
+export interface DashboardWorkoutSummary {
+  days: number;
+  totalMinutes: number;
+}
+
+export interface DashboardDrinkSummary {
+  cups: number;
+  byType: Record<DrinkType, number>;
+}
+
+export interface WorkoutBalanceItem {
+  code: StrengthPart | CardioItem;
+  label: string;
+  category: "strength" | "cardio";
+  count: number;
+}
+
+export interface DrinkBreakdownItem {
+  type: DrinkType;
+  label: string;
+  count: number;
+  color: string;
+  softColor: string;
+  textColor: string;
+}
+
+export interface DashboardHeatmapDay {
+  dayKey: string;
+  month: number;
+  day: number;
+  workoutMinutes: number;
+  drinkCups: number;
+  intensityLevel: 0 | 1 | 2 | 3 | 4;
+}
+
+export interface DashboardDayRecord extends CalendarDayRecord {
+  workoutMinutes: number;
+  trainingType: TrainingType | null;
+  cardioItem: CardioItem | null;
+  strengthParts: StrengthPart[];
+  drinkCounts: Record<DrinkType, number>;
+}
+
+export interface DashboardMonthSnapshot extends Omit<CalendarMonthSnapshot, "days"> {
+  days: DashboardDayRecord[];
+}
+
+export interface DashboardSnapshot {
+  currentUserId: string;
+  year: number;
+  month: number;
+  currentMonthKey: string;
+  period: DashboardPeriod;
+  workoutSummary: DashboardWorkoutSummary;
+  drinkSummary: DashboardDrinkSummary;
+  workoutBalance: WorkoutBalanceItem[];
+  drinkBreakdown: DrinkBreakdownItem[];
+  heatmap: DashboardHeatmapDay[];
+  monthCalendar: DashboardMonthSnapshot;
 }
 
 export type CellStatus = boolean | null;

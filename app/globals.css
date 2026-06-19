@@ -6675,146 +6675,6 @@ body {
 }
 }
 
-.game-weekly-report {
-  border: 4px solid #1f2937;
-  background: #fff7d6;
-  box-shadow: 6px 6px 0 #1f2937;
-  border-radius: 1.25rem;
-  padding: 1rem;
-}
-
-.game-weekly-report__header,
-.game-weekly-report__actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.game-weekly-report__eyebrow {
-  margin: 0;
-  color: #92400e;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.game-weekly-report h2,
-.game-weekly-report h3,
-.game-weekly-report p {
-  margin: 0;
-}
-
-.game-weekly-report h2 {
-  margin-top: 0.25rem;
-  color: #111827;
-  font-size: 1.5rem;
-  font-weight: 900;
-}
-
-.game-weekly-report__header p:last-child {
-  margin-top: 0.25rem;
-  color: #4b5563;
-  font-weight: 800;
-}
-
-.game-weekly-report__status {
-  border: 2px solid #1f2937;
-  border-radius: 999px;
-  background: #fde047;
-  padding: 0.35rem 0.7rem;
-  color: #111827;
-  font-weight: 900;
-}
-
-.game-weekly-report__metrics,
-.game-weekly-report__summaries {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.game-weekly-card,
-.game-weekly-summary,
-.game-weekly-report__highlights article {
-  border: 2px solid #1f2937;
-  background: #ffffff;
-  border-radius: 1rem;
-  padding: 0.8rem;
-}
-
-.game-weekly-card p,
-.game-weekly-card span,
-.game-weekly-summary p,
-.game-weekly-report__highlights p {
-  color: #4b5563;
-  font-weight: 800;
-}
-
-.game-weekly-card strong {
-  display: block;
-  color: #111827;
-  font-size: 1.8rem;
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-.game-weekly-card--highlight,
-.game-weekly-summary--highlight {
-  background: #fde047;
-}
-
-.game-weekly-card--success,
-.game-weekly-summary--success {
-  background: #dcfce7;
-}
-
-.game-weekly-card--warning,
-.game-weekly-summary--warning {
-  background: #fed7aa;
-}
-
-.game-weekly-report__highlights {
-  display: grid;
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-.game-weekly-report__highlights h3,
-.game-weekly-summary h3 {
-  color: #111827;
-  font-weight: 900;
-}
-
-.game-weekly-report__actions {
-  margin-top: 1rem;
-  justify-content: flex-start;
-}
-
-.game-weekly-report__actions button {
-  border: 2px solid #1f2937;
-  background: #fde047;
-  box-shadow: 3px 3px 0 #1f2937;
-  border-radius: 999px;
-  color: #111827;
-  font-weight: 900;
-  padding: 0.55rem 0.9rem;
-}
-
-.game-weekly-report__actions button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.game-weekly-report__error,
-.game-weekly-report--error {
-  color: #991b1b;
-  font-weight: 900;
-}
-
 .report-scene {
   position: relative;
   isolation: isolate;
@@ -6863,9 +6723,7 @@ body {
 }
 
 .report-scene-header,
-.report-scene-metrics,
-.report-scene-bottom,
-.report-scene-admin {
+.report-scene-metrics {
   flex: 0 0 auto;
 }
 
@@ -6884,34 +6742,13 @@ body {
   gap: clamp(0.55rem, 0.9vw, 0.8rem);
 }
 
-.report-scene-bottom {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: clamp(0.55rem, 0.9vw, 0.8rem);
-  min-height: auto;
-  overflow: visible;
-}
-
-.report-scene-bottom,
-.report-scene-admin,
-.report-analysis-paper,
-.game-weekly-report-desk,
-.weekly-report-admin-sheet {
+.report-analysis-paper {
   min-height: 0;
-}
-
-.report-scene-admin {
-  min-height: auto;
-  width: min(100%, 56rem);
 }
 
 .report-header-strip,
 .report-analysis-editorial-frame,
-.coffee-report-inset-shell,
-.game-weekly-report-paper,
-.game-weekly-report-highlights-rail,
-.weekly-report-admin-sheet,
-.weekly-report-admin-proof-sheet {
+.coffee-report-inset-shell {
   backdrop-filter: blur(2px);
 }
 
@@ -7223,71 +7060,6 @@ body {
   padding: 0.65rem !important;
 }
 
-.game-weekly-report-title-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.game-weekly-report-metric-strip {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.5rem !important;
-  margin-top: 0.55rem !important;
-}
-
-.game-weekly-report-paper {
-  border: 3px solid #111827;
-  padding: clamp(0.65rem, 1vw, 0.9rem) !important;
-}
-
-.game-weekly-report-highlights-rail {
-  border: 4px solid #111827;
-  padding: clamp(0.65rem, 1vw, 0.85rem) !important;
-}
-
-.game-weekly-report-highlight-note {
-  min-height: clamp(5rem, 8vh, 6.2rem);
-  padding: 0.65rem !important;
-}
-
-.game-weekly-report-desk {
-  padding: clamp(0.55rem, 0.9vw, 0.75rem) !important;
-  height: auto;
-  overflow: visible;
-}
-
-.game-weekly-report__header {
-  padding-bottom: 0.55rem !important;
-}
-
-.game-weekly-report__summaries {
-  margin-top: 0.55rem !important;
-}
-
-.game-weekly-card,
-.game-weekly-summary {
-  padding: 0.65rem !important;
-  border-radius: 0.9rem !important;
-}
-
-.game-weekly-card strong {
-  font-size: clamp(1.45rem, 1.8vw, 2rem) !important;
-}
-
-.weekly-report-admin-sheet {
-  min-height: auto;
-  padding: clamp(0.55rem, 0.9vw, 0.75rem) !important;
-}
-
-.weekly-report-admin-sheet {
-  border: 4px solid #111827;
-  box-shadow: 6px 6px 0 #1f2937;
-}
-
-.weekly-report-admin-proof-sheet {
-  min-height: 0;
-}
-
 @media (max-width: 760px) {
   .report-board {
     position: relative;
@@ -7377,15 +7149,10 @@ body {
     box-shadow: 4px 4px 0 #1f2937;
   }
 
-  .report-scene-analysis,
-  .report-scene-bottom {
+  .report-scene-analysis {
     grid-template-columns: 1fr;
     min-height: auto;
     overflow: visible;
-  }
-
-  .report-scene-admin {
-    width: 100%;
   }
 
   .report-analysis-paper {
@@ -7396,10 +7163,6 @@ body {
 
   .report-analysis-body-grid {
     min-height: 12rem;
-  }
-
-  .game-weekly-report-metric-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .coffee-report-inset-shell {
@@ -7413,14 +7176,6 @@ body {
     min-height: 11rem;
   }
 
-  .game-weekly-report-desk {
-    max-height: 42rem;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border-width: 3px;
-    box-shadow: 4px 4px 0 #1f2937;
-    -webkit-overflow-scrolling: touch;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -14715,14 +14470,8 @@ body {
 
   .report-scene,
   .report-scene-content,
-  .report-scene-analysis,
-  .report-scene-bottom {
+  .report-scene-analysis {
     max-width: 100%;
-  }
-
-  .game-weekly-report-desk {
-    max-height: none;
-    overflow-x: hidden;
   }
 
   .report-metric-body {
@@ -14802,5 +14551,590 @@ body {
   .supply-draw-pool-scene--embedded .supply-draw-pool-layout,
   .supply-backpack-shell {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Dashboard prototype styles */
+.dashboard-paper-surface {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-content-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 0.5rem;
+  flex-shrink: 0;
+}
+
+.dashboard-header-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.dashboard-header-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1f2937;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-header-subtitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-metric-tile {
+  display: flex;
+  overflow: hidden;
+  min-height: 7rem;
+  border-radius: 1.25rem;
+  border: 3px solid #111827;
+  box-shadow: 0 6px 0 0 #111827;
+}
+
+.dashboard-metric-tile-workout {
+  background: linear-gradient(135deg, #fef9c3 0%, #fde047 100%);
+  color: #1f2937;
+}
+
+.dashboard-metric-tile-drink {
+  background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+  color: #164e63;
+}
+
+.dashboard-metric-accent {
+  display: flex;
+  width: 4.5rem;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-right: 3px solid #111827;
+  background-color: rgba(255, 255, 255, 0.35);
+  padding: 0.75rem;
+}
+
+.dashboard-metric-icon {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 2px solid #111827;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-metric-icon img,
+.dashboard-metric-icon svg {
+  height: 1.25rem;
+  width: 1.25rem;
+  object-fit: contain;
+}
+
+.dashboard-metric-tag {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.dashboard-metric-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  gap: 0.25rem;
+}
+
+.dashboard-metric-label {
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.dashboard-metric-value {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.dashboard-metric-unit {
+  font-size: 0.75rem;
+  font-weight: 800;
+  opacity: 0.8;
+}
+
+.dashboard-metric-secondary {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  opacity: 0.85;
+}
+
+.dashboard-charts-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-chart-panel {
+  border-radius: 1.25rem;
+  border: 3px solid #111827;
+  background-color: #ffffff;
+  box-shadow: 0 4px 0 0 #111827;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-chart-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-chart-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 2px solid #111827;
+  background-color: #fde047;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1f2937;
+}
+
+.dashboard-chart-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #1f2937;
+}
+
+.dashboard-balance-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.35rem;
+  height: 7rem;
+  padding-top: 0.5rem;
+}
+
+.dashboard-balance-item {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dashboard-balance-track {
+  display: flex;
+  width: 100%;
+  height: 5rem;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background-color: #f1f5f9;
+  padding: 0 0.15rem;
+}
+
+.dashboard-balance-bar {
+  width: 100%;
+  max-width: 1.5rem;
+  border-radius: 0.35rem;
+  border: 2px solid #111827;
+  box-shadow: 0 2px 0 0 rgba(17, 24, 39, 0.25);
+  transition: height 0.2s ease;
+}
+
+.dashboard-balance-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #4b5563;
+  text-align: center;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-balance-count {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+.dashboard-drink-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dashboard-drink-breakdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-drink-breakdown-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dashboard-drink-breakdown-dot {
+  height: 0.6rem;
+  width: 0.6rem;
+  border-radius: 9999px;
+  border: 1.5px solid #111827;
+  flex-shrink: 0;
+}
+
+.dashboard-drink-breakdown-label {
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #374151;
+}
+
+.dashboard-drink-breakdown-count {
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+.dashboard-drink-breakdown-track {
+  height: 0.55rem;
+  border-radius: 9999px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+.dashboard-drink-breakdown-bar {
+  height: 100%;
+  border-radius: 9999px;
+  border-right: 2px solid #111827;
+  transition: width 0.2s ease;
+}
+
+.dashboard-heatmap-panel {
+  border-radius: 1.25rem;
+  border: 3px solid #111827;
+  background-color: #ffffff;
+  box-shadow: 0 4px 0 0 #111827;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 16rem;
+}
+
+.dashboard-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-heatmap-scroll {
+  overflow-x: auto;
+  padding: 0.5rem;
+  background-color: #f8fafc;
+  border-radius: 0.75rem;
+  border: 2px solid #e2e8f0;
+}
+
+.dashboard-heatmap-month-track {
+  display: grid;
+  gap: 0.3rem;
+  margin-bottom: 0.35rem;
+  min-width: 100%;
+}
+
+.dashboard-heatmap-month-name {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #475569;
+  text-align: left;
+  padding-left: 0.1rem;
+}
+
+.dashboard-heatmap-grid {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.3rem;
+  width: fit-content;
+  min-width: 100%;
+}
+
+.dashboard-heatmap-cell {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1.5px solid #cbd5e1;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  cursor: pointer;
+}
+
+.dashboard-heatmap-cell:hover {
+  transform: scale(1.2);
+  border-color: #111827;
+  z-index: 1;
+}
+
+.dashboard-heatmap-cell-intensity-0 {
+  background-color: #ffffff;
+}
+
+.dashboard-heatmap-cell-intensity-1 {
+  background-color: #fef9c3;
+  border-color: #fde047;
+}
+
+.dashboard-heatmap-cell-intensity-2 {
+  background-color: #fde047;
+  border-color: #facc15;
+}
+
+.dashboard-heatmap-cell-intensity-3 {
+  background-color: #facc15;
+  border-color: #eab308;
+}
+
+.dashboard-heatmap-cell-intensity-4 {
+  background-color: #eab308;
+  border-color: #ca8a04;
+}
+
+.dashboard-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.dashboard-heatmap-legend-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #6b7280;
+}
+
+.dashboard-heatmap-legend .dashboard-heatmap-cell {
+  width: 1rem;
+  height: 1rem;
+}
+
+.dashboard-month-calendar {
+  border-radius: 1.25rem;
+  border: 3px solid #111827;
+  background-color: #ffffff;
+  box-shadow: 0 4px 0 0 #111827;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-month-calendar .calendar-day-cell {
+  position: relative;
+}
+
+.dashboard-calendar-workout-detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+}
+
+.dashboard-calendar-duration {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #b45309;
+  background-color: #fef3c7;
+  border: 1.5px solid #111827;
+  border-radius: 0.25rem;
+  padding: 0.05rem 0.25rem;
+}
+
+.dashboard-calendar-drink-dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 9999px;
+  background-color: #22d3ee;
+  border: 1.5px solid #111827;
+  margin-left: auto;
+}
+
+.dashboard-calendar-drink-count {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #0891b2;
+  margin-left: 0.1rem;
+}
+
+.dashboard-day-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: 16rem;
+  transform: translateX(-50%);
+  border-radius: 0.75rem;
+  border: 2px solid #111827;
+  background-color: #ffffff;
+  box-shadow: 0 6px 0 0 #111827;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  pointer-events: none;
+}
+
+.dashboard-day-tooltip-arrow {
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #ffffff;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+}
+
+.dashboard-day-tooltip-date {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.dashboard-day-tooltip-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dashboard-day-tooltip-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1.5px solid #111827;
+}
+
+.dashboard-day-tooltip-badge-workout {
+  background-color: #fde047;
+  color: #1f2937;
+}
+
+.dashboard-day-tooltip-badge-cardio {
+  background-color: #22d3ee;
+  color: #164e63;
+}
+
+.dashboard-day-tooltip-minutes {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #4b5563;
+  margin-left: 0.2rem;
+}
+
+.dashboard-day-tooltip-empty {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.dashboard-day-tooltip-drink-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #374151;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  background-color: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+}
+
+.dashboard-day-tooltip-drink-dot {
+  height: 0.45rem;
+  width: 0.45rem;
+  border-radius: 9999px;
+  border: 1.5px solid #111827;
+}
+
+.dashboard-day-tooltip-drink-count {
+  margin-left: 0.2rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+@media (max-width: 768px) {
+  .dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-balance-chart {
+    gap: 0.25rem;
+  }
+
+  .dashboard-balance-label {
+    font-size: 0.55rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .dashboard-heatmap-cell {
+    width: 0.75rem;
+    height: 0.75rem;
   }
 }

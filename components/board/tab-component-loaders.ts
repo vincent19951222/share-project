@@ -4,6 +4,7 @@ import type { AppTab } from "@/lib/types";
 export const loadSharedBoard = () => import("@/components/shared-board/SharedBoard").then((mod) => mod.SharedBoard);
 export const loadDrinkCheckin = () => import("@/components/drink-checkin/DrinkCheckin").then((mod) => mod.DrinkCheckin);
 export const loadCalendarBoard = () => import("@/components/calendar/CalendarBoard").then((mod) => mod.CalendarBoard);
+export const loadDashboardBoard = () => import("@/components/dashboard/DashboardBoard").then((mod) => mod.DashboardBoard);
 export const loadReportCenter = () => import("@/components/report-center/ReportCenter").then((mod) => mod.ReportCenter);
 export const loadSupplyStation = () => import("@/components/gamification/SupplyStation").then((mod) => mod.SupplyStation);
 
@@ -16,7 +17,7 @@ export function preloadBoardTabComponent(tab: AppTab) {
       void loadDrinkCheckin();
       break;
     case "calendar":
-      void loadCalendarBoard();
+      void loadDashboardBoard();
       break;
     case "dash":
       void loadReportCenter();

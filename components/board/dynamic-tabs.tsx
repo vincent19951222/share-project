@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { BoardTabLoadingShell } from "./BoardTabLoadingShell";
 import {
   loadCalendarBoard,
+  loadDashboardBoard,
   loadDrinkCheckin,
   loadReportCenter,
   loadSharedBoard,
@@ -20,6 +21,10 @@ export const DynamicDrinkCheckin = dynamic(loadDrinkCheckin, {
 
 export const DynamicCalendarBoard = dynamic(loadCalendarBoard, {
   loading: () => <BoardTabLoadingShell label="牛马日历加载中" />,
+});
+
+export const DynamicDashboardBoard = dynamic(loadDashboardBoard, {
+  loading: () => <BoardTabLoadingShell label="个人看板加载中" />,
 });
 
 export const DynamicReportCenter = dynamic(loadReportCenter, {
