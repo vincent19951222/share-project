@@ -15134,6 +15134,70 @@ body {
   color: #111827;
 }
 
+/* 战报中心柱状图 hover 标签：复用日历 tooltip 的 Brutalist 视觉，独立 class 避免 scope 冲突 */
+.report-bar-tooltip-host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  cursor: default;
+  outline: none;
+}
+
+.report-bar-tooltip-host:focus-visible .report-bar-tooltip {
+  opacity: 1;
+}
+
+.report-bar-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.45rem);
+  left: 50%;
+  z-index: 30;
+  width: max-content;
+  max-width: 14rem;
+  transform: translateX(-50%);
+  border-radius: 0.6rem;
+  border: 2px solid #111827;
+  background-color: #ffffff;
+  box-shadow: 0 4px 0 0 #111827;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #1f2937;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.report-bar-tooltip-arrow {
+  position: absolute;
+  bottom: -0.4rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 0.6rem;
+  height: 0.6rem;
+  background-color: #ffffff;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .report-bar-tooltip {
+    animation: report-bar-tooltip-in 0.12s ease-out;
+  }
+}
+
+@keyframes report-bar-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-metrics {
     grid-template-columns: 1fr;

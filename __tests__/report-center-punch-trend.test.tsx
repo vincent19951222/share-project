@@ -65,4 +65,35 @@ describe("PunchTrendChart", () => {
     expect((bars[0] as HTMLElement).className).not.toContain("/45");
     expect((bars[1] as HTMLElement).className).toContain("bg-[#fde047]/45");
   });
+
+  it("shows a hover tooltip with date and count, and an x-axis with key ticks", () => {
+    const points: TeamPunchTrendPoint[] = [
+      { dayKey: "2026-06-10", count: 2, isFullAttendance: true },
+      { dayKey: "2026-06-11", count: 1, isFullAttendance: false },
+    ];
+
+    act(() => {
+      root.render(<PunchTrendChart points={points} />);
+    });
+
+    // 初始无 tooltip
+    expect(container.querySelector(".report-bar-tooltip")).toBeNull();
+
+    // hover 第一根柱 → 浮出含日期+人数的 tooltip
+    const host = container.querySelector(".report-bar-tooltip-host") as HTMLElement;
+    expect(host).not.toBeNull();
+    // React 合成 onMouseEnter 由 mouseover 冒泡触发
+    act(() => {
+      host.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    });
+    const tooltip = container.querySelector(".report-bar-tooltip");
+    expect(tooltip).not.toBeNull();
+    expect(tooltip!.textContent).toContain("6月10日");
+    expect(tooltip!.textContent).toContain("2 人");
+    expect(tooltip!.textContent).toContain("全勤");
+
+    // x 轴标签存在（≤5 根柱时全部标注）
+    expect(container.textContent).toContain("6/10");
+    expect(container.textContent).toContain("6/11");
+  });
 });

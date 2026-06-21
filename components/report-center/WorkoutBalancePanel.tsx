@@ -1,5 +1,6 @@
 import { CARDIO_ITEMS } from "@/lib/workouts";
 import type { TeamWorkoutBalanceItem } from "@/lib/types";
+import { BarTooltip } from "./BarTooltip";
 import { ChartPanel } from "./ChartPanel";
 import { EmptyState } from "./EmptyState";
 
@@ -10,9 +11,11 @@ const CARDIO_COLOR = "#22d3ee";
  * 团队训练部位均衡。
  * 镜像个人看板 WorkoutBalanceChart：垂直 div 柱，力量按黄色梯度、有氧青色。
  * 从 code 反推 category（TeamWorkoutBalanceItem 不带 category 字段）。
+ * hover 柱子显示「部位 · N 次 · 占 X%」。
  */
 export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[] }) {
   const maxCount = Math.max(1, ...items.map((i) => i.count));
+  const totalCount = items.reduce((sum, i) => sum + i.count, 0);
 
   if (items.every((i) => i.count === 0)) {
     return (
@@ -33,15 +36,17 @@ export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[]
           if (!isCardio) strengthIndex += 1;
           const heightPct =
             item.count <= 0 ? 0 : `${Math.max(12, (item.count / maxCount) * 100)}%`;
+          const pct = totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0;
 
           return (
             <div key={item.code} className="dashboard-balance-item" style={{ flex: 1 }}>
               <div className="dashboard-balance-track" style={{ height: "auto", flex: 1 }}>
-                <div
-                  className="dashboard-balance-bar"
-                  style={{ height: heightPct, backgroundColor: color }}
-                  title={`${item.label}：${item.count} 次`}
-                />
+                <BarTooltip label={`${item.label} · ${item.count} 次 · 占 ${pct}%`}>
+                  <div
+                    className="dashboard-balance-bar"
+                    style={{ height: heightPct, backgroundColor: color }}
+                  />
+                </BarTooltip>
               </div>
               <span className="dashboard-balance-label">{item.label}</span>
               <span className="dashboard-balance-count">{item.count}</span>

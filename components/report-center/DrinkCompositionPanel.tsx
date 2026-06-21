@@ -2,6 +2,7 @@ import type {
   TeamDrinkBreakdownItem,
   TeamDrinkTrendPoint,
 } from "@/lib/types";
+import { BarTooltip } from "./BarTooltip";
 import { ChartPanel } from "./ChartPanel";
 import { EmptyState } from "./EmptyState";
 
@@ -75,16 +76,14 @@ export function DrinkCompositionPanel({
             {trend.map((t) => {
               const heightPct = t.count <= 0 ? 6 : Math.max(12, (t.count / trendMax) * 100);
               return (
-                <div
-                  key={t.dayKey}
-                  className="flex h-full min-w-[4px] flex-1 flex-col justify-end"
-                  title={`${t.dayKey}：${t.count} 杯`}
-                >
-                  <div
-                    data-drink-trend-bar
-                    className="mx-auto w-full max-w-[0.9rem] rounded-[0.25rem] border-[1.5px] border-[#111827] bg-[#22d3ee] shadow-[0_2px_0_0_rgba(17,24,39,0.2)]"
-                    style={{ height: `${heightPct}%` }}
-                  />
+                <div key={t.dayKey} className="flex h-full min-w-[4px] flex-1 flex-col justify-end">
+                  <BarTooltip label={formatDrinkTrendLabel(t)}>
+                    <div
+                      data-drink-trend-bar
+                      className="mx-auto w-full max-w-[0.9rem] rounded-[0.25rem] border-[1.5px] border-[#111827] bg-[#22d3ee] shadow-[0_2px_0_0_rgba(17,24,39,0.2)]"
+                      style={{ height: `${heightPct}%` }}
+                    />
+                  </BarTooltip>
                 </div>
               );
             })}
@@ -93,4 +92,13 @@ export function DrinkCompositionPanel({
       )}
     </ChartPanel>
   );
+}
+
+/** 饮水趋势 tooltip 文案 */
+function formatDrinkTrendLabel(point: TeamDrinkTrendPoint): string {
+  const isMonth = point.dayKey.length === 10;
+  const dateText = isMonth
+    ? `${Number(point.dayKey.slice(5, 7))}月${Number(point.dayKey.slice(8, 10))}日`
+    : `${point.dayKey.slice(0, 4)}年${Number(point.dayKey.slice(5, 7))}月`;
+  return `${dateText} · ${point.count} 杯`;
 }
