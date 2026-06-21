@@ -2,7 +2,7 @@ import type {
   BoardSnapshot,
   CalendarMonthSnapshot,
   CoffeeSnapshot,
-  DashboardPeriod,
+  DashboardScope,
   DashboardSnapshot,
   DrinkSnapshot,
   GamificationLotteryDrawSnapshot,
@@ -11,6 +11,7 @@ import type {
   SupplyStationProductionSnapshot,
   TeamDashboardSnapshot,
 } from "@/lib/types";
+import { scopeToQuery } from "@/lib/dashboard-scope";
 import type { DrinkType } from "@/lib/drinks";
 import type { WorkoutTicketPayload } from "@/lib/workouts";
 
@@ -242,8 +243,8 @@ export async function fetchCalendarState(
   return readCalendarSnapshot(response);
 }
 
-export async function fetchDashboardState(period: DashboardPeriod): Promise<DashboardSnapshot> {
-  const response = await fetch(`/api/dashboard/state?period=${period}`, {
+export async function fetchDashboardState(scope: DashboardScope): Promise<DashboardSnapshot> {
+  const response = await fetch(`/api/dashboard/state?${scopeToQuery(scope)}`, {
     cache: "no-store",
     credentials: "same-origin",
   });
@@ -252,9 +253,9 @@ export async function fetchDashboardState(period: DashboardPeriod): Promise<Dash
 }
 
 export async function fetchTeamDashboardState(
-  period: DashboardPeriod,
+  scope: DashboardScope,
 ): Promise<TeamDashboardSnapshot> {
-  const response = await fetch(`/api/dashboard/team-state?period=${period}`, {
+  const response = await fetch(`/api/dashboard/team-state?${scopeToQuery(scope)}`, {
     cache: "no-store",
     credentials: "same-origin",
   });
