@@ -744,3 +744,46 @@ export type BoardAction =
       source: "punch";
       punchEpoch: number;
     };
+
+export interface TeamPunchTrendPoint {
+  /** 月视图=日期 YYYY-MM-DD；年视图=月份 YYYY-MM */
+  dayKey: string;
+  count: number;
+  isFullAttendance: boolean;
+}
+
+export interface TeamWorkoutBalanceItem {
+  /** 部位/有氧项的 code，如 "chest"、"treadmill" */
+  code: string;
+  label: string;
+  count: number;
+}
+
+export interface TeamDrinkBreakdownItem {
+  type: DrinkType;
+  label: string;
+  count: number;
+  color: string;
+}
+
+export interface TeamDrinkTrendPoint {
+  /** 月视图=日期 YYYY-MM-DD；年视图=月份 YYYY-MM */
+  dayKey: string;
+  count: number;
+}
+
+export interface TeamMetrics {
+  /** 0-1 之间，totalPunches / (memberCount * elapsedDays) */
+  completionRate: number;
+  totalPunches: number;
+  fullAttendanceDays: number;
+}
+
+export interface TeamDashboardSnapshot {
+  period: { type: DashboardPeriod; startKey: string; endKey: string };
+  metrics: TeamMetrics;
+  punchTrend: TeamPunchTrendPoint[];
+  workoutBalance: TeamWorkoutBalanceItem[];
+  drinkBreakdown: TeamDrinkBreakdownItem[];
+  drinkTrend: TeamDrinkTrendPoint[];
+}
