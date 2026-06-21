@@ -9,8 +9,9 @@ import {
   type CardioItem,
   type StrengthPart,
 } from "@/lib/workouts";
+import { scopeToStartEnd } from "@/lib/dashboard-scope";
 import type {
-  DashboardPeriod,
+  DashboardScope,
   TeamDashboardSnapshot,
   TeamDrinkBreakdownItem,
   TeamDrinkTrendPoint,
@@ -36,14 +37,11 @@ function countElapsedDays(startKey: string, endKey: string): number {
 
 export async function buildTeamDashboardSnapshot(
   teamId: string,
-  period: DashboardPeriod,
+  scope: DashboardScope,
   now: Date = new Date(),
 ): Promise<TeamDashboardSnapshot | null> {
   const todayDayKey = getShanghaiDayKey(now);
-  const year = Number(todayDayKey.slice(0, 4));
-  const monthKey = todayDayKey.slice(0, 7);
-  const startKey = period === "month" ? `${monthKey}-01` : `${year}-01-01`;
-  const endKey = todayDayKey;
+  const { startKey, endKey, isComplete } = scopeToStartEnd(scope, now);
 
   const team = await prisma.team.findUnique({
     where: { id: teamId },
@@ -97,7 +95,7 @@ export async function buildTeamDashboardSnapshot(
   const punchTrend: TeamPunchTrendPoint[] = [];
   const drinkTrend: TeamDrinkTrendPoint[] = [];
 
-  if (period === "month") {
+  if (scope.type === "month") {
     let cur = startKey;
     while (cur <= endKey) {
       const count = punchByDay.get(cur) ?? 0;
@@ -110,8 +108,8 @@ export async function buildTeamDashboardSnapshot(
       cur = addDays(cur, 1);
     }
   } else {
-    // 年视图：按月聚合 1 月到当前月
-    const currentMonth = Number(todayDayKey.slice(5, 7));
+    // 年视图：历史年聚合 1-12 月，当年聚合 1 到当前月
+    const lastMonth = isComplete ? 12 : Number(todayDayKey.slice(5, 7));
     const punchByMonth = new Map<string, number>();
     const drinkByMonth = new Map<string, number>();
     for (const [day, c] of punchByDay) {
@@ -122,8 +120,8 @@ export async function buildTeamDashboardSnapshot(
       const m = day.slice(0, 7);
       drinkByMonth.set(m, (drinkByMonth.get(m) ?? 0) + c);
     }
-    for (let m = 1; m <= currentMonth; m++) {
-      const monthKey2 = `${year}-${String(m).padStart(2, "0")}`;
+    for (let m = 1; m <= lastMonth; m++) {
+      const monthKey2 = `${scope.year}-${String(m).padStart(2, "0")}`;
       const count = punchByMonth.get(monthKey2) ?? 0;
       punchTrend.push({
         dayKey: monthKey2,
@@ -190,7 +188,7 @@ export async function buildTeamDashboardSnapshot(
   );
 
   return {
-    period: { type: period, startKey, endKey },
+    period: { type: scope.type, startKey, endKey },
     metrics: { completionRate, totalPunches, fullAttendanceDays },
     punchTrend,
     workoutBalance,

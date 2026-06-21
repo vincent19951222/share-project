@@ -27,7 +27,7 @@ describe("buildTeamDashboardSnapshot - month", () => {
 
   it("returns null when team not found", async () => {
     (prisma.team.findUnique as any).mockResolvedValue(null);
-    const snap = await buildTeamDashboardSnapshot("missing", "month", NOW);
+    const snap = await buildTeamDashboardSnapshot("missing", { type: "month", monthKey: "2026-06" }, NOW);
     expect(snap).toBeNull();
   });
 
@@ -58,7 +58,7 @@ describe("buildTeamDashboardSnapshot - month", () => {
       }),
     );
 
-    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    const snap = await buildTeamDashboardSnapshot("team-1", { type: "month", monthKey: "2026-06" }, NOW);
     expect(snap).not.toBeNull();
     const point10 = snap!.punchTrend.find((p) => p.dayKey === "2026-06-10");
     const point11 = snap!.punchTrend.find((p) => p.dayKey === "2026-06-11");
@@ -104,7 +104,7 @@ describe("buildTeamDashboardSnapshot - year", () => {
       }),
     );
 
-    const snap = await buildTeamDashboardSnapshot("team-1", "year", NOW);
+    const snap = await buildTeamDashboardSnapshot("team-1", { type: "year", year: 2026 }, NOW);
     expect(snap!.period).toEqual({
       type: "year",
       startKey: "2026-01-01",
@@ -152,7 +152,7 @@ describe("buildTeamDashboardSnapshot - balance & drinks", () => {
         ],
       }),
     );
-    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    const snap = await buildTeamDashboardSnapshot("team-1", { type: "month", monthKey: "2026-06" }, NOW);
     const chest = snap!.workoutBalance.find((b) => b.code === "chest");
     const treadmill = snap!.workoutBalance.find((b) => b.code === "treadmill");
     const back = snap!.workoutBalance.find((b) => b.code === "back");
@@ -180,7 +180,7 @@ describe("buildTeamDashboardSnapshot - balance & drinks", () => {
         ],
       }),
     );
-    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    const snap = await buildTeamDashboardSnapshot("team-1", { type: "month", monthKey: "2026-06" }, NOW);
     const water = snap!.drinkBreakdown.find((d) => d.type === "water");
     const milkTea = snap!.drinkBreakdown.find((d) => d.type === "milkTea");
     const americano = snap!.drinkBreakdown.find((d) => d.type === "americano");
@@ -195,10 +195,77 @@ describe("buildTeamDashboardSnapshot - balance & drinks", () => {
 
   it("handles empty team gracefully", async () => {
     (prisma.team.findUnique as any).mockResolvedValue(makeTeam({ users: [] }));
-    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    const snap = await buildTeamDashboardSnapshot("team-1", { type: "month", monthKey: "2026-06" }, NOW);
     expect(snap!.metrics.completionRate).toBe(0);
     expect(snap!.metrics.totalPunches).toBe(0);
     expect(snap!.punchTrend.length).toBe(15);
     expect(snap!.punchTrend.every((p) => !p.isFullAttendance)).toBe(true);
+  });
+});
+
+describe("buildTeamDashboardSnapshot - historical month", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("uses month-end as endKey for a complete historical month", async () => {
+    (prisma.team.findUnique as any).mockResolvedValue(
+      makeTeam({
+        users: [
+          {
+            id: "u1",
+            punchRecords: [
+              { dayKey: "2026-05-10", punched: true },
+              { dayKey: "2026-05-31", punched: true },
+            ],
+            workoutRecords: [],
+            drinkRecords: [],
+          },
+        ],
+      }),
+    );
+
+    const snap = await buildTeamDashboardSnapshot(
+      "team-1",
+      { type: "month", monthKey: "2026-05" },
+      NOW,
+    );
+    expect(snap!.period).toEqual({
+      type: "month",
+      startKey: "2026-05-01",
+      endKey: "2026-05-31",
+    });
+    expect(snap!.punchTrend.length).toBe(31);
+    expect(snap!.metrics.totalPunches).toBe(2);
+  });
+
+  it("aggregates a complete historical year into 12 month buckets", async () => {
+    (prisma.team.findUnique as any).mockResolvedValue(
+      makeTeam({
+        users: [
+          {
+            id: "u1",
+            punchRecords: [
+              { dayKey: "2025-01-05", punched: true },
+              { dayKey: "2025-12-20", punched: true },
+            ],
+            workoutRecords: [],
+            drinkRecords: [],
+          },
+        ],
+      }),
+    );
+
+    const snap = await buildTeamDashboardSnapshot(
+      "team-1",
+      { type: "year", year: 2025 },
+      NOW,
+    );
+    expect(snap!.period).toEqual({
+      type: "year",
+      startKey: "2025-01-01",
+      endKey: "2025-12-31",
+    });
+    expect(snap!.punchTrend.length).toBe(12);
+    expect(snap!.punchTrend[0]).toEqual({ dayKey: "2025-01", count: 1, isFullAttendance: false });
+    expect(snap!.punchTrend[11]).toEqual({ dayKey: "2025-12", count: 1, isFullAttendance: false });
   });
 });
