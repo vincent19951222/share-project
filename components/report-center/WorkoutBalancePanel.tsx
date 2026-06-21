@@ -44,7 +44,7 @@ export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[]
         <span className="text-[#64748b]">次 · {activePct}%</span>
       </div>
 
-      <div className="dashboard-balance-chart" style={{ height: "auto", flex: 1, minHeight: "9rem" }}>
+      <div className="dashboard-balance-chart" style={{ height: "auto" }}>
         {items.map((item, i) => {
           const isCardio = (CARDIO_ITEMS as readonly string[]).includes(item.code);
           const color = isCardio ? CARDIO_COLOR : STRENGTH_COLORS[strengthIndex % STRENGTH_COLORS.length];
@@ -55,7 +55,11 @@ export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[]
 
           return (
             <div key={item.code} className="dashboard-balance-item" style={{ flex: 1 }}>
-              <div className="dashboard-balance-track" style={{ height: "auto", flex: 1 }}>
+              <div
+                className="dashboard-balance-track"
+                // 固定高度基准，让柱子的百分比 height 能正确解析
+                style={{ height: "8rem" }}
+              >
                 <div
                   className={`dashboard-balance-bar ${isActive ? "ring-2 ring-[#111827]/70 ring-offset-1" : ""}`}
                   style={{ height: heightPct, backgroundColor: color }}
