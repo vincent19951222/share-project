@@ -63,6 +63,8 @@ describe("DashboardBoard", () => {
   let root: Root;
 
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-06-15T03:00:00Z"));
     container = document.createElement("div");
     document.body.appendChild(container);
     global.fetch = vi.fn().mockResolvedValue(
@@ -73,18 +75,24 @@ describe("DashboardBoard", () => {
   afterEach(() => {
     root?.unmount();
     container.remove();
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
-  it("renders dashboard title and period toggle", async () => {
+  it("renders dashboard title and period navigator", async () => {
     await act(async () => {
       root = createRoot(container);
       root.render(<DashboardBoard />);
     });
 
     expect(container.textContent).toContain("牛马日历");
-    expect(container.textContent).toContain("本月");
-    expect(container.textContent).toContain("本年");
+    expect(container.textContent).toContain("2026年6月");
+    expect(container.textContent).toContain("按月");
+    expect(container.textContent).toContain("按年");
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/dashboard/state?period=month&monthKey=2026-06",
+      expect.any(Object),
+    );
   });
 
   it("displays workout and drink summary cards", async () => {
@@ -107,16 +115,14 @@ describe("DashboardBoard", () => {
       createJsonResponse({ snapshot: createMockSnapshot("year") }),
     );
 
-    const yearButton = Array.from(container.querySelectorAll("button")).find((btn) =>
-      btn.textContent?.includes("本年"),
-    );
+    const yearButton = container.querySelector<HTMLButtonElement>("button[data-granularity='year']");
 
     await act(async () => {
       yearButton?.click();
     });
 
     expect(global.fetch).toHaveBeenLastCalledWith(
-      "/api/dashboard/state?period=year",
+      "/api/dashboard/state?period=year&year=2026",
       expect.any(Object),
     );
   });

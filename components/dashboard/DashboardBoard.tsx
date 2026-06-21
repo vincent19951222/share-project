@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { fetchDashboardState } from "@/lib/api";
 import { CALENDAR_REFRESH_EVENT } from "@/lib/calendar-refresh";
-import type { DashboardPeriod, DashboardSnapshot } from "@/lib/types";
+import { currentScope } from "@/lib/dashboard-scope";
+import type { DashboardScope, DashboardSnapshot } from "@/lib/types";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { DashboardHeader } from "./DashboardHeader";
 import { DrinkBreakdownChart } from "./DrinkBreakdownChart";
@@ -13,7 +14,7 @@ import { WorkoutBalanceChart } from "./WorkoutBalanceChart";
 
 export function DashboardBoard() {
   const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null);
-  const [period, setPeriod] = useState<DashboardPeriod>("month");
+  const [scope, setScope] = useState<DashboardScope>(() => currentScope(new Date()));
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +26,7 @@ export function DashboardBoard() {
       setError(null);
 
       try {
-        const nextSnapshot = await fetchDashboardState(period);
+        const nextSnapshot = await fetchDashboardState(scope);
         if (!cancelled) {
           setSnapshot(nextSnapshot);
         }
@@ -44,7 +45,7 @@ export function DashboardBoard() {
     return () => {
       cancelled = true;
     };
-  }, [period]);
+  }, [scope]);
 
   useEffect(() => {
     function handleRefresh() {
@@ -52,7 +53,7 @@ export function DashboardBoard() {
 
       async function load() {
         try {
-          const nextSnapshot = await fetchDashboardState(period);
+          const nextSnapshot = await fetchDashboardState(scope);
           if (!cancelled) {
             setSnapshot(nextSnapshot);
             setError(null);
@@ -74,7 +75,7 @@ export function DashboardBoard() {
     return () => {
       window.removeEventListener(CALENDAR_REFRESH_EVENT, handleRefresh);
     };
-  }, [period]);
+  }, [scope]);
 
   return (
     <section className="calendar-board-viewport absolute inset-0">
@@ -121,7 +122,7 @@ export function DashboardBoard() {
         <div className="calendar-scene-content">
           <div className="calendar-binder-shell">
             <div className="calendar-paper-surface dashboard-paper-surface">
-              <DashboardHeader period={period} onPeriodChange={setPeriod} />
+              <DashboardHeader scope={scope} onScopeChange={setScope} />
 
               <div className="dashboard-content-scroll">
                 {error ? (
