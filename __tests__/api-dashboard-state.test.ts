@@ -49,12 +49,50 @@ describe("GET /api/dashboard/state", () => {
     expect(typeof body.snapshot.drinkSummary.cups).toBe("number");
   });
 
+  it("uses historical monthKey from query", async () => {
+    const response = await GET(request(userId, "?period=month&monthKey=2026-05"));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.snapshot.period).toBe("month");
+    expect(body.snapshot.currentMonthKey).toBe("2026-05");
+    expect(body.snapshot.month).toBe(5);
+  });
+
+  it("falls back to current month for future monthKey", async () => {
+    const response = await GET(request(userId, "?period=month&monthKey=2026-12"));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.snapshot.period).toBe("month");
+    expect(body.snapshot.currentMonthKey).toBe("2026-06");
+    expect(body.snapshot.month).toBe(6);
+  });
+
   it("returns year snapshot when period=year", async () => {
     const response = await GET(request(userId, "?period=year"));
 
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.snapshot.period).toBe("year");
+  });
+
+  it("uses historical year from query", async () => {
+    const response = await GET(request(userId, "?period=year&year=2025"));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.snapshot.period).toBe("year");
+    expect(body.snapshot.year).toBe(2025);
+  });
+
+  it("falls back to current year for future year", async () => {
+    const response = await GET(request(userId, "?period=year&year=2030"));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.snapshot.period).toBe("year");
+    expect(body.snapshot.year).toBe(2026);
   });
 
   it("defaults to month when period is invalid", async () => {
