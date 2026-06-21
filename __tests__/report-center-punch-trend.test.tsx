@@ -66,7 +66,7 @@ describe("PunchTrendChart", () => {
     expect((bars[1] as HTMLElement).className).toContain("bg-[#fde047]/45");
   });
 
-  it("shows a hover tooltip with date and count, and an x-axis with key ticks", () => {
+  it("shows a value label that defaults to the latest day and updates on hover", () => {
     const points: TeamPunchTrendPoint[] = [
       { dayKey: "2026-06-10", count: 2, isFullAttendance: true },
       { dayKey: "2026-06-11", count: 1, isFullAttendance: false },
@@ -76,21 +76,19 @@ describe("PunchTrendChart", () => {
       root.render(<PunchTrendChart points={points} />);
     });
 
-    // 初始无 tooltip
-    expect(container.querySelector(".report-bar-tooltip")).toBeNull();
+    // 默认显示最近一天（06-11，1 人）
+    expect(container.textContent).toContain("6月11日");
+    expect(container.textContent).toContain("1人");
 
-    // hover 第一根柱 → 浮出含日期+人数的 tooltip
-    const host = container.querySelector(".report-bar-tooltip-host") as HTMLElement;
-    expect(host).not.toBeNull();
-    // React 合成 onMouseEnter 由 mouseover 冒泡触发
+    // hover 第一根柱（06-10，2 人，全勤）→ 标签切换
+    const bar = container.querySelector("[data-punch-bar]") as HTMLElement;
+    expect(bar).not.toBeNull();
     act(() => {
-      host.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      bar.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
     });
-    const tooltip = container.querySelector(".report-bar-tooltip");
-    expect(tooltip).not.toBeNull();
-    expect(tooltip!.textContent).toContain("6月10日");
-    expect(tooltip!.textContent).toContain("2 人");
-    expect(tooltip!.textContent).toContain("全勤");
+    expect(container.textContent).toContain("6月10日");
+    expect(container.textContent).toContain("2人");
+    expect(container.textContent).toContain("全勤");
 
     // x 轴标签存在（≤5 根柱时全部标注）
     expect(container.textContent).toContain("6/10");
