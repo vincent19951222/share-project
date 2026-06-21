@@ -1,27 +1,23 @@
 "use client";
 
-import type { DashboardPeriod } from "@/lib/types";
-import { PeriodSwitcher } from "./PeriodSwitcher";
-
-function periodLabel(period: DashboardPeriod): string {
-  // 由 ReportCenter 传入当前日期派生的中文标题更准确；此处简化用副标题占位
-  return period === "month" ? "本月战报" : "本年战报";
-}
+import type { DashboardScope } from "@/lib/types";
+import { formatScopeLabel } from "@/lib/dashboard-scope";
+import { PeriodNavigator } from "@/components/dashboard/PeriodNavigator";
 
 export function TeamHeader({
-  period,
-  onPeriodChange,
+  scope,
+  onScopeChange,
 }: {
-  period: DashboardPeriod;
-  onPeriodChange: (p: DashboardPeriod) => void;
+  scope: DashboardScope;
+  onScopeChange: (s: DashboardScope) => void;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h1 className="text-2xl font-extrabold text-main">战报中心</h1>
-        <p className="text-sub">{periodLabel(period)}</p>
+        <p className="text-sub">{formatScopeLabel(scope)}战报</p>
       </div>
-      <PeriodSwitcher period={period} onChange={onPeriodChange} />
+      <PeriodNavigator scope={scope} onScopeChange={onScopeChange} />
     </div>
   );
 }

@@ -40,6 +40,8 @@ describe("ReportCenter", () => {
   let root: Root;
 
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-06-15T03:00:00Z"));
     vi.clearAllMocks();
     vi.mocked(fetchTeamDashboardState).mockResolvedValue(snapshot);
     container = document.createElement("div");
@@ -50,6 +52,7 @@ describe("ReportCenter", () => {
   afterEach(() => {
     act(() => root.unmount());
     container.remove();
+    vi.useRealTimers();
   });
 
   it("renders all panels after loading snapshot", async () => {
@@ -63,11 +66,37 @@ describe("ReportCenter", () => {
     });
 
     expect(container.textContent).toContain("战报中心");
+    expect(fetchTeamDashboardState).toHaveBeenCalledWith({ type: "month", monthKey: "2026-06" });
     expect(container.textContent).toContain("50%"); // MetricSummary 完成率
     expect(container.textContent).toContain("六月冲刺"); // SeasonSprintPanel
     expect(container.textContent).toContain("每日趋势"); // PunchTrendChart
     expect(container.textContent).toContain("部位频次"); // WorkoutBalancePanel
     expect(container.textContent).toContain("喝些什么"); // DrinkCompositionPanel
+  });
+
+  it("refetches with previous month scope when period navigator goes back", async () => {
+    await act(async () => {
+      root.render(<ReportCenter />);
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    const prevButton = container.querySelector<HTMLButtonElement>("button[aria-label='上一个周期']");
+    expect(prevButton).not.toBeNull();
+
+    await act(async () => {
+      prevButton!.click();
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(fetchTeamDashboardState).toHaveBeenLastCalledWith({
+      type: "month",
+      monthKey: "2026-05",
+    });
   });
 
   it("refetches when retry button is clicked after error", async () => {
@@ -88,7 +117,7 @@ describe("ReportCenter", () => {
     expect(container.textContent).toContain("重试");
 
     await act(async () => {
-      // PeriodSwitcher 也有按钮，用 quest-btn class 精确定位重试按钮
+      // PeriodNavigator 也有按钮，用 quest-btn class 精确定位重试按钮
       const retryButton = container.querySelector<HTMLButtonElement>("button.quest-btn");
       expect(retryButton).not.toBeNull();
       retryButton!.click();

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { DashboardPeriod, TeamDashboardSnapshot } from "@/lib/types";
+import type { DashboardScope, TeamDashboardSnapshot } from "@/lib/types";
 import { fetchTeamDashboardState } from "@/lib/api";
+import { currentScope } from "@/lib/dashboard-scope";
 import { useBoard } from "@/lib/store";
 import { TeamHeader } from "./TeamHeader";
 import { MetricSummary } from "./MetricSummary";
@@ -14,7 +15,7 @@ import { EmptyState } from "./EmptyState";
 
 export function ReportCenter() {
   const { state } = useBoard();
-  const [period, setPeriod] = useState<DashboardPeriod>("month");
+  const [scope, setScope] = useState<DashboardScope>(() => currentScope(new Date()));
   const [snapshot, setSnapshot] = useState<TeamDashboardSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -24,7 +25,7 @@ export function ReportCenter() {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    fetchTeamDashboardState(period)
+    fetchTeamDashboardState(scope)
       .then((snap) => {
         if (!cancelled) setSnapshot(snap);
       })
@@ -37,11 +38,11 @@ export function ReportCenter() {
     return () => {
       cancelled = true;
     };
-  }, [period, retryNonce]);
+  }, [scope, retryNonce]);
 
   return (
     <div className="space-y-4 p-4">
-      <TeamHeader period={period} onPeriodChange={setPeriod} />
+      <TeamHeader scope={scope} onScopeChange={setScope} />
 
       {loading && !snapshot ? (
         <EmptyState message="加载中…" />
@@ -58,7 +59,7 @@ export function ReportCenter() {
         </div>
       ) : snapshot ? (
         <>
-          <MetricSummary metrics={snapshot.metrics} period={period} />
+          <MetricSummary metrics={snapshot.metrics} period={scope.type} />
           <SeasonSprintPanel season={state.activeSeason ?? null} />
           <div className="grid gap-4 md:grid-cols-3">
             <PunchTrendChart points={snapshot.punchTrend} />
