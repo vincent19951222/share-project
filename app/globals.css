@@ -14800,6 +14800,18 @@ body {
   color: #111827;
 }
 
+.report-balance-body {
+  display: flex;
+  flex: 1;
+  min-height: 13.5rem;
+  align-items: center;
+}
+
+.report-balance-body .dashboard-balance-chart {
+  width: 100%;
+  padding-top: 0;
+}
+
 .dashboard-drink-breakdown {
   display: flex;
   flex-direction: column;
@@ -15149,6 +15161,10 @@ body {
 
   .dashboard-balance-label {
     font-size: 0.55rem;
+  }
+
+  .report-balance-body {
+    min-height: 11.5rem;
   }
 
   .dashboard-header {

@@ -59,4 +59,32 @@ describe("SeasonSprintPanel", () => {
     const slices = container.querySelectorAll("path[data-season-slice]");
     expect(slices.length).toBe(2);
   });
+
+  it("renders segmented progress slots with contributor hover labels", () => {
+    const season: ActiveSeasonSnapshot = {
+      id: "s1",
+      monthKey: "2026-06",
+      goalName: "六月冲刺",
+      targetSlots: 5,
+      filledSlots: 3,
+      contributions: [
+        { userId: "u1", name: "张三", avatarKey: "a", colorIndex: 0, slotContribution: 2, seasonIncome: 12 },
+        { userId: "u2", name: "李四", avatarKey: "b", colorIndex: 1, slotContribution: 1, seasonIncome: 6 },
+      ],
+    };
+
+    act(() => {
+      root.render(<SeasonSprintPanel season={season} />);
+    });
+
+    const grid = container.querySelector("[data-report-season-progress-grid]") as HTMLElement | null;
+    expect(grid).not.toBeNull();
+    expect(grid?.style.gridTemplateColumns).toBe("repeat(5, minmax(0, 1fr))");
+
+    const slots = container.querySelectorAll("[data-report-season-slot]");
+    expect(slots.length).toBe(5);
+    expect(container.querySelectorAll('[data-report-season-slot][data-slot-state="filled"]').length).toBe(3);
+    expect(container.querySelector('[data-report-season-slot][title*="张三"]')).not.toBeNull();
+    expect(container.querySelector('[data-report-season-slot][title*="李四"]')).not.toBeNull();
+  });
 });

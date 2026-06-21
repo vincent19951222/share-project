@@ -44,34 +44,36 @@ export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[]
         <span className="text-[#64748b]">次 · {activePct}%</span>
       </div>
 
-      <div className="dashboard-balance-chart" style={{ height: "auto" }}>
-        {items.map((item, i) => {
-          const isCardio = (CARDIO_ITEMS as readonly string[]).includes(item.code);
-          const color = isCardio ? CARDIO_COLOR : STRENGTH_COLORS[strengthIndex % STRENGTH_COLORS.length];
-          if (!isCardio) strengthIndex += 1;
-          const heightPct =
-            item.count <= 0 ? 0 : `${Math.max(12, (item.count / maxCount) * 100)}%`;
-          const isActive = i === activeIdx;
+      <div className="report-balance-body">
+        <div className="dashboard-balance-chart" style={{ height: "auto" }}>
+          {items.map((item, i) => {
+            const isCardio = (CARDIO_ITEMS as readonly string[]).includes(item.code);
+            const color = isCardio ? CARDIO_COLOR : STRENGTH_COLORS[strengthIndex % STRENGTH_COLORS.length];
+            if (!isCardio) strengthIndex += 1;
+            const heightPct =
+              item.count <= 0 ? 0 : `${Math.max(12, (item.count / maxCount) * 100)}%`;
+            const isActive = i === activeIdx;
 
-          return (
-            <div key={item.code} className="dashboard-balance-item" style={{ flex: 1 }}>
-              <div
-                className="dashboard-balance-track"
-                // 固定高度基准，让柱子的百分比 height 能正确解析
-                style={{ height: "8rem" }}
-              >
+            return (
+              <div key={item.code} className="dashboard-balance-item" style={{ flex: 1 }}>
                 <div
-                  className={`dashboard-balance-bar ${isActive ? "ring-2 ring-[#111827]/70 ring-offset-1" : ""}`}
-                  style={{ height: heightPct, backgroundColor: color }}
-                  onMouseEnter={() => setHoverIdx(i)}
-                  onMouseLeave={() => setHoverIdx(null)}
-                />
+                  className="dashboard-balance-track"
+                  // 固定高度基准，让柱子的百分比 height 能正确解析
+                  style={{ height: "8rem" }}
+                >
+                  <div
+                    className={`dashboard-balance-bar ${isActive ? "ring-2 ring-[#111827]/70 ring-offset-1" : ""}`}
+                    style={{ height: heightPct, backgroundColor: color }}
+                    onMouseEnter={() => setHoverIdx(i)}
+                    onMouseLeave={() => setHoverIdx(null)}
+                  />
+                </div>
+                <span className="dashboard-balance-label">{item.label}</span>
+                <span className="dashboard-balance-count">{item.count}</span>
               </div>
-              <span className="dashboard-balance-label">{item.label}</span>
-              <span className="dashboard-balance-count">{item.count}</span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </ChartPanel>
   );

@@ -52,6 +52,21 @@ describe("WorkoutBalancePanel", () => {
     expect(container.querySelectorAll(".dashboard-balance-item").length).toBe(3);
   });
 
+  it("centers the chart body within the panel", () => {
+    const items: TeamWorkoutBalanceItem[] = [
+      { code: "chest", label: "胸", count: 5 },
+      { code: "back", label: "背", count: 1 },
+      { code: "treadmill", label: "跑步机", count: 3 },
+    ];
+
+    act(() => {
+      root.render(<WorkoutBalancePanel items={items} />);
+    });
+
+    expect(container.querySelector(".report-balance-body")).not.toBeNull();
+    expect(container.querySelector(".dashboard-balance-chart")?.parentElement?.className).toContain("report-balance-body");
+  });
+
   it("colors strength bars with the yellow family and cardio with cyan", () => {
     const items: TeamWorkoutBalanceItem[] = [
       { code: "chest", label: "胸", count: 5 },
