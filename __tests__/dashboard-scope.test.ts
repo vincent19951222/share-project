@@ -148,6 +148,12 @@ describe("parseScopeFromQuery", () => {
       monthKey: "2026-06",
     });
   });
+  it("falls back to current month for lexically past but invalid monthKey", () => {
+    expect(parseScopeFromQuery(sp("period=month&monthKey=2025-99"), NOW)).toEqual({
+      type: "month",
+      monthKey: "2026-06",
+    });
+  });
   it("parses historical year", () => {
     expect(parseScopeFromQuery(sp("period=year&year=2025"), NOW)).toEqual({ type: "year", year: 2025 });
   });

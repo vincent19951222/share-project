@@ -463,7 +463,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (dynamicsToCreate.length > 0) {
-      await Promise.all(dynamicsToCreate);
+      await Promise.allSettled(dynamicsToCreate);
     }
 
     const pushTasks: Promise<unknown>[] = [];

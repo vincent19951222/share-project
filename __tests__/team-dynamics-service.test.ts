@@ -125,4 +125,46 @@ describe("team-dynamics service", () => {
     expect(result.unreadCount).toBe(0);
     expect(result.items).toHaveLength(0);
   });
+
+  it("paginates entries with identical occurredAt without skipping rows", async () => {
+    const occurredAt = new Date("2026-04-25T12:00:00+08:00");
+
+    for (const sourceId of ["same-time-1", "same-time-2", "same-time-3"]) {
+      await createOrReuseTeamDynamic({
+        teamId,
+        type: TEAM_DYNAMIC_TYPES.SEASON_STARTED,
+        title: `动态 ${sourceId}`,
+        summary: "same timestamp",
+        payload: { sourceId },
+        sourceType: "same-time",
+        sourceId,
+        occurredAt,
+      });
+    }
+
+    const firstPage = await listTeamDynamicsForUser({
+      userId,
+      view: "page",
+      unreadOnly: false,
+      type: "ALL",
+      limit: 2,
+      cursor: null,
+    });
+
+    expect(firstPage.items).toHaveLength(2);
+    expect(firstPage.nextCursor).not.toBeNull();
+
+    const secondPage = await listTeamDynamicsForUser({
+      userId,
+      view: "page",
+      unreadOnly: false,
+      type: "ALL",
+      limit: 2,
+      cursor: firstPage.nextCursor,
+    });
+
+    const ids = [...firstPage.items, ...secondPage.items].map((item) => item.id);
+    expect(secondPage.items).toHaveLength(1);
+    expect(new Set(ids).size).toBe(3);
+  });
 });

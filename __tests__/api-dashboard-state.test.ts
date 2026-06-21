@@ -69,6 +69,16 @@ describe("GET /api/dashboard/state", () => {
     expect(body.snapshot.month).toBe(6);
   });
 
+  it("falls back to current month for invalid monthKey", async () => {
+    const response = await GET(request(userId, "?period=month&monthKey=2025-99"));
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.snapshot.period).toBe("month");
+    expect(body.snapshot.currentMonthKey).toBe("2026-06");
+    expect(body.snapshot.month).toBe(6);
+  });
+
   it("returns year snapshot when period=year", async () => {
     const response = await GET(request(userId, "?period=year"));
 

@@ -8,6 +8,7 @@ import { seedDatabase } from "@/lib/db-seed";
 import { getCurrentBoardDay } from "@/lib/board-state";
 import { getPreviousShanghaiDayKey, getShanghaiDayKey } from "@/lib/economy";
 import { createCookieValue } from "@/lib/auth";
+import * as teamDynamicsService from "@/lib/team-dynamics-service";
 
 const validWorkoutPayload = {
   trainingType: "both",
@@ -1455,6 +1456,31 @@ describe("/api/board/punch", () => {
     });
 
     expect(entry.title).toContain("7 天");
+  });
+
+  it("keeps punch success when a milestone team dynamic write fails", async () => {
+    await resetState();
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        currentStreak: 6,
+        lastPunchDayKey: "2026-04-23",
+      },
+    });
+    vi.spyOn(teamDynamicsService, "createOrReuseTeamDynamic").mockRejectedValueOnce(
+      new Error("team dynamic write failed"),
+    );
+
+    const response = await POST(request("POST", userId));
+    expect(response.status).toBe(200);
+
+    const record = await prisma.punchRecord.findUnique({
+      where: { userId_dayKey: { userId, dayKey: todayDayKey } },
+    });
+    expect(record).toMatchObject({
+      punched: true,
+      streakAfterPunch: 7,
+    });
   });
 
   it("sends a streak milestone push when the user reaches fourteen days", async () => {

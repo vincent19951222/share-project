@@ -48,6 +48,27 @@ function serializeItem(item: TeamDynamicWithReadState): TeamDynamicListItem {
   };
 }
 
+const TEAM_DYNAMIC_CURSOR_SEPARATOR = "::";
+
+function encodeTeamDynamicCursor(item: TeamDynamic): string {
+  return `${item.occurredAt.toISOString()}${TEAM_DYNAMIC_CURSOR_SEPARATOR}${item.id}`;
+}
+
+function parseTeamDynamicCursor(cursor: string | null): { occurredAt: Date; id: string | null } | null {
+  if (!cursor) {
+    return null;
+  }
+
+  const [occurredAtText, id] = cursor.split(TEAM_DYNAMIC_CURSOR_SEPARATOR);
+  const occurredAt = new Date(occurredAtText);
+
+  if (Number.isNaN(occurredAt.getTime())) {
+    return null;
+  }
+
+  return { occurredAt, id: id?.trim() ? id : null };
+}
+
 export async function createOrReuseTeamDynamic(input: CreateTeamDynamicInput) {
   const client = input.client ?? prisma;
 
@@ -97,11 +118,22 @@ export async function listTeamDynamicsForUser(input: {
   });
 
   const readStateWhere = { none: { userId: input.userId } };
+  const cursor = parseTeamDynamicCursor(input.cursor);
+  const cursorWhere: Prisma.TeamDynamicWhereInput = cursor
+    ? cursor.id
+      ? {
+          OR: [
+            { occurredAt: { lt: cursor.occurredAt } },
+            { occurredAt: cursor.occurredAt, id: { lt: cursor.id } },
+          ],
+        }
+      : { occurredAt: { lt: cursor.occurredAt } }
+    : {};
   const where: Prisma.TeamDynamicWhereInput = {
     teamId: user.teamId,
     ...(input.type === "ALL" ? {} : { type: input.type }),
     ...(input.unreadOnly ? { readStates: readStateWhere } : {}),
-    ...(input.cursor ? { occurredAt: { lt: new Date(input.cursor) } } : {}),
+    ...cursorWhere,
   };
 
   const [items, unreadCount] = await Promise.all([
@@ -123,14 +155,12 @@ export async function listTeamDynamicsForUser(input: {
       },
     }),
   ]);
+  const lastItem = items.at(-1) ?? null;
 
   return {
     unreadCount,
     items: items.map(serializeItem),
-    nextCursor:
-      items.length === input.limit
-        ? items.at(-1)?.occurredAt.toISOString() ?? null
-        : null,
+    nextCursor: items.length === input.limit && lastItem ? encodeTeamDynamicCursor(lastItem) : null,
   };
 }
 

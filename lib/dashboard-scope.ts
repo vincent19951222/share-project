@@ -94,7 +94,7 @@ export function parseScopeFromQuery(searchParams: URLSearchParams, now: Date): D
   const rawMonthKey = searchParams.get("monthKey");
   const currentMonthKey = todayKey.slice(0, 7);
   const monthKey =
-    rawMonthKey && /^\d{4}-\d{2}$/.test(rawMonthKey) && rawMonthKey <= currentMonthKey
+    rawMonthKey && isValidMonthKey(rawMonthKey) && rawMonthKey <= currentMonthKey
       ? rawMonthKey
       : currentMonthKey;
   return { type: "month", monthKey };
@@ -107,4 +107,8 @@ function formatMonthKey(year: number, month: number): string {
 function lastDayOfMonth(year: number, month: number): number {
   // month: 1-12。用下个月第 0 天 = 本月最后一天
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+function isValidMonthKey(monthKey: string): boolean {
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(monthKey);
 }

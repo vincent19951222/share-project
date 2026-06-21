@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
 
 vi.mock("@/lib/auth", () => ({
   parseCookieValue: vi.fn((value: string | undefined | null) => value ?? null),
@@ -35,7 +35,16 @@ const SNAPSHOT_STUB = {
 };
 
 describe("team-state route", () => {
+  beforeAll(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-06-15T03:00:00Z"));
+  });
+
   beforeEach(() => vi.clearAllMocks());
+
+  afterAll(() => {
+    vi.useRealTimers();
+  });
 
   it("returns 401 when not logged in", async () => {
     const res = await GET(makeReq(undefined));
@@ -76,6 +85,18 @@ describe("team-state route", () => {
     (prisma.user.findUnique as any).mockResolvedValue({ id: "u1", teamId: "team-1" });
     (buildTeamDashboardSnapshot as any).mockResolvedValue(SNAPSHOT_STUB);
     const res = await GET(makeReq("u1", "period=month&monthKey=2026-12"));
+    expect(res.status).toBe(200);
+    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith(
+      "team-1",
+      { type: "month", monthKey: "2026-06" },
+      expect.any(Date),
+    );
+  });
+
+  it("falls back to current month for invalid monthKey", async () => {
+    (prisma.user.findUnique as any).mockResolvedValue({ id: "u1", teamId: "team-1" });
+    (buildTeamDashboardSnapshot as any).mockResolvedValue(SNAPSHOT_STUB);
+    const res = await GET(makeReq("u1", "period=month&monthKey=2025-99"));
     expect(res.status).toBe(200);
     expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith(
       "team-1",
