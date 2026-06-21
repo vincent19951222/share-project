@@ -1,97 +1,76 @@
 "use client";
 
-import { useMemo } from "react";
-import { useDrink } from "@/lib/drink-store";
+import { useEffect, useState } from "react";
+import type { DashboardPeriod, TeamDashboardSnapshot } from "@/lib/types";
+import { fetchTeamDashboardState } from "@/lib/api";
 import { useBoard } from "@/lib/store";
-import { ReportHeader } from "./ReportHeader";
-import { Milestones } from "./Milestones";
-import { DrinkReportPanel } from "./DrinkReportPanel";
-import { TrendChart } from "./TrendChart";
-import { buildReportData } from "./report-data";
-
-const reportSceneProps = [
-  {
-    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_binder_clip_left.webp",
-    className: "left-4 top-2 w-20 sm:left-8 sm:w-24",
-  },
-  {
-    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_discipline_note.webp",
-    className: "left-0 top-28 hidden w-36 sm:block lg:w-40",
-  },
-  {
-    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_no_excuses_note.webp",
-    className: "right-3 top-10 hidden w-32 sm:block lg:w-36",
-  },
-  {
-    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_bar_chart_note.webp",
-    className: "right-2 top-72 hidden w-28 lg:block xl:w-32",
-  },
-  {
-    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_stronger_stamp.webp",
-    className: "bottom-28 left-3 hidden w-28 md:block lg:w-32",
-  },
-  {
-    src: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_focus_marker.webp",
-    className: "bottom-8 right-2 hidden w-36 md:block lg:w-40",
-  },
-] as const;
+import { TeamHeader } from "./TeamHeader";
+import { MetricSummary } from "./MetricSummary";
+import { SeasonSprintPanel } from "./SeasonSprintPanel";
+import { PunchTrendChart } from "./PunchTrendChart";
+import { WorkoutBalancePanel } from "./WorkoutBalancePanel";
+import { DrinkCompositionPanel } from "./DrinkCompositionPanel";
+import { EmptyState } from "./EmptyState";
 
 export function ReportCenter() {
   const { state } = useBoard();
-  const drinkState = useDrink();
-  const report = useMemo(
-    () => buildReportData(state, new Date(), drinkState.snapshot),
-    [drinkState.snapshot, state],
-  );
+  const [period, setPeriod] = useState<DashboardPeriod>("month");
+  const [snapshot, setSnapshot] = useState<TeamDashboardSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
+    fetchTeamDashboardState(period)
+      .then((snap) => {
+        if (!cancelled) setSnapshot(snap);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [period]);
 
   return (
-    <div className="report-board absolute inset-0 overflow-y-auto transition-opacity duration-300">
-      <div className="report-scene relative isolate min-h-full overflow-hidden rounded-[2rem] border-[3px] border-slate-900 bg-[#f7f3e8] shadow-[0_16px_0_0_#111827]">
-        <div className="report-scene-background absolute inset-0">
-          <img
-            src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_report_editor_desk_bg.webp"
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover opacity-80"
-          />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.82),_rgba(247,243,232,0.96)_60%)]" />
+    <div className="space-y-4 p-4">
+      <TeamHeader period={period} onPeriodChange={setPeriod} />
+
+      {loading && !snapshot ? (
+        <EmptyState message="加载中…" />
+      ) : error ? (
+        <div className="soft-card p-4">
+          <EmptyState message="战报加载失败" />
+          <button
+            type="button"
+            className="quest-btn mt-2"
+            onClick={() => setPeriod(period)}
+          >
+            重试
+          </button>
         </div>
-        <div className="report-scene-props pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          {reportSceneProps.map((prop) => (
-            <img
-              key={prop.src}
-              src={prop.src}
-              alt=""
-              aria-hidden="true"
-              className={`absolute select-none ${prop.className}`}
-            />
-          ))}
-        </div>
-        <div className="report-scene-content relative z-10 flex min-h-full flex-col gap-5 p-4 sm:p-6 lg:p-8">
-          <div className="report-scene-header">
-            <ReportHeader
-              title={report.title}
-              summary={report.summary}
-              teamVault={report.teamVault}
-              metrics={report.metrics}
+      ) : snapshot ? (
+        <>
+          <MetricSummary metrics={snapshot.metrics} period={period} />
+          <SeasonSprintPanel season={state.activeSeason ?? null} />
+          <div className="grid gap-4 md:grid-cols-3">
+            <PunchTrendChart points={snapshot.punchTrend} />
+            <WorkoutBalancePanel items={snapshot.workoutBalance} />
+            <DrinkCompositionPanel
+              breakdown={snapshot.drinkBreakdown}
+              trend={snapshot.drinkTrend}
             />
           </div>
-          <Milestones metrics={report.metrics} />
-          <div className="report-scene-analysis grid grid-cols-1 gap-4 xl:grid-cols-3">
-            <TrendChart
-              dailyPoints={report.dailyPoints}
-              monthNumber={report.monthNumber}
-              peakDay={report.peakDay}
-              lowDay={report.lowDay}
-            />
-            <DrinkReportPanel
-              drink={report.drink}
-              loading={!drinkState.snapshot && !drinkState.error}
-              error={drinkState.error}
-            />
-          </div>
-        </div>
-      </div>
+        </>
+      ) : null}
     </div>
   );
 }
+
+export default ReportCenter;
