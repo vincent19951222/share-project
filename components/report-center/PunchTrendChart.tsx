@@ -41,7 +41,7 @@ export function PunchTrendChart({ points }: { points: TeamPunchTrendPoint[] }) {
         )}
       </div>
 
-      <div className="flex h-24 items-end gap-[3px] overflow-x-auto pb-1">
+      <div className="flex min-h-[6rem] flex-1 items-end gap-[3px] overflow-x-auto pb-1">
         {points.map((p) => {
           const heightPct = p.count <= 0 ? 6 : Math.max(12, (p.count / max) * 100);
           return (

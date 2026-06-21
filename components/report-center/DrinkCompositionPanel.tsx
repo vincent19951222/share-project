@@ -71,7 +71,7 @@ export function DrinkCompositionPanel({
             </span>
             <span className="h-px flex-1 bg-[#e2e8f0]" />
           </div>
-          <div className="flex h-12 items-end gap-[2px] overflow-x-auto pb-1">
+          <div className="flex min-h-[3rem] flex-1 items-end gap-[2px] overflow-x-auto pb-1">
             {trend.map((t) => {
               const heightPct = t.count <= 0 ? 6 : Math.max(12, (t.count / trendMax) * 100);
               return (

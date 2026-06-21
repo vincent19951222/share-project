@@ -26,7 +26,7 @@ export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[]
 
   return (
     <ChartPanel chip="训练平衡" title="部位频次">
-      <div className="dashboard-balance-chart">
+      <div className="dashboard-balance-chart" style={{ height: "auto", flex: 1, minHeight: "9rem" }}>
         {items.map((item) => {
           const isCardio = (CARDIO_ITEMS as readonly string[]).includes(item.code);
           const color = isCardio ? CARDIO_COLOR : STRENGTH_COLORS[strengthIndex % STRENGTH_COLORS.length];
@@ -35,8 +35,8 @@ export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[]
             item.count <= 0 ? 0 : `${Math.max(12, (item.count / maxCount) * 100)}%`;
 
           return (
-            <div key={item.code} className="dashboard-balance-item">
-              <div className="dashboard-balance-track">
+            <div key={item.code} className="dashboard-balance-item" style={{ flex: 1 }}>
+              <div className="dashboard-balance-track" style={{ height: "auto", flex: 1 }}>
                 <div
                   className="dashboard-balance-bar"
                   style={{ height: heightPct, backgroundColor: color }}
