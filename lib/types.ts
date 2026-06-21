@@ -629,6 +629,11 @@ export interface CalendarMonthSnapshot {
 
 export type DashboardPeriod = "month" | "year";
 
+/** 带锚点的统计周期：粒度 + 具体哪个月/年。支持历史周期翻页。 */
+export type DashboardScope =
+  | { type: "month"; monthKey: string } // "2026-05"
+  | { type: "year"; year: number }; // 2025
+
 export interface DashboardWorkoutSummary {
   days: number;
   totalMinutes: number;
