@@ -72,3 +72,40 @@ describe("buildTeamDashboardSnapshot - month", () => {
     expect(snap!.metrics.completionRate).toBeCloseTo(0.1, 5);
   });
 });
+
+describe("buildTeamDashboardSnapshot - year", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("aggregates punchTrend and drinkTrend by month (buckets up to current month)", async () => {
+    (prisma.team.findUnique as any).mockResolvedValue(
+      makeTeam({
+        users: [
+          {
+            id: "u1",
+            punchRecords: [
+              { dayKey: "2026-01-05", punched: true },
+              { dayKey: "2026-06-10", punched: true },
+            ],
+            workoutRecords: [],
+            drinkRecords: [
+              { dayKey: "2026-06-10", drinkType: "water" },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const snap = await buildTeamDashboardSnapshot("team-1", "year", NOW);
+    expect(snap!.period).toEqual({
+      type: "year",
+      startKey: "2026-01-01",
+      endKey: "2026-06-15",
+    });
+    // 年视图 punchTrend = 6 个月（1-6月）
+    expect(snap!.punchTrend.length).toBe(6);
+    expect(snap!.punchTrend[0]).toEqual({ dayKey: "2026-01", count: 1, isFullAttendance: false });
+    expect(snap!.punchTrend[5]).toEqual({ dayKey: "2026-06", count: 1, isFullAttendance: false });
+    expect(snap!.drinkTrend[5]).toEqual({ dayKey: "2026-06", count: 1 });
+    expect(snap!.drinkTrend[0].count).toBe(0);
+  });
+});

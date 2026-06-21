@@ -85,17 +85,53 @@ export async function buildTeamDashboardSnapshot(
     }
   }
 
-  // 月视图 punchTrend：逐天
+  // --- drink by day（trend 复用，需先于 trend 构建）---
+  const drinkByDay = new Map<string, number>();
+  for (const u of team.users) {
+    for (const dr of u.drinkRecords) {
+      drinkByDay.set(dr.dayKey, (drinkByDay.get(dr.dayKey) ?? 0) + 1);
+    }
+  }
+
+  // --- punchTrend / drinkTrend 构建（月视图逐天，年视图按月聚合）---
   const punchTrend: TeamPunchTrendPoint[] = [];
-  let cur = startKey;
-  while (cur <= endKey) {
-    const count = punchByDay.get(cur) ?? 0;
-    punchTrend.push({
-      dayKey: cur,
-      count,
-      isFullAttendance: memberCount > 0 && count === memberCount,
-    });
-    cur = addDays(cur, 1);
+  const drinkTrend: TeamDrinkTrendPoint[] = [];
+
+  if (period === "month") {
+    let cur = startKey;
+    while (cur <= endKey) {
+      const count = punchByDay.get(cur) ?? 0;
+      punchTrend.push({
+        dayKey: cur,
+        count,
+        isFullAttendance: memberCount > 0 && count === memberCount,
+      });
+      drinkTrend.push({ dayKey: cur, count: drinkByDay.get(cur) ?? 0 });
+      cur = addDays(cur, 1);
+    }
+  } else {
+    // 年视图：按月聚合 1 月到当前月
+    const currentMonth = Number(todayDayKey.slice(5, 7));
+    const punchByMonth = new Map<string, number>();
+    const drinkByMonth = new Map<string, number>();
+    for (const [day, c] of punchByDay) {
+      const m = day.slice(0, 7);
+      punchByMonth.set(m, (punchByMonth.get(m) ?? 0) + c);
+    }
+    for (const [day, c] of drinkByDay) {
+      const m = day.slice(0, 7);
+      drinkByMonth.set(m, (drinkByMonth.get(m) ?? 0) + c);
+    }
+    for (let m = 1; m <= currentMonth; m++) {
+      const monthKey2 = `${year}-${String(m).padStart(2, "0")}`;
+      const count = punchByMonth.get(monthKey2) ?? 0;
+      punchTrend.push({
+        dayKey: monthKey2,
+        count,
+        isFullAttendance: false, // 年视图不标全勤
+      });
+      drinkTrend.push({ dayKey: monthKey2, count: drinkByMonth.get(monthKey2) ?? 0 });
+    }
   }
 
   const totalPunches = Array.from(punchByDay.values()).reduce((a, b) => a + b, 0);
@@ -147,20 +183,6 @@ export async function buildTeamDashboardSnapshot(
       color: drinkCatalog[type].color,
     }),
   );
-
-  // --- drink trend (月视图逐天) ---
-  const drinkByDay = new Map<string, number>();
-  for (const u of team.users) {
-    for (const dr of u.drinkRecords) {
-      drinkByDay.set(dr.dayKey, (drinkByDay.get(dr.dayKey) ?? 0) + 1);
-    }
-  }
-  const drinkTrend: TeamDrinkTrendPoint[] = [];
-  let dCur = startKey;
-  while (dCur <= endKey) {
-    drinkTrend.push({ dayKey: dCur, count: drinkByDay.get(dCur) ?? 0 });
-    dCur = addDays(dCur, 1);
-  }
 
   return {
     period: { type: period, startKey, endKey },
