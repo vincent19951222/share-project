@@ -39,7 +39,7 @@ describe("DrinkCompositionPanel", () => {
     expect(container.textContent).toContain("暂无饮水数据");
   });
 
-  it("renders pie slices for non-zero types and trend bars", () => {
+  it("renders a breakdown row per type (including zero-count) and a trend bar per point", () => {
     const breakdown: TeamDrinkBreakdownItem[] = [
       { type: "water", label: "水", count: 4, color: "#4fb8d6" },
       { type: "milkTea", label: "奶茶", count: 2, color: "#ef7f8f" },
@@ -56,11 +56,14 @@ describe("DrinkCompositionPanel", () => {
       );
     });
 
-    // 饼图扇区 = 非零类型数 = 2
-    const slices = container.querySelectorAll("path[data-slice]");
-    expect(slices.length).toBe(2);
+    // 水平柱：每个类型一行（含 0 杯的美式，保持扇区/行稳定）
+    expect(container.querySelectorAll(".dashboard-drink-breakdown-item").length).toBe(3);
+    expect(container.textContent).toContain("水");
+    expect(container.textContent).toContain("奶茶");
+    // 占比百分比
+    expect(container.textContent).toContain("67%"); // 4 / 6
+    expect(container.textContent).toContain("33%"); // 2 / 6
     // 趋势柱 = trend 长度 = 2
-    const bars = container.querySelectorAll("rect[data-drink-bar]");
-    expect(bars.length).toBe(2);
+    expect(container.querySelectorAll("[data-drink-trend-bar]").length).toBe(2);
   });
 });

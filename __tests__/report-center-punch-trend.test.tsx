@@ -31,7 +31,7 @@ describe("PunchTrendChart", () => {
     expect(container.textContent).toContain("暂无打卡数据");
   });
 
-  it("renders a bar per point and highlights peak", () => {
+  it("renders a bar per point and marks full-attendance distinctly", () => {
     const points: TeamPunchTrendPoint[] = [
       { dayKey: "2026-06-10", count: 2, isFullAttendance: true },
       { dayKey: "2026-06-11", count: 1, isFullAttendance: false },
@@ -41,12 +41,13 @@ describe("PunchTrendChart", () => {
       root.render(<PunchTrendChart points={points} />);
     });
 
-    const bars = container.querySelectorAll("rect[data-bar]");
+    const bars = container.querySelectorAll("[data-punch-bar]");
     expect(bars.length).toBe(2);
     expect(container.textContent).toContain("峰值 2人");
+    expect(container.textContent).toContain("全勤 1");
   });
 
-  it("uses green fill for full-attendance bars", () => {
+  it("distinguishes full-attendance bars from partial ones via data-full", () => {
     const points: TeamPunchTrendPoint[] = [
       { dayKey: "2026-06-10", count: 2, isFullAttendance: true },
       { dayKey: "2026-06-11", count: 1, isFullAttendance: false },
@@ -56,8 +57,12 @@ describe("PunchTrendChart", () => {
       root.render(<PunchTrendChart points={points} />);
     });
 
-    const bars = container.querySelectorAll("rect[data-bar]");
-    expect(bars[0].getAttribute("fill")).toBe("#16a34a");
-    expect(bars[1].getAttribute("fill")).toBe("#fde047");
+    const bars = container.querySelectorAll("[data-punch-bar]");
+    expect(bars[0].getAttribute("data-full")).toBe("true");
+    expect(bars[1].getAttribute("data-full")).toBe("false");
+    // 全勤柱为实心黄，部分柱为半透明黄（均不引入绿色）
+    expect((bars[0] as HTMLElement).className).toContain("bg-[#fde047]");
+    expect((bars[0] as HTMLElement).className).not.toContain("/45");
+    expect((bars[1] as HTMLElement).className).toContain("bg-[#fde047]/45");
   });
 });

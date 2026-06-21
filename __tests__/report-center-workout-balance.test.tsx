@@ -33,11 +33,11 @@ describe("WorkoutBalancePanel", () => {
     expect(container.textContent).toContain("暂无训练数据");
   });
 
-  it("renders a row per item with label and count", () => {
+  it("renders a vertical bar per item with label and count", () => {
     const items: TeamWorkoutBalanceItem[] = [
       { code: "chest", label: "胸", count: 5 },
       { code: "back", label: "背", count: 1 },
-      { code: "legs", label: "腿", count: 3 },
+      { code: "treadmill", label: "跑步机", count: 3 },
     ];
 
     act(() => {
@@ -46,36 +46,28 @@ describe("WorkoutBalancePanel", () => {
 
     expect(container.textContent).toContain("胸");
     expect(container.textContent).toContain("5");
-    expect(container.textContent).toContain("背");
-    expect(container.textContent).toContain("1");
-    expect(container.textContent).toContain("腿");
+    expect(container.textContent).toContain("跑步机");
     expect(container.textContent).toContain("3");
+    // 每个部位一根柱
+    expect(container.querySelectorAll(".dashboard-balance-item").length).toBe(3);
   });
 
-  it("marks the weakest item with a label", () => {
+  it("colors strength bars with the yellow family and cardio with cyan", () => {
     const items: TeamWorkoutBalanceItem[] = [
       { code: "chest", label: "胸", count: 5 },
-      { code: "back", label: "背", count: 1 },
-      { code: "legs", label: "腿", count: 3 },
+      { code: "treadmill", label: "跑步机", count: 2 },
     ];
 
     act(() => {
       root.render(<WorkoutBalancePanel items={items} />);
     });
 
-    expect(container.textContent).toContain("最薄弱");
-  });
-
-  it("does not mark weakest when all counts are equal", () => {
-    const items: TeamWorkoutBalanceItem[] = [
-      { code: "chest", label: "胸", count: 3 },
-      { code: "back", label: "背", count: 3 },
-    ];
-
-    act(() => {
-      root.render(<WorkoutBalancePanel items={items} />);
-    });
-
-    expect(container.textContent).not.toContain("最薄弱");
+    const bars = container.querySelectorAll(".dashboard-balance-bar") as NodeListOf<HTMLElement>;
+    const chestColor = bars[0]?.style.backgroundColor;
+    const cardioColor = bars[1]?.style.backgroundColor;
+    // 力量（胸）应为黄色系，有氧（跑步机）应为青色 —— 两者不同
+    expect(chestColor).toBeTruthy();
+    expect(cardioColor).toBeTruthy();
+    expect(chestColor).not.toBe(cardioColor);
   });
 });

@@ -1,47 +1,54 @@
+import { CARDIO_ITEMS } from "@/lib/workouts";
 import type { TeamWorkoutBalanceItem } from "@/lib/types";
+import { ChartPanel } from "./ChartPanel";
 import { EmptyState } from "./EmptyState";
 
-export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[] }) {
-  const max = Math.max(...items.map((i) => i.count), 0);
-  const min = Math.min(...items.map((i) => i.count));
+const STRENGTH_COLORS = ["#fde047", "#facc15", "#eab308", "#ca8a04", "#fde047", "#facc15", "#eab308"];
+const CARDIO_COLOR = "#22d3ee";
 
-  if (max === 0) {
+/**
+ * 团队训练部位均衡。
+ * 镜像个人看板 WorkoutBalanceChart：垂直 div 柱，力量按黄色梯度、有氧青色。
+ * 从 code 反推 category（TeamWorkoutBalanceItem 不带 category 字段）。
+ */
+export function WorkoutBalancePanel({ items }: { items: TeamWorkoutBalanceItem[] }) {
+  const maxCount = Math.max(1, ...items.map((i) => i.count));
+
+  if (items.every((i) => i.count === 0)) {
     return (
-      <div className="soft-card p-4">
-        <h3 className="mb-2 text-sm font-bold text-main">团队训练部位均衡</h3>
+      <ChartPanel chip="训练平衡" title="部位频次">
         <EmptyState message="暂无训练数据" />
-      </div>
+      </ChartPanel>
     );
   }
 
-  // 最薄弱项 = count === min 且 min < max（避免全相等时误标）
-  const weakestCode = min < max ? items.find((i) => i.count === min)?.code : undefined;
+  let strengthIndex = 0;
 
   return (
-    <div className="soft-card p-4">
-      <h3 className="mb-2 text-sm font-bold text-main">团队训练部位均衡</h3>
-      <div className="space-y-2">
-        {items.map((i) => {
-          const isMax = i.count === max;
-          const isWeakest = i.code === weakestCode;
-          const widthPct = (i.count / max) * 100;
+    <ChartPanel chip="训练平衡" title="部位频次">
+      <div className="dashboard-balance-chart">
+        {items.map((item) => {
+          const isCardio = (CARDIO_ITEMS as readonly string[]).includes(item.code);
+          const color = isCardio ? CARDIO_COLOR : STRENGTH_COLORS[strengthIndex % STRENGTH_COLORS.length];
+          if (!isCardio) strengthIndex += 1;
+          const heightPct =
+            item.count <= 0 ? 0 : `${Math.max(12, (item.count / maxCount) * 100)}%`;
+
           return (
-            <div key={i.code} className="flex items-center gap-2">
-              <span className="w-12 shrink-0 text-xs text-sub">{i.label}</span>
-              <div className="h-4 flex-1 rounded border border-[#1f2937]/30 bg-[#f3f4f6]">
+            <div key={item.code} className="dashboard-balance-item">
+              <div className="dashboard-balance-track">
                 <div
-                  className={`h-full rounded ${isMax ? "bg-[#fde047]" : "bg-[#fbbf24]/60"}`}
-                  style={{ width: `${widthPct}%` }}
+                  className="dashboard-balance-bar"
+                  style={{ height: heightPct, backgroundColor: color }}
+                  title={`${item.label}：${item.count} 次`}
                 />
               </div>
-              <span className={`w-8 shrink-0 text-right text-xs ${isWeakest ? "text-sub" : "text-main"}`}>
-                {i.count}
-              </span>
-              {isWeakest && <span className="text-[10px] text-sub">最薄弱</span>}
+              <span className="dashboard-balance-label">{item.label}</span>
+              <span className="dashboard-balance-count">{item.count}</span>
             </div>
           );
         })}
       </div>
-    </div>
+    </ChartPanel>
   );
 }

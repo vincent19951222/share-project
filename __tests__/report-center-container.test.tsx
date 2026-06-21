@@ -65,9 +65,9 @@ describe("ReportCenter", () => {
     expect(container.textContent).toContain("战报中心");
     expect(container.textContent).toContain("50%"); // MetricSummary 完成率
     expect(container.textContent).toContain("六月冲刺"); // SeasonSprintPanel
-    expect(container.textContent).toContain("每日打卡趋势"); // PunchTrendChart
-    expect(container.textContent).toContain("团队训练部位均衡"); // WorkoutBalancePanel
-    expect(container.textContent).toContain("水铺饮品构成"); // DrinkCompositionPanel
+    expect(container.textContent).toContain("每日趋势"); // PunchTrendChart
+    expect(container.textContent).toContain("部位频次"); // WorkoutBalancePanel
+    expect(container.textContent).toContain("喝些什么"); // DrinkCompositionPanel
   });
 
   it("refetches when retry button is clicked after error", async () => {
@@ -102,6 +102,6 @@ describe("ReportCenter", () => {
     });
 
     expect(container.textContent).not.toContain("战报加载失败");
-    expect(container.textContent).toContain("每日打卡趋势"); // 成功态面板标题
+    expect(container.textContent).toContain("每日趋势"); // 成功态面板标题
   });
 });

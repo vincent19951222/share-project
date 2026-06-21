@@ -2,31 +2,14 @@ import type {
   TeamDrinkBreakdownItem,
   TeamDrinkTrendPoint,
 } from "@/lib/types";
+import { ChartPanel } from "./ChartPanel";
 import { EmptyState } from "./EmptyState";
 
-const R = 50;
-const C = 2 * Math.PI * R;
-
-function arcPath(start: number, end: number): string {
-  // start/end 为 0-1 占比
-  if (end - start >= 1) {
-    // 整圆（单类型退化）
-    return `M ${R} 0 A ${R} ${R} 0 1 1 ${R - 0.01} 0 Z`;
-  }
-  const a0 = start * 2 * Math.PI - Math.PI / 2;
-  const a1 = end * 2 * Math.PI - Math.PI / 2;
-  const x0 = R + R * Math.cos(a0);
-  const y0 = R + R * Math.sin(a0);
-  const x1 = R + R * Math.cos(a1);
-  const y1 = R + R * Math.sin(a1);
-  const large = end - start > 0.5 ? 1 : 0;
-  return `M ${R} ${R} L ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`;
-}
-
-const BAR_W = 10;
-const BAR_GAP = 3;
-const TREND_H = 100;
-
+/**
+ * 水铺饮品构成。
+ * 去掉饼图（项目设计语言里无饼图），改用个人看板 DrinkBreakdownChart 同款水平柱：
+ * dot + label + count + 占比%。下方保留「每日饮水」迷你青色柱条。
+ */
 export function DrinkCompositionPanel({
   breakdown,
   trend,
@@ -34,84 +17,80 @@ export function DrinkCompositionPanel({
   breakdown: TeamDrinkBreakdownItem[];
   trend: TeamDrinkTrendPoint[];
 }) {
-  const nonZero = breakdown.filter((b) => b.count > 0);
-  const total = nonZero.reduce((a, b) => a + b.count, 0);
+  const total = breakdown.reduce((sum, b) => sum + b.count, 0);
 
   if (total === 0) {
     return (
-      <div className="soft-card p-4">
-        <h3 className="mb-2 text-sm font-bold text-main">水铺饮品构成</h3>
+      <ChartPanel chip="水铺构成" title="喝些什么">
         <EmptyState message="暂无饮水数据" />
-      </div>
+      </ChartPanel>
     );
   }
 
-  // 饼图扇区
-  let acc = 0;
-  const slices = nonZero.map((b) => {
-    const start = acc / total;
-    acc += b.count;
-    const end = acc / total;
-    return { ...b, start, end };
-  });
-
-  // 趋势柱
+  const maxCount = Math.max(1, ...breakdown.map((b) => b.count));
   const trendMax = Math.max(...trend.map((t) => t.count), 1);
-  const trendW = trend.length * (BAR_W + BAR_GAP);
 
   return (
-    <div className="soft-card p-4">
-      <h3 className="mb-2 text-sm font-bold text-main">水铺饮品构成</h3>
-      <div className="flex flex-wrap items-center gap-4">
-        <svg width={R * 2} height={R * 2} viewBox={`0 0 ${R * 2} ${R * 2}`} role="img" aria-label="饮品构成">
-          {slices.map((s) => (
-            <path
-              key={s.type}
-              data-slice
-              d={arcPath(s.start, s.end)}
-              fill={s.color}
-              stroke="#1f2937"
-              strokeWidth={1}
-            >
-              <title>{`${s.label}: ${s.count} 杯 (${Math.round((s.count / total) * 100)}%)`}</title>
-            </path>
-          ))}
-        </svg>
-        <ul className="space-y-1 text-xs">
-          {slices.map((s) => (
-            <li key={s.type} className="flex items-center gap-1">
-              <span
-                className="inline-block h-3 w-3 rounded-sm border border-[#1f2937]/40"
-                style={{ backgroundColor: s.color }}
-              />
-              <span className="text-main">{s.label}</span>
-              <span className="text-sub">{s.count}</span>
-            </li>
-          ))}
-        </ul>
+    <ChartPanel chip="水铺构成" title="喝些什么">
+
+      <div className="dashboard-drink-breakdown">
+        {breakdown.map((item) => {
+          const pct = Math.round((item.count / total) * 100);
+          const widthPct =
+            item.count <= 0 ? 0 : `${Math.max(12, (item.count / maxCount) * 100)}%`;
+          return (
+            <div key={item.type} className="dashboard-drink-breakdown-item">
+              <div className="dashboard-drink-breakdown-info">
+                <span
+                  className="dashboard-drink-breakdown-dot"
+                  style={{ backgroundColor: item.color }}
+                  aria-hidden="true"
+                />
+                <span className="dashboard-drink-breakdown-label">{item.label}</span>
+                <span className="dashboard-drink-breakdown-count">{item.count}</span>
+                <span className="ml-auto text-[0.65rem] font-bold text-[#94a3b8]">
+                  {pct}%
+                </span>
+              </div>
+              <div className="dashboard-drink-breakdown-track">
+                <div
+                  className="dashboard-drink-breakdown-bar"
+                  style={{ width: widthPct, backgroundColor: item.color }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
+
       {trend.length > 0 && (
-        <svg className="mt-3" width={trendW} height={TREND_H} role="img" aria-label="每日饮水趋势">
-          {trend.map((t, i) => {
-            const h = (t.count / trendMax) * (TREND_H - 16);
-            return (
-              <rect
-                key={t.dayKey}
-                data-drink-bar
-                x={i * (BAR_W + BAR_GAP)}
-                y={TREND_H - h}
-                width={BAR_W}
-                height={Math.max(h, 2)}
-                fill="#4fb8d6"
-                stroke="#1f2937"
-                strokeWidth={1}
-              >
-                <title>{`${t.dayKey}: ${t.count} 杯`}</title>
-              </rect>
-            );
-          })}
-        </svg>
+        <>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="text-[0.65rem] font-black uppercase tracking-wide text-[#64748b]">
+              每日饮水
+            </span>
+            <span className="h-px flex-1 bg-[#e2e8f0]" />
+          </div>
+          <div className="flex h-12 items-end gap-[2px] overflow-x-auto pb-1">
+            {trend.map((t) => {
+              const heightPct = t.count <= 0 ? 6 : Math.max(12, (t.count / trendMax) * 100);
+              return (
+                <div
+                  key={t.dayKey}
+                  className="flex h-full min-w-[4px] flex-1 flex-col justify-end"
+                  title={`${t.dayKey}：${t.count} 杯`}
+                >
+                  <div
+                    data-drink-trend-bar
+                    className="mx-auto w-full max-w-[0.9rem] rounded-[0.25rem] border-[1.5px] border-[#111827] bg-[#22d3ee] shadow-[0_2px_0_0_rgba(17,24,39,0.2)]"
+                    style={{ height: `${heightPct}%` }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
-    </div>
+    </ChartPanel>
   );
 }
