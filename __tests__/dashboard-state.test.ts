@@ -160,7 +160,7 @@ describe("buildDashboardSnapshotForUser", () => {
     });
     await createDrink(user.id, team.id, "2026-06-10", "latte");
 
-    const snapshot = await buildDashboardSnapshotForUser(user.id, "month", TEST_NOW);
+    const snapshot = await buildDashboardSnapshotForUser(user.id, { type: "month", monthKey: "2026-06" }, TEST_NOW);
 
     expect(snapshot).not.toBeNull();
     expect(snapshot!.workoutSummary.days).toBe(1);
@@ -175,7 +175,7 @@ describe("buildDashboardSnapshotForUser", () => {
   it("uses localized workout balance labels even when counts are zero", async () => {
     const { user } = await createTestUser();
 
-    const snapshot = await buildDashboardSnapshotForUser(user.id, "month", TEST_NOW);
+    const snapshot = await buildDashboardSnapshotForUser(user.id, { type: "month", monthKey: "2026-06" }, TEST_NOW);
 
     expect(snapshot).not.toBeNull();
     expect(snapshot!.workoutBalance.find((item) => item.code === "glutes")).toMatchObject({
@@ -207,7 +207,7 @@ describe("buildDashboardSnapshotForUser", () => {
     });
     await createDrink(user.id, team.id, "2026-03-10", "water");
 
-    const snapshot = await buildDashboardSnapshotForUser(user.id, "year", TEST_NOW);
+    const snapshot = await buildDashboardSnapshotForUser(user.id, { type: "year", year: 2026 }, TEST_NOW);
 
     expect(snapshot).not.toBeNull();
     expect(snapshot!.workoutSummary.days).toBe(2);
@@ -230,7 +230,7 @@ describe("buildDashboardSnapshotForUser", () => {
       durationMinutes: 40,
     });
 
-    const snapshot = await buildDashboardSnapshotForUser(user.id, "year", TEST_NOW);
+    const snapshot = await buildDashboardSnapshotForUser(user.id, { type: "year", year: 2026 }, TEST_NOW);
 
     expect(snapshot).not.toBeNull();
     expect(snapshot!.heatmap[0]?.dayKey).toBe("2025-07-01");
@@ -239,5 +239,34 @@ describe("buildDashboardSnapshotForUser", () => {
     expect(snapshot!.heatmap.some((day) => day.dayKey === "2025-07-03" && day.workoutMinutes === 30)).toBe(true);
     expect(snapshot!.heatmap.some((day) => day.dayKey === "2026-06-20")).toBe(false);
     expect(snapshot!.heatmap.some((day) => day.month === 12 && day.dayKey.startsWith("2026-12"))).toBe(false);
+  });
+
+  it("queries a complete historical month without bleeding into later months", async () => {
+    const { user, team } = await createTestUser();
+
+    await createPunchWithWorkout(user.id, team.id, "2026-05-20", {
+      trainingType: "strength",
+      strengthParts: ["chest"],
+      durationMinutes: 30,
+    });
+    await createPunchWithWorkout(user.id, team.id, "2026-06-10", {
+      trainingType: "strength",
+      strengthParts: ["back"],
+      durationMinutes: 40,
+    });
+
+    const snapshot = await buildDashboardSnapshotForUser(
+      user.id,
+      { type: "month", monthKey: "2026-05" },
+      TEST_NOW,
+    );
+
+    expect(snapshot).not.toBeNull();
+    expect(snapshot!.workoutSummary.days).toBe(1);
+    expect(snapshot!.workoutSummary.totalMinutes).toBe(30);
+    expect(snapshot!.workoutBalance.find((item) => item.code === "chest")?.count).toBe(1);
+    expect(snapshot!.workoutBalance.find((item) => item.code === "back")?.count).toBe(0);
+    expect(snapshot!.currentMonthKey).toBe("2026-05");
+    expect(snapshot!.month).toBe(5);
   });
 });

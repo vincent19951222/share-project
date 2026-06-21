@@ -12,11 +12,12 @@ import {
   buildHeatmapDays,
   getRollingHeatmapStartDayKey,
 } from "@/components/dashboard/dashboard-data";
+import { scopeToStartEnd } from "@/lib/dashboard-scope";
 import type {
   DashboardDayRecord,
   DashboardHeatmapDay,
   DashboardMonthSnapshot,
-  DashboardPeriod,
+  DashboardScope,
   DashboardSnapshot,
   DrinkBreakdownItem,
   WorkoutBalanceItem,
@@ -183,15 +184,14 @@ function buildWorkoutBalance(
 
 export async function buildDashboardSnapshotForUser(
   userId: string,
-  period: DashboardPeriod,
+  scope: DashboardScope,
   now: Date = new Date(),
 ): Promise<DashboardSnapshot | null> {
   const todayDayKey = getShanghaiDayKey(now);
   const currentMonthKey = todayDayKey.slice(0, 7);
-  const year = Number(todayDayKey.slice(0, 4));
-  const month = Number(todayDayKey.slice(5, 7));
+  const { startKey: summaryStartDayKey, endKey: summaryEndDayKey } = scopeToStartEnd(scope, now);
   const heatmapStartDayKey = getRollingHeatmapStartDayKey(todayDayKey);
-  const summaryStartDayKey = period === "month" ? `${currentMonthKey}-01` : `${year}-01-01`;
+  // 查询窗口取 summary 与 heatmap 的并集下界到今天（heatmap 恒到今天）
   const queryStartDayKey =
     heatmapStartDayKey < summaryStartDayKey ? heatmapStartDayKey : summaryStartDayKey;
 
@@ -225,11 +225,12 @@ export async function buildDashboardSnapshotForUser(
     return null;
   }
 
+  // summary 用 scope 的 start/end（历史月 endKey=月末），不能用到今天
   const summaryWorkoutRecords = user.workoutRecords.filter(
-    (record) => record.dayKey >= summaryStartDayKey && record.dayKey <= todayDayKey,
+    (record) => record.dayKey >= summaryStartDayKey && record.dayKey <= summaryEndDayKey,
   );
   const summaryDrinkRecords = user.drinkRecords.filter(
-    (record) => record.dayKey >= summaryStartDayKey && record.dayKey <= todayDayKey,
+    (record) => record.dayKey >= summaryStartDayKey && record.dayKey <= summaryEndDayKey,
   );
 
   const workoutDays = new Set(summaryWorkoutRecords.map((record) => record.dayKey));
@@ -277,18 +278,25 @@ export async function buildDashboardSnapshotForUser(
     todayDayKey,
     activityByDay,
   );
-  const monthCalendar = await buildDashboardMonthSnapshotForUser(userId, currentMonthKey, now);
+  // 月历跟随 scope 的月（月视图=scope.monthKey）；年视图月历保持当月（spec 决定）
+  const calendarMonthKey = scope.type === "month" ? scope.monthKey : currentMonthKey;
+  const monthCalendar = await buildDashboardMonthSnapshotForUser(userId, calendarMonthKey, now);
 
   if (!monthCalendar) {
     return null;
   }
 
+  // 返回字段反映 scope 的周期（看 5 月就显示 2026/5/2026-05）
+  const scopeYear = scope.type === "year" ? scope.year : Number(scope.monthKey.slice(0, 4));
+  const scopeMonth = scope.type === "year" ? Number(todayDayKey.slice(5, 7)) : Number(scope.monthKey.slice(5, 7));
+  const scopeMonthKey = scope.type === "year" ? currentMonthKey : scope.monthKey;
+
   return {
     currentUserId: user.id,
-    year,
-    month,
-    currentMonthKey,
-    period,
+    year: scopeYear,
+    month: scopeMonth,
+    currentMonthKey: scopeMonthKey,
+    period: scope.type,
     workoutSummary: {
       days: workoutDays.size,
       totalMinutes,
