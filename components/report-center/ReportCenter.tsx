@@ -18,6 +18,7 @@ export function ReportCenter() {
   const [snapshot, setSnapshot] = useState<TeamDashboardSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [retryNonce, setRetryNonce] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,7 +37,7 @@ export function ReportCenter() {
     return () => {
       cancelled = true;
     };
-  }, [period]);
+  }, [period, retryNonce]);
 
   return (
     <div className="space-y-4 p-4">
@@ -50,7 +51,7 @@ export function ReportCenter() {
           <button
             type="button"
             className="quest-btn mt-2"
-            onClick={() => setPeriod(period)}
+            onClick={() => setRetryNonce((n) => n + 1)}
           >
             重试
           </button>

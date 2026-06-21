@@ -69,4 +69,39 @@ describe("ReportCenter", () => {
     expect(container.textContent).toContain("团队训练部位均衡"); // WorkoutBalancePanel
     expect(container.textContent).toContain("水铺饮品构成"); // DrinkCompositionPanel
   });
+
+  it("refetches when retry button is clicked after error", async () => {
+    // 第一次 reject 触发 error 态，第二次 resolve 恢复成功态
+    vi.mocked(fetchTeamDashboardState)
+      .mockRejectedValueOnce(new Error("network"))
+      .mockResolvedValueOnce(snapshot);
+
+    await act(async () => {
+      root.render(<ReportCenter />);
+      // 刷新 fetch().catch().finally() 微任务链，使 setError / setLoading 完成
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("战报加载失败");
+    expect(container.textContent).toContain("重试");
+
+    await act(async () => {
+      // PeriodSwitcher 也有按钮，用 quest-btn class 精确定位重试按钮
+      const retryButton = container.querySelector<HTMLButtonElement>("button.quest-btn");
+      expect(retryButton).not.toBeNull();
+      retryButton!.click();
+      // 点击重试 → setRetryNonce → effect 重跑 → fetch().then().finally()
+      // 需要更多微任务刷新以覆盖 state 更新 → effect 调度 → promise 链
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).not.toContain("战报加载失败");
+    expect(container.textContent).toContain("每日打卡趋势"); // 成功态面板标题
+  });
 });
