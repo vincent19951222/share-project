@@ -7,6 +7,7 @@ import {
   scopeToStartEnd,
   formatScopeLabel,
   scopeToQuery,
+  parseScopeFromQuery,
 } from "@/lib/dashboard-scope";
 
 // 固定"今天"为 2026-06-15（上海时区）
@@ -117,5 +118,43 @@ describe("scopeToQuery", () => {
   });
   it("year query", () => {
     expect(scopeToQuery({ type: "year", year: 2025 })).toBe("period=year&year=2025");
+  });
+});
+
+describe("parseScopeFromQuery", () => {
+  const sp = (qs: string) => new URLSearchParams(qs);
+
+  it("defaults to current month when no params", () => {
+    expect(parseScopeFromQuery(sp(""), NOW)).toEqual({ type: "month", monthKey: "2026-06" });
+  });
+  it("defaults to current month for bogus period", () => {
+    expect(parseScopeFromQuery(sp("period=bogus"), NOW)).toEqual({ type: "month", monthKey: "2026-06" });
+  });
+  it("parses historical monthKey", () => {
+    expect(parseScopeFromQuery(sp("period=month&monthKey=2026-05"), NOW)).toEqual({
+      type: "month",
+      monthKey: "2026-05",
+    });
+  });
+  it("falls back to current month for future monthKey", () => {
+    expect(parseScopeFromQuery(sp("period=month&monthKey=2026-12"), NOW)).toEqual({
+      type: "month",
+      monthKey: "2026-06",
+    });
+  });
+  it("falls back to current month for malformed monthKey", () => {
+    expect(parseScopeFromQuery(sp("period=month&monthKey=2026-13"), NOW)).toEqual({
+      type: "month",
+      monthKey: "2026-06",
+    });
+  });
+  it("parses historical year", () => {
+    expect(parseScopeFromQuery(sp("period=year&year=2025"), NOW)).toEqual({ type: "year", year: 2025 });
+  });
+  it("falls back to current year for future year", () => {
+    expect(parseScopeFromQuery(sp("period=year&year=2030"), NOW)).toEqual({ type: "year", year: 2026 });
+  });
+  it("defaults to current year when year param missing", () => {
+    expect(parseScopeFromQuery(sp("period=year"), NOW)).toEqual({ type: "year", year: 2026 });
   });
 });

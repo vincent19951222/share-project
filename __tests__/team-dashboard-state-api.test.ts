@@ -17,8 +17,8 @@ import { prisma } from "@/lib/prisma";
 import { buildTeamDashboardSnapshot } from "@/lib/team-dashboard-state";
 import { GET } from "@/app/api/dashboard/team-state/route";
 
-function makeReq(cookie: string | undefined, period = "month") {
-  const url = `http://localhost/api/dashboard/team-state?period=${period}`;
+function makeReq(cookie: string | undefined, query = "period=month") {
+  const url = `http://localhost/api/dashboard/team-state?${query}`;
   const req = new Request(url);
   Object.defineProperty(req, "cookies", {
     get: () => ({
@@ -27,6 +27,12 @@ function makeReq(cookie: string | undefined, period = "month") {
   });
   return req as any;
 }
+
+const SNAPSHOT_STUB = {
+  period: { type: "month", startKey: "2026-06-01", endKey: "2026-06-15" },
+  metrics: { completionRate: 0, totalPunches: 0, fullAttendanceDays: 0 },
+  punchTrend: [], workoutBalance: [], drinkBreakdown: [], drinkTrend: [],
+};
 
 describe("team-state route", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -42,27 +48,51 @@ describe("team-state route", () => {
     expect(res.status).toBe(401);
   });
 
-  it("calls aggregator with teamId and falls back period to month", async () => {
+  it("defaults to current month scope when period is bogus", async () => {
     (prisma.user.findUnique as any).mockResolvedValue({ id: "u1", teamId: "team-1" });
-    (buildTeamDashboardSnapshot as any).mockResolvedValue({
-      period: { type: "month", startKey: "2026-06-01", endKey: "2026-06-15" },
-      metrics: { completionRate: 0, totalPunches: 0, fullAttendanceDays: 0 },
-      punchTrend: [], workoutBalance: [], drinkBreakdown: [], drinkTrend: [],
-    });
-    const res = await GET(makeReq("u1", "bogus"));
+    (buildTeamDashboardSnapshot as any).mockResolvedValue(SNAPSHOT_STUB);
+    const res = await GET(makeReq("u1", "period=bogus"));
     expect(res.status).toBe(200);
-    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith("team-1", "month", expect.any(Date));
+    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith(
+      "team-1",
+      expect.objectContaining({ type: "month" }),
+      expect.any(Date),
+    );
   });
 
-  it("passes year period through", async () => {
+  it("passes monthKey from query as scope", async () => {
     (prisma.user.findUnique as any).mockResolvedValue({ id: "u1", teamId: "team-1" });
-    (buildTeamDashboardSnapshot as any).mockResolvedValue({
-      period: { type: "year", startKey: "2026-01-01", endKey: "2026-06-15" },
-      metrics: { completionRate: 0, totalPunches: 0, fullAttendanceDays: 0 },
-      punchTrend: [], workoutBalance: [], drinkBreakdown: [], drinkTrend: [],
-    });
-    const res = await GET(makeReq("u1", "year"));
+    (buildTeamDashboardSnapshot as any).mockResolvedValue(SNAPSHOT_STUB);
+    const res = await GET(makeReq("u1", "period=month&monthKey=2026-05"));
     expect(res.status).toBe(200);
-    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith("team-1", "year", expect.any(Date));
+    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith(
+      "team-1",
+      { type: "month", monthKey: "2026-05" },
+      expect.any(Date),
+    );
+  });
+
+  it("falls back to current month for future monthKey", async () => {
+    (prisma.user.findUnique as any).mockResolvedValue({ id: "u1", teamId: "team-1" });
+    (buildTeamDashboardSnapshot as any).mockResolvedValue(SNAPSHOT_STUB);
+    const res = await GET(makeReq("u1", "period=month&monthKey=2026-12"));
+    expect(res.status).toBe(200);
+    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith(
+      "team-1",
+      { type: "month", monthKey: "2026-06" },
+      expect.any(Date),
+    );
+  });
+
+  it("passes year through and parses historical year", async () => {
+    (prisma.user.findUnique as any).mockResolvedValue({ id: "u1", teamId: "team-1" });
+    (buildTeamDashboardSnapshot as any).mockResolvedValue(SNAPSHOT_STUB);
+    const res = await GET(makeReq("u1", "period=year&year=2025"));
+    expect(res.status).toBe(200);
+    expect(buildTeamDashboardSnapshot).toHaveBeenCalledWith(
+      "team-1",
+      { type: "year", year: 2025 },
+      expect.any(Date),
+    );
   });
 });

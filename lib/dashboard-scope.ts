@@ -77,6 +77,29 @@ export function scopeToQuery(scope: DashboardScope): string {
   return `period=month&monthKey=${scope.monthKey}`;
 }
 
+/** 从 API query 解析 scope。缺省锚点=当期；非法/未来锚点回退当期。 */
+export function parseScopeFromQuery(searchParams: URLSearchParams, now: Date): DashboardScope {
+  const todayKey = getShanghaiDayKey(now);
+  const rawPeriod = searchParams.get("period");
+
+  if (rawPeriod === "year") {
+    const rawYear = Number(searchParams.get("year"));
+    const currentYear = Number(todayKey.slice(0, 4));
+    const year =
+      Number.isFinite(rawYear) && rawYear >= 2000 && rawYear <= currentYear ? rawYear : currentYear;
+    return { type: "year", year };
+  }
+
+  // month（默认）
+  const rawMonthKey = searchParams.get("monthKey");
+  const currentMonthKey = todayKey.slice(0, 7);
+  const monthKey =
+    rawMonthKey && /^\d{4}-\d{2}$/.test(rawMonthKey) && rawMonthKey <= currentMonthKey
+      ? rawMonthKey
+      : currentMonthKey;
+  return { type: "month", monthKey };
+}
+
 function formatMonthKey(year: number, month: number): string {
   return `${year}-${String(month).padStart(2, "0")}`;
 }

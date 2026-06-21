@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseCookieValue } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildTeamDashboardSnapshot } from "@/lib/team-dashboard-state";
-import type { DashboardPeriod } from "@/lib/types";
+import { parseScopeFromQuery } from "@/lib/dashboard-scope";
 
 export async function GET(request: NextRequest) {
   const userId = parseCookieValue(request.cookies.get("userId")?.value);
@@ -20,12 +20,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "未加入团队" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const rawPeriod = searchParams.get("period");
-  const period: DashboardPeriod = rawPeriod === "year" ? "year" : "month";
+  const now = new Date();
+  const scope = parseScopeFromQuery(new URL(request.url).searchParams, now);
 
   try {
-    const snapshot = await buildTeamDashboardSnapshot(user.teamId, period, new Date());
+    const snapshot = await buildTeamDashboardSnapshot(user.teamId, scope, now);
 
     if (!snapshot) {
       return NextResponse.json({ error: "团队不存在" }, { status: 404 });

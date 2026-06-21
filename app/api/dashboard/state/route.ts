@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseCookieValue } from "@/lib/auth";
 import { buildDashboardSnapshotForUser } from "@/lib/dashboard-state";
-import type { DashboardPeriod } from "@/lib/types";
+import { parseScopeFromQuery } from "@/lib/dashboard-scope";
 
 export async function GET(request: NextRequest) {
   const userId = parseCookieValue(request.cookies.get("userId")?.value);
@@ -10,12 +10,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const rawPeriod = searchParams.get("period");
-  const period: DashboardPeriod = rawPeriod === "year" ? "year" : "month";
+  const now = new Date();
+  const scope = parseScopeFromQuery(new URL(request.url).searchParams, now);
 
   try {
-    const snapshot = await buildDashboardSnapshotForUser(userId, period);
+    const snapshot = await buildDashboardSnapshotForUser(userId, scope, now);
 
     if (!snapshot) {
       return NextResponse.json({ error: "用户不存在" }, { status: 401 });
