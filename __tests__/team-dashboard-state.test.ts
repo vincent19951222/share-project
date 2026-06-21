@@ -126,3 +126,79 @@ describe("buildTeamDashboardSnapshot - year", () => {
     expect(snap!.metrics.completionRate).toBeCloseTo(3 / (2 * 166), 5);
   });
 });
+
+describe("buildTeamDashboardSnapshot - balance & drinks", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("buckets workout entries into strength parts and cardio items", async () => {
+    (prisma.team.findUnique as any).mockResolvedValue(
+      makeTeam({
+        users: [
+          {
+            id: "u1",
+            punchRecords: [],
+            workoutRecords: [
+              {
+                dayKey: "2026-06-10",
+                entries: [
+                  { category: "strength", code: "chest" },
+                  { category: "strength", code: "chest" },
+                  { category: "cardio", code: "treadmill" },
+                ],
+              },
+            ],
+            drinkRecords: [],
+          },
+        ],
+      }),
+    );
+    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    const chest = snap!.workoutBalance.find((b) => b.code === "chest");
+    const treadmill = snap!.workoutBalance.find((b) => b.code === "treadmill");
+    const back = snap!.workoutBalance.find((b) => b.code === "back");
+    expect(chest!.count).toBe(2);
+    expect(treadmill!.count).toBe(1);
+    expect(back!.count).toBe(0);
+    // 7 力量 + 4 有氧 = 11 行
+    expect(snap!.workoutBalance.length).toBe(11);
+  });
+
+  it("buckets drinks by type and keeps zero-count types", async () => {
+    (prisma.team.findUnique as any).mockResolvedValue(
+      makeTeam({
+        users: [
+          {
+            id: "u1",
+            punchRecords: [],
+            workoutRecords: [],
+            drinkRecords: [
+              { dayKey: "2026-06-10", drinkType: "water" },
+              { dayKey: "2026-06-10", drinkType: "milkTea" },
+              { dayKey: "2026-06-11", drinkType: "unknown-type" },
+            ],
+          },
+        ],
+      }),
+    );
+    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    const water = snap!.drinkBreakdown.find((d) => d.type === "water");
+    const milkTea = snap!.drinkBreakdown.find((d) => d.type === "milkTea");
+    const americano = snap!.drinkBreakdown.find((d) => d.type === "americano");
+    expect(water!.count).toBe(1);
+    expect(milkTea!.count).toBe(1);
+    expect(americano!.count).toBe(0);
+    // unknown-type 被归入 other
+    const other = snap!.drinkBreakdown.find((d) => d.type === "other");
+    expect(other!.count).toBe(1);
+    expect(snap!.drinkBreakdown.length).toBe(5);
+  });
+
+  it("handles empty team gracefully", async () => {
+    (prisma.team.findUnique as any).mockResolvedValue(makeTeam({ users: [] }));
+    const snap = await buildTeamDashboardSnapshot("team-1", "month", NOW);
+    expect(snap!.metrics.completionRate).toBe(0);
+    expect(snap!.metrics.totalPunches).toBe(0);
+    expect(snap!.punchTrend.length).toBe(15);
+    expect(snap!.punchTrend.every((p) => !p.isFullAttendance)).toBe(true);
+  });
+});
