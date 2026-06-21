@@ -9,6 +9,7 @@ import type {
   GamificationRedemptionSnapshot,
   GamificationStateSnapshot,
   SupplyStationProductionSnapshot,
+  TeamDashboardSnapshot,
 } from "@/lib/types";
 import type { DrinkType } from "@/lib/drinks";
 import type { WorkoutTicketPayload } from "@/lib/workouts";
@@ -248,6 +249,20 @@ export async function fetchDashboardState(period: DashboardPeriod): Promise<Dash
   });
 
   return readDashboardSnapshot(response);
+}
+
+export async function fetchTeamDashboardState(
+  period: DashboardPeriod,
+): Promise<TeamDashboardSnapshot> {
+  const response = await fetch(`/api/dashboard/team-state?period=${period}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  const payload = await readApiResult<{ snapshot: TeamDashboardSnapshot }>(
+    response,
+    "获取团队战报失败",
+  );
+  return payload.snapshot;
 }
 
 export async function fetchGamificationState(): Promise<GamificationStateSnapshot> {
