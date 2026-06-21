@@ -138,7 +138,7 @@ export function DashboardBoard() {
                       <DrinkBreakdownChart items={snapshot.drinkBreakdown} />
                     </div>
 
-                    <ActivityHeatmap days={snapshot.heatmap} year={snapshot.year} />
+                    <ActivityHeatmap days={snapshot.heatmap} />
 
                     <MonthCalendar snapshot={snapshot.monthCalendar} />
                   </>

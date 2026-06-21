@@ -5,18 +5,17 @@ import { getHeatmapMonthLabels, getHeatmapWeekCount } from "./dashboard-data";
 
 interface ActivityHeatmapProps {
   days: DashboardHeatmapDay[];
-  year: number;
 }
 
-export function ActivityHeatmap({ days, year }: ActivityHeatmapProps) {
+export function ActivityHeatmap({ days }: ActivityHeatmapProps) {
   const weekCount = getHeatmapWeekCount(days);
   const monthLabels = getHeatmapMonthLabels(days);
 
   return (
     <section className="dashboard-heatmap-panel">
       <div className="dashboard-chart-heading">
-        <span className="dashboard-chart-chip">全年活跃</span>
-        <h2 className="dashboard-chart-title">{year} 年活跃度</h2>
+        <span className="dashboard-chart-chip">过去12个月</span>
+        <h2 className="dashboard-chart-title">活跃度热力图</h2>
       </div>
 
       <div className="dashboard-heatmap">
@@ -48,7 +47,7 @@ export function ActivityHeatmap({ days, year }: ActivityHeatmapProps) {
               gridTemplateRows: "repeat(7, minmax(0, 1fr))",
             }}
             role="grid"
-            aria-label={`${year} 年个人活跃度热力图`}
+            aria-label="过去 12 个月个人活跃度热力图"
           >
             {days.map((day) => (
               <div

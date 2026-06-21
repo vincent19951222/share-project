@@ -172,6 +172,26 @@ describe("buildDashboardSnapshotForUser", () => {
     expect(snapshot!.heatmap.some((day) => day.dayKey === "2026-06-10" && day.workoutMinutes === 50)).toBe(true);
   });
 
+  it("uses localized workout balance labels even when counts are zero", async () => {
+    const { user } = await createTestUser();
+
+    const snapshot = await buildDashboardSnapshotForUser(user.id, "month", TEST_NOW);
+
+    expect(snapshot).not.toBeNull();
+    expect(snapshot!.workoutBalance.find((item) => item.code === "glutes")).toMatchObject({
+      label: "臀",
+      count: 0,
+    });
+    expect(snapshot!.workoutBalance.find((item) => item.code === "elliptical")).toMatchObject({
+      label: "椭圆机",
+      count: 0,
+    });
+    expect(snapshot!.workoutBalance.find((item) => item.code === "walk")).toMatchObject({
+      label: "散步",
+      count: 0,
+    });
+  });
+
   it("aggregates full year data when period is year", async () => {
     const { user, team } = await createTestUser();
 
@@ -196,4 +216,28 @@ describe("buildDashboardSnapshotForUser", () => {
     expect(snapshot!.workoutBalance.find((item) => item.code === "swim")?.count).toBe(2);
   });
 
+  it("builds the heatmap from the past 12 calendar months through today", async () => {
+    const { user, team } = await createTestUser();
+
+    await createPunchWithWorkout(user.id, team.id, "2025-07-03", {
+      trainingType: "cardio",
+      cardioItem: "walk",
+      durationMinutes: 30,
+    });
+    await createPunchWithWorkout(user.id, team.id, "2026-06-20", {
+      trainingType: "cardio",
+      cardioItem: "swim",
+      durationMinutes: 40,
+    });
+
+    const snapshot = await buildDashboardSnapshotForUser(user.id, "year", TEST_NOW);
+
+    expect(snapshot).not.toBeNull();
+    expect(snapshot!.heatmap[0]?.dayKey).toBe("2025-07-01");
+    expect(snapshot!.heatmap.at(-1)?.dayKey).toBe("2026-06-19");
+    expect(snapshot!.workoutSummary.days).toBe(0);
+    expect(snapshot!.heatmap.some((day) => day.dayKey === "2025-07-03" && day.workoutMinutes === 30)).toBe(true);
+    expect(snapshot!.heatmap.some((day) => day.dayKey === "2026-06-20")).toBe(false);
+    expect(snapshot!.heatmap.some((day) => day.month === 12 && day.dayKey.startsWith("2026-12"))).toBe(false);
+  });
 });

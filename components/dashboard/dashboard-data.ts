@@ -1,6 +1,8 @@
 import type { DashboardDayRecord, DashboardHeatmapDay, DashboardMonthSnapshot } from "@/lib/types";
 
 const MONTH_KEY_PATTERN = /^(\d{4})-(\d{2})$/;
+const DAY_KEY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function formatDashboardMonthLabel(monthKey: string): string {
   const match = MONTH_KEY_PATTERN.exec(monthKey);
@@ -44,26 +46,71 @@ export function getIntensityLevel(workoutMinutes: number, drinkCups: number): 0 
   return 0;
 }
 
-export function getDaysInYear(year: number): number {
-  return isLeapYear(year) ? 366 : 365;
+function parseDayKey(dayKey: string): { year: number; month: number; day: number } | null {
+  const match = DAY_KEY_PATTERN.exec(dayKey);
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() + 1 !== month ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return { year, month, day };
 }
 
-function isLeapYear(year: number): boolean {
-  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+function formatDayKey(year: number, month: number, day: number): string {
+  return `${year.toString().padStart(4, "0")}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+}
+
+export function getRollingHeatmapStartDayKey(todayDayKey: string): string {
+  const today = parseDayKey(todayDayKey);
+  if (!today) {
+    throw new RangeError(`Invalid day key: ${todayDayKey}`);
+  }
+
+  const currentMonthIndex = today.year * 12 + today.month - 1;
+  const startMonthIndex = currentMonthIndex - 11;
+  const startYear = Math.floor(startMonthIndex / 12);
+  const startMonth = (startMonthIndex % 12) + 1;
+
+  return formatDayKey(startYear, startMonth, 1);
 }
 
 export function buildHeatmapDays(
-  year: number,
+  startDayKey: string,
+  endDayKey: string,
   activityByDay: Record<string, { workoutMinutes: number; drinkCups: number }>,
 ): DashboardHeatmapDay[] {
-  const days: DashboardHeatmapDay[] = [];
-  const totalDays = isLeapYear(year) ? 366 : 365;
+  const start = parseDayKey(startDayKey);
+  const end = parseDayKey(endDayKey);
+  if (!start || !end) {
+    throw new RangeError(`Invalid heatmap range: ${startDayKey} - ${endDayKey}`);
+  }
 
-  for (let dayOfYear = 1; dayOfYear <= totalDays; dayOfYear += 1) {
-    const date = new Date(Date.UTC(year, 0, dayOfYear));
+  const days: DashboardHeatmapDay[] = [];
+  const startTime = Date.UTC(start.year, start.month - 1, start.day);
+  const endTime = Date.UTC(end.year, end.month - 1, end.day);
+
+  if (endTime < startTime) {
+    return days;
+  }
+
+  for (let time = startTime; time <= endTime; time += DAY_MS) {
+    const date = new Date(time);
+    const year = date.getUTCFullYear();
     const month = date.getUTCMonth() + 1;
     const day = date.getUTCDate();
-    const dayKey = `${year.toString().padStart(4, "0")}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+    const dayKey = formatDayKey(year, month, day);
     const activity = activityByDay[dayKey] ?? { workoutMinutes: 0, drinkCups: 0 };
 
     days.push({

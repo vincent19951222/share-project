@@ -19,12 +19,14 @@ function DashboardCalendarDayCell({
   cell,
   monthKey,
   activeDay,
+  cellIndex,
   onActivate,
   onDeactivate,
 }: {
   cell: DashboardCalendarGridCell;
   monthKey: string;
   activeDay: DashboardDayRecord | null;
+  cellIndex: number;
   onActivate: (day: DashboardDayRecord) => void;
   onDeactivate: () => void;
 }) {
@@ -46,6 +48,7 @@ function DashboardCalendarDayCell({
   const hasActivity = cell.workedOut || totalDrinkCups > 0;
   const isActive = activeDay?.day === cell.day;
   const showTooltip = isHovered || isActive;
+  const shouldShowTooltipBelow = cellIndex < 7;
 
   return (
     <button
@@ -53,7 +56,7 @@ function DashboardCalendarDayCell({
       type="button"
       className={`calendar-day-cell ${cell.isToday ? "calendar-day-cell-today" : ""} ${
         hasActivity ? "calendar-day-cell-active" : "calendar-day-cell-empty"
-      }`}
+      } ${shouldShowTooltipBelow ? "calendar-day-cell-tooltip-below" : ""}`}
       onMouseEnter={() => {
         setIsHovered(true);
         onActivate(cell);
@@ -146,6 +149,7 @@ export function MonthCalendar({ snapshot }: MonthCalendarProps) {
               cell={cell}
               monthKey={snapshot.monthKey}
               activeDay={activeDay}
+              cellIndex={index}
               onActivate={cell.kind === "day" ? setActiveDay : () => {}}
               onDeactivate={() => setActiveDay(null)}
             />

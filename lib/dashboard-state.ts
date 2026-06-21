@@ -1,9 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { getShanghaiDayKey } from "@/lib/economy";
 import { drinkCatalog, isDrinkType } from "@/lib/drinks";
-import { CARDIO_ITEMS, STRENGTH_PARTS } from "@/lib/workouts";
+import {
+  CARDIO_ITEMS,
+  STRENGTH_PARTS,
+  getCardioItemLabel,
+  getStrengthPartLabel,
+} from "@/lib/workouts";
 import { buildCalendarMonthSnapshotForUser } from "@/lib/calendar-state";
-import { buildHeatmapDays } from "@/components/dashboard/dashboard-data";
+import {
+  buildHeatmapDays,
+  getRollingHeatmapStartDayKey,
+} from "@/components/dashboard/dashboard-data";
 import type {
   DashboardDayRecord,
   DashboardHeatmapDay,
@@ -155,7 +163,7 @@ function buildWorkoutBalance(
     const item = countMap.get(part);
     balance.push({
       code: part,
-      label: item?.label ?? part,
+      label: getStrengthPartLabel(part),
       category: "strength",
       count: item?.count ?? 0,
     });
@@ -164,7 +172,7 @@ function buildWorkoutBalance(
     const found = countMap.get(item);
     balance.push({
       code: item,
-      label: found?.label ?? item,
+      label: getCardioItemLabel(item),
       category: "cardio",
       count: found?.count ?? 0,
     });
@@ -182,7 +190,10 @@ export async function buildDashboardSnapshotForUser(
   const currentMonthKey = todayDayKey.slice(0, 7);
   const year = Number(todayDayKey.slice(0, 4));
   const month = Number(todayDayKey.slice(5, 7));
-  const prefix = period === "month" ? currentMonthKey : String(year);
+  const heatmapStartDayKey = getRollingHeatmapStartDayKey(todayDayKey);
+  const summaryStartDayKey = period === "month" ? `${currentMonthKey}-01` : `${year}-01-01`;
+  const queryStartDayKey =
+    heatmapStartDayKey < summaryStartDayKey ? heatmapStartDayKey : summaryStartDayKey;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -190,13 +201,19 @@ export async function buildDashboardSnapshotForUser(
       id: true,
       workoutRecords: {
         where: {
-          dayKey: { startsWith: prefix },
+          dayKey: {
+            gte: queryStartDayKey,
+            lte: todayDayKey,
+          },
         },
         include: { entries: true },
       },
       drinkRecords: {
         where: {
-          dayKey: { startsWith: prefix },
+          dayKey: {
+            gte: queryStartDayKey,
+            lte: todayDayKey,
+          },
           deletedAt: null,
         },
         select: { dayKey: true, drinkType: true },
@@ -208,16 +225,23 @@ export async function buildDashboardSnapshotForUser(
     return null;
   }
 
-  const workoutDays = new Set(user.workoutRecords.map((record) => record.dayKey));
-  const totalMinutes = user.workoutRecords.reduce(
+  const summaryWorkoutRecords = user.workoutRecords.filter(
+    (record) => record.dayKey >= summaryStartDayKey && record.dayKey <= todayDayKey,
+  );
+  const summaryDrinkRecords = user.drinkRecords.filter(
+    (record) => record.dayKey >= summaryStartDayKey && record.dayKey <= todayDayKey,
+  );
+
+  const workoutDays = new Set(summaryWorkoutRecords.map((record) => record.dayKey));
+  const totalMinutes = summaryWorkoutRecords.reduce(
     (sum, record) => sum + (record.durationMinutes ?? 0),
     0,
   );
 
-  const workoutBalance = buildWorkoutBalance(user.workoutRecords);
+  const workoutBalance = buildWorkoutBalance(summaryWorkoutRecords);
 
   const drinkByType = createEmptyDrinkCounts();
-  for (const record of user.drinkRecords) {
+  for (const record of summaryDrinkRecords) {
     const type = isDrinkType(record.drinkType) ? record.drinkType : "other";
     drinkByType[type] += 1;
   }
@@ -248,7 +272,11 @@ export async function buildDashboardSnapshotForUser(
     };
   }
 
-  const heatmap: DashboardHeatmapDay[] = buildHeatmapDays(year, activityByDay);
+  const heatmap: DashboardHeatmapDay[] = buildHeatmapDays(
+    heatmapStartDayKey,
+    todayDayKey,
+    activityByDay,
+  );
   const monthCalendar = await buildDashboardMonthSnapshotForUser(userId, currentMonthKey, now);
 
   if (!monthCalendar) {
@@ -266,7 +294,7 @@ export async function buildDashboardSnapshotForUser(
       totalMinutes,
     },
     drinkSummary: {
-      cups: user.drinkRecords.length,
+      cups: summaryDrinkRecords.length,
       byType: drinkByType,
     },
     workoutBalance,

@@ -14859,16 +14859,19 @@ body {
   background-color: #ffffff;
   box-shadow: 0 4px 0 0 #111827;
   padding: 1rem;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  min-height: 16rem;
+  min-height: 18.75rem;
+  overflow: visible;
 }
 
 .dashboard-heatmap {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding-bottom: 1.35rem;
 }
 
 .dashboard-heatmap-scroll {
@@ -14946,6 +14949,8 @@ body {
   align-items: center;
   justify-content: flex-end;
   gap: 0.4rem;
+  min-height: 1.5rem;
+  padding-top: 0.15rem;
 }
 
 .dashboard-heatmap-legend-label {
@@ -14972,6 +14977,11 @@ body {
 
 .dashboard-month-calendar .calendar-day-cell {
   position: relative;
+}
+
+.dashboard-month-calendar .calendar-month-table,
+.dashboard-month-calendar .calendar-month-grid {
+  overflow: visible;
 }
 
 .dashboard-calendar-workout-detail {
@@ -15037,6 +15047,20 @@ body {
   background-color: #ffffff;
   border-right: 2px solid #111827;
   border-bottom: 2px solid #111827;
+}
+
+.dashboard-month-calendar .calendar-day-cell-tooltip-below .dashboard-day-tooltip {
+  top: calc(100% + 0.5rem);
+  bottom: auto;
+}
+
+.dashboard-month-calendar .calendar-day-cell-tooltip-below .dashboard-day-tooltip-arrow {
+  top: -0.5rem;
+  bottom: auto;
+  border-top: 2px solid #111827;
+  border-left: 2px solid #111827;
+  border-right: 0;
+  border-bottom: 0;
 }
 
 .dashboard-day-tooltip-date {

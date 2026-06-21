@@ -47,6 +47,14 @@ const strengthLabels: Record<StrengthPart, string> = {
   abs: "腹",
 };
 
+export function getCardioItemLabel(item: CardioItem): string {
+  return cardioLabels[item];
+}
+
+export function getStrengthPartLabel(part: StrengthPart): string {
+  return strengthLabels[part];
+}
+
 function isTrainingType(value: unknown): value is TrainingType {
   return typeof value === "string" && TRAINING_TYPES.includes(value as TrainingType);
 }
