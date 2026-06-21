@@ -135,7 +135,12 @@ export async function buildTeamDashboardSnapshot(
   }
 
   const totalPunches = Array.from(punchByDay.values()).reduce((a, b) => a + b, 0);
-  const fullAttendanceDays = punchTrend.filter((p) => p.isFullAttendance).length;
+  // 口径：周期内当天全员打卡的天数。直接从 punchByDay 计算——
+  // punchByDay 仅含 punched=true 记录，count===memberCount 即当天全员打卡；
+  // 年视图 punchTrend 为月聚合点（isFullAttendance 一律 false），若从 trend 推导会恒为 0。
+  const fullAttendanceDays = Array.from(punchByDay.entries()).filter(
+    ([, c]) => memberCount > 0 && c === memberCount,
+  ).length;
   const completionRate =
     memberCount > 0 && elapsedDays > 0 ? totalPunches / (memberCount * elapsedDays) : 0;
 
