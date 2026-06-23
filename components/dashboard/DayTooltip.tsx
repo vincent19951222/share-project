@@ -13,8 +13,7 @@ const PART_LABELS: Record<string, string> = {
   back: "背",
   shoulder: "肩",
   arms: "手臂",
-  glutes: "臀",
-  legs: "腿",
+  legs: "臀腿",
   abs: "腹",
 };
 
@@ -23,10 +22,12 @@ const CARDIO_LABELS: Record<string, string> = {
   elliptical: "椭圆机",
   walk: "散步",
   swim: "游泳",
+  dance: "跳舞",
 };
 
 export function DayTooltip({ monthKey, day }: DayTooltipProps) {
   const [year, month] = monthKey.split("-").map(Number);
+  const cardioItems = day.cardioItems.length > 0 ? day.cardioItems : day.cardioItem ? [day.cardioItem] : [];
   const activeDrinks = (Object.entries(day.drinkCounts) as Array<[keyof typeof drinkCatalog, number]>).filter(
     ([, count]) => count > 0,
   );
@@ -47,11 +48,11 @@ export function DayTooltip({ monthKey, day }: DayTooltipProps) {
                 ? "力量"
                 : "有氧 + 力量"}
           </span>
-          {day.cardioItem ? (
-            <span className="dashboard-day-tooltip-badge dashboard-day-tooltip-badge-cardio">
-              {CARDIO_LABELS[day.cardioItem] ?? day.cardioItem}
+          {cardioItems.map((item) => (
+            <span key={item} className="dashboard-day-tooltip-badge dashboard-day-tooltip-badge-cardio">
+              {CARDIO_LABELS[item] ?? item}
             </span>
-          ) : null}
+          ))}
           {day.strengthParts.map((part) => (
             <span key={part} className="dashboard-day-tooltip-badge dashboard-day-tooltip-badge-workout">
               {PART_LABELS[part] ?? part}

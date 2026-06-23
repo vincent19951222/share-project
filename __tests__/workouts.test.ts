@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  CARDIO_ITEMS,
+  STRENGTH_PARTS,
   buildDefaultWorkoutPayload,
   buildWorkoutEntries,
   buildWorkoutSummary,
@@ -10,6 +12,20 @@ import {
 } from "@/lib/workouts";
 
 describe("workout helpers", () => {
+  it("keeps visible strength and cardio catalogs aligned with the ticket", () => {
+    expect(STRENGTH_PARTS).not.toContain("glutes");
+    expect(CARDIO_ITEMS).toContain("dance");
+
+    expect(buildWorkoutEntries({
+      trainingType: "strength",
+      cardioItem: null,
+      strengthParts: ["legs"],
+      durationMinutes: 40,
+    })).toEqual([
+      { category: "strength", code: "legs", label: "臀腿" },
+    ]);
+  });
+
   it("builds cardio and strength entries from a mixed workout ticket", () => {
     const parsed = parseWorkoutTicketPayload({
       trainingType: "both",
@@ -27,6 +43,27 @@ describe("workout helpers", () => {
       { category: "strength", code: "abs", label: "腹" },
     ]);
     expect(buildWorkoutSummary(parsed.payload)).toBe("椭圆机 + 胸 / 腹 · 60 分钟");
+  });
+
+  it("accepts multiple cardio items and stores one entry per item", () => {
+    const parsed = parseWorkoutTicketPayload({
+      trainingType: "cardio",
+      cardioItem: null,
+      cardioItems: ["dance", "treadmill", "dance"],
+      strengthParts: [],
+      durationMinutes: 60,
+    });
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) throw new Error(parsed.error);
+
+    expect(parsed.payload.cardioItem).toBe("treadmill");
+    expect(parsed.payload.cardioItems).toEqual(["treadmill", "dance"]);
+    expect(buildWorkoutEntries(parsed.payload)).toEqual([
+      { category: "cardio", code: "treadmill", label: "跑步机" },
+      { category: "cardio", code: "dance", label: "跳舞" },
+    ]);
+    expect(buildWorkoutSummary(parsed.payload)).toBe("跑步机 / 跳舞 · 60 分钟");
   });
 
   it("rejects strength workouts without a strength part", () => {
@@ -139,6 +176,7 @@ describe("workout helpers", () => {
       payload: {
         trainingType: "cardio",
         cardioItem: "treadmill",
+        cardioItems: ["treadmill"],
         strengthParts: [],
         durationMinutes: 10,
       },
@@ -154,6 +192,7 @@ describe("workout helpers", () => {
       payload: {
         trainingType: "cardio",
         cardioItem: "treadmill",
+        cardioItems: ["treadmill"],
         strengthParts: [],
         durationMinutes: 180,
       },
@@ -174,6 +213,7 @@ describe("workout helpers", () => {
     expect(parsed.payload).toEqual({
       trainingType: "strength",
       cardioItem: null,
+      cardioItems: [],
       strengthParts: ["chest", "abs"],
       durationMinutes: 40,
     });
@@ -189,6 +229,7 @@ describe("workout helpers", () => {
     expect(payload).toEqual({
       trainingType: "cardio",
       cardioItem: "treadmill",
+      cardioItems: ["treadmill"],
       strengthParts: [],
       durationMinutes: null,
     });
@@ -280,6 +321,7 @@ describe("workout helpers", () => {
     expect(payload).toEqual({
       trainingType: "both",
       cardioItem: "swim",
+      cardioItems: ["swim"],
       strengthParts: ["chest", "abs"],
       durationMinutes: 70,
     });
@@ -297,6 +339,7 @@ describe("workout helpers", () => {
     expect(payload).toEqual({
       trainingType: "cardio",
       cardioItem: "treadmill",
+      cardioItems: ["treadmill"],
       strengthParts: [],
       durationMinutes: 60,
     });

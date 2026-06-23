@@ -28,7 +28,8 @@ function createMonthSnapshot(): DashboardMonthSnapshot {
         workoutMinutes: day === 3 ? 50 : day === 16 ? 90 : 0,
         trainingType: day === 3 ? "cardio" : day === 16 ? "strength" : null,
         cardioItem: day === 3 ? "elliptical" : null,
-        strengthParts: day === 16 ? ["glutes"] : [],
+        cardioItems: day === 3 ? ["elliptical"] : [],
+        strengthParts: day === 16 ? ["legs"] : [],
         drinkCounts: {
           water: day === 16 ? 2 : 0,
           milkTea: 0,

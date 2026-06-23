@@ -253,6 +253,7 @@ describe("HeatmapGrid punch flow", () => {
         body: JSON.stringify({
           trainingType: "cardio",
           cardioItem: "treadmill",
+          cardioItems: ["treadmill"],
           strengthParts: [],
           durationMinutes: 60,
         }),
@@ -529,6 +530,7 @@ describe("HeatmapGrid punch flow", () => {
             currentUserTodayWorkout: {
               trainingType: "both",
               cardioItem: "treadmill",
+              cardioItems: ["treadmill"],
               strengthParts: ["chest"],
               durationMinutes: 60,
             },
@@ -544,6 +546,7 @@ describe("HeatmapGrid punch flow", () => {
       currentUserTodayWorkout: {
         trainingType: "both",
         cardioItem: "treadmill",
+        cardioItems: ["treadmill"],
         strengthParts: ["chest"],
         durationMinutes: 60,
       },
@@ -583,6 +586,7 @@ describe("HeatmapGrid punch flow", () => {
       body: JSON.stringify({
         trainingType: "both",
         cardioItem: "treadmill",
+        cardioItems: ["treadmill"],
         strengthParts: ["chest", "abs"],
         durationMinutes: 60,
       }),

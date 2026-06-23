@@ -37,12 +37,13 @@ describe("FitnessPunchTicketPrototypePage", () => {
     expect(container.textContent).toContain("A");
     expect(container.textContent).toContain("有氧项目");
     expect(container.textContent).toContain("散步");
+    expect(container.textContent).toContain("跳舞");
     expect(container.textContent).not.toContain("单车");
     expect(container.textContent).toContain("B");
     expect(container.textContent).toContain("今日重点部位");
     expect(container.textContent).toContain("胸部");
     expect(container.textContent).toContain("手臂");
-    expect(container.textContent).toContain("腿部");
+    expect(container.textContent).toContain("臀腿");
     expect(container.textContent).not.toContain("臀部");
     expect(container.textContent).toContain("C");
     expect(container.textContent).toContain("训练时长");

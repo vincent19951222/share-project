@@ -97,11 +97,12 @@ describe("PunchPopup", () => {
     expect(pageText()).toContain("今日训练小票");
     expect(pageText()).toContain("有氧项目");
     expect(pageText()).toContain("散步");
+    expect(pageText()).toContain("跳舞");
     expect(pageText()).not.toContain("单车");
     expect(pageText()).toContain("今日重点部位");
     expect(pageText()).toContain("胸部");
     expect(pageText()).toContain("手臂");
-    expect(pageText()).toContain("腿部");
+    expect(pageText()).toContain("臀腿");
     expect(pageText()).not.toContain("臀部");
     expect(pageText()).toContain("训练时长");
     expect(pageText()).toContain("确认后会记为今日健身打卡，并获得 1 张健身券。");
@@ -146,6 +147,7 @@ describe("PunchPopup", () => {
     expect(onConfirm).toHaveBeenCalledWith({
       trainingType: "cardio",
       cardioItem: "treadmill",
+      cardioItems: ["treadmill"],
       strengthParts: [],
       durationMinutes: 60,
     });
@@ -165,6 +167,7 @@ describe("PunchPopup", () => {
     });
 
     await act(async () => {
+      findModalButton("跑步机")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       findModalButton("散步")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
@@ -180,6 +183,44 @@ describe("PunchPopup", () => {
     expect(onConfirm).toHaveBeenCalledWith({
       trainingType: "cardio",
       cardioItem: "walk",
+      cardioItems: ["walk"],
+      strengthParts: [],
+      durationMinutes: 60,
+    });
+  });
+
+  it("allows selecting multiple cardio items including dance", async () => {
+    const onConfirm = vi.fn().mockResolvedValue(true);
+
+    await act(async () => {
+      root.render(<PunchPopup onConfirm={onConfirm} variant="fitness-ticket" />);
+    });
+
+    const trigger = Array.from(container.querySelectorAll("button")).find((button) => button.textContent?.trim() === "+");
+
+    await act(async () => {
+      trigger!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    await act(async () => {
+      findModalButton("跳舞")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expectModalButtonActive("跑步机", true);
+    expectModalButtonActive("跳舞", true);
+    expect(workoutSummaryText()).toContain("有氧：跑步机、跳舞");
+
+    const confirmButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("确认打卡"));
+
+    await act(async () => {
+      confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(onConfirm).toHaveBeenCalledWith({
+      trainingType: "cardio",
+      cardioItem: "treadmill",
+      cardioItems: ["treadmill", "dance"],
       strengthParts: [],
       durationMinutes: 60,
     });
@@ -203,6 +244,7 @@ describe("PunchPopup", () => {
     const confirmButton = Array.from(document.body.querySelectorAll("button")).find((button) => button.textContent?.includes("确认打卡"));
 
     await act(async () => {
+      findModalButton("跑步机")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       swimButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       armsButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       confirmButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -212,6 +254,7 @@ describe("PunchPopup", () => {
     expect(onConfirm).toHaveBeenCalledWith({
       trainingType: "both",
       cardioItem: "swim",
+      cardioItems: ["swim"],
       strengthParts: ["arms"],
       durationMinutes: 60,
     });
@@ -270,19 +313,19 @@ describe("PunchPopup", () => {
 
     await act(async () => {
       findModalButton("手臂")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      findModalButton("腿部")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      findModalButton("臀腿")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
     expectModalButtonActive("手臂", true);
-    expectModalButtonActive("腿部", true);
-    expect(workoutSummaryText()).toContain("部位：手臂、腿部");
+    expectModalButtonActive("臀腿", true);
+    expect(workoutSummaryText()).toContain("部位：手臂、臀腿");
     expectTrainingTypeSummaryLabels(["有氧", "力量"]);
 
     await act(async () => {
       findModalButton("跑步机")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
-    expect(workoutSummaryText()).toContain("部位：手臂、腿部");
+    expect(workoutSummaryText()).toContain("部位：手臂、臀腿");
     expectTrainingTypeSummaryLabels(["力量"]);
     expect(document.body.querySelector("[data-muscle-part]")).toBeNull();
   });
@@ -346,6 +389,7 @@ describe("PunchPopup", () => {
           initialWorkoutPayload={{
             trainingType: "strength",
             cardioItem: null,
+            cardioItems: [],
             strengthParts: ["back", "abs"],
             durationMinutes: 50,
           }}
@@ -372,6 +416,7 @@ describe("PunchPopup", () => {
     expect(onConfirm).toHaveBeenCalledWith({
       trainingType: "strength",
       cardioItem: null,
+      cardioItems: [],
       strengthParts: ["back", "abs"],
       durationMinutes: 50,
     });

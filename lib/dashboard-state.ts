@@ -75,6 +75,7 @@ export async function buildDashboardMonthSnapshotForUser(
         workoutMinutes: 0,
         trainingType: null,
         cardioItem: null,
+        cardioItems: [],
         strengthParts: [],
         drinkCounts: createEmptyDrinkCounts(),
       })),
@@ -110,7 +111,9 @@ export async function buildDashboardMonthSnapshotForUser(
         (entry) => entry.category === "strength" && entry.code === part,
       ),
     );
-    const cardioEntry = workout?.entries.find((entry) => entry.category === "cardio");
+    const cardioItems = CARDIO_ITEMS.filter((item) =>
+      workout?.entries.some((entry) => entry.category === "cardio" && entry.code === item),
+    );
 
     return {
       ...dayRecord,
@@ -121,10 +124,8 @@ export async function buildDashboardMonthSnapshotForUser(
         workout?.trainingType === "both"
           ? workout.trainingType
           : null,
-      cardioItem:
-        cardioEntry && (CARDIO_ITEMS as readonly string[]).includes(cardioEntry.code)
-          ? (cardioEntry.code as typeof CARDIO_ITEMS[number])
-          : null,
+      cardioItem: cardioItems[0] ?? null,
+      cardioItems,
       strengthParts,
       drinkCounts,
     };

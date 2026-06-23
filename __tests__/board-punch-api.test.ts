@@ -310,6 +310,29 @@ describe("/api/board/punch", () => {
     expect(activity.message).toContain("椭圆机 + 胸 / 腹 · 60 分钟");
   });
 
+  it("stores multiple cardio entries from the workout ticket", async () => {
+    await resetState();
+
+    const response = await POST(request("POST", userId, {
+      trainingType: "cardio",
+      cardioItem: null,
+      cardioItems: ["treadmill", "dance"],
+      strengthParts: [],
+      durationMinutes: 60,
+    }));
+    expect(response.status).toBe(200);
+
+    const workout = await prisma.workoutRecord.findFirstOrThrow({
+      where: { userId, dayKey: todayDayKey },
+      include: { entries: { orderBy: { code: "asc" } } },
+    });
+
+    expect(workout.entries.map((entry) => [entry.category, entry.code, entry.label])).toEqual([
+      ["cardio", "dance", "跳舞"],
+      ["cardio", "treadmill", "跑步机"],
+    ]);
+  });
+
   it("rejects invalid workout payloads before creating today's punch", async () => {
     await resetState();
 
@@ -369,6 +392,7 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.currentUserTodayWorkout).toEqual({
       trainingType: "strength",
       cardioItem: null,
+      cardioItems: [],
       strengthParts: ["shoulder", "abs"],
       durationMinutes: 50,
     });

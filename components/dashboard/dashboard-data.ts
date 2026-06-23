@@ -263,6 +263,7 @@ export function buildDashboardCalendarGrid(
         workoutMinutes: record?.workoutMinutes ?? 0,
         trainingType: record?.trainingType ?? null,
         cardioItem: record?.cardioItem ?? null,
+        cardioItems: record?.cardioItems ?? [],
         strengthParts: record?.strengthParts ?? [],
         drinkCounts: record?.drinkCounts ?? { water: 0, milkTea: 0, americano: 0, latte: 0, other: 0 },
         isToday:

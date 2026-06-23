@@ -156,10 +156,14 @@ describe("buildTeamDashboardSnapshot - balance & drinks", () => {
     const chest = snap!.workoutBalance.find((b) => b.code === "chest");
     const treadmill = snap!.workoutBalance.find((b) => b.code === "treadmill");
     const back = snap!.workoutBalance.find((b) => b.code === "back");
+    const glutes = snap!.workoutBalance.find((b) => b.code === "glutes");
+    const dance = snap!.workoutBalance.find((b) => b.code === "dance");
     expect(chest!.count).toBe(2);
     expect(treadmill!.count).toBe(1);
     expect(back!.count).toBe(0);
-    // 7 力量 + 4 有氧 = 11 行
+    expect(glutes).toBeUndefined();
+    expect(dance).toMatchObject({ label: "跳舞", count: 0 });
+    // 6 力量 + 5 有氧 = 11 行
     expect(snap!.workoutBalance.length).toBe(11);
   });
 

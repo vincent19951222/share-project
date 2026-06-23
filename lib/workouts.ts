@@ -1,8 +1,8 @@
 import type { Prisma } from "@/lib/generated/prisma/client";
 
 export const TRAINING_TYPES = ["cardio", "strength", "both"] as const;
-export const CARDIO_ITEMS = ["treadmill", "elliptical", "walk", "swim"] as const;
-export const STRENGTH_PARTS = ["chest", "back", "shoulder", "arms", "glutes", "legs", "abs"] as const;
+export const CARDIO_ITEMS = ["treadmill", "elliptical", "walk", "swim", "dance"] as const;
+export const STRENGTH_PARTS = ["chest", "back", "shoulder", "arms", "legs", "abs"] as const;
 
 export type TrainingType = (typeof TRAINING_TYPES)[number];
 export type CardioItem = (typeof CARDIO_ITEMS)[number];
@@ -12,6 +12,7 @@ export type WorkoutEntryCategory = "cardio" | "strength";
 export type WorkoutTicketPayload = {
   trainingType: TrainingType;
   cardioItem: CardioItem | null;
+  cardioItems?: CardioItem[];
   strengthParts: StrengthPart[];
   durationMinutes: number;
 };
@@ -35,6 +36,7 @@ const cardioLabels: Record<CardioItem, string> = {
   elliptical: "椭圆机",
   walk: "散步",
   swim: "游泳",
+  dance: "跳舞",
 };
 
 const strengthLabels: Record<StrengthPart, string> = {
@@ -42,8 +44,7 @@ const strengthLabels: Record<StrengthPart, string> = {
   back: "背",
   shoulder: "肩",
   arms: "手臂",
-  glutes: "臀",
-  legs: "腿",
+  legs: "臀腿",
   abs: "腹",
 };
 
@@ -80,6 +81,27 @@ function normalizeStrengthParts(value: unknown): StrengthPart[] | null {
   return STRENGTH_PARTS.filter((part) => selected.has(part));
 }
 
+function normalizeCardioItems(value: unknown): CardioItem[] | null {
+  if (!Array.isArray(value)) return null;
+
+  const selected = new Set<CardioItem>();
+
+  for (const item of value) {
+    if (!isCardioItem(item)) return null;
+    selected.add(item);
+  }
+
+  return CARDIO_ITEMS.filter((item) => selected.has(item));
+}
+
+function normalizeCardioSelection(body: Record<string, unknown>): CardioItem[] | null {
+  if ("cardioItems" in body) {
+    return normalizeCardioItems(body.cardioItems);
+  }
+
+  return isCardioItem(body.cardioItem) ? [body.cardioItem] : [];
+}
+
 function isValidDuration(value: unknown): value is number {
   return (
     typeof value === "number" &&
@@ -102,6 +124,22 @@ function hasCatalogOrderedStrengthParts(value: StrengthPart[]): boolean {
   return normalized.every((part, index) => part === value[index]);
 }
 
+function normalizePayloadCardioItems(payload: WorkoutCreatePayload): CardioItem[] | null {
+  if (Array.isArray(payload.cardioItems)) {
+    const normalized = normalizeCardioItems(payload.cardioItems);
+
+    if (normalized === null || normalized.length !== payload.cardioItems.length) return null;
+
+    return normalized.every((item, index) => item === payload.cardioItems?.[index]) ? normalized : null;
+  }
+
+  return isCardioItem(payload.cardioItem) ? [payload.cardioItem] : [];
+}
+
+function getPayloadCardioItems(payload: WorkoutCreatePayload): CardioItem[] {
+  return normalizePayloadCardioItems(payload) ?? [];
+}
+
 function isValidWorkoutCreatePayload(payload: WorkoutCreatePayload): boolean {
   if (
     !isTrainingType(payload.trainingType) ||
@@ -112,17 +150,21 @@ function isValidWorkoutCreatePayload(payload: WorkoutCreatePayload): boolean {
     return false;
   }
 
-  const cardioItem = payload.cardioItem;
+  const cardioItems = normalizePayloadCardioItems(payload);
+
+  if (cardioItems === null) {
+    return false;
+  }
 
   if (payload.trainingType === "cardio") {
-    return isCardioItem(cardioItem) && payload.strengthParts.length === 0;
+    return cardioItems.length > 0 && payload.strengthParts.length === 0;
   }
 
   if (payload.trainingType === "strength") {
-    return cardioItem === null && payload.strengthParts.length > 0;
+    return cardioItems.length === 0 && payload.strengthParts.length > 0;
   }
 
-  return isCardioItem(cardioItem) && payload.strengthParts.length > 0;
+  return cardioItems.length > 0 && payload.strengthParts.length > 0;
 }
 
 export function parseWorkoutTicketPayload(input: unknown): WorkoutParseResult {
@@ -134,21 +176,26 @@ export function parseWorkoutTicketPayload(input: unknown): WorkoutParseResult {
   const trainingType = body.trainingType;
   const durationMinutes = body.durationMinutes;
   const strengthParts = normalizeStrengthParts(body.strengthParts);
+  const cardioItems = normalizeCardioSelection(body);
 
-  if (!isTrainingType(trainingType) || strengthParts === null || !isValidDuration(durationMinutes)) {
+  if (
+    !isTrainingType(trainingType) ||
+    strengthParts === null ||
+    cardioItems === null ||
+    !isValidDuration(durationMinutes)
+  ) {
     return { ok: false, error: "invalid-workout-payload" };
   }
 
-  const cardioItem = isCardioItem(body.cardioItem) ? body.cardioItem : null;
-
   if (trainingType === "cardio") {
-    if (!cardioItem) return { ok: false, error: "invalid-workout-payload" };
+    if (cardioItems.length === 0) return { ok: false, error: "invalid-workout-payload" };
 
     return {
       ok: true,
       payload: {
         trainingType,
-        cardioItem,
+        cardioItem: cardioItems[0],
+        cardioItems,
         strengthParts: [],
         durationMinutes,
       },
@@ -163,13 +210,14 @@ export function parseWorkoutTicketPayload(input: unknown): WorkoutParseResult {
       payload: {
         trainingType,
         cardioItem: null,
+        cardioItems: [],
         strengthParts,
         durationMinutes,
       },
     };
   }
 
-  if (!cardioItem || strengthParts.length === 0) {
+  if (cardioItems.length === 0 || strengthParts.length === 0) {
     return { ok: false, error: "invalid-workout-payload" };
   }
 
@@ -177,7 +225,8 @@ export function parseWorkoutTicketPayload(input: unknown): WorkoutParseResult {
     ok: true,
     payload: {
       trainingType,
-      cardioItem,
+      cardioItem: cardioItems[0],
+      cardioItems,
       strengthParts,
       durationMinutes,
     },
@@ -188,6 +237,7 @@ export function buildDefaultWorkoutPayload(): WorkoutCreatePayload {
   return {
     trainingType: "cardio",
     cardioItem: "treadmill",
+    cardioItems: ["treadmill"],
     strengthParts: [],
     durationMinutes: null,
   };
@@ -196,12 +246,14 @@ export function buildDefaultWorkoutPayload(): WorkoutCreatePayload {
 export function buildWorkoutEntries(payload: WorkoutCreatePayload): WorkoutEntryInput[] {
   const entries: WorkoutEntryInput[] = [];
 
-  if ((payload.trainingType === "cardio" || payload.trainingType === "both") && payload.cardioItem) {
-    entries.push({
-      category: "cardio",
-      code: payload.cardioItem,
-      label: cardioLabels[payload.cardioItem],
-    });
+  if (payload.trainingType === "cardio" || payload.trainingType === "both") {
+    for (const item of getPayloadCardioItems(payload)) {
+      entries.push({
+        category: "cardio",
+        code: item,
+        label: cardioLabels[item],
+      });
+    }
   }
 
   if (payload.trainingType === "strength" || payload.trainingType === "both") {
@@ -218,7 +270,7 @@ export function buildWorkoutEntries(payload: WorkoutCreatePayload): WorkoutEntry
 }
 
 export function buildWorkoutSummary(payload: WorkoutCreatePayload): string {
-  const cardioText = payload.cardioItem ? cardioLabels[payload.cardioItem] : "";
+  const cardioText = getPayloadCardioItems(payload).map((item) => cardioLabels[item]).join(" / ");
   const strengthText = payload.strengthParts.map((part) => strengthLabels[part]).join(" / ");
   const durationText = payload.durationMinutes ? ` · ${payload.durationMinutes} 分钟` : "";
 
@@ -294,15 +346,16 @@ export function mapWorkoutRecordToTicketPayload(
     return null;
   }
 
-  const cardioEntry = workout.entries.find(
-    (entry) => entry.category === "cardio" && isCardioItem(entry.code),
+  const cardioItems = CARDIO_ITEMS.filter((item) =>
+    workout.entries.some((entry) => entry.category === "cardio" && entry.code === item),
   );
   const strengthParts = STRENGTH_PARTS.filter((part) =>
     workout.entries.some((entry) => entry.category === "strength" && entry.code === part),
   );
   const parsed = parseWorkoutTicketPayload({
     trainingType: workout.trainingType,
-    cardioItem: cardioEntry?.code ?? null,
+    cardioItem: cardioItems[0] ?? null,
+    cardioItems,
     strengthParts,
     durationMinutes: workout.durationMinutes ?? 60,
   });

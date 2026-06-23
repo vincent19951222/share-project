@@ -36,6 +36,7 @@ async function createPunchWithWorkout(
   payload: {
     trainingType: "cardio" | "strength" | "both";
     cardioItem?: string;
+    cardioItems?: string[];
     strengthParts?: string[];
     durationMinutes: number;
   },
@@ -52,8 +53,11 @@ async function createPunchWithWorkout(
   });
 
   const entries: { category: string; code: string; label: string }[] = [];
-  if ((payload.trainingType === "cardio" || payload.trainingType === "both") && payload.cardioItem) {
-    entries.push({ category: "cardio", code: payload.cardioItem, label: payload.cardioItem });
+  const cardioItems = payload.cardioItems ?? (payload.cardioItem ? [payload.cardioItem] : []);
+  if (payload.trainingType === "cardio" || payload.trainingType === "both") {
+    for (const item of cardioItems) {
+      entries.push({ category: "cardio", code: item, label: item });
+    }
   }
   if (payload.trainingType === "strength" || payload.trainingType === "both") {
     for (const part of payload.strengthParts ?? []) {
@@ -121,9 +125,31 @@ describe("buildDashboardMonthSnapshotForUser", () => {
     expect(day?.workoutMinutes).toBe(60);
     expect(day?.trainingType).toBe("both");
     expect(day?.cardioItem).toBe("treadmill");
+    expect(day?.cardioItems).toEqual(["treadmill"]);
     expect(day?.strengthParts).toEqual(["chest", "abs"]);
     expect(day?.drinkCups).toBe(2);
     expect(day?.drinkCounts).toMatchObject({ water: 1, americano: 1 });
+  });
+
+  it("aggregates multiple cardio items by day", async () => {
+    const { user, team } = await createTestUser();
+
+    await createPunchWithWorkout(user.id, team.id, "2026-06-06", {
+      trainingType: "cardio",
+      cardioItems: ["treadmill", "dance"],
+      durationMinutes: 60,
+    });
+
+    const snapshot = await buildDashboardMonthSnapshotForUser(
+      user.id,
+      "2026-06",
+      TEST_NOW,
+    );
+
+    expect(snapshot).not.toBeNull();
+    const day = snapshot!.days.find((d) => d.day === 6);
+    expect(day?.cardioItem).toBe("treadmill");
+    expect(day?.cardioItems).toEqual(["treadmill", "dance"]);
   });
 
   it("returns zero details for days with no records", async () => {
@@ -172,14 +198,15 @@ describe("buildDashboardSnapshotForUser", () => {
     expect(snapshot!.heatmap.some((day) => day.dayKey === "2026-06-10" && day.workoutMinutes === 50)).toBe(true);
   });
 
-  it("uses localized workout balance labels even when counts are zero", async () => {
+  it("uses visible workout balance labels even when counts are zero", async () => {
     const { user } = await createTestUser();
 
     const snapshot = await buildDashboardSnapshotForUser(user.id, { type: "month", monthKey: "2026-06" }, TEST_NOW);
 
     expect(snapshot).not.toBeNull();
-    expect(snapshot!.workoutBalance.find((item) => item.code === "glutes")).toMatchObject({
-      label: "臀",
+    expect(snapshot!.workoutBalance.map((item) => String(item.code))).not.toContain("glutes");
+    expect(snapshot!.workoutBalance.find((item) => item.code === "legs")).toMatchObject({
+      label: "臀腿",
       count: 0,
     });
     expect(snapshot!.workoutBalance.find((item) => item.code === "elliptical")).toMatchObject({
@@ -188,6 +215,10 @@ describe("buildDashboardSnapshotForUser", () => {
     });
     expect(snapshot!.workoutBalance.find((item) => item.code === "walk")).toMatchObject({
       label: "散步",
+      count: 0,
+    });
+    expect(snapshot!.workoutBalance.find((item) => item.code === "dance")).toMatchObject({
+      label: "跳舞",
       count: 0,
     });
   });

@@ -27,6 +27,7 @@ const cardioItems: Array<{ id: CardioItem; label: string }> = [
   { id: "elliptical", label: "椭圆机" },
   { id: "walk", label: "散步" },
   { id: "swim", label: "游泳" },
+  { id: "dance", label: "跳舞" },
 ];
 
 const strengthParts: Array<{ id: StrengthPart; label: string }> = [
@@ -35,12 +36,13 @@ const strengthParts: Array<{ id: StrengthPart; label: string }> = [
   { id: "shoulder", label: "肩部" },
   { id: "arms", label: "手臂" },
   { id: "abs", label: "腹部" },
-  { id: "legs", label: "腿部" },
+  { id: "legs", label: "臀腿" },
 ];
 
 const defaultTicketPayload: WorkoutTicketPayload = {
   trainingType: "cardio",
   cardioItem: "treadmill",
+  cardioItems: ["treadmill"],
   strengthParts: [],
   durationMinutes: 60,
 };
@@ -48,12 +50,16 @@ const defaultTicketPayload: WorkoutTicketPayload = {
 const strengthPartIconBasePath =
   "/assets/ui-prototypes/fitness-punch-ticket/generated/part-icons";
 
-function deriveTrainingType(cardioItem: CardioItem | null, parts: StrengthPart[]): TrainingType | null {
-  if (cardioItem && parts.length > 0) {
+function getStartingCardioItems(payload: WorkoutTicketPayload): CardioItem[] {
+  return payload.cardioItems ?? (payload.cardioItem ? [payload.cardioItem] : []);
+}
+
+function deriveTrainingType(cardioItems: CardioItem[], parts: StrengthPart[]): TrainingType | null {
+  if (cardioItems.length > 0 && parts.length > 0) {
     return "both";
   }
 
-  if (cardioItem) {
+  if (cardioItems.length > 0) {
     return "cardio";
   }
 
@@ -64,10 +70,10 @@ function deriveTrainingType(cardioItem: CardioItem | null, parts: StrengthPart[]
   return null;
 }
 
-function deriveTrainingTypeLabels(cardioItem: CardioItem | null, parts: StrengthPart[]) {
+function deriveTrainingTypeLabels(cardioItems: CardioItem[], parts: StrengthPart[]) {
   const labels: string[] = [];
 
-  if (cardioItem) {
+  if (cardioItems.length > 0) {
     labels.push("有氧");
   }
 
@@ -84,6 +90,14 @@ function togglePart(parts: StrengthPart[], part: StrengthPart) {
   }
 
   return [...parts, part];
+}
+
+function toggleCardioItem(items: CardioItem[], item: CardioItem) {
+  if (items.includes(item)) {
+    return items.filter((current) => current !== item);
+  }
+
+  return [...items, item];
 }
 
 function StrengthPartIcon({ part }: { part: StrengthPart }) {
@@ -114,14 +128,15 @@ export function FitnessPunchTicket({
 }: FitnessPunchTicketProps) {
   const hasDangerAction = Boolean(onDangerAction && dangerLabel);
   const startingPayload = initialPayload ?? defaultTicketPayload;
-  const [cardioItem, setCardioItem] = useState<CardioItem | null>(startingPayload.cardioItem);
+  const startingCardioItems = getStartingCardioItems(startingPayload);
+  const [selectedCardioItems, setSelectedCardioItems] = useState<CardioItem[]>(startingCardioItems);
   const [selectedParts, setSelectedParts] = useState<StrengthPart[]>(startingPayload.strengthParts);
   const [duration, setDuration] = useState(startingPayload.durationMinutes);
-  const cardioItemRef = useRef<CardioItem | null>(startingPayload.cardioItem);
+  const selectedCardioItemsRef = useRef<CardioItem[]>(startingCardioItems);
   const selectedPartsRef = useRef(startingPayload.strengthParts);
   const durationRef = useRef(startingPayload.durationMinutes);
-  const trainingType = deriveTrainingType(cardioItem, selectedParts);
-  const trainingTypeSummaryLabels = deriveTrainingTypeLabels(cardioItem, selectedParts);
+  const trainingType = deriveTrainingType(selectedCardioItems, selectedParts);
+  const trainingTypeSummaryLabels = deriveTrainingTypeLabels(selectedCardioItems, selectedParts);
   const isSelectionValid = trainingType !== null;
 
   const selectedPartText = useMemo(
@@ -132,7 +147,11 @@ export function FitnessPunchTicket({
         .join("、"),
     [selectedParts],
   );
-  const selectedCardioText = cardioItems.find((item) => item.id === cardioItem)?.label ?? "未选择";
+  const selectedCardioText =
+    cardioItems
+      .filter((item) => selectedCardioItems.includes(item.id))
+      .map((item) => item.label)
+      .join("、") || "未选择";
   const selectedPartSummaryText = selectedPartText || "未选择";
 
   function changeDuration(delta: number) {
@@ -143,10 +162,10 @@ export function FitnessPunchTicket({
   }
 
   function selectCardioItem(nextCardioItem: CardioItem) {
-    const nextSelection = cardioItemRef.current === nextCardioItem ? null : nextCardioItem;
+    const nextSelection = toggleCardioItem(selectedCardioItemsRef.current, nextCardioItem);
 
-    cardioItemRef.current = nextSelection;
-    setCardioItem(nextSelection);
+    selectedCardioItemsRef.current = nextSelection;
+    setSelectedCardioItems(nextSelection);
   }
 
   function toggleSelectedPart(part: StrengthPart) {
@@ -157,15 +176,18 @@ export function FitnessPunchTicket({
   }
 
   function buildPayload(): WorkoutTicketPayload | null {
-    const nextTrainingType = deriveTrainingType(cardioItemRef.current, selectedPartsRef.current);
+    const nextTrainingType = deriveTrainingType(selectedCardioItemsRef.current, selectedPartsRef.current);
 
     if (!nextTrainingType) {
       return null;
     }
 
+    const nextCardioItems = nextTrainingType === "strength" ? [] : selectedCardioItemsRef.current;
+
     return {
       trainingType: nextTrainingType,
-      cardioItem: nextTrainingType === "strength" ? null : cardioItemRef.current,
+      cardioItem: nextCardioItems[0] ?? null,
+      cardioItems: nextCardioItems,
       strengthParts: nextTrainingType === "cardio" ? [] : selectedPartsRef.current,
       durationMinutes: durationRef.current,
     };
@@ -226,9 +248,9 @@ export function FitnessPunchTicket({
                 {cardioItems.map((item) => (
                   <button
                     key={item.id}
-                    className={item.id === cardioItem ? "fitness-ticket-option-active" : "fitness-ticket-option"}
+                    className={selectedCardioItems.includes(item.id) ? "fitness-ticket-option-active" : "fitness-ticket-option"}
                     type="button"
-                    aria-pressed={item.id === cardioItem}
+                    aria-pressed={selectedCardioItems.includes(item.id)}
                     disabled={busy}
                     onClick={() => selectCardioItem(item.id)}
                   >

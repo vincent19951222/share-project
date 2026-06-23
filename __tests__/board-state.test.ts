@@ -203,6 +203,7 @@ describe("board-state", () => {
       expect(snapshot?.currentUserTodayWorkout).toEqual({
         trainingType: "both",
         cardioItem: "elliptical",
+        cardioItems: ["elliptical"],
         strengthParts: ["chest", "abs"],
         durationMinutes: 60,
       });

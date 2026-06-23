@@ -673,6 +673,7 @@ export interface DashboardDayRecord extends CalendarDayRecord {
   workoutMinutes: number;
   trainingType: TrainingType | null;
   cardioItem: CardioItem | null;
+  cardioItems: CardioItem[];
   strengthParts: StrengthPart[];
   drinkCounts: Record<DrinkType, number>;
 }
