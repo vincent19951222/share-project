@@ -54,11 +54,12 @@ export function SeasonSprintPanel({ season }: { season: ActiveSeasonSnapshot | n
   const month = parseSeasonMonth(season.monthKey) ?? 1;
   const theme = getSeasonTheme(month);
 
-  const pct = season.targetSlots > 0 ? season.filledSlots / season.targetSlots : 0;
+  const targetSlots = Math.max(0, season.targetSlots);
+  const displayFilledSlots = Math.max(0, season.filledSlots);
+  const filledSlots = Math.min(displayFilledSlots, targetSlots);
+  const pct = targetSlots > 0 ? Math.min(displayFilledSlots / targetSlots, 1) : 0;
   const contributors = season.contributions.filter((c) => c.slotContribution > 0);
   const totalContribution = contributors.reduce((a, c) => a + c.slotContribution, 0);
-  const targetSlots = Math.max(0, season.targetSlots);
-  const filledSlots = Math.max(0, Math.min(season.filledSlots, targetSlots));
   const segments = targetSlots > 0 ? targetSlots : 1;
   const filledSlotContributors = buildFilledSlots(season.contributions);
   const pieGridClipId = `report-season-pie-grid-${toSafeSvgId(season.id)}`;
@@ -118,7 +119,7 @@ export function SeasonSprintPanel({ season }: { season: ActiveSeasonSnapshot | n
             })}
           </div>
           <p className="mt-1 text-xs text-sub">
-            {Math.round(pct * 100)}% · 已 {season.filledSlots} / 目标 {season.targetSlots}
+            {Math.round(pct * 100)}% · 已 {displayFilledSlots} / 目标 {season.targetSlots}
           </p>
         </div>
         {contributors.length > 0 && (

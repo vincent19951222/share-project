@@ -76,6 +76,17 @@ export async function buildBoardSnapshotForUser(
                   },
                 },
               },
+              punches: {
+                where: {
+                  punched: true,
+                  dayKey: {
+                    startsWith: currentMonthKey,
+                  },
+                },
+                select: {
+                  userId: true,
+                },
+              },
             },
           },
         },
@@ -112,15 +123,36 @@ export async function buildBoardSnapshotForUser(
   const statsByUserId = new Map(
     activeSeason?.memberStats.map((stat) => [stat.userId, stat]) ?? [],
   );
+  const seasonPunchContributionByUserId = new Map<string, number>();
 
-  const members = user.team.users.map((member) => ({
-    id: member.id,
-    name: member.username,
-    avatarKey: member.avatarKey,
-    assetBalance: member.coins,
-    seasonIncome: statsByUserId.get(member.id)?.seasonIncome ?? 0,
-    slotContribution: statsByUserId.get(member.id)?.slotContribution ?? 0,
-  }));
+  for (const punch of activeSeason?.punches ?? []) {
+    seasonPunchContributionByUserId.set(
+      punch.userId,
+      (seasonPunchContributionByUserId.get(punch.userId) ?? 0) + 1,
+    );
+  }
+
+  const derivedFilledSlots = Array.from(
+    seasonPunchContributionByUserId.values(),
+  ).reduce((sum, count) => sum + count, 0);
+  const getDisplaySlotContribution = (userId: string, statContribution: number) =>
+    Math.max(statContribution, seasonPunchContributionByUserId.get(userId) ?? 0);
+
+  const members = user.team.users.map((member) => {
+    const stat = statsByUserId.get(member.id);
+
+    return {
+      id: member.id,
+      name: member.username,
+      avatarKey: member.avatarKey,
+      assetBalance: member.coins,
+      seasonIncome: stat?.seasonIncome ?? 0,
+      slotContribution: getDisplaySlotContribution(
+        member.id,
+        stat?.slotContribution ?? 0,
+      ),
+    };
+  });
 
   const gridData: CellStatus[][] = user.team.users.map((member) => {
     return Array.from({ length: totalDays }, (_, index) => {
@@ -150,18 +182,22 @@ export async function buildBoardSnapshotForUser(
         monthKey: activeSeason.monthKey,
         goalName: activeSeason.goalName,
         targetSlots: activeSeason.targetSlots,
-        filledSlots: Math.min(activeSeason.filledSlots, activeSeason.targetSlots),
+        filledSlots: Math.max(0, activeSeason.filledSlots, derivedFilledSlots),
         contributions: user.team.users
           .map((member, index) => {
             const stat = statsByUserId.get(member.id);
             const memberOrder = stat?.memberOrder ?? index;
+            const slotContribution = getDisplaySlotContribution(
+              member.id,
+              stat?.slotContribution ?? 0,
+            );
 
             return {
               userId: member.id,
               name: member.username,
               avatarKey: member.avatarKey,
               colorIndex: stat?.colorIndex ?? index,
-              slotContribution: stat?.slotContribution ?? 0,
+              slotContribution,
               seasonIncome: stat?.seasonIncome ?? 0,
               memberOrder,
             };

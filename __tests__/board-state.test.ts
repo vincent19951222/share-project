@@ -152,6 +152,130 @@ describe("board-state", () => {
     }
   });
 
+  it("derives over-target season progress and contributions from real season punches", async () => {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    const teamUsers = await prisma.user.findMany({
+      where: { teamId: user.teamId },
+      orderBy: { createdAt: "asc" },
+    });
+    const seasons = await prisma.season.findMany({
+      where: { teamId: user.teamId },
+      select: { id: true },
+    });
+
+    await prisma.punchRecord.deleteMany({
+      where: {
+        userId: { in: teamUsers.map((member) => member.id) },
+      },
+    });
+    await prisma.seasonMemberStat.deleteMany({
+      where: {
+        seasonId: { in: seasons.map((season) => season.id) },
+      },
+    });
+    await prisma.season.deleteMany({
+      where: { id: { in: seasons.map((season) => season.id) } },
+    });
+
+    const activeSeason = await prisma.season.create({
+      data: {
+        teamId: user.teamId,
+        monthKey: "2026-04",
+        goalName: "April sprint",
+        status: "ACTIVE",
+        targetSlots: 2,
+        filledSlots: 2,
+        startedAt: new Date("2026-04-01T00:00:00+08:00"),
+      },
+    });
+
+    try {
+      await prisma.seasonMemberStat.createMany({
+        data: [
+          {
+            seasonId: activeSeason.id,
+            userId,
+            seasonIncome: 20,
+            slotContribution: 1,
+            colorIndex: 0,
+            memberOrder: 0,
+            firstContributionAt: new Date("2026-04-05T08:00:00+08:00"),
+          },
+          {
+            seasonId: activeSeason.id,
+            userId: teamUsers[1].id,
+            seasonIncome: 20,
+            slotContribution: 1,
+            colorIndex: 1,
+            memberOrder: 1,
+            firstContributionAt: new Date("2026-04-06T08:00:00+08:00"),
+          },
+        ],
+      });
+      await prisma.punchRecord.createMany({
+        data: [
+          {
+            userId,
+            seasonId: activeSeason.id,
+            dayIndex: 1,
+            dayKey: "2026-04-01",
+            punched: true,
+            punchType: "default",
+            countedForSeasonSlot: true,
+          },
+          {
+            userId,
+            seasonId: activeSeason.id,
+            dayIndex: 2,
+            dayKey: "2026-04-02",
+            punched: true,
+            punchType: "default",
+            countedForSeasonSlot: false,
+          },
+          {
+            userId: teamUsers[1].id,
+            seasonId: activeSeason.id,
+            dayIndex: 1,
+            dayKey: "2026-04-01",
+            punched: true,
+            punchType: "default",
+            countedForSeasonSlot: true,
+          },
+          {
+            userId: teamUsers[1].id,
+            seasonId: activeSeason.id,
+            dayIndex: 2,
+            dayKey: "2026-04-02",
+            punched: true,
+            punchType: "default",
+            countedForSeasonSlot: false,
+          },
+        ],
+      });
+
+      const snapshot = await buildBoardSnapshotForUser(
+        userId,
+        new Date("2026-04-18T09:00:00+08:00"),
+      );
+      const currentUserRow = snapshot!.activeSeason?.contributions.find(
+        (item) => item.userId === userId,
+      );
+      const otherUserRow = snapshot!.activeSeason?.contributions.find(
+        (item) => item.userId === teamUsers[1].id,
+      );
+
+      expect(snapshot!.activeSeason?.filledSlots).toBe(4);
+      expect(currentUserRow?.slotContribution).toBe(2);
+      expect(otherUserRow?.slotContribution).toBe(2);
+    } finally {
+      await prisma.punchRecord.deleteMany({ where: { seasonId: activeSeason.id } });
+      await prisma.seasonMemberStat.deleteMany({ where: { seasonId: activeSeason.id } });
+      await prisma.season.deleteMany({ where: { id: activeSeason.id } });
+    }
+  });
+
   it("returns null when the user does not exist", async () => {
     const snapshot = await buildBoardSnapshotForUser(
       "missing-user",

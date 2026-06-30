@@ -807,7 +807,7 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.currentUser.seasonIncome).toBe(0);
   });
 
-  it("keeps filled slots capped and skips slot contribution when the season is already full", async () => {
+  it("continues season progress and slot contribution when the season is already full", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 1, targetSlots: 1 });
     const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -833,12 +833,12 @@ describe("/api/board/punch", () => {
     });
 
     expect(after.coins).toBe(before.coins + 10);
-    expect(afterSeason.filledSlots).toBe(1);
+    expect(afterSeason.filledSlots).toBe(2);
     expect(stat.seasonIncome).toBe(10);
-    expect(stat.slotContribution).toBe(0);
-    expect(stat.firstContributionAt).toBeNull();
-    expect(record.countedForSeasonSlot).toBe(false);
-    expect(body.snapshot.activeSeason?.filledSlots).toBe(1);
+    expect(stat.slotContribution).toBe(1);
+    expect(stat.firstContributionAt).toBeInstanceOf(Date);
+    expect(record.countedForSeasonSlot).toBe(true);
+    expect(body.snapshot.activeSeason?.filledSlots).toBe(2);
   });
 
   it("awards today's punch without season ledger writes when a pre-read active season has ended", async () => {
@@ -1105,7 +1105,7 @@ describe("/api/board/punch", () => {
     expect(response.status).toBe(409);
   });
 
-  it("keeps season slot capped during yesterday makeup when the active season is full", async () => {
+  it("continues season progress during yesterday makeup when the active season is full", async () => {
     await resetState();
     const season = await createActiveSeason({ filledSlots: 1, targetSlots: 1 });
     const before = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -1123,11 +1123,11 @@ describe("/api/board/punch", () => {
     });
 
     expect(after.coins).toBe(before.coins + 10);
-    expect(afterSeason.filledSlots).toBe(1);
+    expect(afterSeason.filledSlots).toBe(2);
     expect(stat.seasonIncome).toBe(10);
-    expect(stat.slotContribution).toBe(0);
-    expect(stat.firstContributionAt).toBeNull();
-    expect(record.countedForSeasonSlot).toBe(false);
+    expect(stat.slotContribution).toBe(1);
+    expect(stat.firstContributionAt).toBeInstanceOf(Date);
+    expect(record.countedForSeasonSlot).toBe(true);
   });
 
   it("rejects cross-month yesterday makeup on the first day of a month", async () => {
@@ -1263,6 +1263,36 @@ describe("/api/board/punch", () => {
     expect(body.snapshot.gridData[targetRowIndex][9]).toBe(true);
   });
 
+  it("continues season progress during admin makeup when the active season is full", async () => {
+    await resetState();
+    const season = await createActiveSeason({ filledSlots: 1, targetSlots: 1 });
+    const target = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
+    const makeupDayKey = "2026-04-10";
+
+    const response = await POST_ADMIN_MAKEUP(
+      adminMakeupRequest(userId, {
+        targetUserId: target.id,
+        dayKey: makeupDayKey,
+      }),
+    );
+
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    const afterSeason = await prisma.season.findUniqueOrThrow({ where: { id: season.id } });
+    const stat = await prisma.seasonMemberStat.findUniqueOrThrow({
+      where: { seasonId_userId: { seasonId: season.id, userId: target.id } },
+    });
+    const record = await prisma.punchRecord.findUniqueOrThrow({
+      where: { userId_dayKey: { userId: target.id, dayKey: makeupDayKey } },
+    });
+
+    expect(afterSeason.filledSlots).toBe(2);
+    expect(stat.slotContribution).toBe(1);
+    expect(record.countedForSeasonSlot).toBe(true);
+    expect(body.snapshot.activeSeason?.filledSlots).toBe(2);
+  });
+
   it("rejects global makeup from non-admin users", async () => {
     await resetState();
     const member = await prisma.user.findUniqueOrThrow({ where: { username: "luo" } });
@@ -1383,7 +1413,7 @@ describe("/api/board/punch", () => {
     expect(after.coins).toBe(before.coins + 10);
   });
 
-  it("caps season slot growth when different users punch concurrently", async () => {
+  it("counts season slot growth when different users punch concurrently", async () => {
     await resetState();
     const currentUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
     const otherUser = await prisma.user.findFirstOrThrow({
@@ -1411,9 +1441,9 @@ describe("/api/board/punch", () => {
     });
 
     expect([firstResponse.status, secondResponse.status].sort((a, b) => a - b)).toEqual([200, 200]);
-    expect(afterSeason.filledSlots).toBe(1);
-    expect(records.filter((record) => record.countedForSeasonSlot)).toHaveLength(1);
-    expect(stats.reduce((sum, stat) => sum + stat.slotContribution, 0)).toBe(1);
+    expect(afterSeason.filledSlots).toBe(2);
+    expect(records.filter((record) => record.countedForSeasonSlot)).toHaveLength(2);
+    expect(stats.reduce((sum, stat) => sum + stat.slotContribution, 0)).toBe(2);
   });
 
   it("writes a season target reached dynamic exactly once when the last slot fills", async () => {

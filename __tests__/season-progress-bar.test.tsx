@@ -143,4 +143,43 @@ describe("SeasonProgressBar", () => {
     expect(container.textContent).toContain("已冲满");
     expect(container.textContent).toContain("继续打卡仍累计我的银子和赛季收入");
   });
+
+  it("shows over-target totals while keeping the grid capped to target slots", () => {
+    act(() => {
+      root.render(
+        <SeasonProgressBar
+          activeSeason={{
+            id: "season-over",
+            monthKey: "2026-04",
+            goalName: "四月掉脂挑战",
+            targetSlots: 2,
+            filledSlots: 4,
+            contributions: [
+              {
+                userId: "u1",
+                name: "li",
+                avatarKey: "male1",
+                colorIndex: 0,
+                slotContribution: 3,
+                seasonIncome: 120,
+              },
+              {
+                userId: "u2",
+                name: "luo",
+                avatarKey: "male2",
+                colorIndex: 1,
+                slotContribution: 1,
+                seasonIncome: 40,
+              },
+            ],
+          }}
+        />,
+      );
+    });
+
+    expect(container.textContent).toContain("四月掉脂挑战 · 4/2");
+    expect(container.querySelectorAll("[data-slot-state='filled']")).toHaveLength(2);
+    expect(container.querySelectorAll("[data-slot-state='empty']")).toHaveLength(0);
+    expect(container.textContent).toContain("已冲满");
+  });
 });

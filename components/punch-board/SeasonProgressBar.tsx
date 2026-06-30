@@ -53,14 +53,15 @@ export function SeasonProgressBar({ activeSeason }: SeasonProgressBarProps) {
 
   const theme = getSeasonTheme(month);
   const targetSlots = Math.max(0, activeSeason.targetSlots);
-  const filledSlots = Math.max(0, Math.min(activeSeason.filledSlots, targetSlots));
+  const displayFilledSlots = Math.max(0, activeSeason.filledSlots);
+  const filledSlots = Math.min(displayFilledSlots, targetSlots);
   const segments = targetSlots > 0 ? targetSlots : 1;
   const filledSlotContributors = buildFilledSlots(activeSeason.contributions);
   const helperText =
     targetSlots > 0
-      ? `${activeSeason.goalName} · ${filledSlots}/${targetSlots}`
+      ? `${activeSeason.goalName} · ${displayFilledSlots}/${targetSlots}`
       : `${activeSeason.goalName} · 0/0`;
-  const isCompleted = targetSlots > 0 && filledSlots >= targetSlots;
+  const isCompleted = targetSlots > 0 && displayFilledSlots >= targetSlots;
 
   return (
     <div className="flex flex-col gap-2">
