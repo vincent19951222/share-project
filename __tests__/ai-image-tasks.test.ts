@@ -44,7 +44,18 @@ import {
   retryAiImageTask,
   settleTimedOutAiImageTask,
 } from "@/lib/gamification/ai-image/tasks";
-import { runAiImageTask } from "@/lib/gamification/ai-image/task-runner";
+import { runAiImageTask, runAiImageTaskWithDependencies } from "@/lib/gamification/ai-image/task-runner";
+
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((innerResolve, innerReject) => {
+    resolve = innerResolve;
+    reject = innerReject;
+  });
+
+  return { promise, resolve, reject };
+}
 
 describe("AI image task service", () => {
   let userId: string;
@@ -475,5 +486,61 @@ describe("AI image task service", () => {
     expect(settledTask.items[0]?.status).toBe("failed");
     expect(settledTask.items[0]?.errorMessage).toBe("生成任务缺少可执行提示词");
     expect(user.coins).toBe(1000);
+  });
+
+  it("does not timeout an actively running task while heartbeat liveness stays fresh", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-06T12:00:00+08:00"));
+
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-01",
+      userPrompt: "heartbeat task",
+      requestedCount: 1,
+      referenceImages: [],
+      startRunner: false,
+    });
+    const deferred = createDeferred<{ b64Json: string; mimeType: "image/png" }>();
+    const runPromise = runAiImageTaskWithDependencies(task.id, {
+      heartbeatIntervalMs: 1_000,
+      provider: () => deferred.promise,
+      upload: uploadAiImageBase64Mock,
+    });
+
+    try {
+      await vi.advanceTimersByTimeAsync(11 * 60 * 1000);
+
+      await settleTimedOutAiImageTask({
+        taskId: task.id,
+        now: new Date("2026-07-06T12:11:00+08:00"),
+      });
+
+      const liveTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+        where: { id: task.id },
+        include: { items: { orderBy: { index: "asc" } } },
+      });
+      const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+      expect(liveTask.status).toBe("running");
+      expect(liveTask.coinRefunded).toBe(false);
+      expect(liveTask.refundedCoinAmount).toBe(0);
+      expect(liveTask.items[0]?.status).toBe("running");
+      expect(user.coins).toBe(940);
+    } finally {
+      deferred.resolve({
+        b64Json: Buffer.from("heartbeat-output").toString("base64"),
+        mimeType: "image/png",
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      await runPromise;
+    }
+
+    const completedTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+      include: { items: true },
+    });
+
+    expect(completedTask.status).toBe("completed");
+    expect(completedTask.refundedCoinAmount).toBe(0);
   });
 });

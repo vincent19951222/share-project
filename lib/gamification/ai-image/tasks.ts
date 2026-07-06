@@ -533,24 +533,73 @@ export async function settleTimedOutAiImageTask(input: {
   now?: Date;
 }): Promise<void> {
   const now = input.now ?? new Date();
-  const task = await prisma.aiImageGenerationTask.findUnique({
-    where: { id: input.taskId },
-    select: {
-      id: true,
-      userId: true,
-      status: true,
-      coinCost: true,
-      coinRefunded: true,
-      refundedCoinAmount: true,
-      updatedAt: true,
-    },
-  });
+  const [task, freshestRunningItem] = await Promise.all([
+    prisma.aiImageGenerationTask.findUnique({
+      where: { id: input.taskId },
+      select: {
+        id: true,
+        status: true,
+        updatedAt: true,
+      },
+    }),
+    prisma.aiImageGenerationItem.findFirst({
+      where: {
+        taskId: input.taskId,
+        status: "running",
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        updatedAt: true,
+      },
+    }),
+  ]);
 
   if (!task || task.status !== "running") {
     return;
   }
 
-  if (now.getTime() - task.updatedAt.getTime() < AI_IMAGE_TASK_TIMEOUT_MS) {
+  const lastLivenessAt =
+    freshestRunningItem && freshestRunningItem.updatedAt > task.updatedAt
+      ? freshestRunningItem.updatedAt
+      : task.updatedAt;
+
+  if (now.getTime() - lastLivenessAt.getTime() < AI_IMAGE_TASK_TIMEOUT_MS) {
+    return;
+  }
+
+  const currentTask = await prisma.aiImageGenerationTask.findUnique({
+    where: { id: input.taskId },
+    select: {
+      id: true,
+      status: true,
+      updatedAt: true,
+    },
+  });
+
+  if (!currentTask || currentTask.status !== "running") {
+    return;
+  }
+
+  const currentFreshestRunningItem = await prisma.aiImageGenerationItem.findFirst({
+    where: {
+      taskId: input.taskId,
+      status: "running",
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+    select: {
+      updatedAt: true,
+    },
+  });
+  const currentLastLivenessAt =
+    currentFreshestRunningItem && currentFreshestRunningItem.updatedAt > currentTask.updatedAt
+      ? currentFreshestRunningItem.updatedAt
+      : currentTask.updatedAt;
+
+  if (now.getTime() - currentLastLivenessAt.getTime() < AI_IMAGE_TASK_TIMEOUT_MS) {
     return;
   }
 

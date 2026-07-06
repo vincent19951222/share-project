@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 export interface AiImageTaskRunnerDependencies {
   fetchImpl: typeof fetch;
+  heartbeatIntervalMs: number;
   provider: (input: GenerateAiImageInput) => Promise<GenerateAiImageResult>;
   upload: typeof uploadAiImageBase64;
 }
@@ -16,6 +17,7 @@ function buildRunnerDependencies(
 ): AiImageTaskRunnerDependencies {
   return {
     fetchImpl: fetch,
+    heartbeatIntervalMs: 5_000,
     provider: generateAiImage,
     upload: uploadAiImageBase64,
     ...overrides,
@@ -86,6 +88,62 @@ async function finalizeTask(taskId: string) {
   await settleAiImageTaskByItems({ taskId });
 }
 
+function startRunnerHeartbeat(input: {
+  taskId: string;
+  itemId: string;
+  intervalMs: number;
+}) {
+  let stopped = false;
+  let inFlight = false;
+
+  const tick = async () => {
+    if (stopped || inFlight) {
+      return;
+    }
+
+    inFlight = true;
+
+    try {
+      const now = new Date();
+      await Promise.all([
+        prisma.aiImageGenerationTask.updateMany({
+          where: {
+            id: input.taskId,
+            status: "running",
+          },
+          data: { updatedAt: now },
+        }),
+        prisma.aiImageGenerationItem.updateMany({
+          where: {
+            id: input.itemId,
+            status: "running",
+          },
+          data: { updatedAt: now },
+        }),
+      ]);
+    } catch {
+      // Best-effort heartbeat only.
+    } finally {
+      inFlight = false;
+    }
+  };
+
+  const timer = setInterval(() => {
+    void tick();
+  }, input.intervalMs);
+
+  if (typeof timer.unref === "function") {
+    timer.unref();
+  }
+
+  void tick();
+
+  return () => {
+    stopped = true;
+    clearInterval(timer);
+  };
+}
+
 export async function runAiImageTaskWithDependencies(
   taskId: string,
   overrides: Partial<AiImageTaskRunnerDependencies> = {},
@@ -132,6 +190,11 @@ export async function runAiImageTaskWithDependencies(
           status: "running",
           errorMessage: null,
         },
+      });
+      const stopHeartbeat = startRunnerHeartbeat({
+        taskId,
+        itemId: item.id,
+        intervalMs: dependencies.heartbeatIntervalMs,
       });
 
       try {
@@ -184,6 +247,8 @@ export async function runAiImageTaskWithDependencies(
             errorMessage: toSafeErrorMessage(error),
           },
         });
+      } finally {
+        stopHeartbeat();
       }
     }
   } catch (error) {
