@@ -4,16 +4,19 @@ import type { SupplyAiImageSnapshot } from "@/lib/types";
 
 interface SupplyThemeGachaPanelProps {
   snapshot: SupplyAiImageSnapshot;
+  mutationsDisabled?: boolean;
   isDrawingTheme?: boolean;
   onDrawTheme: () => Promise<void> | void;
 }
 
 export function SupplyThemeGachaPanel({
+  mutationsDisabled = false,
   snapshot,
   isDrawingTheme = false,
   onDrawTheme,
 }: SupplyThemeGachaPanelProps) {
   const canDraw =
+    !mutationsDisabled &&
     !isDrawingTheme &&
     !snapshot.themes.allUnlocked &&
     snapshot.wallet.coins >= snapshot.wallet.themeDrawCost;

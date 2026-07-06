@@ -322,6 +322,65 @@ describe("SupplyStationShell AI image flows", () => {
     expect(container.textContent).toContain("创建失败");
   });
 
+  it("clears studio inputs after create succeeds even if refresh fails, then shows a safe stale warning", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildAiSnapshot() }))
+        .mockResolvedValueOnce(createJsonResponse({ taskId: "task-2" }))
+        .mockResolvedValueOnce(
+          createJsonResponse({ error: "provider timeout gpt-image-2 debug trace" }, false, 500),
+        ),
+    );
+
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell />);
+    });
+    await flush();
+
+    const input = container.querySelector<HTMLInputElement>("input[type='file']");
+    const textarea = container.querySelector<HTMLTextAreaElement>("textarea");
+
+    expect(input).not.toBeNull();
+    expect(textarea).not.toBeNull();
+
+    await act(async () => {
+      Object.defineProperty(input!, "files", {
+        configurable: true,
+        value: [createFile("clear.png", "clear")],
+      });
+      input?.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await flushAsyncState();
+
+    await act(async () => {
+      textarea!.value = "提交成功后应清空";
+      textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      "/api/gamification/ai-image/tasks",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(textarea?.value).toBe("");
+    expect(container.textContent).not.toContain("clear.png");
+    expect(container.textContent).toContain("生图任务已创建");
+    expect(container.textContent).toContain("补给站还没刷新出来");
+    expect(container.textContent).not.toContain("provider timeout gpt-image-2 debug trace");
+    expect(container.textContent).not.toContain("gpt-image-2");
+  });
+
   it("retries a failed task item and draws a new theme from the shell panels", async () => {
     vi.stubGlobal(
       "fetch",
@@ -463,5 +522,73 @@ describe("SupplyStationShell AI image flows", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(fetch).toHaveBeenCalledTimes(3);
+  });
+
+  it("disables mutation buttons while snapshot is stale after a committed mutation refresh failure", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildAiSnapshot() }))
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            theme: {
+              id: "theme-02",
+              name: "深夜健身房",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(createJsonResponse({ error: "stale backend trace" }, false, 500))
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildAiSnapshot() })),
+    );
+
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell initialPanel="themeGacha" />);
+    });
+    await flush();
+
+    const drawButton = container.querySelector<HTMLButtonElement>("[data-action='draw-ai-image-theme']");
+    expect(drawButton?.disabled).toBe(false);
+
+    await act(async () => {
+      drawButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(drawButton?.disabled).toBe(true);
+    expect(container.textContent).toContain("补给站还没刷新出来");
+    expect(container.textContent).not.toContain("stale backend trace");
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-panel='studio']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(
+      container.querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")?.disabled,
+    ).toBe(true);
+    expect(
+      container.querySelector<HTMLButtonElement>("[data-action='retry-ai-image-task']")?.disabled,
+    ).toBe(true);
+
+    await act(async () => {
+      Array.from(container.querySelectorAll("button"))
+        .find((button) => button.textContent?.includes("刷新"))
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-panel='themeGacha']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(
+      container.querySelector<HTMLButtonElement>("[data-action='draw-ai-image-theme']")?.disabled,
+    ).toBe(false);
   });
 });

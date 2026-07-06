@@ -65,7 +65,22 @@ export function SupplyStationShell({
   const [activeAction, setActiveAction] = useState<SupplyAction | null>(null);
   const [error, setError] = useState<SupplyErrorState | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [snapshotStaleAfterMutation, setSnapshotStaleAfterMutation] = useState(false);
+  const [snapshotRefreshWarning, setSnapshotRefreshWarning] = useState<string | null>(null);
   const activeActionRef = useRef<SupplyAction | null>(null);
+  const snapshotStaleAfterMutationRef = useRef(false);
+
+  const markSnapshotFresh = useCallback(() => {
+    snapshotStaleAfterMutationRef.current = false;
+    setSnapshotStaleAfterMutation(false);
+    setSnapshotRefreshWarning(null);
+  }, []);
+
+  const markSnapshotStaleAfterMutation = useCallback(() => {
+    snapshotStaleAfterMutationRef.current = true;
+    setSnapshotStaleAfterMutation(true);
+    setSnapshotRefreshWarning("操作已提交成功，但补给站还没刷新出来，请先刷新后再继续。");
+  }, []);
 
   const applySnapshot = useCallback((nextSnapshot: SupplyStationProductionSnapshot) => {
     cacheSupplyNavSnapshot(nextSnapshot);
@@ -77,19 +92,21 @@ export function SupplyStationShell({
       setError(null);
       const nextSnapshot = await fetchSupplyStationState();
       applySnapshot(nextSnapshot);
+      markSnapshotFresh();
     } catch (caught) {
       setError(getSupplyErrorState(caught));
     }
-  }, [applySnapshot]);
+  }, [applySnapshot, markSnapshotFresh]);
 
   const refreshSnapshotSilently = useCallback(async () => {
     try {
       const nextSnapshot = await fetchSupplyStationState();
       applySnapshot(nextSnapshot);
+      markSnapshotFresh();
     } catch {
       // Keep the current snapshot if a background refresh fails.
     }
-  }, [applySnapshot]);
+  }, [applySnapshot, markSnapshotFresh]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -133,7 +150,7 @@ export function SupplyStationShell({
 
   const runAction = useCallback(
     async (action: SupplyAction, work: () => Promise<string | void>) => {
-      if (activeActionRef.current) {
+      if (activeActionRef.current || snapshotStaleAfterMutationRef.current) {
         return false;
       }
 
@@ -144,9 +161,16 @@ export function SupplyStationShell({
 
       try {
         const message = await work();
-        const nextSnapshot = await fetchSupplyStationState();
-        applySnapshot(nextSnapshot);
         setSuccessMessage(message ?? "操作成功");
+
+        try {
+          const nextSnapshot = await fetchSupplyStationState();
+          applySnapshot(nextSnapshot);
+          markSnapshotFresh();
+        } catch {
+          markSnapshotStaleAfterMutation();
+        }
+
         return true;
       } catch (caught) {
         setError(getSupplyErrorState(caught));
@@ -156,7 +180,7 @@ export function SupplyStationShell({
         setActiveAction(null);
       }
     },
-    [applySnapshot],
+    [applySnapshot, markSnapshotFresh, markSnapshotStaleAfterMutation],
   );
 
   const handleCreateTask = useCallback(
@@ -251,6 +275,18 @@ export function SupplyStationShell({
             ) : null}
           </div>
         ) : null}
+        {snapshotRefreshWarning ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm font-bold text-main">{snapshotRefreshWarning}</p>
+            <button
+              className="rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-black text-main shadow-[0_2px_0_0_#1f2937]"
+              onClick={() => void loadSnapshot()}
+              type="button"
+            >
+              刷新补给站
+            </button>
+          </div>
+        ) : null}
         {successMessage ? <p className="text-sm font-bold text-main">{successMessage}</p> : null}
       </div>
 
@@ -258,6 +294,7 @@ export function SupplyStationShell({
         <>
           {activePanel === "studio" ? (
             <SupplyAiImageStudioPanel
+              mutationsDisabled={snapshotStaleAfterMutation}
               onCreateTask={handleCreateTask}
               onRetryTask={handleRetryTask}
               snapshot={snapshot.supplyAiImage}
@@ -266,6 +303,7 @@ export function SupplyStationShell({
 
           {activePanel === "themeGacha" ? (
             <SupplyThemeGachaPanel
+              mutationsDisabled={snapshotStaleAfterMutation}
               isDrawingTheme={activeAction === "draw-ai-image-theme"}
               onDrawTheme={handleDrawTheme}
               snapshot={snapshot.supplyAiImage}

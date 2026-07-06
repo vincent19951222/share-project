@@ -18,6 +18,7 @@ interface LocalReferenceImage {
 
 interface SupplyAiImageStudioPanelProps {
   snapshot: SupplyAiImageSnapshot;
+  mutationsDisabled?: boolean;
   onCreateTask: (payload: CreateAiImageGenerationTaskPayload) => Promise<boolean | void> | boolean | void;
   onRetryTask: (taskId: string) => Promise<void> | void;
 }
@@ -109,6 +110,7 @@ function formatItemErrorMessage(item: SupplyAiImageSnapshot["recentTasks"][numbe
 }
 
 export function SupplyAiImageStudioPanel({
+  mutationsDisabled = false,
   snapshot,
   onCreateTask,
   onRetryTask,
@@ -134,6 +136,7 @@ export function SupplyAiImageStudioPanel({
 
   const canGenerate =
     Boolean(selectedTheme) &&
+    !mutationsDisabled &&
     !isSubmitting &&
     snapshot.wallet.coins >= snapshot.wallet.generationCostPerImage * requestedCount;
 
@@ -141,6 +144,7 @@ export function SupplyAiImageStudioPanel({
     const files = Array.from(event.target.files ?? []).slice(0, Math.max(0, 3 - referenceImages.length));
 
     if (files.length === 0) {
+      event.target.value = "";
       return;
     }
 
@@ -377,12 +381,12 @@ export function SupplyAiImageStudioPanel({
                   {task.retryAvailable ? (
                     <button
                       className="rounded-xl border-[3px] border-slate-900 bg-white px-3 py-2 text-sm font-black text-main shadow-[0_3px_0_0_#1f2937] disabled:opacity-50"
-                      data-action="retry-ai-image-task"
-                      data-task-id={task.id}
-                      disabled={retryingTaskId === task.id}
-                      onClick={() => void handleRetry(task.id)}
-                      type="button"
-                    >
+                    data-action="retry-ai-image-task"
+                    data-task-id={task.id}
+                    disabled={retryingTaskId === task.id || mutationsDisabled}
+                    onClick={() => void handleRetry(task.id)}
+                    type="button"
+                  >
                       {retryingTaskId === task.id ? "重试中..." : "重新生成失败项"}
                     </button>
                   ) : null}

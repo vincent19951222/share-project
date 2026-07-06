@@ -321,6 +321,52 @@ describe("SupplyAiImageStudioPanel", () => {
     });
   });
 
+  it("clears the file input value even when a new upload is rejected by the cap", async () => {
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={snapshot}
+          onCreateTask={vi.fn()}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    const input = container.querySelector<HTMLInputElement>("input[type='file']");
+    expect(input).not.toBeNull();
+
+    await act(async () => {
+      Object.defineProperty(input!, "files", {
+        configurable: true,
+        value: [
+          createFile("one.png", "one"),
+          createFile("two.png", "two"),
+          createFile("three.png", "three"),
+        ],
+      });
+      input?.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await flushAsyncState();
+
+    Object.defineProperty(input!, "value", {
+      configurable: true,
+      writable: true,
+      value: "C:\\fakepath\\extra.png",
+    });
+
+    await act(async () => {
+      Object.defineProperty(input!, "files", {
+        configurable: true,
+        value: [createFile("extra.png", "extra")],
+      });
+      input?.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    expect(input?.value).toBe("");
+    expect(container.querySelectorAll("[data-reference-image-id]")).toHaveLength(3);
+    expect(container.textContent).not.toContain("extra.png");
+  });
+
   it("replaces raw task and item backend errors with curated user-safe copy", () => {
     act(() => {
       root.render(
