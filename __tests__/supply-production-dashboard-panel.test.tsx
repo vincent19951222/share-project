@@ -120,7 +120,7 @@ describe("SupplyDashboardPanel", () => {
     container.remove();
   });
 
-  it("renders production resources, profile exp, and empty today effects", async () => {
+  it("renders legacy resources, profile exp, and empty today effects", async () => {
     await act(async () => {
       root.render(
         <SupplyDashboardPanel
@@ -136,8 +136,8 @@ describe("SupplyDashboardPanel", () => {
 
     expect(container.textContent).toContain("银子");
     expect(container.textContent).toContain("2,450");
-    expect(container.textContent).not.toContain("抽奖券");
-    expect(container.textContent).not.toContain("背包");
+    expect(container.textContent).toContain("领取抽奖券");
+    expect(container.textContent).toContain("看背包");
     expect(container.textContent).toContain("Lv.3");
     expect(container.textContent).toContain("720/1000");
     expect(container.textContent).toContain("距离升级还差 280 EXP");

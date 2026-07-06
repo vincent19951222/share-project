@@ -40,16 +40,17 @@ const bannedUiLabRouteTerms = [
 ];
 
 const requiredProductionVisualTerms = [
-  "SupplyDashboardScene",
-  "SupplyDrawPoolScene",
-  "SupplyBackpackScene",
-  "SupplyShopScene",
-  "SupplyTaskRecordScene",
-  "toSupplyDashboardPreview",
-  "toSupplyDrawPoolPreview",
-  "toSupplyBackpackPreview",
-  "toSupplyShopPreview",
-  "toSupplyTaskRecordPreview",
+  "SupplyAiImageStudioPanel",
+  "SupplyThemeGachaPanel",
+  "SupplyArtworkBackpackPanel",
+  "SupplyLegacyArchivePanel",
+  "createAiImageGenerationTask",
+  "retryAiImageGenerationTask",
+  "drawAiImageThemeFromSupply",
+  "studio",
+  "themeGacha",
+  "artworks",
+  "legacyArchive",
 ];
 
 function readSource(file: string) {

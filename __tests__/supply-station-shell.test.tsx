@@ -140,7 +140,7 @@ describe("SupplyStation legacy entry", () => {
     vi.resetModules();
   });
 
-  it("renders the UI Lab production scene through the stable SupplyStation export", async () => {
+  it("renders the AI image production shell through the stable SupplyStation export", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot() })));
     const { SupplyStation } = await import("@/components/gamification/SupplyStation");
 
@@ -154,12 +154,18 @@ describe("SupplyStation legacy entry", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene")?.getAttribute("aria-label")).toBe("牛马补给站");
+    expect(container.querySelector(".supply-ai-image-shell")?.getAttribute("aria-label")).toBe("牛马补给站");
     expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
-    expect(container.textContent).toContain("工位重启");
+    expect(container.textContent).toContain("生图工位");
+    expect(container.textContent).toContain("主题扭蛋");
+    expect(container.textContent).toContain("作品库");
+    expect(container.textContent).toContain("旧补给归档");
+    expect(container.textContent).not.toContain("抽奖券");
+    expect(container.textContent).not.toContain("领取抽奖券");
+    expect(container.textContent).not.toContain("逛商店");
 
     expect(container.textContent).not.toContain("玩法规则");
     expect(container.textContent).not.toContain("抽奖概率");
