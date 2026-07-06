@@ -237,6 +237,28 @@ describe("SupplyStationShell AI image flows", () => {
     vi.resetModules();
   });
 
+  it("does not show old ticket, shop, task, or redemption primary actions", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildAiSnapshot() })));
+
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell />);
+    });
+    await flush();
+
+    expect(container.textContent).not.toContain("抽奖券");
+    expect(container.textContent).not.toContain("领取抽奖券");
+    expect(container.textContent).not.toContain("逛商店");
+    expect(container.textContent).not.toContain("实体兑换");
+    expect(container.textContent).not.toContain("今日主线");
+    expect(container.textContent).not.toContain("任务记录");
+    expect(container.querySelector("[data-action='claim-ticket']")).toBeNull();
+    expect(container.querySelector("[data-action='purchase-shop-item']")).toBeNull();
+    expect(container.querySelector("[data-action='complete-task']")).toBeNull();
+    expect(container.querySelector("[data-action='reroll-task']")).toBeNull();
+  });
+
   it("loads AI image supply state and creates a generation task", async () => {
     vi.stubGlobal(
       "fetch",

@@ -158,12 +158,34 @@ describe("supply production to UI Lab adapters", () => {
     expect(dashboard.shortcutLinks.map((link) => link.id)).toEqual([
       "home",
       "backpack",
-      "draw-pool",
-      "task-record",
     ]);
   });
 
-  it("maps pending received social invitations to dashboard notice and task record badge", () => {
+  it("does not promote legacy draw, task record, ticket, or redemption entrypoints from the dashboard preview", () => {
+    const dashboard = toSupplyDashboardPreview({
+      ...snapshot,
+      drawPool: {
+        ...snapshot.drawPool,
+        wallet: {
+          ...snapshot.drawPool.wallet,
+          lifeTicketClaimable: true,
+          lifeTicketEarned: false,
+        },
+      },
+    });
+    const serializedShortcuts = JSON.stringify(dashboard.shortcutLinks);
+
+    expect(serializedShortcuts).not.toContain("draw-pool");
+    expect(serializedShortcuts).not.toContain("task-record");
+    expect(serializedShortcuts).not.toContain("/dashboard/cards");
+    expect(serializedShortcuts).not.toContain("/dashboard/quest");
+    expect(serializedShortcuts).not.toContain("抽奖池");
+    expect(serializedShortcuts).not.toContain("任务记录");
+    expect(dashboard.motto).not.toContain("今日主线");
+    expect(dashboard.dailyReward).toEqual({ claimable: false, claimed: true });
+  });
+
+  it("maps pending received social invitations to dashboard notice without restoring task-record shortcuts", () => {
     const snapshotWithInvite: SupplyStationProductionSnapshot = {
       ...snapshot,
       social: {
@@ -199,7 +221,7 @@ describe("supply production to UI Lab adapters", () => {
       actionLabel: "去回应",
       target: "task-record",
     });
-    expect(dashboard.shortcutLinks.find((link) => link.id === "task-record")?.badge).toBe("1 待回应");
+    expect(dashboard.shortcutLinks.find((link) => link.id === "task-record")).toBeUndefined();
   });
 
   it("maps secondary panels without mock values", () => {
