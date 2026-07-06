@@ -36,6 +36,66 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
+export interface AiImageThemeSnapshot {
+  id: string;
+  name: string;
+  description: string;
+  previewImageUrl: string;
+  defaultUnlocked: boolean;
+  unlocked: boolean;
+  enabled: boolean;
+  sortOrder: number;
+  tag: string;
+  palette: string[];
+}
+
+export interface AiImageGenerationItemSnapshot {
+  id: string;
+  index: number;
+  status: "queued" | "running" | "completed" | "failed";
+  imageUrl: string | null;
+  errorMessage: string | null;
+}
+
+export interface AiImageGenerationTaskSnapshot {
+  id: string;
+  themeId: string;
+  userPrompt: string;
+  requestedCount: number;
+  status: "queued" | "running" | "completed" | "partial" | "failed";
+  coinCost: number;
+  refundedCoinAmount: number;
+  errorMessage: string | null;
+  retryAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+  items: AiImageGenerationItemSnapshot[];
+}
+
+export interface AiImageArtworkSnapshot {
+  id: string;
+  taskId: string;
+  itemId: string;
+  themeId: string;
+  imageUrl: string;
+  createdAt: string;
+}
+
+export interface SupplyAiImageSnapshot {
+  wallet: {
+    coins: number;
+    generationCostPerImage: number;
+    themeDrawCost: number;
+  };
+  themes: {
+    unlocked: AiImageThemeSnapshot[];
+    locked: AiImageThemeSnapshot[];
+    allUnlocked: boolean;
+  };
+  recentTasks: AiImageGenerationTaskSnapshot[];
+  recentArtworks: AiImageArtworkSnapshot[];
+}
+
 export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";
 
 export type GamificationTaskStatus = "pending" | "completed";
