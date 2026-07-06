@@ -83,7 +83,7 @@ export async function generateAiImage(input: GenerateAiImageInput): Promise<Gene
 
   for (const reference of input.referenceImages) {
     const parsed = parseImageDataUrl(reference.dataUrl);
-    form.append("image", new Blob([parsed.buffer], { type: parsed.mimeType }), reference.filename);
+    form.append("image", new Blob([Uint8Array.from(parsed.buffer)], { type: parsed.mimeType }), reference.filename);
   }
 
   const response = await fetch(AI_IMAGE_EDIT_URL, {
