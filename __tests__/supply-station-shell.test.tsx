@@ -115,6 +115,13 @@ function buildSnapshot(): SupplyStationProductionSnapshot {
       message: "ready",
     },
     redemptions: { mine: [], adminQueue: [] },
+  supplyAiImage: {
+    wallet: { coins: 0, generationCostPerImage: 60, themeDrawCost: 200 },
+    themes: { unlocked: [], locked: [], allUnlocked: false },
+    recentTasks: [],
+    recentArtworks: [],
+  },
+  legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
   };
 }
 

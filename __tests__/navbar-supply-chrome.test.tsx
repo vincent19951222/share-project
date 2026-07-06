@@ -56,14 +56,6 @@ vi.mock("@/components/profile/EditProfileModal", () => ({
 const supplyNavContext: SupplyNavContext = {
   resources: [
     { id: "coins", label: "银子", value: 440, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png" },
-    { id: "ticket", label: "抽奖券", value: 7, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png" },
-    {
-      id: "backpack",
-      label: "背包",
-      value: 12,
-      maxValue: 60,
-      iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
-    },
   ],
   profile: { username: "li", avatarKey: "male1" },
   social: { pendingCount: 0, latestLabel: null },
@@ -177,10 +169,8 @@ describe("Navbar supply chrome", () => {
 
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("银子");
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("440");
-    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("抽奖券");
-    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("7");
-    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("背包");
-    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("12/60");
+    expect(container.querySelector(".app-supply-assets")?.textContent).not.toContain("抽奖券");
+    expect(container.querySelector(".app-supply-assets")?.textContent).not.toContain("背包");
     expect(container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png"]')).not.toBeNull();
   });
 
@@ -215,8 +205,8 @@ describe("Navbar supply chrome", () => {
     expect(container.querySelector(".app-top-nav--with-supply-menu")).not.toBeNull();
     expect(container.querySelector(".app-top-nav--supply")).toBeNull();
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("440");
-    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("7");
-    expect(container.querySelector(".app-supply-assets")?.textContent).toContain("12/60");
+    expect(container.querySelector(".app-supply-assets")?.textContent).not.toContain("抽奖券");
+    expect(container.querySelector(".app-supply-assets")?.textContent).not.toContain("背包");
     expect(container.querySelector(".app-supply-secondary-nav")).not.toBeNull();
     expect(container.querySelector(".app-supply-secondary-tab[aria-current='page']")?.textContent).toContain("我的状态");
   });
@@ -246,12 +236,12 @@ describe("Navbar supply chrome", () => {
     expect(wallet?.parentElement).toBe(navShell);
     expect(container.querySelector(".app-top-nav-actions")).not.toBeNull();
     expect(container.querySelector(".mobile-tab-panel")).toBeNull();
-    expect(wallet?.getAttribute("aria-label")).toBe("补给站资产：银子 440，抽奖券 7，背包 12/60");
+    expect(wallet?.getAttribute("aria-label")).toBe("补给站资产：银子 440");
     expect(wallet?.textContent).toContain("440");
-    expect(wallet?.textContent).toContain("7");
-    expect(wallet?.textContent).toContain("12/60");
+    expect(wallet?.textContent).not.toContain("抽奖券");
+    expect(wallet?.textContent).not.toContain("背包");
 
-    expect(container.querySelectorAll(".app-supply-asset-chip")).toHaveLength(3);
+    expect(container.querySelectorAll(".app-supply-asset-chip")).toHaveLength(1);
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("银子");
   });
 

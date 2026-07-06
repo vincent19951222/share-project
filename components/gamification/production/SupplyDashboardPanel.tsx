@@ -1,5 +1,6 @@
 "use client";
 
+import { getSupplyDisplayResources } from "@/lib/gamification/supply-display-resources";
 import type {
   GamificationDimensionSnapshot,
   SupplyStationProductionSnapshot,
@@ -47,6 +48,7 @@ export function SupplyDashboardPanel({
   onRerollTask,
   snapshot,
 }: SupplyDashboardPanelProps) {
+  const displayResources = getSupplyDisplayResources(snapshot);
   const remainingExp = Math.max(
     0,
     snapshot.profile.nextLevelExp - snapshot.profile.currentLevelExp,
@@ -58,8 +60,8 @@ export function SupplyDashboardPanel({
   return (
     <section className="supply-production-dashboard" aria-label="我的状态">
       <header className="supply-production-dashboard__topbar">
-        {Object.entries(snapshot.resources).map(([key, resource]) => (
-          <article className="supply-production-dashboard__resource" key={key}>
+        {displayResources.map((resource) => (
+          <article className="supply-production-dashboard__resource" key={resource.id}>
             <span>{resource.label}</span>
             <strong>{formatResource(resource.value, resource.maxValue)}</strong>
           </article>

@@ -31,7 +31,7 @@ export function buildSupplyNavContext(snapshot: SupplyStationProductionSnapshot)
     resources: [
       {
         id: "coins",
-        label: snapshot.resources.coins.label,
+        label: "银子",
         value: snapshot.resources.coins.value,
         maxValue: snapshot.resources.coins.maxValue,
         iconImage: supplyUiLabResourceIconPaths.coins,

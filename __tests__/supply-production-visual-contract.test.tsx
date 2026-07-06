@@ -116,6 +116,13 @@ const snapshot = {
     message: "队友雷达可用。",
   },
   redemptions: { mine: [], adminQueue: [] },
+  supplyAiImage: {
+    wallet: { coins: 0, generationCostPerImage: 60, themeDrawCost: 200 },
+    themes: { unlocked: [], locked: [], allUnlocked: false },
+    recentTasks: [],
+    recentArtworks: [],
+  },
+  legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
 } satisfies SupplyStationProductionSnapshot;
 
 describe("production supply UI Lab visual contract", () => {
@@ -168,11 +175,7 @@ describe("production supply UI Lab visual contract", () => {
     expect(container.textContent).not.toContain("操作会写入真实补给站数据");
     expect(navContextMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        resources: expect.arrayContaining([
-          expect.objectContaining({ id: "coins", label: "银子", value: 845 }),
-          expect.objectContaining({ id: "ticket", label: "抽奖券", value: 5 }),
-          expect.objectContaining({ id: "backpack", label: "背包", value: 17, maxValue: 60 }),
-        ]),
+        resources: [expect.objectContaining({ id: "coins", label: "银子", value: 845 })],
         profile: { username: "li", avatarKey: "male1" },
       }),
     );

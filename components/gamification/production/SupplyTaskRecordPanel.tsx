@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { getSupplyDisplayResources } from "@/lib/gamification/supply-display-resources";
 import type {
   GamificationRedemptionSnapshot,
   SocialInvitationSnapshot,
@@ -129,6 +130,8 @@ export function SupplyTaskRecordPanel({
   snapshot,
 }: SupplyTaskRecordPanelProps) {
   const [activeMode, setActiveMode] = useState<SupplyTaskRecordMode>("today");
+  const resources = getSupplyDisplayResources(snapshot);
+  const ticketResource = resources.find((resource) => resource.id === "ticket");
   const [selectedDateKey, setSelectedDateKey] = useState(
     snapshot.taskRecord.dates[0]?.key ?? snapshot.dayKey,
   );
@@ -155,7 +158,7 @@ export function SupplyTaskRecordPanel({
         <div aria-label="记录资源摘要">
           <span>Lv.{snapshot.profile.level}</span>
           <span>{snapshot.resources.coins.label} {snapshot.resources.coins.value}</span>
-          <span>{snapshot.resources.ticket.label} {snapshot.resources.ticket.value}</span>
+          {ticketResource ? <span>{ticketResource.label} {ticketResource.value}</span> : null}
         </div>
       </header>
 

@@ -22,7 +22,7 @@ async function flush() {
 function buildSnapshot(
   overrides: Partial<SupplyStationProductionSnapshot> = {},
 ): SupplyStationProductionSnapshot {
-  return {
+  const baseSnapshot: SupplyStationProductionSnapshot = {
     currentUserId: "u1",
     currentUserRole: "MEMBER",
     teamId: "team-1",
@@ -184,7 +184,43 @@ function buildSnapshot(
       message: "ready",
     },
     redemptions: { mine: [], adminQueue: [] },
+    supplyAiImage: {
+      wallet: { coins: 0, generationCostPerImage: 60, themeDrawCost: 200 },
+      themes: { unlocked: [], locked: [], allUnlocked: false },
+      recentTasks: [],
+      recentArtworks: [],
+    },
+    legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
+  };
+
+  return {
+    ...baseSnapshot,
     ...overrides,
+    resources: { ...baseSnapshot.resources, ...overrides.resources },
+    profile: { ...baseSnapshot.profile, ...overrides.profile },
+    dashboard: { ...baseSnapshot.dashboard, ...overrides.dashboard },
+    drawPool: {
+      ...baseSnapshot.drawPool,
+      ...overrides.drawPool,
+      wallet: { ...baseSnapshot.drawPool.wallet, ...overrides.drawPool?.wallet },
+      lottery: { ...baseSnapshot.drawPool.lottery, ...overrides.drawPool?.lottery },
+    },
+    backpack: {
+      ...baseSnapshot.backpack,
+      ...overrides.backpack,
+      capacity: { ...baseSnapshot.backpack.capacity, ...overrides.backpack?.capacity },
+    },
+    shop: { ...baseSnapshot.shop, ...overrides.shop },
+    taskRecord: { ...baseSnapshot.taskRecord, ...overrides.taskRecord },
+    social: { ...baseSnapshot.social, ...overrides.social },
+    redemptions: { ...baseSnapshot.redemptions, ...overrides.redemptions },
+    supplyAiImage: {
+      ...baseSnapshot.supplyAiImage,
+      ...overrides.supplyAiImage,
+      wallet: { ...baseSnapshot.supplyAiImage.wallet, ...overrides.supplyAiImage?.wallet },
+      themes: { ...baseSnapshot.supplyAiImage.themes, ...overrides.supplyAiImage?.themes },
+    },
+    legacyArchive: { ...baseSnapshot.legacyArchive, ...overrides.legacyArchive },
   };
 }
 
@@ -447,10 +483,7 @@ describe("SupplyStationShell", () => {
     await flush();
 
     expect(getCachedSupplyNavContext()?.resources).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: "coins", value: 2250 }),
-        expect.objectContaining({ id: "backpack", value: 3, maxValue: 60 }),
-      ]),
+      [expect.objectContaining({ id: "coins", value: 2250 })],
     );
   });
 

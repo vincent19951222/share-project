@@ -327,6 +327,18 @@ export interface SupplyResourceSnapshot {
   maxValue?: number;
 }
 
+export interface SupplyCoinsResourceSnapshot extends SupplyResourceSnapshot {
+  label: "银子";
+}
+
+export interface SupplyTicketResourceSnapshot extends SupplyResourceSnapshot {
+  label: "抽奖券";
+}
+
+export interface SupplyBackpackResourceSnapshot extends SupplyResourceSnapshot {
+  label: "背包";
+}
+
 export interface SupplyLegacyArchiveSnapshot {
   ticketBalance: number;
   inventoryQuantity: number;
@@ -372,8 +384,10 @@ export interface SupplyStationProductionSnapshot {
   teamId: string;
   dayKey: string;
   resources: {
-    coins: SupplyResourceSnapshot;
-    [key: string]: SupplyResourceSnapshot;
+    coins: SupplyCoinsResourceSnapshot;
+    ticket?: SupplyTicketResourceSnapshot;
+    backpack?: SupplyBackpackResourceSnapshot;
+    [key: string]: SupplyResourceSnapshot | undefined;
   };
   profile: GamificationProfileSnapshot & {
     username: string;

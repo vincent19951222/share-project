@@ -169,6 +169,13 @@ const snapshot = {
     ],
     adminQueue: [],
   },
+  supplyAiImage: {
+    wallet: { coins: 2450, generationCostPerImage: 60, themeDrawCost: 200 },
+    themes: { unlocked: [], locked: [], allUnlocked: false },
+    recentTasks: [],
+    recentArtworks: [],
+  },
+  legacyArchive: { ticketBalance: 18, inventoryQuantity: 2, redemptionCount: 1, latestTaskRecordCount: 3 },
 } satisfies SupplyStationProductionSnapshot;
 
 describe("SupplyTaskRecordPanel", () => {
