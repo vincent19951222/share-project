@@ -1,4 +1,4 @@
-import "@/lib/gamification/ai-image/server-only";
+import "server-only";
 
 import type { AiImageThemeDefinition } from "@/lib/gamification/ai-image/types";
 

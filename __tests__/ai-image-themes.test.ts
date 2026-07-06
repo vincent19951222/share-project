@@ -35,14 +35,20 @@ describe("AI image preset themes", () => {
       path.join(process.cwd(), "lib/gamification/ai-image/themes.ts"),
       "utf8",
     );
+    const promptSource = readFileSync(
+      path.join(process.cwd(), "lib/gamification/ai-image/prompt.ts"),
+      "utf8",
+    );
     const snapshotSource = readFileSync(
       path.join(process.cwd(), "lib/gamification/ai-image/theme-snapshot.ts"),
       "utf8",
     );
 
-    expect(themesSource).toContain('import "@/lib/gamification/ai-image/server-only";');
+    expect(themesSource).toContain('import "server-only";');
+    expect(promptSource).toContain('import "server-only";');
     expect(snapshotSource).not.toContain("promptTemplate");
     expect(snapshotSource).not.toContain("server-only");
+    expect(snapshotSource).not.toContain('from "@/lib/gamification/ai-image/themes"');
   });
 
   it("returns cloned theme definitions so caller mutation cannot change preset state", () => {
