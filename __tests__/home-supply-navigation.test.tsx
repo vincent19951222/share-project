@@ -49,14 +49,6 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
     return {
       resources: [
         { id: "coins", label: "银子", value: 440, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png" },
-        { id: "ticket", label: "抽奖券", value: 7, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png" },
-        {
-          id: "backpack",
-          label: "背包",
-          value: 12,
-          maxValue: 60,
-          iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
-        },
       ],
       profile: { username: "li", avatarKey: "male1" },
       social: { pendingCount: 0, latestLabel: null },
@@ -129,8 +121,6 @@ describe("Home supply navigation", () => {
   const supplySnapshot = {
     resources: {
       coins: { label: "银子", value: 440 },
-      ticket: { label: "抽奖券", value: 7 },
-      backpack: { label: "背包", value: 12, maxValue: 60 },
     },
     profile: { username: "li", avatarKey: "male1" },
     social: {
@@ -230,8 +220,6 @@ describe("Home supply navigation", () => {
         supplyNavContext: expect.objectContaining({
           resources: expect.arrayContaining([
             expect.objectContaining({ id: "coins", value: 440 }),
-            expect.objectContaining({ id: "ticket", value: 7 }),
-            expect.objectContaining({ id: "backpack", value: 12, maxValue: 60 }),
           ]),
         }),
       }),
@@ -263,8 +251,6 @@ describe("Home supply navigation", () => {
     fetchSupplyStationStateMock.mockResolvedValueOnce({
       resources: {
         coins: { label: "银子", value: 125 },
-        ticket: { label: "抽奖券", value: 2 },
-        backpack: { label: "背包", value: 4, maxValue: 60 },
       },
       profile: { username: "wang", avatarKey: "female1" },
       social: {
@@ -292,8 +278,6 @@ describe("Home supply navigation", () => {
         supplyNavContext: expect.objectContaining({
           resources: expect.arrayContaining([
             expect.objectContaining({ id: "coins", value: 125 }),
-            expect.objectContaining({ id: "ticket", value: 2 }),
-            expect.objectContaining({ id: "backpack", value: 4, maxValue: 60 }),
           ]),
           profile: { username: "wang", avatarKey: "female1" },
         }),

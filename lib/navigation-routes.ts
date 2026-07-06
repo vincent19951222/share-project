@@ -2,11 +2,11 @@ import type { AppTab } from "@/lib/types";
 
 export type SupplyPanelKey = "dashboard" | "drawPool" | "backpack" | "shop" | "taskRecord";
 
-export type SupplyNavResourceId = "coins" | "ticket" | "backpack";
+export type SupplyNavResourceId = "coins" | "backpack";
 
 export interface SupplyNavResource {
   id: SupplyNavResourceId;
-  label: "银子" | "抽奖券" | "背包";
+  label: "银子" | "背包";
   value: number;
   maxValue?: number;
   iconImage: string;

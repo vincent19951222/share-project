@@ -327,6 +327,13 @@ export interface SupplyResourceSnapshot {
   maxValue?: number;
 }
 
+export interface SupplyLegacyArchiveSnapshot {
+  ticketBalance: number;
+  inventoryQuantity: number;
+  redemptionCount: number;
+  latestTaskRecordCount: number;
+}
+
 export interface SupplyShopProductSnapshot {
   itemId: string;
   name: string;
@@ -366,8 +373,7 @@ export interface SupplyStationProductionSnapshot {
   dayKey: string;
   resources: {
     coins: SupplyResourceSnapshot;
-    ticket: SupplyResourceSnapshot;
-    backpack: SupplyResourceSnapshot;
+    [key: string]: SupplyResourceSnapshot;
   };
   profile: GamificationProfileSnapshot & {
     username: string;
@@ -390,6 +396,8 @@ export interface SupplyStationProductionSnapshot {
   taskRecord: SupplyTaskRecordSnapshot;
   social: GamificationSocialSummary;
   redemptions: GamificationRedemptionSectionSnapshot;
+  supplyAiImage: SupplyAiImageSnapshot;
+  legacyArchive: SupplyLegacyArchiveSnapshot;
 }
 
 export type GamificationOpsRiskSeverity = "ok" | "watch" | "risk";

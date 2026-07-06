@@ -29,6 +29,46 @@ describe("supply production view model", () => {
     await prisma.inventoryItem.create({
       data: { userId, teamId, itemId: "task_reroll_coupon", quantity: 2 },
     });
+    const completedTask = await prisma.aiImageGenerationTask.create({
+      data: {
+        userId,
+        teamId,
+        themeId: "theme-01",
+        userPrompt: "训练海报",
+        requestedCount: 1,
+        status: "completed",
+        coinCost: 60,
+        coinRefunded: false,
+        refundedCoinAmount: 0,
+        providerModel: "gpt-image-2",
+        promptSnapshotJson: JSON.stringify({ providerPrompt: "secret server prompt" }),
+        createdAt: new Date("2026-05-25T08:20:00+08:00"),
+      },
+    });
+    const completedItem = await prisma.aiImageGenerationItem.create({
+      data: {
+        taskId: completedTask.id,
+        userId,
+        teamId,
+        themeId: "theme-01",
+        index: 0,
+        status: "completed",
+        imageUrl: "https://example.com/artwork.png",
+        cosKey: "share-project/ai-images/li/artwork.png",
+      },
+    });
+    await prisma.aiImageArtwork.create({
+      data: {
+        taskId: completedTask.id,
+        itemId: completedItem.id,
+        userId,
+        teamId,
+        themeId: "theme-01",
+        imageUrl: completedItem.imageUrl!,
+        cosKey: completedItem.cosKey!,
+        promptSnapshotJson: completedTask.promptSnapshotJson,
+      },
+    });
     await prisma.experienceLedger.create({
       data: {
         userId,
@@ -48,7 +88,7 @@ describe("supply production view model", () => {
     await prisma.$disconnect();
   });
 
-  it("maps real state into the production supply snapshot", async () => {
+  it("maps real state into the phase 1 supply snapshot and archives old systems", async () => {
     const snapshot = await buildSupplyStationViewModelForUser(userId, fixedNow);
 
     expect(snapshot).toMatchObject({
@@ -58,8 +98,6 @@ describe("supply production view model", () => {
       dayKey: "2026-05-25",
       resources: {
         coins: { label: "银子", value: 2450 },
-        ticket: { label: "抽奖券", value: 18 },
-        backpack: { label: "背包", value: 2, maxValue: 60 },
       },
       profile: {
         username,
@@ -71,24 +109,38 @@ describe("supply production view model", () => {
         title: "自律牛马",
       },
     });
-    expect(snapshot?.dashboard.dailyQuests).toHaveLength(4);
+    expect(snapshot?.resources.ticket).toBeUndefined();
+    expect(snapshot?.dashboard.dailyQuests).toEqual([]);
     expect(snapshot?.dashboard.todayEffects).toEqual([]);
-    expect(snapshot?.drawPool.wallet.ticketBalance).toBe(18);
+    expect(snapshot?.drawPool.wallet.ticketBalance).toBe(0);
     expect(snapshot?.drawPool.lottery.status).toBe("active");
-    expect(snapshot?.backpack.capacity).toEqual({ usedSlots: 2, totalSlots: 60 });
-    expect(snapshot?.backpack.previewItems[0]).toMatchObject({
-      itemId: "task_reroll_coupon",
-      quantity: 2,
+    expect(snapshot?.drawPool.lottery.singleDrawEnabled).toBe(false);
+    expect(snapshot?.drawPool.lottery.tenDrawEnabled).toBe(false);
+    expect(snapshot?.drawPool.lottery.message).toBe("旧抽奖池已下线，主题扭蛋请使用 AI 生图入口。");
+    expect(snapshot?.shop.products).toEqual([]);
+    expect(snapshot?.supplyAiImage.wallet).toMatchObject({
+      coins: 2450,
+      generationCostPerImage: 60,
+      themeDrawCost: 200,
     });
-    expect(snapshot?.shop.products[0]).toMatchObject({
-      itemId: "task_reroll_coupon",
-      name: "任务换班券",
-      priceCoins: 150,
-      ownedQuantity: 2,
-      dailyLimit: 1,
-      purchaseEnabled: true,
-      purchaseDisabledReason: null,
-      requiresAdminConfirmation: false,
+    expect(snapshot?.supplyAiImage.recentTasks).toMatchObject([
+      {
+        themeId: "theme-01",
+        status: "completed",
+        requestedCount: 1,
+      },
+    ]);
+    expect(snapshot?.supplyAiImage.recentArtworks).toMatchObject([
+      {
+        themeId: "theme-01",
+        imageUrl: "https://example.com/artwork.png",
+      },
+    ]);
+    expect(snapshot?.legacyArchive).toEqual({
+      ticketBalance: 18,
+      inventoryQuantity: 2,
+      redemptionCount: 0,
+      latestTaskRecordCount: 4,
     });
     expect(snapshot?.taskRecord.dates).toHaveLength(7);
     expect(snapshot?.taskRecord.dates[0]).toMatchObject({
@@ -106,6 +158,8 @@ describe("supply production view model", () => {
         }),
       ]),
     );
+    expect(JSON.stringify(snapshot)).not.toContain("promptTemplate");
+    expect(JSON.stringify(snapshot)).not.toContain("secret server prompt");
   });
 
   it("returns null for an unknown user", async () => {
