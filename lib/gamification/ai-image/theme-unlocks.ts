@@ -6,6 +6,16 @@ import { getDefaultUnlockedAiImageThemeIds, getAiImageThemeById, getAiImageTheme
 import { prisma, type PrismaClientOrTransaction } from "@/lib/prisma";
 import type { AiImageThemeSnapshot } from "@/lib/types";
 
+export class AiImageThemeDrawError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "AiImageThemeDrawError";
+    this.status = status;
+  }
+}
+
 function buildUnlockedThemeSet(themeIds: string[]) {
   return new Set<string>([...getDefaultUnlockedAiImageThemeIds(), ...themeIds]);
 }
@@ -61,7 +71,7 @@ export async function drawAiImageTheme(input: {
     });
 
     if (!user) {
-      throw new Error("用户不存在");
+      throw new AiImageThemeDrawError(401, "用户不存在");
     }
 
     const unlockedThemeIds = buildUnlockedThemeSet(await listUnlockedThemeIds(tx, input.userId));
@@ -70,11 +80,11 @@ export async function drawAiImageTheme(input: {
     );
 
     if (candidates.length === 0) {
-      throw new Error("主题已集齐");
+      throw new AiImageThemeDrawError(409, "主题已集齐");
     }
 
     if (user.coins < AI_IMAGE_THEME_DRAW_COIN_COST) {
-      throw new Error("银子不足");
+      throw new AiImageThemeDrawError(409, "银子不足");
     }
 
     const selected = pickTheme(candidates, rng);

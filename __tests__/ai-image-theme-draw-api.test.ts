@@ -1,10 +1,12 @@
 // @vitest-environment node
 
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/gamification/ai-image/themes/draw/route";
 import { createCookieValue } from "@/lib/auth";
 import { seedDatabase } from "@/lib/db-seed";
+import { getAiImageThemes } from "@/lib/gamification/ai-image/themes";
+import * as themeUnlocksService from "@/lib/gamification/ai-image/theme-unlocks";
 import { prisma } from "@/lib/prisma";
 
 function request(userId?: string) {
@@ -26,6 +28,10 @@ describe("AI image theme draw API", () => {
     const user = await prisma.user.findUniqueOrThrow({ where: { username: "li" } });
     userId = user.id;
     await prisma.user.update({ where: { id: userId }, data: { coins: 1000 } });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -53,5 +59,45 @@ describe("AI image theme draw API", () => {
     });
     expect(Object.keys(body)).toEqual(["theme"]);
     expect(JSON.stringify(body)).not.toContain("promptTemplate");
+  });
+
+  it("maps insufficient coins to a user-facing business error", async () => {
+    await prisma.user.update({ where: { id: userId }, data: { coins: 0 } });
+
+    const response = await POST(request(userId));
+    const body = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(body).toEqual({ error: "银子不足" });
+  });
+
+  it("maps no remaining themes to a user-facing business error", async () => {
+    const lockedThemes = getAiImageThemes().filter((theme) => !theme.defaultUnlocked);
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    await prisma.aiImageThemeUnlock.createMany({
+      data: lockedThemes.map((theme) => ({
+        userId,
+        teamId: user.teamId,
+        themeId: theme.id,
+        source: "draw",
+      })),
+    });
+
+    const response = await POST(request(userId));
+    const body = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(body).toEqual({ error: "主题已集齐" });
+  });
+
+  it("sanitizes unexpected theme draw errors", async () => {
+    vi.spyOn(themeUnlocksService, "drawAiImageTheme").mockRejectedValue(new Error("secret boom"));
+
+    const response = await POST(request(userId));
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: "服务器错误" });
   });
 });

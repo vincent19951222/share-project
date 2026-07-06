@@ -18,6 +18,7 @@ export async function GET(
     }
 
     const { taskId } = await params;
+    await getAiImageTaskForUser({ userId, taskId });
     await settleTimedOutAiImageTask({ taskId });
     const task = await getAiImageTaskForUser({ userId, taskId });
 

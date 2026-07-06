@@ -203,6 +203,59 @@ describe("AI image task API", () => {
     expect(reloadedUser.coins).toBe(1000);
   });
 
+  it("does not settle another user's stale running task when detail access is denied", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-06T12:30:00+08:00"));
+
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-01",
+      requestedCount: 1,
+      referenceImages: [],
+      startRunner: false,
+    });
+
+    await prisma.aiImageGenerationTask.update({
+      where: { id: task.id },
+      data: {
+        status: "running",
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+    await prisma.aiImageGenerationItem.updateMany({
+      where: { taskId: task.id },
+      data: {
+        status: "running",
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+
+    const response = await DETAIL(
+      request(`http://localhost/api/gamification/ai-image/tasks/${task.id}`, otherUserId),
+      { params: Promise.resolve({ taskId: task.id }) },
+    );
+    const body = await response.json();
+    const reloadedTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+      include: { items: { orderBy: { index: "asc" } } },
+    });
+    const reloadedUser = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(response.status).toBe(404);
+    expect(body).toEqual({ error: "任务不存在" });
+    expect(reloadedTask).toMatchObject({
+      status: "running",
+      coinRefunded: false,
+      refundedCoinAmount: 0,
+      errorMessage: null,
+    });
+    expect(reloadedTask.items[0]).toMatchObject({
+      status: "running",
+      errorMessage: null,
+    });
+    expect(reloadedUser.coins).toBe(940);
+  });
+
   it("retries failed tasks and only returns the new id", async () => {
     const original = await createAiImageTask({
       userId,

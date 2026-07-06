@@ -1,18 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { parseCookieValue } from "@/lib/auth";
-import { drawAiImageTheme } from "@/lib/gamification/ai-image/theme-unlocks";
-
-function resolveThemeDrawErrorStatus(message: string) {
-  if (message === "用户不存在") {
-    return 401;
-  }
-
-  if (message === "银子不足" || message === "主题已集齐") {
-    return 409;
-  }
-
-  return 500;
-}
+import {
+  AiImageThemeDrawError,
+  drawAiImageTheme,
+} from "@/lib/gamification/ai-image/theme-unlocks";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,11 +17,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: resolveThemeDrawErrorStatus(error.message) },
-      );
+    if (error instanceof AiImageThemeDrawError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });
