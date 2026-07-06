@@ -14,6 +14,19 @@ function isRetryAvailable(status: string) {
   return status === "failed" || status === "partial";
 }
 
+function toSafeClientImageUrl(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function buildSupplyAiImageSnapshot({
   userId,
   teamId,
@@ -88,17 +101,27 @@ export async function buildSupplyAiImageSnapshot({
         id: item.id,
         index: item.index,
         status: item.status as SupplyAiImageSnapshot["recentTasks"][number]["items"][number]["status"],
-        imageUrl: item.imageUrl,
+        imageUrl: toSafeClientImageUrl(item.imageUrl),
         errorMessage: item.errorMessage,
       })),
     })),
-    recentArtworks: recentArtworks.map((artwork) => ({
-      id: artwork.id,
-      taskId: artwork.taskId,
-      itemId: artwork.itemId,
-      themeId: artwork.themeId,
-      imageUrl: artwork.imageUrl,
-      createdAt: artwork.createdAt.toISOString(),
-    })),
+    recentArtworks: recentArtworks
+      .map((artwork) => {
+        const imageUrl = toSafeClientImageUrl(artwork.imageUrl);
+
+        if (!imageUrl) {
+          return null;
+        }
+
+        return {
+          id: artwork.id,
+          taskId: artwork.taskId,
+          itemId: artwork.itemId,
+          themeId: artwork.themeId,
+          imageUrl,
+          createdAt: artwork.createdAt.toISOString(),
+        };
+      })
+      .filter((artwork): artwork is SupplyAiImageSnapshot["recentArtworks"][number] => artwork !== null),
   };
 }

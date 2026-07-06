@@ -109,7 +109,9 @@ describe("supply production view model", () => {
         title: "自律牛马",
       },
     });
-    expect(snapshot?.resources.ticket).toBeUndefined();
+    expect(snapshot?.resources).toEqual({
+      coins: { label: "银子", value: 2450 },
+    });
     expect(snapshot?.dashboard.dailyQuests).toEqual([]);
     expect(snapshot?.dashboard.todayEffects).toEqual([]);
     expect(snapshot?.drawPool.wallet.ticketBalance).toBe(0);

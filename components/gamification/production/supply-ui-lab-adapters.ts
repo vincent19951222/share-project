@@ -1,5 +1,4 @@
 import { supplyBackpackAssetPaths } from "@/components/gamification/ui-lab/supply-backpack/assets";
-import { getSupplyDisplayResources } from "@/lib/gamification/supply-display-resources";
 import type {
   SupplyBackpackCategory,
   SupplyBackpackCategoryId,
@@ -106,30 +105,28 @@ function avatarPath(avatarKey: string) {
 }
 
 function getResources(snapshot: SupplyStationProductionSnapshot): SupplyUiLabResource[] {
-  return getSupplyDisplayResources(snapshot).map((resource) => {
-    const id = resource.id;
-    return {
-      id,
-      label: resource.label,
-      value: formatResourceValue(resource.value, resource.maxValue),
-      icon: id === "coins" ? "◎" : id === "ticket" ? "券" : "包",
-      iconImage: supplyUiLabResourceIconPaths[id],
-    };
-  });
+  return [
+    {
+      id: "coins",
+      label: snapshot.resources.coins.label,
+      value: formatResourceValue(snapshot.resources.coins.value, snapshot.resources.coins.maxValue),
+      icon: "◎",
+      iconImage: supplyUiLabResourceIconPaths.coins,
+    },
+  ];
 }
 
 function getDashboardResources(snapshot: SupplyStationProductionSnapshot): SupplyDashboardResource[] {
-  return getSupplyDisplayResources(snapshot).map((resource) => {
-    const id = resource.id;
-    return {
-      id,
-      label: resource.label,
-      value: resource.value,
-      maxValue: resource.maxValue,
-      icon: id === "coins" ? "◎" : id === "ticket" ? "券" : "包",
-      iconImage: supplyUiLabResourceIconPaths[id],
-    };
-  });
+  return [
+    {
+      id: "coins",
+      label: snapshot.resources.coins.label,
+      value: snapshot.resources.coins.value,
+      maxValue: snapshot.resources.coins.maxValue,
+      icon: "◎",
+      iconImage: supplyUiLabResourceIconPaths.coins,
+    },
+  ];
 }
 
 function mapTodayEffect(effect: GamificationTodayEffectSnapshot): SupplyUiLabActiveEffect {
@@ -504,8 +501,6 @@ function getSocialInvitationNotice(snapshot: SupplyStationProductionSnapshot) {
 }
 
 export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapshot): SupplyDashboardPreview {
-  const displayResources = getSupplyDisplayResources(snapshot);
-  const ticketResource = displayResources.find((resource) => resource.id === "ticket");
   const completedQuestCount = snapshot.dashboard.dailyQuests.filter(
     (dimension) => dimension.assignment?.status === "completed",
   ).length;
@@ -594,7 +589,6 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       remainingDraws: snapshot.drawPool.wallet.ticketBalance,
       maxDraws: 10,
       featuredRewards: [
-        { id: "ticket", name: "抽奖券", icon: "券", quantity: ticketResource?.value ?? 0 },
         { id: "coins", name: "银子", icon: "◎", quantity: snapshot.resources.coins.value },
       ],
     },

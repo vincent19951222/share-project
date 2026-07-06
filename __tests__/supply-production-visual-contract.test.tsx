@@ -13,8 +13,6 @@ const snapshot = {
   dayKey: "2026-05-26",
   resources: {
     coins: { label: "银子", value: 845 },
-    ticket: { label: "抽奖券", value: 5 },
-    backpack: { label: "背包", value: 17, maxValue: 60 },
   },
   profile: {
     username: "li",

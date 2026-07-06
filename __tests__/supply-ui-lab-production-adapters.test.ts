@@ -15,8 +15,6 @@ const snapshot = {
   dayKey: "2026-05-26",
   resources: {
     coins: { label: "银子", value: 845 },
-    ticket: { label: "抽奖券", value: 5 },
-    backpack: { label: "背包", value: 17, maxValue: 60 },
   },
   profile: {
     username: "li",
@@ -148,8 +146,8 @@ describe("supply production to UI Lab adapters", () => {
       currentLevelExp: 50,
       nextLevelExp: 1000,
     });
-    expect(dashboard.resources.map((resource) => resource.label)).toEqual(["银子", "抽奖券", "背包"]);
-    expect(dashboard.resources[2]).toMatchObject({ value: 17, maxValue: 60 });
+    expect(dashboard.resources.map((resource) => resource.label)).toEqual(["银子"]);
+    expect(dashboard.resources[0]).toMatchObject({ value: 845 });
     expect(dashboard.dailyQuests[0]).toMatchObject({
       id: "movement",
       title: "屁股离线",

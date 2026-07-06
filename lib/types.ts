@@ -385,9 +385,6 @@ export interface SupplyStationProductionSnapshot {
   dayKey: string;
   resources: {
     coins: SupplyCoinsResourceSnapshot;
-    ticket?: SupplyTicketResourceSnapshot;
-    backpack?: SupplyBackpackResourceSnapshot;
-    [key: string]: SupplyResourceSnapshot | undefined;
   };
   profile: GamificationProfileSnapshot & {
     username: string;

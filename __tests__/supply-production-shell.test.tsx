@@ -29,8 +29,6 @@ function buildSnapshot(
     dayKey: "2026-05-26",
     resources: {
       coins: { label: "银子", value: 2400 },
-      ticket: { label: "抽奖券", value: 12 },
-      backpack: { label: "背包", value: 2, maxValue: 60 },
     },
     profile: {
       username: "li",
@@ -460,8 +458,6 @@ describe("SupplyStationShell", () => {
             snapshot: buildSnapshot({
               resources: {
                 coins: { label: "银子", value: 2250 },
-                ticket: { label: "抽奖券", value: 12 },
-                backpack: { label: "背包", value: 3, maxValue: 60 },
               },
             }),
           }),

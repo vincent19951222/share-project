@@ -79,6 +79,52 @@ describe("supply AI image snapshot", () => {
         createdAt: new Date("2026-07-06T08:05:00+08:00"),
       },
     });
+
+    const unsafeTask = await prisma.aiImageGenerationTask.create({
+      data: {
+        userId,
+        teamId,
+        themeId: "theme-01",
+        userPrompt: "unsafe image payload",
+        requestedCount: 1,
+        status: "completed",
+        coinCost: 60,
+        coinRefunded: false,
+        refundedCoinAmount: 0,
+        providerModel: "gpt-image-2",
+        promptSnapshotJson: JSON.stringify({
+          themeId: "theme-01",
+          providerPrompt: "unsafe prompt metadata",
+        }),
+        createdAt: new Date("2026-07-06T07:30:00+08:00"),
+      },
+    });
+
+    const unsafeItem = await prisma.aiImageGenerationItem.create({
+      data: {
+        taskId: unsafeTask.id,
+        userId,
+        teamId,
+        themeId: "theme-01",
+        index: 0,
+        status: "completed",
+        imageUrl: "data:image/png;base64,c2VjcmV0",
+      },
+    });
+
+    await prisma.aiImageArtwork.create({
+      data: {
+        taskId: unsafeTask.id,
+        itemId: unsafeItem.id,
+        userId,
+        teamId,
+        themeId: "theme-01",
+        imageUrl: "data:image/png;base64,c2VjcmV0",
+        cosKey: "unsafe-cos-key",
+        promptSnapshotJson: unsafeTask.promptSnapshotJson,
+        createdAt: new Date("2026-07-06T07:35:00+08:00"),
+      },
+    });
   });
 
   afterAll(async () => {
@@ -121,6 +167,17 @@ describe("supply AI image snapshot", () => {
           },
         ],
       },
+      {
+        themeId: "theme-01",
+        userPrompt: "unsafe image payload",
+        items: [
+          {
+            index: 0,
+            status: "completed",
+            imageUrl: null,
+          },
+        ],
+      },
     ]);
     expect(snapshot?.supplyAiImage.recentArtworks).toMatchObject([
       {
@@ -128,8 +185,14 @@ describe("supply AI image snapshot", () => {
         imageUrl: "https://example.com/output-1.png",
       },
     ]);
-    expect(JSON.stringify(snapshot)).not.toContain("promptTemplate");
-    expect(JSON.stringify(snapshot)).not.toContain("server only prompt");
+    const serializedSnapshot = JSON.stringify(snapshot);
+    expect(serializedSnapshot).not.toContain("promptTemplate");
+    expect(serializedSnapshot).not.toContain("providerPrompt");
+    expect(serializedSnapshot).not.toContain("server only prompt");
+    expect(serializedSnapshot).not.toContain("unsafe prompt metadata");
+    expect(serializedSnapshot).not.toContain("data:image");
+    expect(serializedSnapshot).not.toContain("base64");
+    expect(JSON.stringify(snapshot?.supplyAiImage.themes)).not.toContain("promptTemplate");
   });
 
   it("does not require old daily task assignments", async () => {
