@@ -1,5 +1,6 @@
+import "@/lib/gamification/ai-image/server-only";
+
 import type { AiImageThemeDefinition } from "@/lib/gamification/ai-image/types";
-import type { AiImageThemeSnapshot } from "@/lib/types";
 
 const THEMES: AiImageThemeDefinition[] = [
   {
@@ -186,34 +187,25 @@ const THEMES: AiImageThemeDefinition[] = [
   },
 ];
 
+function cloneTheme(theme: AiImageThemeDefinition): AiImageThemeDefinition {
+  return {
+    ...theme,
+    palette: [...theme.palette],
+  };
+}
+
 export function getAiImageThemes() {
-  return [...THEMES].sort((left, right) => left.sortOrder - right.sortOrder);
+  return [...THEMES].sort((left, right) => left.sortOrder - right.sortOrder).map(cloneTheme);
 }
 
 export function getAiImageThemeById(themeId: string) {
-  return getAiImageThemes().find((theme) => theme.id === themeId) ?? null;
+  const theme = THEMES.find((entry) => entry.id === themeId);
+
+  return theme ? cloneTheme(theme) : null;
 }
 
 export function getDefaultUnlockedAiImageThemeIds() {
-  return getAiImageThemes()
+  return THEMES
     .filter((theme) => theme.enabled && theme.defaultUnlocked)
     .map((theme) => theme.id);
-}
-
-export function toClientThemeSnapshot(
-  theme: AiImageThemeDefinition,
-  unlocked: boolean,
-): AiImageThemeSnapshot {
-  return {
-    id: theme.id,
-    name: theme.name,
-    description: theme.description,
-    previewImageUrl: theme.previewImageUrl,
-    defaultUnlocked: theme.defaultUnlocked,
-    unlocked,
-    enabled: theme.enabled,
-    sortOrder: theme.sortOrder,
-    tag: theme.tag,
-    palette: theme.palette,
-  };
 }

@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, expect, it } from "vitest";
 import { buildPromptSnapshot } from "@/lib/gamification/ai-image/prompt";
 import { getAiImageThemeById } from "@/lib/gamification/ai-image/themes";

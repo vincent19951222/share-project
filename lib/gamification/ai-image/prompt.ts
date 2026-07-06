@@ -1,3 +1,5 @@
+import "@/lib/gamification/ai-image/server-only";
+
 import type {
   AiImagePromptSnapshot,
   AiImageThemeDefinition,
