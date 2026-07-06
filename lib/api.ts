@@ -1,4 +1,6 @@
 import type {
+  AiImageGenerationTaskSnapshot,
+  AiImageThemeSnapshot,
   BoardSnapshot,
   CalendarMonthSnapshot,
   CoffeeSnapshot,
@@ -558,4 +560,59 @@ export async function removeLatestDrinkRecord(drinkType?: DrinkType): Promise<Dr
   });
 
   return readDrinkSnapshot(response);
+}
+
+export async function createAiImageGenerationTask(payload: {
+  themeId: string;
+  userPrompt?: string;
+  requestedCount: 1 | 2 | 4;
+  referenceImages: Array<{ dataUrl: string; filename: string }>;
+}): Promise<{ taskId: string }> {
+  const response = await fetch("/api/gamification/ai-image/tasks", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return readApiResult(response, "创建生图任务失败");
+}
+
+export async function fetchAiImageGenerationTask(
+  taskId: string,
+): Promise<{ task: AiImageGenerationTaskSnapshot }> {
+  const response = await fetch(`/api/gamification/ai-image/tasks/${taskId}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  return readApiResult(response, "获取生图任务失败");
+}
+
+export async function retryAiImageGenerationTask(taskId: string): Promise<{ taskId: string }> {
+  const response = await fetch(`/api/gamification/ai-image/tasks/${taskId}/retry`, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  return readApiResult(response, "重试生图任务失败");
+}
+
+export async function drawAiImageThemeFromSupply(): Promise<{ theme: AiImageThemeSnapshot }> {
+  const response = await fetch("/api/gamification/ai-image/themes/draw", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  return readApiResult(response, "抽取生图主题失败");
 }
