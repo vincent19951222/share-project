@@ -10,7 +10,12 @@
 - 0626 文档回答「牛马补给站 AI 生图 MVP 做什么」。
 - 本文回答「如何复用 `/Users/vincent/Projects/IPStudio` 当前工作区，把生图能力迁移到 share-project」。
 
-本文不改变 0626 文档的产品范围。猜盐 / 海龟汤、图片公开广场、主题直购、后台审核队列、IPStudio 整站迁移都不进入本迁移范围。
+本文不改变 0626 文档的产品范围，但将迁移工作明确拆成两个阶段：
+
+- Phase 1：用户可见的生图闭环。迁移 provider、COS、任务轮询、生图控制台、1 / 2 / 4 多图选择、失败 retry、作品集和初始主题 preset。
+- Phase 2：主题运营后台。迁移 `themes-admin`、admin theme publish / restore、admin images 资产页，用于后续无代码维护主题和排查图片资产。
+
+猜盐 / 海龟汤、图片公开广场、主题直购、后台审核队列、IPStudio 整站迁移都不进入本文范围。
 
 ## 迁移源
 
@@ -51,12 +56,14 @@
 - 用户在补给站选择已解锁主题。
 - 用户可上传参考图，最多 3 张；不上传参考图时也可以只用主题和补充描述生成。
 - 用户可输入一段补充描述。
+- 用户可选择一次生成 1 / 2 / 4 张。
 - 前端不暴露黑盒主题 prompt。
 - 后端组合主题 prompt + 用户补充描述 + 参考图。
 - 后端调用生图 provider。
 - 生成结果上传到 COS。
 - 生成任务和作品记录进入 share-project 数据库。
 - 生成成功后作品进入背包作品集。
+- 任务失败或部分失败时，用户可以基于原输入重试。
 - 生图消耗金币。
 
 ## 明确复用范围
@@ -105,16 +112,17 @@ share-project/ai-images/{userId}/{yyyy}/{mm}/{dd}/{generationId}/original.{ext}
 
 如果使用 `<img>` 直接展示 COS URL，可以不依赖 Next Image remote pattern；如果使用 `next/image`，需要更新 `next.config.ts`。
 
-### 3. 异步任务与轮询
+### 3. 异步任务、轮询与 retry
 
 复用 IPStudio 的任务化思路：
 
 - 创建生成任务。
-- 任务进入 `queued` / `running` / `completed` / `failed` 状态。
+- 任务进入 `queued` / `running` / `completed` / `partial` / `failed` 状态。
 - 前端轮询任务详情。
 - 成功结果以 item 形式展示。
 - 支持失败信息展示。
-- 本次不迁移 IPStudio 的 retry 能力；失败后用户重新提交。
+- 支持失败任务 retry。
+- 支持部分失败任务只重试失败 item 对应数量。
 
 share-project 不使用 IPStudio 的自管 SQLite repository。任务和 item 必须翻译成 Prisma model。
 
@@ -125,31 +133,44 @@ share-project 不使用 IPStudio 的自管 SQLite repository。任务和 item �
 - 上传参考图。
 - 删除参考图。
 - 可选用户补充描述。
+- 选择一次生成 1 / 2 / 4 张。
 - 提交生成任务。
 - 提交成功后清空临时输入。
 - 轮询任务状态。
 - 展示生成中、失败、完成。
+- 失败或部分失败时展示 retry 入口。
 - 图片预览。
 - 最近任务 / 作品入口。
 
-迁移后 UI 应换成牛马补给站语境，不保留 IPStudio 的「实验生成 / 拍摄生成 / Playground」产品表述。
+迁移后 UI 应换成牛马补给站语境，不保留 IPStudio 的「实验生成 / 拍摄生成 / Playground」产品表述。IPStudio 的 Playground 不作为独立调试页迁移，但其中面向用户的控制台能力要迁移成补给站内的「生图控制台」。
 
-## 明确不迁范围
+## 迁移分层与不迁范围
 
-以下内容不进入本次迁移：
+### Phase 1 纳入
+
+- IPStudio `UnifiedCreation` / Playground 中的用户生图控制台能力，迁移为补给站「生图控制台」。
+- IPStudio 1 / 2 / 4 多图并发选择。
+- IPStudio 失败任务 retry UI 和 retry API。
+- IPStudio 默认 13 个通用主题，迁移为 share-project 初始 preset 主题库。
+
+### Phase 2 纳入
+
+- IPStudio `themes-admin` 管理后台。
+- IPStudio admin theme publish / restore 流程。
+- IPStudio admin images 页面。
+
+Phase 2 不阻塞 Phase 1 上线。Phase 1 主题先用代码 preset 管理；Phase 2 再把主题配置、版本发布、回滚和图片资产浏览做成后台能力。
+
+### 不原样迁移
 
 - IPStudio 整站路由。
 - IPStudio 首页、Gallery、CreatorSpace、IpDetail。
 - IPStudio 登录体系。
-- IPStudio `themes-admin` 管理后台。
-- IPStudio admin theme publish / restore 流程。
-- IPStudio Playground 调试页。
+- IPStudio Playground 独立调试页外壳。
 - IPStudio `node:sqlite` / `DatabaseSync` 原仓库实现。
 - IPStudio 手势光标、CameraBooth、拍摄生成模式。
-- IPStudio 1 / 2 / 4 多图并发选择。
-- IPStudio 失败任务 retry UI 和 retry API。
-- IPStudio admin images 页面。
-- IPStudio 默认 13 个通用主题整体搬运。
+
+其中 `node:sqlite` / `DatabaseSync` 不迁移为运行时依赖。share-project 继续使用 Prisma + SQLite，将 IPStudio 的表结构和 repository 行为翻译成 share-project 自己的数据模型与服务层。
 
 ## share-project 数据模型
 
@@ -157,11 +178,13 @@ share-project 不使用 IPStudio 的自管 SQLite repository。任务和 item �
 
 ### 1. 主题定义
 
-主题定义可以先用代码常量，不必入库：
+Phase 1 主题定义可以先用代码常量，不必入库：
 
 ```text
 lib/gamification/ai-image/themes.ts
 ```
+
+IPStudio 默认 13 个通用主题迁移为初始 preset 主题库。迁移时保留可用的 preview、palette、tag、promptTemplate 等字段，但前台命名和文案可以按「牛马补给站」语境调整。
 
 每个主题至少包含：
 
@@ -201,22 +224,45 @@ lib/gamification/ai-image/themes.ts
 - `teamId`
 - `themeId`
 - `userPrompt`
-- `status`：`queued` / `running` / `completed` / `failed`
+- `requestedCount`：普通创建为 `1` / `2` / `4`，retry 内部允许 `1..4`
+- `status`：`queued` / `running` / `completed` / `partial` / `failed`
 - `coinCost`
 - `coinRefunded`
+- `refundedCoinAmount`
 - `providerModel`
+- `errorMessage`
+- `retryOfTaskId`
+- `createdAt`
+- `updatedAt`
+
+`retryOfTaskId` 用于记录 retry 来源。普通任务为空，retry 任务指向被重试的任务。
+
+### 4. 生成结果 item
+
+新增 `AiImageGenerationItem`：
+
+- `id`
+- `taskId`
+- `userId`
+- `teamId`
+- `themeId`
+- `index`
+- `status`：`queued` / `running` / `completed` / `failed`
+- `imageUrl`
+- `cosKey`
 - `errorMessage`
 - `createdAt`
 - `updatedAt`
 
-MVP 每个任务只生成 1 张图。后续如果要多图，再加 item 层。
+每个任务按 `requestedCount` 创建对应数量的 item。普通创建来自用户选择的 1 / 2 / 4，retry 任务可能是 1 到 4。任务状态由 item 汇总：全部成功为 `completed`，全部失败为 `failed`，部分成功为 `partial`。
 
-### 4. 作品记录
+### 5. 作品记录
 
 新增 `AiImageArtwork`：
 
 - `id`
 - `taskId`
+- `itemId`
 - `userId`
 - `teamId`
 - `themeId`
@@ -227,11 +273,29 @@ MVP 每个任务只生成 1 张图。后续如果要多图，再加 item 层。
 
 作品集直接读 `AiImageArtwork`。
 
-### 5. 参考图存储
+### 6. 参考图存储
 
-MVP 不长期保存用户上传的参考图原图。
+为支持 retry，Phase 1 需要保存任务输入参考图，但不把 data URL 或 base64 长期写入数据库。
 
-创建任务时可以将参考图 data URL 暂存在任务执行内存中，用于启动当前 in-process runner。考虑隐私和数据库体积，MVP 默认不支持自动 retry，失败后用户重新提交。
+推荐做法：
+
+- 创建任务时将参考图上传到 COS 的内部输入图前缀。
+- 数据库只保存 `cosKey`、`imageUrl`、`mimeType`、`sizeBytes` 和顺序。
+- 前台作品集不展示输入图，只在任务详情和 retry 中使用。
+- retry 时复用原任务输入图和 prompt snapshot。
+
+新增 `AiImageTaskInputImage`：
+
+- `id`
+- `taskId`
+- `userId`
+- `teamId`
+- `imageUrl`
+- `cosKey`
+- `mimeType`
+- `sizeBytes`
+- `sortOrder`
+- `createdAt`
 
 ## 金币与计费规则
 
@@ -241,9 +305,11 @@ MVP 不长期保存用户上传的参考图原图。
 
 - 创建任务前检查用户是否已解锁主题。
 - 创建任务前检查金币是否足够。
-- 创建任务时扣除金币，并写入任务记录。
+- 创建任务时按 `单张价格 * requestedCount` 扣除金币，并写入任务记录。
 - 任务成功后不再二次扣费。
-- 任务失败时自动退回金币，并标记 `coinRefunded = true`。
+- 任务失败时自动退回全部金币，并标记 `coinRefunded = true`。
+- 任务部分失败时退回失败 item 对应金币，写入 `refundedCoinAmount`，成功 item 保持扣费。
+- retry 创建新任务并按 retry 数量重新计费；由于失败部分已经退款，不会重复收费。
 - 如果服务端进程中断导致任务长时间停留 `running`，任务详情接口应能将超时任务标记失败并退币。
 
 金币价格本迁移 spec 不硬编码，实施计划中再落具体数值。服务层应集中定义价格，例如：
@@ -304,6 +370,7 @@ supplyAiImage: {
 GET  /api/gamification/supply/state
 POST /api/gamification/ai-image/tasks
 GET  /api/gamification/ai-image/tasks/[taskId]
+POST /api/gamification/ai-image/tasks/[taskId]/retry
 POST /api/gamification/ai-image/themes/draw
 ```
 
@@ -315,6 +382,7 @@ POST /api/gamification/ai-image/themes/draw
 - 校验主题存在且已解锁。
 - 校验金币。
 - 校验参考图数量不超过 3，允许 0 张。
+- 校验 `requestedCount` 只能是 1 / 2 / 4。
 - 创建任务并扣金币。
 - 启动后端生成。
 - 返回 `{ taskId }`。
@@ -323,8 +391,19 @@ POST /api/gamification/ai-image/themes/draw
 
 - 校验登录。
 - 只能读取自己的任务。
-- 返回任务状态和作品 URL。
+- 返回任务状态、item 状态、作品 URL 和 retry 可用状态。
 - 对超时 running 任务执行失败结算和退币。
+
+`POST /api/gamification/ai-image/tasks/[taskId]/retry`：
+
+- 校验登录。
+- 只能 retry 自己的任务。
+- 只允许 retry `failed` 或 `partial` 任务。
+- 复用原任务主题、用户补充描述、参考图和 prompt snapshot。
+- 对 `failed` 任务按原 `requestedCount` 创建新任务。
+- 对 `partial` 任务只按失败 item 数量创建新任务，retry 内部数量允许为 1 到 4。
+- 校验金币并按新任务数量扣费。
+- 返回 `{ taskId }`。
 
 `POST /api/gamification/ai-image/themes/draw`：
 
@@ -353,13 +432,58 @@ MVP 首页优先展示 `SupplyAiImageStudioPanel`：
 - 参考图上传，最多 3 张。
 - 每张参考图可删除。
 - 用户补充描述输入。
+- 生成数量选择：1 / 2 / 4。
 - 生成按钮显示金币消耗。
 - 生成中状态。
 - 失败提示。
+- retry 按钮。
+- 多张生成结果的网格预览。
 - 完成结果预览。
 - 最近作品。
 
 保留补给站品牌语言，但不要照搬 IPStudio 的「指意」「实验生成」「拍摄生成」「Playground」标签。
+
+## Phase 2 后台迁移
+
+Phase 2 目标是把 IPStudio 已有的主题运营能力迁移成 share-project 管理后台，不影响 Phase 1 用户生图闭环。
+
+### themes-admin
+
+迁移为管理员可访问的主题配置页面，能力包括：
+
+- 查看主题列表。
+- 新建 / 编辑主题。
+- 配置名称、标签、描述、preview、palette、availability。
+- 编辑服务端 `promptTemplate`。
+- 配置主题参考图。
+- 标记 enabled / disabled。
+- 管理 sortOrder。
+
+Phase 2 后，Phase 1 的代码 preset 仍可作为 fallback；后台发布配置覆盖同 id preset。
+
+### admin theme publish / restore
+
+与 `themes-admin` 一起迁移：
+
+- 管理员生成主题 preview draft。
+- 管理员发布 draft 为当前主题配置。
+- 管理员查看主题版本。
+- 管理员 restore 历史版本。
+
+发布和回滚必须写入版本记录，避免 prompt 或 preview 误改后无法恢复。
+
+### admin images
+
+IPStudio admin images 页面是后台图片资产浏览器，不是普通用户作品集。
+
+迁移到 share-project 后用于：
+
+- 查看已生成图片。
+- 查看 COS URL 和 `cosKey`。
+- 按用户、主题、任务状态筛选。
+- 打开原图排查 provider / COS 问题。
+
+该页面只给管理员使用，不进入普通补给站导航。
 
 ## 旧系统下线配合
 
@@ -384,11 +508,13 @@ MVP 首页优先展示 `SupplyAiImageStudioPanel`：
 - 主题未解锁。
 - 金币不足。
 - 参考图数量超过 3。
+- 生成数量不是 1 / 2 / 4。
 - 参考图格式不是 data URL。
 - provider 缺少 API key。
 - provider 返回失败。
 - COS 上传失败。
 - 任务不存在或不是当前用户的任务。
+- 任务不可 retry。
 - 任务超时。
 
 用户可见错误要使用中文，不暴露黑盒 prompt 和服务端密钥信息。
@@ -403,6 +529,9 @@ MVP 首页优先展示 `SupplyAiImageStudioPanel`：
 - 创建任务扣金币。
 - provider 失败后退金币。
 - COS 上传失败后任务失败并退金币。
+- 1 / 2 / 4 生成数量会创建对应数量 item。
+- 部分失败只退失败 item 对应金币。
+- retry 复用原任务输入并重新计费。
 - 主题扭蛋只抽未解锁主题。
 - 主题全解锁时不扣金币。
 
@@ -412,6 +541,8 @@ MVP 首页优先展示 `SupplyAiImageStudioPanel`：
 - 创建任务返回 taskId。
 - 查询任务只能查询自己的任务。
 - 超时 running 任务会失败结算。
+- retry 只能 retry 自己的 failed / partial 任务。
+- partial retry 只重试失败数量。
 - 主题抽取返回新解锁主题。
 
 ### UI 测试
@@ -420,8 +551,10 @@ MVP 首页优先展示 `SupplyAiImageStudioPanel`：
 - 未解锁主题不可生成。
 - 可上传并删除参考图。
 - 最多 3 张参考图。
+- 可选择生成 1 / 2 / 4 张。
 - 提交成功后清空临时输入。
 - 生成中 / 失败 / 完成状态可见。
+- 失败和部分失败任务可点击 retry。
 - 完成图片进入作品集。
 - 前台不出现抽奖券、生活券、旧四维任务、商店主入口。
 
@@ -441,9 +574,10 @@ npm run build
 2. 打开牛马补给站。
 3. 使用默认主题上传一张参考图。
 4. 生成图片。
-5. 确认扣金币。
+5. 确认按生成数量扣金币。
 6. 确认图片展示并进入作品集。
-7. 确认刷新后作品仍存在。
+7. 人工制造一次失败任务，确认 retry 可重新生成。
+8. 确认刷新后作品仍存在。
 
 ## 实施切片建议
 
@@ -452,13 +586,16 @@ npm run build
 1. 冻结 IPStudio 迁移源快照。
 2. 新增 Prisma 模型和类型。
 3. 迁移 provider + COS 服务层。
-4. 实现 AI 生图任务 API 和 runner。
-5. 实现主题定义、默认解锁和主题扭蛋。
-6. 改造 supply snapshot，停止旧任务自动生成。
-7. 接入 AI 生图 UI。
-8. 接入作品集和旧补给存档。
-9. 清理前台旧券、旧任务、商店、兑换入口。
-10. 完整验证和浏览器 smoke。
+4. 实现参考图输入存储。
+5. 实现 AI 生图任务 API、item runner 和 1 / 2 / 4 多图生成。
+6. 实现 retry API 和 retry UI。
+7. 实现主题 preset、默认解锁和主题扭蛋。
+8. 改造 supply snapshot，停止旧任务自动生成。
+9. 接入 AI 生图控制台 UI。
+10. 接入作品集和旧补给存档。
+11. 清理前台旧券、旧任务、商店、兑换入口。
+12. 完整验证和浏览器 smoke。
+13. Phase 2 再迁移 themes-admin、publish / restore、admin images。
 
 ## 成功标准
 
@@ -466,8 +603,11 @@ npm run build
 - 生图 provider、COS 上传、任务轮询能力可在 share-project 内独立运行。
 - 用户只看到金币，不看到抽奖券体系。
 - 默认主题可直接生成图片。
+- 用户可选择一次生成 1 / 2 / 4 张。
+- 失败或部分失败任务可 retry。
 - 主题扭蛋可解锁新主题。
 - 作品进入背包作品集。
 - 黑盒 prompt 不暴露到客户端。
 - 猜盐 / 海龟汤没有入口。
 - 旧四维任务不会因为打开补给站而继续生成。
+- Phase 2 范围已写清楚：themes-admin、publish / restore、admin images 后台能力不阻塞 Phase 1。
