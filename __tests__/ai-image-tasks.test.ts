@@ -315,4 +315,165 @@ describe("AI image task service", () => {
     expect(settledTask.items[0]?.status).toBe("failed");
     expect(user.coins).toBe(1000);
   });
+
+  it("settles timed out mixed-result tasks as partial and refunds only unfinished image cost", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-06T12:30:00+08:00"));
+
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-01",
+      userPrompt: "mixed timeout",
+      requestedCount: 2,
+      referenceImages: [],
+      startRunner: false,
+    });
+    const [firstItem, secondItem] = await prisma.aiImageGenerationItem.findMany({
+      where: { taskId: task.id },
+      orderBy: { index: "asc" },
+    });
+
+    await prisma.aiImageGenerationTask.update({
+      where: { id: task.id },
+      data: {
+        status: "running",
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+    await prisma.aiImageGenerationItem.update({
+      where: { id: firstItem.id },
+      data: {
+        status: "completed",
+        imageUrl: "https://cdn.example.com/already-done.png",
+        cosKey: "share-project/ai-images/test/already-done.png",
+      },
+    });
+    await prisma.aiImageArtwork.create({
+      data: {
+        taskId: task.id,
+        itemId: firstItem.id,
+        userId,
+        teamId,
+        themeId: task.themeId,
+        imageUrl: "https://cdn.example.com/already-done.png",
+        cosKey: "share-project/ai-images/test/already-done.png",
+        promptSnapshotJson: task.promptSnapshotJson,
+      },
+    });
+    await prisma.aiImageGenerationItem.update({
+      where: { id: secondItem.id },
+      data: {
+        status: "running",
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+
+    await settleTimedOutAiImageTask({ taskId: task.id, now: new Date("2026-07-06T12:30:00+08:00") });
+
+    const settledTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+      include: {
+        items: { orderBy: { index: "asc" } },
+        artworks: true,
+      },
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(settledTask.status).toBe("partial");
+    expect(settledTask.coinRefunded).toBe(true);
+    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.items[0]).toMatchObject({
+      status: "completed",
+      imageUrl: "https://cdn.example.com/already-done.png",
+    });
+    expect(settledTask.items[1]?.status).toBe("failed");
+    expect(settledTask.artworks).toHaveLength(1);
+    expect(user.coins).toBe(940);
+  });
+
+  it("corrects an earlier over-refund when settlement recomputes a partial outcome", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-06T12:30:00+08:00"));
+
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-01",
+      userPrompt: "over refund correction",
+      requestedCount: 2,
+      referenceImages: [],
+      startRunner: false,
+    });
+    const [firstItem, secondItem] = await prisma.aiImageGenerationItem.findMany({
+      where: { taskId: task.id },
+      orderBy: { index: "asc" },
+    });
+
+    await prisma.aiImageGenerationTask.update({
+      where: { id: task.id },
+      data: {
+        status: "running",
+        coinRefunded: true,
+        refundedCoinAmount: 120,
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+    await prisma.user.update({ where: { id: userId }, data: { coins: 1000 } });
+    await prisma.aiImageGenerationItem.update({
+      where: { id: firstItem.id },
+      data: {
+        status: "completed",
+        imageUrl: "https://cdn.example.com/already-done.png",
+        cosKey: "share-project/ai-images/test/already-done.png",
+      },
+    });
+    await prisma.aiImageGenerationItem.update({
+      where: { id: secondItem.id },
+      data: {
+        status: "failed",
+        errorMessage: "已有失败",
+      },
+    });
+
+    await settleTimedOutAiImageTask({ taskId: task.id, now: new Date("2026-07-06T12:30:00+08:00") });
+
+    const settledTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(settledTask.status).toBe("partial");
+    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(user.coins).toBe(940);
+  });
+
+  it("fails malformed prompt snapshots without leaving the task stuck in running", async () => {
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-01",
+      userPrompt: "bad prompt snapshot",
+      requestedCount: 1,
+      referenceImages: [],
+      startRunner: false,
+    });
+
+    await prisma.aiImageGenerationTask.update({
+      where: { id: task.id },
+      data: { promptSnapshotJson: "{}" },
+    });
+
+    await runAiImageTask(task.id);
+
+    const settledTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+      include: { items: true },
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(settledTask.status).toBe("failed");
+    expect(settledTask.coinRefunded).toBe(true);
+    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.items[0]?.status).toBe("failed");
+    expect(settledTask.items[0]?.errorMessage).toBe("生成任务缺少可执行提示词");
+    expect(user.coins).toBe(1000);
+  });
 });

@@ -10,7 +10,6 @@ import {
   AI_IMAGE_RETRY_MIN_COUNT,
   AI_IMAGE_TASK_TIMEOUT_MS,
 } from "@/lib/gamification/ai-image/constants";
-import { enqueueAiImageTask } from "@/lib/gamification/ai-image/task-runner";
 import { uploadAiImageDataUrl } from "@/lib/gamification/ai-image/cos-storage";
 import { buildPromptSnapshot, normalizeAiImageUserPrompt } from "@/lib/gamification/ai-image/prompt";
 import { getAiImageThemeById, getDefaultUnlockedAiImageThemeIds } from "@/lib/gamification/ai-image/themes";
@@ -55,6 +54,26 @@ function getTaskCoinCost(requestedCount: number) {
 
 function buildRetryAvailability(status: string) {
   return status === "failed" || status === "partial";
+}
+
+function buildTaskErrorMessage(input: {
+  status: "completed" | "partial" | "failed";
+  preferredErrorMessage?: string | null;
+  itemErrorMessages: string[];
+}) {
+  if (input.status === "completed") {
+    return null;
+  }
+
+  if (input.preferredErrorMessage) {
+    return input.preferredErrorMessage;
+  }
+
+  if (input.status === "partial") {
+    return input.itemErrorMessages[0] ?? "部分图片生成失败";
+  }
+
+  return input.itemErrorMessages[0] ?? "本次生成失败，已退回金币";
 }
 
 function toTaskSnapshot(task: {
@@ -173,6 +192,93 @@ async function persistUploadedInputImages(input: {
   }
 }
 
+async function startAiImageTaskRunner(taskId: string) {
+  const runner = await import("@/lib/gamification/ai-image/task-runner");
+  runner.enqueueAiImageTask(taskId);
+}
+
+export async function settleAiImageTaskByItems(input: {
+  taskId: string;
+  markUnfinishedAsFailedMessage?: string;
+  taskErrorMessage?: string | null;
+}): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const task = await tx.aiImageGenerationTask.findUnique({
+      where: { id: input.taskId },
+      select: {
+        id: true,
+        userId: true,
+        coinCost: true,
+        refundedCoinAmount: true,
+      },
+    });
+
+    if (!task) {
+      return;
+    }
+
+    if (input.markUnfinishedAsFailedMessage) {
+      await tx.aiImageGenerationItem.updateMany({
+        where: {
+          taskId: input.taskId,
+          status: { in: ["queued", "running"] },
+        },
+        data: {
+          status: "failed",
+          errorMessage: input.markUnfinishedAsFailedMessage,
+        },
+      });
+    }
+
+    const items = await tx.aiImageGenerationItem.findMany({
+      where: { taskId: input.taskId },
+      orderBy: { index: "asc" },
+      select: {
+        status: true,
+        errorMessage: true,
+      },
+    });
+
+    const completedCount = items.filter((item) => item.status === "completed").length;
+    const nonCompletedCount = items.length - completedCount;
+    const targetRefundAmount = Math.min(
+      task.coinCost,
+      nonCompletedCount * AI_IMAGE_GENERATION_COIN_COST,
+    );
+    const targetStatus =
+      nonCompletedCount === 0 ? "completed" : completedCount === 0 ? "failed" : "partial";
+    const refundDelta = targetRefundAmount - task.refundedCoinAmount;
+
+    if (refundDelta !== 0) {
+      await tx.user.update({
+        where: { id: task.userId },
+        data: {
+          coins:
+            refundDelta > 0
+              ? { increment: refundDelta }
+              : { decrement: Math.abs(refundDelta) },
+        },
+      });
+    }
+
+    await tx.aiImageGenerationTask.update({
+      where: { id: input.taskId },
+      data: {
+        status: targetStatus,
+        errorMessage: buildTaskErrorMessage({
+          status: targetStatus,
+          preferredErrorMessage: input.taskErrorMessage,
+          itemErrorMessages: items
+            .map((item) => item.errorMessage?.trim() ?? "")
+            .filter((message) => message.length > 0),
+        }),
+        coinRefunded: targetRefundAmount > 0,
+        refundedCoinAmount: targetRefundAmount,
+      },
+    });
+  });
+}
+
 export async function createAiImageTask(input: CreateAiImageTaskInput): Promise<AiImageGenerationTask> {
   if (!isAllowedRequestedCount(input.requestedCount)) {
     throw new AiImageTaskError(400, "生成数量只支持 1、2、4");
@@ -278,7 +384,7 @@ export async function createAiImageTask(input: CreateAiImageTaskInput): Promise<
   }
 
   if (input.startRunner !== false) {
-    enqueueAiImageTask(created.task.id);
+    void startAiImageTaskRunner(created.task.id);
   }
 
   return created.task;
@@ -416,7 +522,7 @@ export async function retryAiImageTask(input: {
   });
 
   if (input.startRunner !== false) {
-    enqueueAiImageTask(task.id);
+    void startAiImageTaskRunner(task.id);
   }
 
   return task;
@@ -448,52 +554,9 @@ export async function settleTimedOutAiImageTask(input: {
     return;
   }
 
-  await prisma.$transaction(async (tx) => {
-    const current = await tx.aiImageGenerationTask.findUnique({
-      where: { id: input.taskId },
-      select: {
-        id: true,
-        userId: true,
-        status: true,
-        coinCost: true,
-        coinRefunded: true,
-        refundedCoinAmount: true,
-        updatedAt: true,
-      },
-    });
-
-    if (!current || current.status !== "running") {
-      return;
-    }
-
-    const shouldRefund = !current.coinRefunded && current.refundedCoinAmount === 0;
-
-    if (shouldRefund) {
-      await tx.user.update({
-        where: { id: current.userId },
-        data: { coins: { increment: current.coinCost } },
-      });
-    }
-
-    await tx.aiImageGenerationItem.updateMany({
-      where: {
-        taskId: current.id,
-        status: { in: ["queued", "running"] },
-      },
-      data: {
-        status: "failed",
-        errorMessage: "任务处理超时",
-      },
-    });
-
-    await tx.aiImageGenerationTask.update({
-      where: { id: current.id },
-      data: {
-        status: "failed",
-        errorMessage: "任务处理超时",
-        coinRefunded: shouldRefund ? true : current.coinRefunded,
-        refundedCoinAmount: shouldRefund ? current.coinCost : current.refundedCoinAmount,
-      },
-    });
+  await settleAiImageTaskByItems({
+    taskId: input.taskId,
+    markUnfinishedAsFailedMessage: "任务处理超时",
+    taskErrorMessage: "任务处理超时",
   });
 }
