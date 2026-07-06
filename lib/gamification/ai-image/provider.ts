@@ -24,9 +24,7 @@ export interface GenerateAiImageResult {
 }
 
 function getProviderApiKey() {
-  return (
-    process.env.BOLUOPETS_API_KEY?.trim() || process.env.VITE_BOLUOPETS_API_KEY?.trim() || ""
-  );
+  return process.env.BOLUOPETS_API_KEY?.trim() || "";
 }
 
 async function readProviderB64(response: Response): Promise<GenerateAiImageResult> {

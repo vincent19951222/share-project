@@ -16,6 +16,9 @@ export interface ParsedImageDataUrl {
   sizeBytes: number;
 }
 
+const DATA_URL_ERROR_MESSAGE = "参考图格式不是 data URL";
+const CANONICAL_BASE64_PATTERN = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
 function getImageExtension(mimeType: AiImageMimeType): AiImageExtension {
   if (mimeType === "image/jpeg") {
     return "jpg";
@@ -28,11 +31,11 @@ export function parseImageDataUrl(dataUrl: string): ParsedImageDataUrl {
   const match = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
 
   if (!match) {
-    throw new Error("参考图格式不是 data URL");
+    throw new Error(DATA_URL_ERROR_MESSAGE);
   }
 
   const mimeType = match[1] as AiImageMimeType;
-  const buffer = Buffer.from(match[2], "base64");
+  const buffer = decodeCanonicalBase64(match[2], DATA_URL_ERROR_MESSAGE);
 
   return {
     buffer,
@@ -40,6 +43,20 @@ export function parseImageDataUrl(dataUrl: string): ParsedImageDataUrl {
     extension: getImageExtension(mimeType),
     sizeBytes: buffer.byteLength,
   };
+}
+
+function decodeCanonicalBase64(value: string, errorMessage: string) {
+  if (!CANONICAL_BASE64_PATTERN.test(value)) {
+    throw new Error(errorMessage);
+  }
+
+  const buffer = Buffer.from(value, "base64");
+
+  if (buffer.byteLength === 0 || buffer.toString("base64") !== value) {
+    throw new Error(errorMessage);
+  }
+
+  return buffer;
 }
 
 export function buildAiImageCosKey({
@@ -158,7 +175,7 @@ export async function uploadAiImageBase64({
   userId: string;
   id: string;
 }) {
-  const buffer = Buffer.from(b64Json, "base64");
+  const buffer = decodeCanonicalBase64(b64Json, "生图结果不是合法 base64");
   const cosKey = buildAiImageCosKey({
     kind: "output",
     userId,
