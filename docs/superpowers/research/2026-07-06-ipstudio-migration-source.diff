@@ -1,0 +1,1260 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 4ca11cf..2bca9fe 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1,34 +1,56 @@
+ # CLAUDE.md
+ 
+-This file is the canonical instruction source for coding agents working in this repository.
++本文件是本仓库内编码 Agent 的唯一权威规则来源。
+ 
+-## Source Of Truth
++## 规则源
+ 
+-- Treat `CLAUDE.md` as the only authoritative agent-rules file.
+-- `AGENTS.md` must mirror this file. Prefer a symlink from `AGENTS.md` to `CLAUDE.md`.
+-- If an environment cannot use symlinks, keep `AGENTS.md` synchronized by an explicit copy or sync step.
+-- When changing agent rules, edit `CLAUDE.md` only. Do not edit `AGENTS.md` directly.
++- 将 `CLAUDE.md` 视为唯一权威的 Agent 规则文件。
++- `AGENTS.md` 必须镜像本文件。优先使用从 `AGENTS.md` 指向 `CLAUDE.md` 的软链接。
++- 如果当前环境不支持软链接，必须通过明确的复制或同步步骤保持 `AGENTS.md` 与本文件一致。
++- 修改 Agent 规则时，只编辑 `CLAUDE.md`。不要直接编辑 `AGENTS.md`。
+ 
+-## Working Principles
++## 工作原则
+ 
+-- Think before coding. State assumptions when the request is ambiguous, and ask before risky interpretation.
+-- Keep changes simple. Do not add speculative features, abstractions, or configurability.
+-- Make surgical edits. Touch only files directly required by the request, and do not refactor unrelated code.
+-- Preserve user work. Never revert unrelated local changes unless explicitly asked.
+-- Verify before claiming completion. Run the smallest relevant check, read the output, then report the result.
++- 先想清楚再编码。需求含糊时说明假设；存在高风险理解时先问清楚。
++- 保持简单。不要添加未经请求的功能、抽象或可配置项。
++- 保持改动手术刀式精准。只触碰完成请求直接需要的文件，不重构无关代码。
++- 保护用户已有工作。除非用户明确要求，不要回滚无关的本地改动。
++- 完成前必须验证。运行最小相关检查，读完输出，再报告结果。
+ 
+-## Product Principle
++## 产品原则
+ 
+-User experience is the highest product priority. Technical preference, code elegance, and architecture should serve a smooth user-facing experience.
++用户体验是最高产品优先级。技术偏好、代码整洁度和架构设计都应该服务于顺滑的用户体验。
+ 
+-## Project Notes
++## 项目说明
+ 
+-- This is a preview AI Pixel Avatar Studio project.
+-- Keep UI direction aligned with a modern AI Studio landing page plus restrained 64-bit pixel accents.
+-- API keys are configured through env files, not through foreground UI controls.
+-- Do not commit secrets. Keep local API keys in ignored env files such as `.env.local`.
++- 这是一个预览版 AI Pixel Avatar Studio 项目。
++- UI 方向应保持现代 AI Studio 落地页气质，并搭配克制的 64-bit 像素风点缀。
++- API key 通过 env 文件配置，不要放在前台 UI 控件里。
++- 不要提交密钥。把本地 API key 放在已忽略的 env 文件中，例如 `.env.local`。
++- 公共生图和主题流程必须保持 prompt 安全。后端 prompt 模板、参考图内部信息、服务商细节和仅管理员可见的元数据，不得通过公共 UI 或公共 API 泄漏。
++- 内部配置和调试页面可以暴露更多控制能力，但必须位于现有 admin/session 边界之后。
+ 
+-## Useful Commands
++## 架构说明
++
++- `screens/UnifiedCreation.tsx` 是实验生成和拍摄生成的主界面。`app/playground/page.tsx`、`app/themes/page.tsx` 这类薄路由页不应被当作主逻辑来源。
++- 生图任务流程分布在 `lib/server/generationTaskApi.ts`、`lib/server/playgroundTaskRepository.ts`、`lib/server/playgroundTaskRunner.ts`、`services/generationTaskService.ts` 和 `screens/UnifiedCreation.tsx`。
++- 主题配置流程分布在公共 `/api/themes`、需要认证的 `/api/admin/themes`、`lib/server/themeRegistry.ts`、`lib/server/themeConfigApi.ts` 和 `lib/server/themeConfigRepository.ts`。
++- 公共 `/api/themes` 只返回公开主题元数据。`promptTemplate`、`referenceImageUrl`、发布/恢复和版本历史应只出现在已认证的 admin 路由中。
++- 运行态状态默认使用 `.data/generations.sqlite` 下的 SQLite。`.data/` 已被忽略，必须保持在 git 之外；部署时应保留生产运行态数据。
++- 生图任务重试可能会把原始输入图持久化到 SQLite，以便失败或部分失败的任务可重试。修改重试逻辑时，要注意保留周期、清理策略和数据库膨胀风险。
++- 生成资产应存储到 COS，并在记录或配置中通过 URL 引用，不要把本地运行态文件提交进仓库。
++- 生产环境的 `npm run start` 已固定使用端口 `4399`。
++
++## 体验说明
++
++- 公共创建流程应该像顺滑的 AI Studio 工作流：紧凑的聊天式生成记录，清晰的任务状态。
++- 公共页面上必须保持 prompt 内部逻辑为后端黑盒。
++- 只要用户可以上传参考图，就必须提供明确的删除/清空控制。
++- 任务创建成功后，应重置上传参考图、额外 user prompt 等临时输入状态。失败提交不要提前清空，方便用户重试。
++
++## 常用命令
+ 
+ - `npm run dev`
++- `npm test`
+ - `npm run build`
++- 在 zsh 中运行带方括号的 app route 测试路径时，需要加引号，例如 `npm test -- 'app/api/images/tasks/[taskId]/route.test.ts'`。
+diff --git a/app/api/images/playground/tasks/route.test.ts b/app/api/images/playground/tasks/route.test.ts
+index e0e8d3a..2970b2b 100644
+--- a/app/api/images/playground/tasks/route.test.ts
++++ b/app/api/images/playground/tasks/route.test.ts
+@@ -87,6 +87,10 @@ describe('/api/images/playground/tasks', () => {
+       sceneId: 'nail-design',
+       userPrompt: '科幻风',
+       count: 4,
++      inputImages: [
++        'data:image/png;base64,input-a',
++        'data:image/png;base64,input-b',
++      ],
+       items: expect.arrayContaining([
+         expect.objectContaining({ index: 0, generationId: expect.stringMatching(/^gen_/) }),
+         expect.objectContaining({ index: 3, generationId: expect.stringMatching(/^gen_/) }),
+diff --git a/app/api/images/tasks/route.test.ts b/app/api/images/tasks/route.test.ts
+index 48bf496..55fe65a 100644
+--- a/app/api/images/tasks/route.test.ts
++++ b/app/api/images/tasks/route.test.ts
+@@ -60,6 +60,7 @@ describe('/api/images/tasks', () => {
+       sceneId: 'nail-design',
+       userPrompt: '科幻风',
+       count: 2,
++      inputImages: ['data:image/png;base64,lab'],
+       items: expect.arrayContaining([
+         expect.objectContaining({ index: 0, generationId: expect.stringMatching(/^gen_/) }),
+         expect.objectContaining({ index: 1, generationId: expect.stringMatching(/^gen_/) }),
+diff --git a/lib/server/generationRepository.ts b/lib/server/generationRepository.ts
+index 181b0aa..292bca9 100644
+--- a/lib/server/generationRepository.ts
++++ b/lib/server/generationRepository.ts
+@@ -1,6 +1,6 @@
+ import { mkdirSync } from 'node:fs';
+ import path from 'node:path';
+-import { DatabaseSync } from 'node:sqlite';
++import { DatabaseSync } from './sqlite';
+ 
+ export type GenerationStatus = 'generating' | 'completed' | 'failed';
+ 
+diff --git a/lib/server/generationTaskApi.ts b/lib/server/generationTaskApi.ts
+index 68154af..6ab4b1a 100644
+--- a/lib/server/generationTaskApi.ts
++++ b/lib/server/generationTaskApi.ts
+@@ -8,6 +8,8 @@ const ALLOWED_COUNTS = [1, 2, 4] as const;
+ const MAX_REFERENCE_IMAGES = 3;
+ const STALE_RUNNING_TIMEOUT_MS = 30 * 60 * 1000;
+ const REFERENCE_IMAGE_LIMIT_ERROR = 'Reference images can include at most 3 files.';
++const RETRY_STATUS_ERROR = 'Only failed or partial tasks can be retried.';
++const RETRY_INPUT_ERROR = 'Task input images are no longer available.';
+ 
+ type TaskMode = 'lab' | 'shoot';
+ 
+@@ -114,6 +116,7 @@ export const createGenerationTaskResponse = async (
+         sceneId: body.sceneId,
+         userPrompt,
+         count,
++        inputImages: images,
+         items: Array.from({ length: count }, (_, index) => ({
+           id: createId('item'),
+           index,
+@@ -133,6 +136,61 @@ export const createGenerationTaskResponse = async (
+   }
+ };
+ 
++export const retryGenerationTaskResponse = (taskId: string) => {
++  try {
++    const repository = createPlaygroundTaskRepository();
++    let retryTaskId = '';
++    let images: string[] = [];
++
++    try {
++      const detail = repository.getTaskWithItems(taskId);
++
++      if (!detail) {
++        return NextResponse.json({ error: 'Task not found.' }, { status: 404 });
++      }
++
++      if (detail.task.status !== 'failed' && detail.task.status !== 'partial') {
++        return NextResponse.json({ error: RETRY_STATUS_ERROR }, { status: 400 });
++      }
++
++      images = repository.getTaskInputImages(taskId);
++      if (images.length === 0) {
++        return NextResponse.json({ error: RETRY_INPUT_ERROR }, { status: 400 });
++      }
++
++      if (detail.task.mode === 'lab') {
++        getPublishedDesignScenePrompt(detail.task.sceneId, { userPrompt: detail.task.userPrompt });
++      } else {
++        getPublishedDesignScenePrompt(detail.task.sceneId);
++      }
++
++      retryTaskId = createId('task');
++      repository.createTask({
++        id: retryTaskId,
++        mode: detail.task.mode,
++        sceneId: detail.task.sceneId,
++        userPrompt: detail.task.userPrompt,
++        count: detail.task.count,
++        inputImages: images,
++        items: Array.from({ length: detail.task.count }, (_, index) => ({
++          id: createId('item'),
++          index,
++          generationId: createId('gen'),
++        })),
++      });
++    } finally {
++      repository.close();
++    }
++
++    startPlaygroundTask({ taskId: retryTaskId, images });
++
++    return NextResponse.json({ taskId: retryTaskId });
++  } catch (error) {
++    const message = error instanceof Error ? error.message : 'Task retry failed.';
++    return NextResponse.json({ error: message }, { status: getErrorStatus(message) });
++  }
++};
++
+ export const listGenerationTasksResponse = () => {
+   const repository = createPlaygroundTaskRepository();
+ 
+diff --git a/lib/server/playgroundTaskRepository.test.ts b/lib/server/playgroundTaskRepository.test.ts
+index 0fb8b01..30b0b09 100644
+--- a/lib/server/playgroundTaskRepository.test.ts
++++ b/lib/server/playgroundTaskRepository.test.ts
+@@ -54,6 +54,75 @@ describe('createPlaygroundTaskRepository', () => {
+     repository.close();
+   });
+ 
++  test('persists task input images for later retry', () => {
++    const dbPath = getTempDbPath();
++    const repository = createPlaygroundTaskRepository({ dbPath });
++
++    repository.createTask({
++      id: 'task_retryable',
++      sceneId: 'nail-design',
++      userPrompt: '粉色法式',
++      count: 2,
++      inputImages: [
++        'data:image/png;base64,input-a',
++        'data:image/png;base64,input-b',
++      ],
++      items: [
++        { id: 'item_retryable_0', index: 0, generationId: 'gen_retryable_0' },
++        { id: 'item_retryable_1', index: 1, generationId: 'gen_retryable_1' },
++      ],
++    });
++
++    repository.close();
++
++    const reopenedRepository = createPlaygroundTaskRepository({ dbPath });
++
++    expect(reopenedRepository.getTaskInputImages('task_retryable')).toEqual([
++      'data:image/png;base64,input-a',
++      'data:image/png;base64,input-b',
++    ]);
++
++    reopenedRepository.close();
++  });
++
++  test('marks only failed tasks with stored input images as retryable', () => {
++    const repository = createPlaygroundTaskRepository({ dbPath: getTempDbPath() });
++
++    repository.createTask({
++      id: 'task_retryable_failed',
++      sceneId: 'nail-design',
++      userPrompt: '',
++      count: 1,
++      inputImages: ['data:image/png;base64,input'],
++      items: [{ id: 'item_retryable_failed', index: 0, generationId: 'gen_retryable_failed' }],
++    });
++    repository.markTaskRunning('task_retryable_failed');
++    repository.markItemRunning('item_retryable_failed');
++    repository.failItem('item_retryable_failed', 'Provider overloaded.');
++
++    repository.createTask({
++      id: 'task_legacy_failed',
++      sceneId: 'nail-design',
++      userPrompt: '',
++      count: 1,
++      items: [{ id: 'item_legacy_failed', index: 0, generationId: 'gen_legacy_failed' }],
++    });
++    repository.markTaskRunning('task_legacy_failed');
++    repository.markItemRunning('item_legacy_failed');
++    repository.failItem('item_legacy_failed', 'Provider overloaded.');
++
++    const retryFlags = Object.fromEntries(
++      repository.listTasks().map(task => [task.id, task.canRetry]),
++    );
++
++    expect(retryFlags).toMatchObject({
++      task_legacy_failed: false,
++      task_retryable_failed: true,
++    });
++
++    repository.close();
++  });
++
+   test('persists lab and shoot task modes', () => {
+     const timestamps = [
+       new Date('2026-07-02T10:00:00.000Z'),
+diff --git a/lib/server/playgroundTaskRepository.ts b/lib/server/playgroundTaskRepository.ts
+index 2fb8acd..21ef5ef 100644
+--- a/lib/server/playgroundTaskRepository.ts
++++ b/lib/server/playgroundTaskRepository.ts
+@@ -1,6 +1,6 @@
+ import { mkdirSync } from 'node:fs';
+ import path from 'node:path';
+-import { DatabaseSync } from 'node:sqlite';
++import { DatabaseSync } from './sqlite';
+ 
+ export type PlaygroundTaskStatus = 'queued' | 'running' | 'partial' | 'completed' | 'failed';
+ export type PlaygroundTaskItemStatus = 'queued' | 'running' | 'completed' | 'failed';
+@@ -34,6 +34,7 @@ export type PlaygroundTaskItemRecord = {
+ export type PlaygroundTaskSummary = PlaygroundTaskRecord & {
+   completedItems: number;
+   totalItems: number;
++  canRetry: boolean;
+ };
+ 
+ export type PlaygroundTaskWithItems = {
+@@ -47,6 +48,7 @@ export type CreatePlaygroundTaskInput = {
+   sceneId: string;
+   userPrompt: string;
+   count: 1 | 2 | 4;
++  inputImages?: string[];
+   items: Array<{
+     id: string;
+     index: number;
+@@ -129,8 +131,20 @@ export const createPlaygroundTaskRepository = ({
+       FOREIGN KEY (task_id) REFERENCES playground_tasks(id) ON DELETE CASCADE
+     );
+ 
++    CREATE TABLE IF NOT EXISTS playground_task_input_images (
++      task_id TEXT NOT NULL,
++      image_index INTEGER NOT NULL,
++      image_data TEXT NOT NULL,
++      created_at TEXT NOT NULL,
++      PRIMARY KEY (task_id, image_index),
++      FOREIGN KEY (task_id) REFERENCES playground_tasks(id) ON DELETE CASCADE
++    );
++
+     CREATE INDEX IF NOT EXISTS idx_playground_task_items_task_id
+       ON playground_task_items(task_id, item_index);
++
++    CREATE INDEX IF NOT EXISTS idx_playground_task_input_images_task_id
++      ON playground_task_input_images(task_id, image_index);
+   `);
+ 
+   const taskColumns = Array.from(db.prepare(`
+@@ -190,6 +204,11 @@ export const createPlaygroundTaskRepository = ({
+           id, task_id, item_index, generation_id, status, updated_at
+         ) VALUES (?, ?, ?, ?, 'queued', ?)
+       `);
++      const insertInputImage = db.prepare(`
++        INSERT INTO playground_task_input_images (
++          task_id, image_index, image_data, created_at
++        ) VALUES (?, ?, ?, ?)
++      `);
+ 
+       db.exec('BEGIN');
+       try {
+@@ -205,6 +224,9 @@ export const createPlaygroundTaskRepository = ({
+         input.items.forEach(item => {
+           insertItem.run(item.id, input.id, item.index, item.generationId, timestamp);
+         });
++        (input.inputImages || []).forEach((image, index) => {
++          insertInputImage.run(input.id, index, image, timestamp);
++        });
+         db.exec('COMMIT');
+       } catch (error) {
+         db.exec('ROLLBACK');
+@@ -277,15 +299,31 @@ export const createPlaygroundTaskRepository = ({
+       };
+     },
+ 
++    getTaskInputImages(taskId: string): string[] {
++      const rows = Array.from(db.prepare(`
++        SELECT image_data FROM playground_task_input_images
++        WHERE task_id = ?
++        ORDER BY image_index ASC
++      `).iterate(taskId)) as Array<{ image_data: string }>;
++
++      return rows.map(row => row.image_data);
++    },
++
+     listTasks(limit = 20): PlaygroundTaskSummary[] {
+       const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 100);
+       const rows = Array.from(db.prepare(`
+         SELECT
+           t.*,
+           COUNT(i.id) AS total_items,
+-          SUM(CASE WHEN i.status = 'completed' THEN 1 ELSE 0 END) AS completed_items
++          SUM(CASE WHEN i.status = 'completed' THEN 1 ELSE 0 END) AS completed_items,
++          COALESCE(input_counts.input_image_count, 0) AS input_image_count
+         FROM playground_tasks t
+         LEFT JOIN playground_task_items i ON i.task_id = t.id
++        LEFT JOIN (
++          SELECT task_id, COUNT(*) AS input_image_count
++          FROM playground_task_input_images
++          GROUP BY task_id
++        ) input_counts ON input_counts.task_id = t.id
+         GROUP BY t.id
+         ORDER BY t.created_at DESC
+         LIMIT ?
+@@ -295,6 +333,9 @@ export const createPlaygroundTaskRepository = ({
+         ...mapTask(row),
+         completedItems: Number(row.completed_items || 0),
+         totalItems: Number(row.total_items || 0),
++        canRetry:
++          (row.status === 'failed' || row.status === 'partial') &&
++          Number(row.input_image_count || 0) > 0,
+       }));
+     },
+ 
+diff --git a/lib/server/themeConfigRepository.ts b/lib/server/themeConfigRepository.ts
+index b92859c..a4797c4 100644
+--- a/lib/server/themeConfigRepository.ts
++++ b/lib/server/themeConfigRepository.ts
+@@ -1,7 +1,7 @@
+ import { randomUUID } from 'node:crypto';
+ import { mkdirSync } from 'node:fs';
+ import path from 'node:path';
+-import { DatabaseSync } from 'node:sqlite';
++import { DatabaseSync } from './sqlite';
+ import type {
+   ThemeConfigDraftPayload,
+   ThemeConfigTask,
+diff --git a/screens/UnifiedCreation.test.tsx b/screens/UnifiedCreation.test.tsx
+index 07e7d6f..984f62d 100644
+--- a/screens/UnifiedCreation.test.tsx
++++ b/screens/UnifiedCreation.test.tsx
+@@ -7,15 +7,17 @@ import {
+   createGenerationTask,
+   getGenerationTask,
+   listGenerationTasks,
++  retryGenerationTask,
+ } from '../services/generationTaskService';
+ import { listDesignScenes } from '../services/designSceneService';
+ import { DESIGN_SCENES } from '../lib/designScenes';
+-import type { GenerationTaskDetailResponse, GenerationTaskMode } from '../types';
++import type { GenerationTaskDetailResponse, GenerationTaskMode, GenerationTaskStatus } from '../types';
+ 
+ vi.mock('../services/generationTaskService', () => ({
+   createGenerationTask: vi.fn(),
+   getGenerationTask: vi.fn(),
+   listGenerationTasks: vi.fn(),
++  retryGenerationTask: vi.fn(),
+ }));
+ vi.mock('../services/designSceneService', () => ({
+   listDesignScenes: vi.fn(),
+@@ -52,7 +54,14 @@ const renderUnifiedCreation = async (
+ };
+ 
+ const uploadImage = async (fileNames = ['photo.png']) => {
+-  const input = document.querySelector<HTMLInputElement>('[data-testid="creation-file-input"]');
++  let input = document.querySelector<HTMLInputElement>('[data-testid="creation-file-input"]');
++
++  if (!input) {
++    await act(async () => {
++      document.querySelector<HTMLButtonElement>('[data-testid="desktop-composer-collapsed-input"]')?.click();
++    });
++    input = document.querySelector<HTMLInputElement>('[data-testid="creation-file-input"]');
++  }
+ 
+   Object.defineProperty(input, 'files', {
+     configurable: true,
+@@ -82,11 +91,13 @@ const createTaskDetail = ({
+   taskId,
+   completedItems = 1,
+   totalItems = 1,
++  status,
+ }: {
+   mode?: GenerationTaskMode;
+   taskId?: string;
+   completedItems?: number;
+   totalItems?: 1 | 2 | 4;
++  status?: GenerationTaskStatus;
+ } = {}): GenerationTaskDetailResponse => ({
+   task: {
+     id: taskId || (mode === 'shoot' ? 'task_shoot' : 'task_123'),
+@@ -94,23 +105,34 @@ const createTaskDetail = ({
+     sceneId: 'nail-design',
+     userPrompt: mode === 'lab' ? '科幻风' : '',
+     count: totalItems,
+-    status: completedItems === totalItems ? 'completed' : 'running',
++    status: status || (completedItems === totalItems ? 'completed' : 'running'),
+     createdAt: '2026-07-01T00:00:00.000Z',
+     updatedAt: '2026-07-01T00:00:08.000Z',
+   },
+-  items: Array.from({ length: totalItems }, (_, index) => ({
+-    id: `item_${index}`,
+-    taskId: taskId || (mode === 'shoot' ? 'task_shoot' : 'task_123'),
+-    index,
+-    generationId: `gen_${index}`,
+-    status: index < completedItems ? 'completed' : 'running',
+-    imageUrl: index < completedItems ? `https://cos.example.com/gen_${index}.png` : null,
+-    downloadUrl: index < completedItems ? `https://cos.example.com/gen_${index}.png` : null,
+-    errorMessage: null,
+-    startedAt: '2026-07-01T00:00:01.000Z',
+-    completedAt: index < completedItems ? '2026-07-01T00:00:07.000Z' : null,
+-    updatedAt: '2026-07-01T00:00:07.000Z',
+-  })),
++  items: Array.from({ length: totalItems }, (_, index) => {
++    const itemStatus = status === 'failed'
++      ? 'failed'
++      : index < completedItems
++        ? 'completed'
++        : status === 'partial'
++          ? 'failed'
++          : 'running';
++    const completed = itemStatus === 'completed';
++
++    return {
++      id: `item_${index}`,
++      taskId: taskId || (mode === 'shoot' ? 'task_shoot' : 'task_123'),
++      index,
++      generationId: `gen_${index}`,
++      status: itemStatus,
++      imageUrl: completed ? `https://cos.example.com/gen_${index}.png` : null,
++      downloadUrl: completed ? `https://cos.example.com/gen_${index}.png` : null,
++      errorMessage: itemStatus === 'failed' ? 'Provider overloaded.' : null,
++      startedAt: '2026-07-01T00:00:01.000Z',
++      completedAt: itemStatus === 'running' ? null : '2026-07-01T00:00:07.000Z',
++      updatedAt: '2026-07-01T00:00:07.000Z',
++    };
++  }),
+ });
+ 
+ describe('UnifiedCreation', () => {
+@@ -136,10 +158,9 @@ describe('UnifiedCreation', () => {
+     expect(document.body.textContent).toContain('实验生成');
+     expect(document.body.textContent).toContain('拍摄生成');
+     expect(document.querySelector<HTMLButtonElement>('[data-testid="creation-mode-lab"]')?.getAttribute('aria-pressed')).toBe('true');
+-    expect(document.body.textContent).toContain('参考图片');
+-    expect(document.body.textContent).toContain('User Prompt（用户输入）');
+-    expect(document.body.textContent).toContain('生成数量');
+     expect(document.body.textContent).toContain('AI 生成记录');
++    expect(document.querySelector('[data-testid="desktop-composer-collapsed-input"]')).toBeTruthy();
++    expect(document.querySelector('[data-testid="desktop-expanded-creation-panel"]')).toBeFalsy();
+ 
+     const masonry = document.querySelector<HTMLElement>('[data-testid="unified-creation-scene-masonry"]');
+     const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-testid="design-scene-card"]'));
+@@ -215,15 +236,50 @@ describe('UnifiedCreation', () => {
+     expect(stickyGenerate?.textContent).toContain('生成');
+ 
+     const operationDeck = document.querySelector<HTMLElement>('[data-testid="creation-operation-deck"]');
+-    const deckText = operationDeck?.textContent || '';
+-    expect(deckText.indexOf('参考图片')).toBeLessThan(deckText.indexOf('User Prompt（用户输入）'));
+-    expect(deckText.indexOf('User Prompt（用户输入）')).toBeLessThan(deckText.indexOf('生成数量'));
+-    expect(deckText).not.toContain('留空时使用当前主题默认逻辑');
++    expect(operationDeck?.querySelector('[data-testid="desktop-composer-collapsed-input"]')).toBeTruthy();
++    expect(operationDeck?.querySelector('[data-testid="desktop-expanded-creation-panel"]')).toBeFalsy();
++    expect(operationDeck?.textContent).not.toContain('留空时使用当前主题默认逻辑');
+ 
+     expect(document.querySelector('[data-testid="mobile-content-more-plays-section"]')).toBeFalsy();
+     expect(document.querySelector('[data-testid="mobile-more-plays-panel"]')).toBeFalsy();
+   });
+ 
++  test('mirrors the mobile collapsed composer interaction on desktop', async () => {
++    await renderUnifiedCreation();
++
++    const desktopComposer = document.querySelector<HTMLElement>('[data-testid="desktop-creation-composer"]');
++    const desktopChatFlow = document.querySelector<HTMLElement>('[data-testid="desktop-creation-chat-flow"]');
++    const collapsedInput = desktopComposer?.querySelector<HTMLButtonElement>('[data-testid="desktop-composer-collapsed-input"]');
++    expect(desktopComposer).toBeTruthy();
++    expect(desktopChatFlow).toBeTruthy();
++    expect(collapsedInput).toBeTruthy();
++    expect(collapsedInput?.textContent).toContain('上传参考图，描述想要的美甲');
++    expect(desktopComposer?.querySelector('[data-testid="desktop-expanded-creation-panel"]')).toBeFalsy();
++    expect(desktopComposer?.querySelector('[data-testid="creation-file-input"]')).toBeFalsy();
++    expect(desktopComposer?.querySelector('[data-testid="creation-user-prompt"]')).toBeFalsy();
++    expect(desktopComposer?.querySelector('[data-testid="creation-generate-button"]')).toBeFalsy();
++
++    await act(async () => {
++      collapsedInput?.click();
++    });
++
++    const expandedPanel = desktopComposer?.querySelector<HTMLElement>('[data-testid="desktop-expanded-creation-panel"]');
++    expect(expandedPanel).toBeTruthy();
++    expect(expandedPanel?.textContent).toContain('添加参考');
++    expect(expandedPanel?.textContent).toContain('补充要求');
++    expect(expandedPanel?.textContent).toContain('可选');
++    expect(expandedPanel?.querySelector('[data-testid="creation-file-input"]')).toBeTruthy();
++    expect(expandedPanel?.querySelector('[data-testid="creation-user-prompt"]')).toBeTruthy();
++    expect(expandedPanel?.querySelector('[data-testid="creation-generate-button"]')).toBeTruthy();
++
++    await act(async () => {
++      desktopChatFlow?.click();
++    });
++
++    expect(desktopComposer?.querySelector('[data-testid="desktop-expanded-creation-panel"]')).toBeFalsy();
++    expect(desktopComposer?.querySelector('[data-testid="desktop-composer-collapsed-input"]')).toBeTruthy();
++  });
++
+   test('selects a weekly play from the low-priority mobile more plays panel', async () => {
+     vi.mocked(listGenerationTasks).mockResolvedValue({
+       tasks: [
+@@ -478,6 +534,17 @@ describe('UnifiedCreation', () => {
+ 
+     const desktopChatFlow = document.querySelector<HTMLElement>('[data-testid="desktop-creation-chat-flow"]');
+     const desktopHistory = document.querySelector<HTMLElement>('[data-testid="desktop-task-history"]');
++    const desktopDeck = document.querySelector<HTMLElement>('[data-testid="creation-operation-deck"]');
++    const desktopComposer = document.querySelector<HTMLElement>('[data-testid="desktop-creation-composer"]');
++    expect(desktopDeck?.className).toContain('flex');
++    expect(desktopDeck?.className).toContain('overflow-hidden');
++    expect(desktopDeck?.className).toContain('h-[calc(100dvh-13rem)]');
++    expect(desktopDeck?.className).toContain('max-h-[814px]');
++    expect(desktopDeck?.className).toContain('xl:h-[calc(100dvh-6rem)]');
++    expect(desktopChatFlow?.className).toContain('flex-1');
++    expect(desktopChatFlow?.className).toContain('min-h-0');
++    expect(desktopChatFlow?.className).toContain('overflow-y-auto');
++    expect(desktopComposer?.className).toContain('shrink-0');
+     expect(desktopChatFlow).toBeTruthy();
+     expect(desktopHistory).toBeTruthy();
+     expect(desktopChatFlow?.contains(desktopHistory)).toBe(true);
+@@ -490,23 +557,23 @@ describe('UnifiedCreation', () => {
+       desktopHistory?.querySelectorAll<HTMLElement>('[data-testid="generation-task-row"]') || [],
+     );
+     expect(desktopRows).toHaveLength(2);
+-    expect(desktopRows[0].dataset.taskId).toBe('task_two');
+-    expect(desktopRows[1].dataset.taskId).toBe('task_one');
+-    expect(desktopRows[0].textContent).toContain('角色速写');
+-    expect(desktopRows[0].textContent).toContain('实验生成');
+-    expect(desktopRows[0].textContent).toContain('已完成');
+-    expect(desktopRows[0].textContent).not.toContain('task_two');
++    expect(desktopRows[0].dataset.taskId).toBe('task_one');
++    expect(desktopRows[1].dataset.taskId).toBe('task_two');
++    expect(desktopRows[1].textContent).toContain('角色速写');
++    expect(desktopRows[1].textContent).toContain('实验生成');
++    expect(desktopRows[1].textContent).toContain('已完成');
++    expect(desktopRows[1].textContent).not.toContain('task_two');
+     expect(
+-      desktopRows[0].querySelector<HTMLElement>('[data-testid="generation-task-count"]')?.className,
++      desktopRows[1].querySelector<HTMLElement>('[data-testid="generation-task-count"]')?.className,
+     ).toContain('min-w-[4.5rem]');
+ 
+     await act(async () => {
+-      desktopRows[0]
++      desktopRows[1]
+         .querySelector<HTMLButtonElement>('[data-testid="generation-task-summary"]')
+         ?.click();
+     });
+ 
+-    expect(desktopRows[0].querySelector('[data-testid="generation-task-inline-detail"]')).toBeTruthy();
++    expect(desktopRows[1].querySelector('[data-testid="generation-task-inline-detail"]')).toBeTruthy();
+ 
+     await act(async () => {
+       mobileHistory
+@@ -562,6 +629,117 @@ describe('UnifiedCreation', () => {
+     expect(getGenerationTask).toHaveBeenCalledTimes(detailFetchCountBeforeCollapse);
+   });
+ 
++  test('retries a failed task as a new full-batch chat message', async () => {
++    vi.mocked(listGenerationTasks)
++      .mockResolvedValueOnce({
++        tasks: [
++          {
++            id: 'task_failed',
++            mode: 'lab',
++            sceneId: 'nail-design',
++            userPrompt: '粉色法式',
++            count: 2,
++            status: 'failed',
++            createdAt: '2026-07-02T00:00:00.000Z',
++            updatedAt: '2026-07-02T00:00:08.000Z',
++            completedItems: 0,
++            totalItems: 2,
++            canRetry: true,
++          },
++        ],
++      })
++      .mockResolvedValueOnce({
++        tasks: [
++          {
++            id: 'task_failed',
++            mode: 'lab',
++            sceneId: 'nail-design',
++            userPrompt: '粉色法式',
++            count: 2,
++            status: 'failed',
++            createdAt: '2026-07-02T00:00:00.000Z',
++            updatedAt: '2026-07-02T00:00:08.000Z',
++            completedItems: 0,
++            totalItems: 2,
++            canRetry: true,
++          },
++          {
++            id: 'task_retry',
++            mode: 'lab',
++            sceneId: 'nail-design',
++            userPrompt: '粉色法式',
++            count: 2,
++            status: 'running',
++            createdAt: '2026-07-02T00:02:00.000Z',
++            updatedAt: '2026-07-02T00:02:08.000Z',
++            completedItems: 0,
++            totalItems: 2,
++          },
++        ],
++      });
++    vi.mocked(retryGenerationTask).mockResolvedValue({ taskId: 'task_retry' });
++    vi.mocked(getGenerationTask).mockResolvedValue(
++      createTaskDetail({
++        taskId: 'task_retry',
++        completedItems: 0,
++        totalItems: 2,
++        status: 'running',
++      }),
++    );
++
++    await renderUnifiedCreation();
++
++    const desktopHistory = document.querySelector<HTMLElement>('[data-testid="desktop-task-history"]');
++    const failedRow = desktopHistory?.querySelector<HTMLElement>('[data-task-id="task_failed"]');
++    const retryButton = failedRow?.querySelector<HTMLButtonElement>('[data-testid="generation-task-retry"]');
++    expect(retryButton).toBeTruthy();
++    expect(retryButton?.textContent).toContain('重试');
++
++    await act(async () => {
++      retryButton?.click();
++    });
++
++    expect(retryGenerationTask).toHaveBeenCalledWith('task_failed');
++    expect(getGenerationTask).toHaveBeenCalledWith('task_retry');
++
++    const rows = Array.from(
++      desktopHistory?.querySelectorAll<HTMLElement>('[data-testid="generation-task-row"]') || [],
++    );
++    expect(rows.map(row => row.dataset.taskId)).toEqual(['task_failed', 'task_retry']);
++    expect(rows[1].textContent).toContain('生成中');
++    expect(rows[1].querySelector('[data-testid="generation-task-inline-detail"]')).toBeTruthy();
++  });
++
++  test('shows a disabled retry entry for legacy failed tasks without stored inputs', async () => {
++    vi.mocked(listGenerationTasks).mockResolvedValue({
++      tasks: [
++        {
++          id: 'task_legacy_failed',
++          mode: 'lab',
++          sceneId: 'theme-12',
++          userPrompt: '',
++          count: 1,
++          status: 'failed',
++          createdAt: '2026-07-02T00:00:00.000Z',
++          updatedAt: '2026-07-02T00:00:08.000Z',
++          completedItems: 0,
++          totalItems: 1,
++          canRetry: false,
++        },
++      ],
++    });
++
++    await renderUnifiedCreation();
++
++    const desktopHistory = document.querySelector<HTMLElement>('[data-testid="desktop-task-history"]');
++    const failedRow = desktopHistory?.querySelector<HTMLElement>('[data-task-id="task_legacy_failed"]');
++    const retryButton = failedRow?.querySelector<HTMLButtonElement>('[data-testid="generation-task-retry"]');
++    expect(retryButton).toBeTruthy();
++    expect(retryButton?.disabled).toBe(true);
++    expect(retryButton?.textContent).toContain('重试');
++    expect(retryButton?.getAttribute('aria-label')).toContain('无法自动重试');
++  });
++
+   test('creates a lab task from uploaded images', async () => {
+     vi.stubGlobal('FileReader', MockFileReader);
+     vi.mocked(createGenerationTask).mockResolvedValue({ taskId: 'task_123' });
+@@ -610,13 +788,9 @@ describe('UnifiedCreation', () => {
+     expect(desktopComposer).toBeTruthy();
+ 
+     expect(desktopComposer?.textContent).not.toContain('photo.png');
+-    expect(desktopComposer?.textContent).toContain('上传一张参考图');
+-    expect(
+-      desktopComposer?.querySelector<HTMLTextAreaElement>('[data-testid="creation-user-prompt"]')?.value,
+-    ).toBe('');
+-    expect(
+-      desktopComposer?.querySelector<HTMLButtonElement>('[data-testid="creation-generate-button"]')?.disabled,
+-    ).toBe(true);
++    expect(desktopComposer?.textContent).toContain('上传参考图，描述想要的美甲');
++    expect(desktopComposer?.querySelector('[data-testid="desktop-composer-collapsed-input"]')).toBeTruthy();
++    expect(desktopComposer?.querySelector('[data-testid="desktop-expanded-creation-panel"]')).toBeFalsy();
+   });
+ 
+   test('removes an uploaded reference image before creating a lab task', async () => {
+@@ -921,7 +1095,7 @@ describe('UnifiedCreation', () => {
+     });
+ 
+     expect(document.querySelector('[data-testid="creation-operation-deck"]')).toBeTruthy();
+-    expect(document.querySelector('[data-testid="creation-file-input"]')).toBeTruthy();
++    expect(document.querySelector('[data-testid="desktop-composer-collapsed-input"]')).toBeTruthy();
+ 
+     await act(async () => {
+       document.querySelector<HTMLButtonElement>('[data-testid="creation-mode-shoot"]')?.click();
+@@ -938,7 +1112,7 @@ describe('UnifiedCreation', () => {
+     });
+ 
+     expect(document.querySelector('[data-testid="creation-operation-deck"]')).toBeTruthy();
+-    expect(document.querySelector('[data-testid="creation-file-input"]')).toBeTruthy();
++    expect(document.querySelector('[data-testid="desktop-composer-collapsed-input"]')).toBeTruthy();
+     expect(document.querySelector('[data-testid="fake-camera"]')).toBeFalsy();
+   });
+ });
+diff --git a/screens/UnifiedCreation.tsx b/screens/UnifiedCreation.tsx
+index d39c733..857a680 100644
+--- a/screens/UnifiedCreation.tsx
++++ b/screens/UnifiedCreation.tsx
+@@ -7,6 +7,7 @@ import {
+   createGenerationTask,
+   getGenerationTask,
+   listGenerationTasks,
++  retryGenerationTask,
+ } from '../services/generationTaskService';
+ import { listDesignScenes } from '../services/designSceneService';
+ import type {
+@@ -38,11 +39,12 @@ type UnifiedCreationProps = {
+ 
+ const COUNT_OPTIONS: PlaygroundGenerationCount[] = [1, 2, 4];
+ const ACTIVE_TASK_STATUSES = new Set(['queued', 'running']);
++const RETRIABLE_TASK_STATUSES = new Set<GenerationTaskStatus>(['failed', 'partial']);
+ const MAX_REFERENCE_IMAGES = 3;
+ const MOBILE_MORE_PLAY_LIMIT = 3;
+ 
+ const DECK_CLASS =
+-  'rounded-[1.25rem] border border-brand-black/10 bg-white/95 p-4 pb-20 shadow-[0_24px_80px_rgba(24,24,27,0.12)] backdrop-blur xl:sticky xl:top-20 xl:min-h-[814px]';
++  'flex h-[calc(100dvh-13rem)] max-h-[814px] min-h-0 flex-col overflow-hidden rounded-[1.25rem] border border-brand-black/10 bg-white/95 p-4 shadow-[0_24px_80px_rgba(24,24,27,0.12)] backdrop-blur xl:sticky xl:top-20 xl:h-[calc(100dvh-6rem)]';
+ const DECK_SECTION_CLASS = 'border-t border-brand-black/10 pt-4';
+ const EYEBROW_CLASS = 'text-[11px] font-black uppercase tracking-[0.18em] text-brand-blue';
+ const SECTION_TITLE_CLASS = 'text-xl font-black tracking-normal';
+@@ -252,6 +254,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+   const [shootStep, setShootStep] = useState<ShootStep>('theme');
+   const [isMobileMorePlaysOpen, setIsMobileMorePlaysOpen] = useState(false);
+   const [isMobileComposerExpanded, setIsMobileComposerExpanded] = useState(false);
++  const [isDesktopComposerExpanded, setIsDesktopComposerExpanded] = useState(false);
+   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+   const [userPrompt, setUserPrompt] = useState('');
+   const [count, setCount] = useState<PlaygroundGenerationCount>(1);
+@@ -259,6 +262,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+   const [recentTasks, setRecentTasks] = useState<GenerationTaskSummary[]>([]);
+   const [previewItem, setPreviewItem] = useState<GenerationTaskItem | null>(null);
+   const [isCreatingTask, setIsCreatingTask] = useState(false);
++  const [retryingTaskId, setRetryingTaskId] = useState<string | null>(null);
+   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+ 
+@@ -273,14 +277,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+     !isCreatingTask;
+   const currentTaskIsInRecentTasks =
+     !!currentTask && recentTasks.some((task) => task.id === currentTask.task.id);
+-  const sortedRecentTasks = useMemo(
+-    () =>
+-      [...recentTasks].sort(
+-        (left, right) => getTaskCreatedTime(right.createdAt) - getTaskCreatedTime(left.createdAt),
+-      ),
+-    [recentTasks],
+-  );
+-  const mobileRecentTasks = useMemo(
++  const chronologicalRecentTasks = useMemo(
+     () =>
+       [...recentTasks].sort(
+         (left, right) => getTaskCreatedTime(left.createdAt) - getTaskCreatedTime(right.createdAt),
+@@ -308,6 +305,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+ 
+     setIsMobileMorePlaysOpen(false);
+     setIsMobileComposerExpanded(false);
++    setIsDesktopComposerExpanded(false);
+   };
+ 
+   const handleLabSceneSelect = (scene: DesignSceneCardData) => {
+@@ -327,6 +325,12 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+     }
+   };
+ 
++  const collapseDesktopComposer = () => {
++    if (isDesktopComposerExpanded) {
++      setIsDesktopComposerExpanded(false);
++    }
++  };
++
+   const handleShootSceneSelect = (scene: DesignSceneCardData) => {
+     setSelectedSceneId(scene.id);
+     setCurrentTask(null);
+@@ -360,6 +364,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+       setUploadedImages((current) => [...current, ...nextImages].slice(0, MAX_REFERENCE_IMAGES));
+       setCurrentTask(null);
+       setIsMobileComposerExpanded(true);
++      setIsDesktopComposerExpanded(true);
+     } catch (uploadError) {
+       setUploadedImages([]);
+       setError(uploadError instanceof Error ? uploadError.message : 'Image upload failed.');
+@@ -422,6 +427,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+       setUploadedImages([]);
+       setUserPrompt('');
+       setIsMobileComposerExpanded(false);
++      setIsDesktopComposerExpanded(false);
+       await refreshRecentTasks();
+     } catch (generationError) {
+       setError(generationError instanceof Error ? generationError.message : '任务创建失败。');
+@@ -430,6 +436,24 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+     }
+   };
+ 
++  const handleRetryTask = async (taskId: string) => {
++    setError(null);
++    setRetryingTaskId(taskId);
++    setIsMobileComposerExpanded(false);
++    setIsDesktopComposerExpanded(false);
++
++    try {
++      const response = await retryGenerationTask(taskId);
++      const detail = await getGenerationTask(response.taskId);
++      setCurrentTask(detail);
++      await refreshRecentTasks();
++    } catch (retryError) {
++      setError(retryError instanceof Error ? retryError.message : '任务重试失败。');
++    } finally {
++      setRetryingTaskId(null);
++    }
++  };
++
+   const handleShootCapture = async (capturedImage: string) => {
+     setError(null);
+     setIsCreatingTask(true);
+@@ -682,7 +706,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+         </div>
+       )}
+ 
+-      {sortedRecentTasks.map((task) => {
++      {chronologicalRecentTasks.map((task) => {
+         const expanded = currentTask?.task.id === task.id;
+         const statusMeta = TASK_STATUS_META[task.status];
+ 
+@@ -736,6 +760,25 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+                 </div>
+               </button>
+ 
++              {RETRIABLE_TASK_STATUSES.has(task.status) && (
++                <div className="flex justify-end px-3 pb-3">
++                  <button
++                    type="button"
++                    data-testid="generation-task-retry"
++                    aria-label={task.canRetry === true ? '重试任务' : '旧任务缺少原始参考图，无法自动重试'}
++                    title={task.canRetry === true ? undefined : '旧任务缺少原始参考图，无法自动重试'}
++                    onClick={(event) => {
++                      event.stopPropagation();
++                      void handleRetryTask(task.id);
++                    }}
++                    disabled={retryingTaskId !== null || task.canRetry !== true}
++                    className="inline-flex min-h-9 items-center justify-center rounded-full bg-brand-black px-4 text-xs font-black text-white transition hover:bg-brand-blue disabled:bg-gray-300 disabled:text-white"
++                  >
++                    {retryingTaskId === task.id ? '重试中...' : '重试'}
++                  </button>
++                </div>
++              )}
++
+               {expanded && currentTask && renderInlineTaskDetail(currentTask, 'grid-cols-2')}
+             </div>
+           </article>
+@@ -786,7 +829,7 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+         </div>
+       )}
+ 
+-      {mobileRecentTasks.map((task) => {
++      {chronologicalRecentTasks.map((task) => {
+         const expanded = currentTask?.task.id === task.id;
+         const statusMeta = TASK_STATUS_META[task.status];
+ 
+@@ -840,6 +883,25 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+                 </div>
+               </button>
+ 
++              {RETRIABLE_TASK_STATUSES.has(task.status) && (
++                <div className="flex justify-end px-3 pb-3">
++                  <button
++                    type="button"
++                    data-testid="generation-task-retry"
++                    aria-label={task.canRetry === true ? '重试任务' : '旧任务缺少原始参考图，无法自动重试'}
++                    title={task.canRetry === true ? undefined : '旧任务缺少原始参考图，无法自动重试'}
++                    onClick={(event) => {
++                      event.stopPropagation();
++                      void handleRetryTask(task.id);
++                    }}
++                    disabled={retryingTaskId !== null || task.canRetry !== true}
++                    className="inline-flex min-h-9 items-center justify-center rounded-full bg-brand-black px-4 text-xs font-black text-white transition active:scale-[0.98] disabled:bg-gray-300 disabled:text-white"
++                  >
++                    {retryingTaskId === task.id ? '重试中...' : '重试'}
++                  </button>
++                </div>
++              )}
++
+               {expanded && currentTask && renderInlineTaskDetail(currentTask, 'grid-cols-2')}
+             </div>
+           </article>
+@@ -1285,14 +1347,18 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+         </div>
+ 
+         <aside data-testid="creation-operation-deck" className={DECK_CLASS}>
+-          <div className="mb-4 flex items-start justify-between gap-4 border-b border-brand-black/10 pb-4">
++          <div className="mb-4 flex shrink-0 items-start justify-between gap-4 border-b border-brand-black/10 pb-4">
+             <h2 className="text-2xl font-black tracking-normal">对话流</h2>
+             <span className="max-w-[150px] truncate rounded-full bg-[#f3f7ff] px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-brand-blue">
+               {selectedScene.name}
+             </span>
+           </div>
+ 
+-          <div data-testid="desktop-creation-chat-flow" className="space-y-4">
++          <div
++            data-testid="desktop-creation-chat-flow"
++            onClick={collapseDesktopComposer}
++            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1"
++          >
+             <article className="flex items-start gap-3">
+               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-black text-sm font-black text-white">
+                 菠
+@@ -1312,79 +1378,128 @@ export const UnifiedCreation: React.FC<UnifiedCreationProps> = ({
+             {renderDesktopTaskMessages()}
+           </div>
+ 
+-          <div data-testid="desktop-creation-composer" className="mt-5 space-y-4 border-t border-brand-black/10 pt-4">
+-            <section>
+-              <div className="mb-2 flex items-center justify-between gap-4">
+-                <h2 className="text-lg font-black tracking-normal">参考图片</h2>
+-                <span className="rounded-full bg-[#fff3eb] px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-brand-orange">
+-                  UPLOAD
+-                </span>
++          <div data-testid="desktop-creation-composer" className="mt-5 shrink-0 space-y-3 border-t border-brand-black/10 pt-4">
++            {error && (
++              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
++                {error}
+               </div>
+-              <label className="flex min-h-[132px] cursor-pointer flex-col items-center justify-center rounded-[0.9rem] border border-dashed border-brand-black/20 bg-[#f8fbff] p-3 text-center transition-all hover:border-brand-blue hover:bg-white">
+-                {uploadedImages.length > 0 ? (
+-                  renderUploadedImageGrid()
+-                ) : (
+-                  <>
+-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-black/10 bg-white text-xl font-black text-brand-blue">
+-                      +
+-                    </span>
+-                    <span className="mt-2 text-sm font-black">上传一张参考图</span>
+-                    <span className="mt-1 text-xs font-medium leading-5 text-gray-500">
+-                      最多 3 张，支持 PNG、JPG、WebP
+-                    </span>
+-                  </>
+-                )}
+-                <input
+-                  data-testid="creation-file-input"
+-                  type="file"
+-                  accept="image/*"
+-                  multiple
+-                  className="sr-only"
+-                  onChange={handleFileChange}
+-                />
+-              </label>
+-            </section>
++            )}
+ 
+-            {renderUserPromptSection(DECK_SECTION_CLASS)}
++            {!isDesktopComposerExpanded && (
++              <div className="space-y-2">
++                <button
++                  type="button"
++                  data-testid="desktop-mode-pill"
++                  aria-pressed="true"
++                  className="min-h-10 rounded-full border border-brand-black/10 bg-white px-4 text-sm font-black text-brand-black shadow-[0_8px_22px_rgba(24,24,27,0.08)]"
++                >
++                  {selectedScene.name}
++                </button>
+ 
+-            <section className={DECK_SECTION_CLASS}>
+-              <div className="mb-2 flex items-center justify-between gap-4">
+-                <h2 className="text-lg font-black tracking-normal">生成数量</h2>
+-                <span className="rounded-full bg-[#fdf0f7] px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-brand-pink">
+-                  PARALLEL
+-                </span>
++                <button
++                  type="button"
++                  data-testid="desktop-composer-collapsed-input"
++                  onClick={() => setIsDesktopComposerExpanded(true)}
++                  className="flex min-h-16 w-full items-center justify-between gap-3 rounded-[1.25rem] border border-brand-black/10 bg-white px-5 text-left text-base font-black text-gray-500 shadow-[0_14px_34px_rgba(24,24,27,0.08)] transition active:scale-[0.99]"
++                >
++                  <span>上传参考图，描述想要的美甲</span>
++                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-black text-xl font-black leading-none text-white">
++                    +
++                  </span>
++                </button>
+               </div>
+-              <div className="grid grid-cols-3 gap-2">
+-                {COUNT_OPTIONS.map((option) => (
++            )}
++
++            {isDesktopComposerExpanded && (
++              <div
++                data-testid="desktop-expanded-creation-panel"
++                className="space-y-4 rounded-[1.5rem] border border-brand-black/10 bg-white p-3 shadow-[0_18px_48px_rgba(24,24,27,0.12)]"
++              >
++                <div className="flex items-center justify-between gap-3">
+                   <button
+-                    key={option}
+                     type="button"
+-                    aria-pressed={count === option}
+-                    onClick={() => setCount(option)}
+-                    className={`rounded-xl border px-5 py-2.5 text-lg font-black transition-all ${
+-                      count === option
+-                        ? 'border-brand-blue bg-brand-blue text-white shadow-[0_12px_28px_rgba(59,130,246,0.18)]'
+-                        : 'border-brand-black/10 bg-white text-brand-black hover:border-brand-black/25'
+-                    }`}
++                    data-testid="desktop-mode-pill"
++                    aria-pressed="true"
++                    className="min-h-10 rounded-full bg-brand-gray px-4 text-sm font-black text-brand-black"
+                   >
+-                    {option}
++                    {selectedScene.name}
+                   </button>
+-                ))}
+-              </div>
+-              <Button
+-                data-testid="creation-generate-button"
+-                onClick={handleLabGenerate}
+-                disabled={!canGenerate}
+-                className="mt-3 w-full rounded-xl px-8 py-3 text-sm"
+-              >
+-                {isCreatingTask ? '创建任务中...' : '开始生成'}
+-              </Button>
+-              {error && (
+-                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+-                  {error}
++                  <span className="text-xs font-bold text-gray-500">
++                    {uploadedImages.length > 0 ? `${uploadedImages.length} / ${MAX_REFERENCE_IMAGES} 张参考图` : '还需上传参考图'}
++                  </span>
+                 </div>
+-              )}
+-            </section>
++
++                <label className="block cursor-pointer rounded-[1rem] border border-dashed border-brand-black/15 bg-[#f8fbff] p-3 transition active:scale-[0.99]">
++                  {uploadedImages.length > 0 ? (
++                    renderUploadedImageGrid()
++                  ) : (
++                    <div className="flex min-h-[104px] items-center gap-4">
++                      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white text-3xl font-black text-brand-blue shadow-[0_8px_18px_rgba(24,24,27,0.08)]">
++                        +
++                      </span>
++                      <span className="text-lg font-black text-gray-500">添加参考</span>
++                    </div>
++                  )}
++                  <input
++                    data-testid="creation-file-input"
++                    type="file"
++                    accept="image/*"
++                    multiple
++                    className="sr-only"
++                    onChange={handleFileChange}
++                  />
++                </label>
++
++                <div>
++                  <div className="mb-2 flex items-center justify-between gap-2">
++                    <label htmlFor="desktop-creation-user-prompt" className="text-sm font-black text-brand-black">
++                      补充要求
++                    </label>
++                    <span className="rounded-full bg-brand-gray px-2.5 py-1 text-[11px] font-black text-gray-500">
++                      可选
++                    </span>
++                  </div>
++                  <textarea
++                    id="desktop-creation-user-prompt"
++                    data-testid="creation-user-prompt"
++                    value={userPrompt}
++                    onChange={(event) => setUserPrompt(event.target.value)}
++                    placeholder="粉色系、法式、甜酷一点..."
++                    className="min-h-[112px] w-full resize-none rounded-[1rem] border border-brand-black/10 bg-[#f7f8fb] p-3 text-base font-semibold leading-6 text-brand-black outline-none transition focus:border-brand-blue focus:bg-white focus:ring-4 focus:ring-brand-blue/10"
++                  />
++                </div>
++
++                <div className="flex items-center justify-between gap-3">
++                  <div className="inline-grid grid-cols-3 rounded-full bg-brand-gray p-1">
++                    {COUNT_OPTIONS.map((option) => (
++                      <button
++                        key={option}
++                        type="button"
++                        aria-label={`生成 ${option} 张`}
++                        aria-pressed={count === option}
++                        onClick={() => setCount(option)}
++                        className={`flex h-10 min-w-10 items-center justify-center rounded-full px-4 text-sm font-black transition ${
++                          count === option
++                            ? 'bg-brand-black text-white'
++                            : 'text-gray-500 active:bg-white'
++                        }`}
++                      >
++                        {option}
++                      </button>
++                    ))}
++                  </div>
++
++                  <Button
++                    data-testid="creation-generate-button"
++                    onClick={handleLabGenerate}
++                    disabled={!canGenerate}
++                    className="min-h-12 shrink-0 rounded-xl px-7 py-3 text-sm shadow-none"
++                  >
++                    {isCreatingTask ? '创建中...' : '生成'}
++                  </Button>
++                </div>
++              </div>
++            )}
+           </div>
+         </aside>
+       </section>
+diff --git a/services/generationTaskService.test.ts b/services/generationTaskService.test.ts
+index 35852f0..cce4fa9 100644
+--- a/services/generationTaskService.test.ts
++++ b/services/generationTaskService.test.ts
+@@ -3,6 +3,7 @@ import {
+   createGenerationTask,
+   getGenerationTask,
+   listGenerationTasks,
++  retryGenerationTask,
+ } from './generationTaskService';
+ 
+ describe('generationTaskService', () => {
+@@ -72,4 +73,17 @@ describe('generationTaskService', () => {
+     await expect(listGenerationTasks()).resolves.toEqual({ tasks: [] });
+     expect(fetchMock).toHaveBeenCalledWith('/api/images/tasks');
+   });
++
++  test('retries a canonical generation task', async () => {
++    const fetchMock = vi.fn().mockResolvedValue(
++      new Response(JSON.stringify({ taskId: 'task_retry' }), { status: 200 })
++    );
++    vi.stubGlobal('fetch', fetchMock);
++
++    await expect(retryGenerationTask('task_failed')).resolves.toEqual({ taskId: 'task_retry' });
++
++    expect(fetchMock).toHaveBeenCalledWith('/api/images/tasks/task_failed/retry', {
++      method: 'POST',
++    });
++  });
+ });
+diff --git a/services/generationTaskService.ts b/services/generationTaskService.ts
+index f987165..6653e96 100644
+--- a/services/generationTaskService.ts
++++ b/services/generationTaskService.ts
+@@ -53,6 +53,25 @@ export const getGenerationTask = async (
+   return payload as GenerationTaskDetailResponse;
+ };
+ 
++export const retryGenerationTask = async (
++  taskId: string
++): Promise<GenerationTaskCreateResponse> => {
++  const response = await fetch(`/api/images/tasks/${encodeURIComponent(taskId)}/retry`, {
++    method: 'POST',
++  });
++  const payload = await readJson(response);
++
++  if (!response.ok) {
++    throw new Error(payload?.error || `Generation task retry failed (${response.status}).`);
++  }
++
++  if (typeof payload?.taskId !== 'string') {
++    throw new Error('Generation task retry failed: response did not include taskId.');
++  }
++
++  return { taskId: payload.taskId };
++};
++
+ export const listGenerationTasks = async (): Promise<GenerationTaskListResponse> => {
+   const response = await fetch('/api/images/tasks');
+   const payload = await readJson(response);
+diff --git a/types.ts b/types.ts
+index 305d1a0..78906c3 100644
+--- a/types.ts
++++ b/types.ts
+@@ -130,6 +130,7 @@ export interface GenerationTaskItem {
+ export interface GenerationTaskSummary extends GenerationTask {
+   completedItems: number;
+   totalItems: number;
++  canRetry?: boolean;
+ }
+ 
+ export interface GenerationTaskCreateRequest {
