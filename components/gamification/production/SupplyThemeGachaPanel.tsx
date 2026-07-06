@@ -4,11 +4,19 @@ import type { SupplyAiImageSnapshot } from "@/lib/types";
 
 interface SupplyThemeGachaPanelProps {
   snapshot: SupplyAiImageSnapshot;
+  isDrawingTheme?: boolean;
   onDrawTheme: () => Promise<void> | void;
 }
 
-export function SupplyThemeGachaPanel({ snapshot, onDrawTheme }: SupplyThemeGachaPanelProps) {
-  const canDraw = !snapshot.themes.allUnlocked && snapshot.wallet.coins >= snapshot.wallet.themeDrawCost;
+export function SupplyThemeGachaPanel({
+  snapshot,
+  isDrawingTheme = false,
+  onDrawTheme,
+}: SupplyThemeGachaPanelProps) {
+  const canDraw =
+    !isDrawingTheme &&
+    !snapshot.themes.allUnlocked &&
+    snapshot.wallet.coins >= snapshot.wallet.themeDrawCost;
 
   return (
     <section className="supply-theme-gacha-panel grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
@@ -40,7 +48,7 @@ export function SupplyThemeGachaPanel({ snapshot, onDrawTheme }: SupplyThemeGach
           onClick={() => void onDrawTheme()}
           type="button"
         >
-          {snapshot.themes.allUnlocked ? "主题已抽满" : "抽一个新主题"}
+          {snapshot.themes.allUnlocked ? "主题已抽满" : isDrawingTheme ? "抽取中..." : "抽一个新主题"}
         </button>
       </div>
 

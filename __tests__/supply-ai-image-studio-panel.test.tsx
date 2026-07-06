@@ -201,6 +201,55 @@ describe("SupplyAiImageStudioPanel", () => {
     expect(container.textContent).not.toContain("light.png");
   });
 
+  it("keeps prompt and reference images after a failed create attempt", async () => {
+    const onCreateTask = vi.fn().mockRejectedValue(new Error("create failed"));
+
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={snapshot}
+          onCreateTask={onCreateTask}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    const input = container.querySelector<HTMLInputElement>("input[type='file']");
+    const textarea = container.querySelector<HTMLTextAreaElement>("textarea");
+
+    expect(input).not.toBeNull();
+    expect(textarea).not.toBeNull();
+
+    await act(async () => {
+      Object.defineProperty(input!, "files", {
+        configurable: true,
+        value: [createFile("keep.png", "keep")],
+      });
+      input?.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await flushAsyncState();
+
+    await act(async () => {
+      textarea!.value = "失败后也要保留";
+      textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await act(async () => {
+      await expect(
+        (async () => {
+          container
+            .querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")
+            ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+          await Promise.resolve();
+        })(),
+      ).resolves.toBeUndefined();
+    });
+
+    expect(onCreateTask).toHaveBeenCalledTimes(1);
+    expect(textarea?.value).toBe("失败后也要保留");
+    expect(container.textContent).toContain("keep.png");
+  });
+
   it("caps uploads at three and deleting one duplicate filename only removes the clicked item", async () => {
     const onCreateTask = vi.fn().mockResolvedValue(undefined);
 

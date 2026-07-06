@@ -18,7 +18,7 @@ interface LocalReferenceImage {
 
 interface SupplyAiImageStudioPanelProps {
   snapshot: SupplyAiImageSnapshot;
-  onCreateTask: (payload: CreateAiImageGenerationTaskPayload) => Promise<void> | void;
+  onCreateTask: (payload: CreateAiImageGenerationTaskPayload) => Promise<boolean | void> | boolean | void;
   onRetryTask: (taskId: string) => Promise<void> | void;
 }
 
@@ -157,7 +157,7 @@ export function SupplyAiImageStudioPanel({
     setIsSubmitting(true);
 
     try {
-      await onCreateTask({
+      const didSucceed = await onCreateTask({
         themeId: selectedTheme.id,
         requestedCount,
         userPrompt,
@@ -166,8 +166,12 @@ export function SupplyAiImageStudioPanel({
           filename: image.filename,
         })),
       });
-      setUserPrompt("");
-      setReferenceImages([]);
+      if (didSucceed !== false) {
+        setUserPrompt("");
+        setReferenceImages([]);
+      }
+    } catch {
+      // Keep the local draft intact when the create request fails.
     } finally {
       setIsSubmitting(false);
     }

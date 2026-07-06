@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ApiError,
   createAiImageGenerationTask,
@@ -62,9 +62,10 @@ export function SupplyStationShell({
 }) {
   const [snapshot, setSnapshot] = useState<SupplyStationProductionSnapshot | null>(null);
   const [activePanel, setActivePanel] = useState<SupplyProductionPanel>(initialPanel);
-  const [, setActiveAction] = useState<SupplyAction | null>(null);
+  const [activeAction, setActiveAction] = useState<SupplyAction | null>(null);
   const [error, setError] = useState<SupplyErrorState | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const activeActionRef = useRef<SupplyAction | null>(null);
 
   const applySnapshot = useCallback((nextSnapshot: SupplyStationProductionSnapshot) => {
     cacheSupplyNavSnapshot(nextSnapshot);
@@ -132,6 +133,11 @@ export function SupplyStationShell({
 
   const runAction = useCallback(
     async (action: SupplyAction, work: () => Promise<string | void>) => {
+      if (activeActionRef.current) {
+        return false;
+      }
+
+      activeActionRef.current = action;
       setActiveAction(action);
       setError(null);
       setSuccessMessage(null);
@@ -141,9 +147,12 @@ export function SupplyStationShell({
         const nextSnapshot = await fetchSupplyStationState();
         applySnapshot(nextSnapshot);
         setSuccessMessage(message ?? "操作成功");
+        return true;
       } catch (caught) {
         setError(getSupplyErrorState(caught));
+        return false;
       } finally {
+        activeActionRef.current = null;
         setActiveAction(null);
       }
     },
@@ -152,10 +161,16 @@ export function SupplyStationShell({
 
   const handleCreateTask = useCallback(
     async (payload: CreateAiImageGenerationTaskPayload) => {
-      await runAction("create-ai-image-task", async () => {
+      const didSucceed = await runAction("create-ai-image-task", async () => {
         await createAiImageGenerationTask(payload);
         return "生图任务已创建";
       });
+
+      if (!didSucceed) {
+        throw new Error("create-ai-image-task-failed");
+      }
+
+      return true;
     },
     [runAction],
   );
@@ -250,7 +265,11 @@ export function SupplyStationShell({
           ) : null}
 
           {activePanel === "themeGacha" ? (
-            <SupplyThemeGachaPanel onDrawTheme={handleDrawTheme} snapshot={snapshot.supplyAiImage} />
+            <SupplyThemeGachaPanel
+              isDrawingTheme={activeAction === "draw-ai-image-theme"}
+              onDrawTheme={handleDrawTheme}
+              snapshot={snapshot.supplyAiImage}
+            />
           ) : null}
 
           {activePanel === "artworks" ? (

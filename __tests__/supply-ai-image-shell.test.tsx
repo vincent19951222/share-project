@@ -19,6 +19,27 @@ async function flush() {
   });
 }
 
+async function flushAsyncState() {
+  await act(async () => {
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+  });
+}
+
+function createFile(name: string, content: string, type = "image/png") {
+  return new File([content], name, { type });
+}
+
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((nextResolve, nextReject) => {
+    resolve = nextResolve;
+    reject = nextReject;
+  });
+
+  return { promise, resolve, reject };
+}
+
 function buildAiSnapshot(
   overrides: Partial<SupplyStationProductionSnapshot> = {},
 ): SupplyStationProductionSnapshot {
@@ -248,6 +269,59 @@ describe("SupplyStationShell AI image flows", () => {
     expect(container.textContent).toContain("生图任务已创建");
   });
 
+  it("keeps studio inputs after a failed create request from the real shell", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildAiSnapshot() }))
+        .mockResolvedValueOnce(createJsonResponse({ error: "创建失败" }, false, 500)),
+    );
+
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell />);
+    });
+    await flush();
+
+    const input = container.querySelector<HTMLInputElement>("input[type='file']");
+    const textarea = container.querySelector<HTMLTextAreaElement>("textarea");
+
+    expect(input).not.toBeNull();
+    expect(textarea).not.toBeNull();
+
+    await act(async () => {
+      Object.defineProperty(input!, "files", {
+        configurable: true,
+        value: [createFile("keep.png", "keep")],
+      });
+      input?.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await flushAsyncState();
+
+    await act(async () => {
+      textarea!.value = "失败后别清空";
+      textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      "/api/gamification/ai-image/tasks",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(textarea?.value).toBe("失败后别清空");
+    expect(container.textContent).toContain("keep.png");
+    expect(container.textContent).toContain("创建失败");
+  });
+
   it("retries a failed task item and draws a new theme from the shell panels", async () => {
     vi.stubGlobal(
       "fetch",
@@ -332,5 +406,62 @@ describe("SupplyStationShell AI image flows", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(container.textContent).toContain("新主题已解锁");
+  });
+
+  it("disables theme draw while the request is in flight and prevents double submit", async () => {
+    const drawRequest = createDeferred<Response>();
+
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildAiSnapshot() }))
+        .mockImplementationOnce(() => drawRequest.promise)
+        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildAiSnapshot() })),
+    );
+
+    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
+
+    await act(async () => {
+      root.render(<SupplyStationShell initialPanel="themeGacha" />);
+    });
+    await flush();
+
+    const drawButton = container.querySelector<HTMLButtonElement>("[data-action='draw-ai-image-theme']");
+    expect(drawButton).not.toBeNull();
+    expect(drawButton?.disabled).toBe(false);
+
+    await act(async () => {
+      drawButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(drawButton?.disabled).toBe(true);
+    expect(fetch).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      drawButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      drawRequest.resolve(
+        createJsonResponse({
+          theme: {
+            id: "theme-02",
+            name: "深夜健身房",
+          },
+        }),
+      );
+      await drawRequest.promise;
+    });
+    await flush();
+
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      "/api/gamification/ai-image/themes/draw",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(fetch).toHaveBeenCalledTimes(3);
   });
 });
