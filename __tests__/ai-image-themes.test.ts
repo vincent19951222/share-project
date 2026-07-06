@@ -13,6 +13,13 @@ describe("AI image preset themes", () => {
     expect(themes).toHaveLength(13);
     expect(themes.filter((theme) => theme.defaultUnlocked)).toHaveLength(1);
     expect(themes.every((theme) => theme.enabled)).toBe(true);
+    expect(themes.every((theme) => theme.previewImageUrl.includes("/images/"))).toBe(true);
+    expect(themes[0]?.previewImageUrl).toBe(
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/nail-design.webp",
+    );
+    expect(themes[12]?.previewImageUrl).toBe(
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-13-editorial-grid.webp",
+    );
   });
 
   it("does not expose promptTemplate in client snapshots", () => {
@@ -43,12 +50,17 @@ describe("AI image preset themes", () => {
       path.join(process.cwd(), "lib/gamification/ai-image/theme-snapshot.ts"),
       "utf8",
     );
+    const vitestConfigSource = readFileSync(path.join(process.cwd(), "vitest.config.ts"), "utf8");
 
     expect(themesSource).toContain('import "server-only";');
     expect(promptSource).toContain('import "server-only";');
     expect(snapshotSource).not.toContain("promptTemplate");
     expect(snapshotSource).not.toContain("server-only");
     expect(snapshotSource).not.toContain('from "@/lib/gamification/ai-image/themes"');
+    expect(vitestConfigSource).toContain(
+      '"server-only": path.resolve(__dirname, "__tests__/fixtures/server-only-empty.ts")',
+    );
+    expect(vitestConfigSource).not.toContain("node_modules/next/dist/compiled/server-only/empty.js");
   });
 
   it("returns cloned theme definitions so caller mutation cannot change preset state", () => {

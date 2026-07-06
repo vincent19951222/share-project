@@ -8,7 +8,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "牛马像素馆",
     description: "把照片或文字变成粗边框像素健身角色。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_120.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/nail-design.webp",
     promptTemplate:
       "8-bit pixel art fitness poster, chunky black outlines, bold yellow and charcoal blocks, playful Chinese fitness team energy, clean composition.",
     defaultUnlocked: true,
@@ -22,7 +22,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "工地减脂风",
     description: "安全帽、反光马甲、杠铃和水泥灰的硬核减脂照。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_020.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-02-character-sketch-reference.webp",
     promptTemplate:
       "construction-site fat-loss poster, hard hat, reflective vest, barbell, concrete gray, fluorescent yellow, bold brutalist typography feeling.",
     defaultUnlocked: false,
@@ -36,7 +36,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "低脂美食拟人",
     description: "鸡胸肉、西兰花和鸡蛋变成训练搭子。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coins_005.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-03-fashion-collage-reference.webp",
     promptTemplate:
       "healthy low-fat food characters training together, chicken breast, broccoli, egg, humorous mascot style, bright editorial composition.",
     defaultUnlocked: false,
@@ -50,7 +50,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "复古港风健身达人",
     description: "90 年代港风海报质感的训练大片。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_task_reroll_coupon.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-04-portrait.webp",
     promptTemplate:
       "1990s Hong Kong movie poster fitness portrait, warm film grain, dramatic gym lighting, retro Chinese poster mood.",
     defaultUnlocked: false,
@@ -64,7 +64,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "办公室减脂",
     description: "工位、电脑和偷偷训练的小动作。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_small_boost_coupon.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-05-thinking.webp",
     promptTemplate:
       "office worker stealth fitness scene, desk, monitor, resistance band, humorous but polished, modern Chinese workplace energy.",
     defaultUnlocked: false,
@@ -78,7 +78,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "Brutalist 海报",
     description: "粗字体、强对比、几何图形的训练宣言。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_coin_rich_coupon.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-magazine-cover.webp",
     promptTemplate:
       "brutalist fitness poster, huge bold typography feeling, strict grid, chunky border, yellow black white red accents, no generic neon.",
     defaultUnlocked: false,
@@ -92,7 +92,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "肌肉萌宠",
     description: "宠物拟人举铁，轻松搞笑但不幼稚。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_team_invite_card.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-emoji-sticker-pack.webp",
     promptTemplate:
       "cute muscular pet mascot lifting weights, funny gym energy, expressive character design, polished illustration, bold outlines.",
     defaultUnlocked: false,
@@ -106,7 +106,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "瑜伽仙人",
     description: "东方修仙和瑜伽动作结合的轻盈场景。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_team_spark.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-08-pixel-avatar-collage.webp",
     promptTemplate:
       "eastern immortal yoga master, elegant stretching pose, misty mountain training ground, refined Chinese fantasy fitness poster.",
     defaultUnlocked: false,
@@ -120,7 +120,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "赛博健身海报",
     description: "未来训练房和机械感灯牌，避开泛霓虹廉价感。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_leave_shield.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-09-doodle-illustration.webp",
     promptTemplate:
       "cyber fitness poster, disciplined futuristic gym, mechanical light signage, sharp composition, restrained neon, premium sports editorial.",
     defaultUnlocked: false,
@@ -134,7 +134,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "暴汗训练场",
     description: "训练后暴汗、灯牌和团队口号的现场感。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_boss_ticket.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-10-cinematic-still.webp",
     promptTemplate:
       "sweaty training arena, team slogan lightbox, post-workout energy, cinematic sports scene, bold local fitness community.",
     defaultUnlocked: false,
@@ -148,7 +148,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "牛马漫画格",
     description: "四格漫画感，把训练瞬间变成吐槽剧情。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_meal_coupon.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-11-graffiti-revival.webp",
     promptTemplate:
       "comic panel fitness story, four-panel energy, expressive Chinese captions feeling without readable text, funny workout struggle.",
     defaultUnlocked: false,
@@ -162,7 +162,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "训练贴纸包",
     description: "把人或物做成可爱的健身贴纸资产。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_priority_badge.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-12-contact-sheet.webp",
     promptTemplate:
       "fitness sticker pack style, clean cutout, white sticker border, playful gym accessories, transparent-background feeling.",
     defaultUnlocked: false,
@@ -176,7 +176,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "团队战报封面",
     description: "生成一张适合晒到团队战报里的封面图。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_gamification_rewards_icons_luckin_coffee.png",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-13-editorial-grid.webp",
     promptTemplate:
       "team fitness report cover, editorial layout, bold title space without readable text, achievement atmosphere, yellow black accent colors.",
     defaultUnlocked: false,
