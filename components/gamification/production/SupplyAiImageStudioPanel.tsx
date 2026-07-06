@@ -10,13 +10,26 @@ export interface CreateAiImageGenerationTaskPayload {
   referenceImages: Array<{ dataUrl: string; filename: string }>;
 }
 
+interface LocalReferenceImage {
+  id: string;
+  dataUrl: string;
+  filename: string;
+}
+
 interface SupplyAiImageStudioPanelProps {
   snapshot: SupplyAiImageSnapshot;
   onCreateTask: (payload: CreateAiImageGenerationTaskPayload) => Promise<void> | void;
   onRetryTask: (taskId: string) => Promise<void> | void;
 }
 
-async function readFileAsDataUrl(file: File): Promise<{ dataUrl: string; filename: string }> {
+let localReferenceImageSeq = 0;
+
+function createLocalReferenceImageId() {
+  localReferenceImageSeq += 1;
+  return `reference-image-${localReferenceImageSeq}`;
+}
+
+async function readFileAsDataUrl(file: File): Promise<LocalReferenceImage> {
   return await new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -27,6 +40,7 @@ async function readFileAsDataUrl(file: File): Promise<{ dataUrl: string; filenam
       }
 
       resolve({
+        id: createLocalReferenceImageId(),
         dataUrl: reader.result,
         filename: file.name,
       });
@@ -74,6 +88,26 @@ function formatItemStatus(status: SupplyAiImageSnapshot["recentTasks"][number]["
   }
 }
 
+function formatTaskErrorMessage(task: SupplyAiImageSnapshot["recentTasks"][number]) {
+  if (!task.errorMessage) {
+    return null;
+  }
+
+  if (task.retryAvailable || task.status === "partial" || task.status === "failed") {
+    return "任务有未完成的图片，可直接重试。";
+  }
+
+  return "这次生成暂时没完成，可以稍后再试。";
+}
+
+function formatItemErrorMessage(item: SupplyAiImageSnapshot["recentTasks"][number]["items"][number]) {
+  if (!item.errorMessage) {
+    return null;
+  }
+
+  return "这张图片暂时没出图，重试后会重新排队。";
+}
+
 export function SupplyAiImageStudioPanel({
   snapshot,
   onCreateTask,
@@ -83,7 +117,7 @@ export function SupplyAiImageStudioPanel({
   const [selectedThemeId, setSelectedThemeId] = useState<string>(unlockedThemes[0]?.id ?? "");
   const [requestedCount, setRequestedCount] = useState<1 | 2 | 4>(1);
   const [userPrompt, setUserPrompt] = useState("");
-  const [referenceImages, setReferenceImages] = useState<Array<{ dataUrl: string; filename: string }>>([]);
+  const [referenceImages, setReferenceImages] = useState<LocalReferenceImage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryingTaskId, setRetryingTaskId] = useState<string | null>(null);
 
@@ -127,7 +161,10 @@ export function SupplyAiImageStudioPanel({
         themeId: selectedTheme.id,
         requestedCount,
         userPrompt,
-        referenceImages,
+        referenceImages: referenceImages.map((image) => ({
+          dataUrl: image.dataUrl,
+          filename: image.filename,
+        })),
       });
       setUserPrompt("");
       setReferenceImages([]);
@@ -227,15 +264,17 @@ export function SupplyAiImageStudioPanel({
                 <div className="mt-2 flex flex-col gap-2">
                   {referenceImages.map((image) => (
                     <div
-                      key={image.filename}
+                      key={image.id}
+                      data-reference-image-id={image.id}
                       className="flex items-center justify-between gap-2 rounded-lg border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-main"
                     >
                       <span className="truncate">{image.filename}</span>
                       <button
+                        aria-label={`删除参考图 ${image.filename}`}
                         className="rounded-lg border-2 border-slate-900 bg-white px-2 py-1 text-xs font-black text-main shadow-[0_2px_0_0_#1f2937]"
                         onClick={() =>
                           setReferenceImages((current) =>
-                            current.filter((candidate) => candidate.filename !== image.filename),
+                            current.filter((candidate) => candidate.id !== image.id),
                           )
                         }
                         type="button"
@@ -313,58 +352,66 @@ export function SupplyAiImageStudioPanel({
         </div>
 
         <div className="mt-4 grid gap-3">
-          {snapshot.recentTasks.map((task) => (
-            <article
-              key={task.id}
-              className="rounded-xl border-[3px] border-slate-900 bg-white p-4 shadow-[0_4px_0_0_#1f2937]"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-base font-black text-main">{formatTaskStatus(task.status)}</p>
-                    <span className="rounded-full border-2 border-slate-900 bg-yellow-100 px-2 py-1 text-[10px] font-black text-main shadow-[0_2px_0_0_#1f2937]">
-                      {task.requestedCount} 张
-                    </span>
+          {snapshot.recentTasks.map((task) => {
+            const taskErrorMessage = formatTaskErrorMessage(task);
+
+            return (
+              <article
+                key={task.id}
+                className="rounded-xl border-[3px] border-slate-900 bg-white p-4 shadow-[0_4px_0_0_#1f2937]"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-base font-black text-main">{formatTaskStatus(task.status)}</p>
+                      <span className="rounded-full border-2 border-slate-900 bg-yellow-100 px-2 py-1 text-[10px] font-black text-main shadow-[0_2px_0_0_#1f2937]">
+                        {task.requestedCount} 张
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm font-bold text-sub">{task.userPrompt || "未追加文案要求"}</p>
                   </div>
-                  <p className="mt-1 text-sm font-bold text-sub">{task.userPrompt || "未追加文案要求"}</p>
+                  {task.retryAvailable ? (
+                    <button
+                      className="rounded-xl border-[3px] border-slate-900 bg-white px-3 py-2 text-sm font-black text-main shadow-[0_3px_0_0_#1f2937] disabled:opacity-50"
+                      data-action="retry-ai-image-task"
+                      data-task-id={task.id}
+                      disabled={retryingTaskId === task.id}
+                      onClick={() => void handleRetry(task.id)}
+                      type="button"
+                    >
+                      {retryingTaskId === task.id ? "重试中..." : "重新生成失败项"}
+                    </button>
+                  ) : null}
                 </div>
-                {task.retryAvailable ? (
-                  <button
-                    className="rounded-xl border-[3px] border-slate-900 bg-white px-3 py-2 text-sm font-black text-main shadow-[0_3px_0_0_#1f2937] disabled:opacity-50"
-                    data-action="retry-ai-image-task"
-                    data-task-id={task.id}
-                    disabled={retryingTaskId === task.id}
-                    onClick={() => void handleRetry(task.id)}
-                    type="button"
-                  >
-                    {retryingTaskId === task.id ? "重试中..." : "重新生成失败项"}
-                  </button>
-                ) : null}
-              </div>
 
-              {task.errorMessage ? <p className="mt-3 text-sm font-bold text-sub">{task.errorMessage}</p> : null}
+                {taskErrorMessage ? <p className="mt-3 text-sm font-bold text-sub">{taskErrorMessage}</p> : null}
 
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                {task.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-lg border-2 border-slate-300 bg-slate-50 p-3 text-sm font-bold text-main"
-                  >
-                    <p className="text-xs font-black uppercase tracking-[0.14em] text-sub">#{item.index + 1}</p>
-                    <p className="mt-1">{formatItemStatus(item.status)}</p>
-                    {item.errorMessage ? <p className="mt-1 text-xs text-sub">{item.errorMessage}</p> : null}
-                    {item.imageUrl ? (
-                      <img
-                        alt={`任务 ${task.id} 结果 ${item.index + 1}`}
-                        className="mt-2 aspect-square w-full rounded-md border-2 border-slate-900 object-cover"
-                        src={item.imageUrl}
-                      />
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            </article>
-          ))}
+                <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {task.items.map((item) => {
+                    const itemErrorMessage = formatItemErrorMessage(item);
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-lg border-2 border-slate-300 bg-slate-50 p-3 text-sm font-bold text-main"
+                      >
+                        <p className="text-xs font-black uppercase tracking-[0.14em] text-sub">#{item.index + 1}</p>
+                        <p className="mt-1">{formatItemStatus(item.status)}</p>
+                        {itemErrorMessage ? <p className="mt-1 text-xs text-sub">{itemErrorMessage}</p> : null}
+                        {item.imageUrl ? (
+                          <img
+                            alt={`任务 ${task.id} 结果 ${item.index + 1}`}
+                            className="mt-2 aspect-square w-full rounded-md border-2 border-slate-900 object-cover"
+                            src={item.imageUrl}
+                          />
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              </article>
+            );
+          })}
 
           {snapshot.recentTasks.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm font-bold text-sub">
