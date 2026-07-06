@@ -150,7 +150,7 @@ describe("production supply UI Lab visual contract", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders the approved UI Lab dashboard scene in production", async () => {
+  it("renders the approved AI image studio shell in production", async () => {
     const navContextMock = vi.fn();
 
     await act(async () => {
@@ -161,16 +161,15 @@ describe("production supply UI Lab visual contract", () => {
       await Promise.resolve();
     });
 
-    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-background")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-hero-stage")).not.toBeNull();
-    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
-    expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.querySelector(".supply-ui-lab-production-nav")).toBeNull();
-    expect(container.textContent).toContain("50/1000");
+    expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell-header")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell-nav")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene")).toBeNull();
+    expect(container.textContent).toContain("845");
     expect(container.textContent).not.toContain("生产模式");
-    expect(container.textContent).not.toContain("操作会写入真实补给站数据");
+    expect(container.textContent).not.toContain("debug");
+    expect(container.textContent).not.toContain("Playground");
     expect(navContextMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         resources: [expect.objectContaining({ id: "coins", label: "银子", value: 845 })],
@@ -179,19 +178,18 @@ describe("production supply UI Lab visual contract", () => {
     );
   });
 
-  it("embeds production panels without their internal top navigation", async () => {
+  it("switches to the requested AI image panel without legacy lab chrome", async () => {
     await act(async () => {
-      root.render(<SupplyStationShell initialPanel="shop" onBackToPunch={vi.fn()} />);
+      root.render(<SupplyStationShell initialPanel="artworks" onBackToPunch={vi.fn()} />);
     });
 
     await act(async () => {
       await Promise.resolve();
     });
 
-    expect(container.querySelector(".supply-shop-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-shop-scene--embedded")).not.toBeNull();
+    expect(container.querySelector(".supply-artwork-backpack-panel")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
-    expect(container.querySelector(".supply-ui-lab-return-action")).toBeNull();
-    expect(container.querySelector(".supply-ui-lab-tabs a[href^='/ui-lab/supply-dashboard']")).toBeNull();
+    expect(container.querySelector(".supply-shop-scene")).toBeNull();
+    expect(container.querySelector("[data-panel='artworks'][data-state='active']")).not.toBeNull();
   });
 });

@@ -183,10 +183,79 @@ function buildSnapshot(
     },
     redemptions: { mine: [], adminQueue: [] },
     supplyAiImage: {
-      wallet: { coins: 0, generationCostPerImage: 60, themeDrawCost: 200 },
-      themes: { unlocked: [], locked: [], allUnlocked: false },
-      recentTasks: [],
-      recentArtworks: [],
+      wallet: { coins: 2400, generationCostPerImage: 60, themeDrawCost: 200 },
+      themes: {
+        unlocked: [
+          {
+            id: "theme-01",
+            name: "牛马像素馆",
+            description: "像素风训练海报",
+            previewImageUrl: "https://example.com/theme-1.png",
+            defaultUnlocked: true,
+            unlocked: true,
+            enabled: true,
+            sortOrder: 1,
+            tag: "像素",
+            palette: ["#fde047"],
+          },
+        ],
+        locked: [
+          {
+            id: "theme-02",
+            name: "深夜健身房",
+            description: "霓虹训练棚",
+            previewImageUrl: "https://example.com/theme-2.png",
+            defaultUnlocked: false,
+            unlocked: false,
+            enabled: true,
+            sortOrder: 2,
+            tag: "霓虹",
+            palette: ["#1d4ed8"],
+          },
+        ],
+        allUnlocked: false,
+      },
+      recentTasks: [
+        {
+          id: "task-1",
+          themeId: "theme-01",
+          userPrompt: "训练后的像素海报",
+          requestedCount: 2,
+          status: "failed",
+          coinCost: 120,
+          refundedCoinAmount: 0,
+          errorMessage: "有一张失败",
+          retryAvailable: true,
+          createdAt: "2026-07-06T08:00:00.000Z",
+          updatedAt: "2026-07-06T08:10:00.000Z",
+          items: [
+            {
+              id: "item-1",
+              index: 0,
+              status: "completed",
+              imageUrl: "https://example.com/art-1.png",
+              errorMessage: null,
+            },
+            {
+              id: "item-2",
+              index: 1,
+              status: "failed",
+              imageUrl: null,
+              errorMessage: "provider timeout",
+            },
+          ],
+        },
+      ],
+      recentArtworks: [
+        {
+          id: "art-1",
+          taskId: "task-1",
+          itemId: "item-1",
+          themeId: "theme-01",
+          imageUrl: "https://example.com/art-1.png",
+          createdAt: "2026-07-06T08:05:00.000Z",
+        },
+      ],
     },
     legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
   };
@@ -254,37 +323,39 @@ describe("SupplyStationShell", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
-    expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene")?.getAttribute("aria-label")).toBe("牛马补给站");
-    expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
-    expect(container.textContent).toContain("工位重启");
+    expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
+    expect(container.querySelector("[data-panel='studio'][data-state='active']")).not.toBeNull();
+    expect(container.textContent).toContain("牛马像素馆");
+    expect(container.textContent).toContain("生成");
   });
 
-  it("completes a dashboard task and refreshes the production snapshot", async () => {
+  it("creates an AI image task and refreshes the production snapshot", async () => {
     vi.stubGlobal(
       "fetch",
       vi
         .fn()
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: {} }))
+        .mockResolvedValueOnce(createJsonResponse({ taskId: "task-2" }))
         .mockResolvedValueOnce(
           createJsonResponse({
             snapshot: buildSnapshot({
-              dashboard: {
-                ...buildSnapshot().dashboard,
-                dailyQuests: [
+              supplyAiImage: {
+                ...buildSnapshot().supplyAiImage,
+                recentTasks: [
                   {
-                    ...buildSnapshot().dashboard.dailyQuests[0],
-                    assignment: {
-                      ...buildSnapshot().dashboard.dailyQuests[0].assignment!,
-                      status: "completed",
-                      completedAt: "2026-05-26T03:00:00.000Z",
-                      completionText: "Done",
-                      canComplete: false,
-                      canReroll: false,
-                    },
+                    id: "task-2",
+                    themeId: "theme-01",
+                    userPrompt: "",
+                    requestedCount: 1,
+                    status: "queued",
+                    coinCost: 60,
+                    refundedCoinAmount: 0,
+                    errorMessage: null,
+                    retryAvailable: false,
+                    createdAt: "2026-07-06T08:00:00.000Z",
+                    updatedAt: "2026-07-06T08:00:00.000Z",
+                    items: [],
                   },
                 ],
               },
@@ -301,22 +372,16 @@ describe("SupplyStationShell", () => {
 
     await act(async () => {
       container
-        .querySelector<HTMLButtonElement>("[data-action='complete-task']")
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    await act(async () => {
-      Array.from(container.querySelectorAll("button"))
-        .find((button) => button.textContent?.includes("确认打卡"))
+        .querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
 
     expect(fetch).toHaveBeenNthCalledWith(
       2,
-      "/api/gamification/tasks/complete",
+      "/api/gamification/ai-image/tasks",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ dimensionKey: "movement" }),
       }),
     );
     expect(fetch).toHaveBeenNthCalledWith(
@@ -324,38 +389,16 @@ describe("SupplyStationShell", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.textContent).toContain("任务已完成");
+    expect(container.textContent).toContain("生图任务已创建");
   });
 
-  it("runs a single draw, keeps the result, and refreshes the production snapshot", async () => {
+  it("retries a failed AI image task and refreshes the production snapshot", async () => {
     vi.stubGlobal(
       "fetch",
       vi
         .fn()
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
-        .mockResolvedValueOnce(
-          createJsonResponse({
-            snapshot: {},
-            draw: {
-              id: "draw-1",
-              drawType: "SINGLE",
-              ticketSpent: 1,
-              coinSpent: 0,
-              guaranteeApplied: false,
-              createdAt: "2026-05-26T03:10:00.000Z",
-              rewards: [
-                {
-                  rewardId: "coins_005",
-                  rewardTier: "coin",
-                  rewardKind: "coins",
-                  name: "摸鱼补贴",
-                  description: "获得 5 银子",
-                  effectSummary: "+5 银子",
-                },
-              ],
-            },
-          }),
-        )
+        .mockResolvedValueOnce(createJsonResponse({ taskId: "task-1" }))
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() })),
     );
     const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
@@ -366,30 +409,23 @@ describe("SupplyStationShell", () => {
     await flush();
 
     await act(async () => {
-      Array.from(container.querySelectorAll("a"))
-        .find((link) => link.textContent?.includes("抽奖池"))
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
-    });
-    await act(async () => {
       container
-        .querySelector<HTMLButtonElement>("[data-action='draw-single']")
+        .querySelector<HTMLButtonElement>("[data-action='retry-ai-image-task']")
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
 
     expect(fetch).toHaveBeenNthCalledWith(
       2,
-      "/api/gamification/lottery/draw",
+      "/api/gamification/ai-image/tasks/task-1/retry",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ drawType: "SINGLE", useCoinTopUp: false }),
       }),
     );
-    expect(container.textContent).toContain("摸鱼补贴");
-    expect(container.textContent).toContain("+5 银子");
+    expect(container.textContent).toContain("已重新提交失败图片");
   });
 
-  it("purchases a shop item and refreshes the production snapshot", async () => {
+  it("draws an AI image theme and refreshes the production snapshot", async () => {
     vi.stubGlobal(
       "fetch",
       vi
@@ -397,36 +433,60 @@ describe("SupplyStationShell", () => {
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
         .mockResolvedValueOnce(
           createJsonResponse({
-            purchase: {
-              id: "purchase-1",
-              itemId: "task_reroll_coupon",
-              totalPriceCoins: 150,
+            theme: {
+              id: "theme-02",
+              name: "深夜健身房",
             },
-            snapshot: {},
           }),
         )
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() })),
+        .mockResolvedValueOnce(
+          createJsonResponse({
+            snapshot: buildSnapshot({
+              supplyAiImage: {
+                ...buildSnapshot().supplyAiImage,
+                themes: {
+                  unlocked: [
+                    ...buildSnapshot().supplyAiImage.themes.unlocked,
+                    {
+                      id: "theme-02",
+                      name: "深夜健身房",
+                      description: "霓虹训练棚",
+                      previewImageUrl: "https://example.com/theme-2.png",
+                      defaultUnlocked: false,
+                      unlocked: true,
+                      enabled: true,
+                      sortOrder: 2,
+                      tag: "霓虹",
+                      palette: ["#1d4ed8"],
+                    },
+                  ],
+                  locked: [],
+                  allUnlocked: false,
+                },
+              },
+            }),
+          }),
+        ),
     );
     const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
 
     await act(async () => {
-      root.render(<SupplyStationShell initialPanel="shop" />);
+      root.render(<SupplyStationShell initialPanel="themeGacha" />);
     });
     await flush();
 
     await act(async () => {
       container
-        .querySelector<HTMLButtonElement>("[data-action='purchase-shop-item']")
+        .querySelector<HTMLButtonElement>("[data-action='draw-ai-image-theme']")
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
 
     expect(fetch).toHaveBeenNthCalledWith(
       2,
-      "/api/gamification/shop/purchase",
+      "/api/gamification/ai-image/themes/draw",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ itemId: "task_reroll_coupon" }),
       }),
     );
     expect(fetch).toHaveBeenNthCalledWith(
@@ -434,7 +494,7 @@ describe("SupplyStationShell", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.textContent).toContain("购买成功");
+    expect(container.textContent).toContain("新主题已解锁");
   });
 
   it("updates the shared nav asset cache after a supply mutation refreshes state", async () => {
@@ -443,16 +503,7 @@ describe("SupplyStationShell", () => {
       vi
         .fn()
         .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
-        .mockResolvedValueOnce(
-          createJsonResponse({
-            purchase: {
-              id: "purchase-1",
-              itemId: "task_reroll_coupon",
-              totalPriceCoins: 150,
-            },
-            snapshot: {},
-          }),
-        )
+        .mockResolvedValueOnce(createJsonResponse({ taskId: "task-2" }))
         .mockResolvedValueOnce(
           createJsonResponse({
             snapshot: buildSnapshot({
@@ -467,13 +518,13 @@ describe("SupplyStationShell", () => {
     const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
 
     await act(async () => {
-      root.render(<SupplyStationShell initialPanel="shop" />);
+      root.render(<SupplyStationShell />);
     });
     await flush();
 
     await act(async () => {
       container
-        .querySelector<HTMLButtonElement>("[data-action='purchase-shop-item']")
+        .querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     await flush();
@@ -526,69 +577,7 @@ describe("SupplyStationShell", () => {
     await flush();
 
     expect(fetch).toHaveBeenCalledTimes(2);
-    expect(container.textContent).toContain("队友邀请待响应");
-  });
-
-  it("dismisses a social invitation and refreshes the production snapshot", async () => {
-    const emptySocial = {
-      status: "active" as const,
-      pendingSentCount: 0,
-      pendingReceivedCount: 0,
-      teamWidePendingCount: 0,
-      sent: [],
-      received: [],
-      teamWide: [],
-      recentResponses: [],
-      availableRecipients: [],
-      message: "ready",
-    };
-
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
-        .mockResolvedValueOnce(
-          createJsonResponse({
-            invitation: { id: "social-received-1", status: "CANCELLED" },
-            snapshot: buildSnapshot({ social: emptySocial }),
-          }),
-        )
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot({ social: emptySocial }) })),
-    );
-    const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
-
-    await act(async () => {
-      root.render(<SupplyStationShell initialPanel="taskRecord" />);
-    });
-    await flush();
-
-    await act(async () => {
-      Array.from(container.querySelectorAll<HTMLButtonElement>("button"))
-        .find((button) => button.textContent?.includes("队友雷达"))
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    await act(async () => {
-      Array.from(container.querySelectorAll<HTMLButtonElement>("button"))
-        .find((button) => button.textContent?.includes("忽略"))
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    await flush();
-
-    expect(fetch).toHaveBeenNthCalledWith(
-      2,
-      "/api/gamification/social/dismiss",
-      expect.objectContaining({
-        method: "POST",
-        body: JSON.stringify({ invitationId: "social-received-1" }),
-      }),
-    );
-    expect(fetch).toHaveBeenNthCalledWith(
-      3,
-      "/api/gamification/supply/state",
-      expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
-    );
-    expect(container.textContent).toContain("已忽略队友邀请");
+    expect(container.textContent).toContain("牛马像素馆");
   });
 
   it("keeps the legacy SupplyStation export on the production shell", async () => {
@@ -600,11 +589,11 @@ describe("SupplyStationShell", () => {
     });
     await flush();
 
-    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.querySelector(".supply-ui-lab-production-nav")).toBeNull();
-    expect(container.textContent).not.toContain("玩法规则");
-    expect(container.textContent).not.toContain("抽奖概率");
+    expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
+    expect(container.querySelector(".supply-dashboard-scene")).toBeNull();
+    expect(container.textContent).not.toContain("Playground");
+    expect(container.textContent).not.toContain("promptTemplate");
   });
 
   it("renders a login recovery state for 401 responses", async () => {

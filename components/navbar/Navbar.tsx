@@ -315,7 +315,7 @@ export function Navbar({
                   );
                 })
               ) : (
-                ["coins", "ticket", "backpack"].map((resourceId) => (
+                ["coins"].map((resourceId) => (
                   <span
                     aria-hidden="true"
                     className={`app-supply-asset-chip app-supply-asset-skeleton app-supply-asset-chip--${resourceId}`}
@@ -454,15 +454,11 @@ export function Navbar({
         >
           <div className="app-supply-secondary-rail" role="tablist">
             {supplyNavItems.map((item) => {
-              const selected = item.id === (activeSupplyPanel ?? "dashboard");
+              const selected = item.id === (activeSupplyPanel ?? "studio");
 
               return (
                 <button
-                  aria-label={
-                    item.id === "taskRecord" && socialPendingLabel
-                      ? `${item.label}，${socialPendingLabel}`
-                      : item.label
-                  }
+                  aria-label={item.label}
                   aria-current={selected ? "page" : undefined}
                   aria-selected={selected}
                   className={`app-supply-secondary-tab${pendingSupplyPanel === item.id ? " pending" : ""}`}
@@ -475,9 +471,6 @@ export function Navbar({
                 >
                   <img alt="" aria-hidden="true" src={item.iconImage} />
                   {item.label}
-                  {item.id === "taskRecord" && socialPendingCount > 0 ? (
-                    <span className="app-supply-social-badge">{socialPendingCount}</span>
-                  ) : null}
                 </button>
               );
             })}

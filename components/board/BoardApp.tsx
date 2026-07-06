@@ -29,7 +29,7 @@ import type { AppTab } from "@/lib/types";
 
 export function BoardApp({
   activeTab,
-  supplyPanel = "dashboard",
+  supplyPanel = "studio",
 }: {
   activeTab: AppTab;
   supplyPanel?: SupplyPanelKey;
