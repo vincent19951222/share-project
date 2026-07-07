@@ -234,26 +234,15 @@ export function Navbar({
                 共享看板
               </TabBtn>
               <TabBtn
-                active={activeTab === "calendar"}
-                className="calendar-tab"
-                pending={pendingTab === "calendar"}
-                onFocus={() => prefetchAppTab("calendar")}
-                onMouseEnter={() => prefetchAppTab("calendar")}
-                onClick={() => handleTabChange("calendar")}
+                active={activeTab === "data"}
+                className="data-tab"
+                pending={pendingTab === "data"}
+                onFocus={() => prefetchAppTab("data")}
+                onMouseEnter={() => prefetchAppTab("data")}
+                onClick={() => handleTabChange("data")}
               >
                 <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
-                牛马日历
-              </TabBtn>
-              <TabBtn
-                active={activeTab === "dash"}
-                className="report-tab"
-                pending={pendingTab === "dash"}
-                onFocus={() => prefetchAppTab("dash")}
-                onMouseEnter={() => prefetchAppTab("dash")}
-                onClick={() => handleTabChange("dash")}
-              >
-                <AssetIcon name="report" className="h-4 w-4 object-contain" />
-                战报中心
+                数据看板
               </TabBtn>
               <TabBtn
                 aria-label={supplyTabAriaLabel}
@@ -402,29 +391,16 @@ export function Navbar({
               </span>
             </TabBtn>
             <TabBtn
-              active={activeTab === "calendar"}
-              className="mobile-tab-btn calendar-tab justify-between"
-              pending={pendingTab === "calendar"}
-              onFocus={() => prefetchAppTab("calendar")}
-              onMouseEnter={() => prefetchAppTab("calendar")}
-              onClick={() => handleTabChange("calendar")}
+              active={activeTab === "data"}
+              className="mobile-tab-btn data-tab justify-between"
+              pending={pendingTab === "data"}
+              onFocus={() => prefetchAppTab("data")}
+              onMouseEnter={() => prefetchAppTab("data")}
+              onClick={() => handleTabChange("data")}
             >
               <span className="flex items-center gap-2">
                 <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
-                牛马日历
-              </span>
-            </TabBtn>
-            <TabBtn
-              active={activeTab === "dash"}
-              className="mobile-tab-btn report-tab justify-between"
-              pending={pendingTab === "dash"}
-              onFocus={() => prefetchAppTab("dash")}
-              onMouseEnter={() => prefetchAppTab("dash")}
-              onClick={() => handleTabChange("dash")}
-            >
-              <span className="flex items-center gap-2">
-                <AssetIcon name="report" className="h-4 w-4 object-contain" />
-                战报中心
+                数据看板
               </span>
             </TabBtn>
             <TabBtn

@@ -3609,21 +3609,13 @@ body {
   background-color: #ccfbf1;
   color: #3f2a1d;
 }
-.tab-btn.calendar-tab.active {
+.tab-btn.data-tab.active {
   background-color: #ddd6fe;
   color: #4c1d95;
 }
-.tab-btn.calendar-tab.inactive:hover {
+.tab-btn.data-tab.inactive:hover {
   background-color: #ede9fe;
   color: #5b21b6;
-}
-.tab-btn.report-tab.active {
-  background-color: #fecaca;
-  color: #7f1d1d;
-}
-.tab-btn.report-tab.inactive:hover {
-  background-color: #fee2e2;
-  color: #7f1d1d;
 }
 .tab-btn.inactive {
   background-color: transparent;
@@ -3661,8 +3653,7 @@ body {
 .home-tab-strip .tab-btn.active,
 .home-tab-strip .tab-btn.board-tab.active,
 .home-tab-strip .tab-btn.coffee-tab.active,
-.home-tab-strip .tab-btn.calendar-tab.active,
-.home-tab-strip .tab-btn.report-tab.active,
+.home-tab-strip .tab-btn.data-tab.active,
 .home-tab-strip .tab-btn.supply-tab.active {
   border-color: #111827;
   background-color: #fde047;

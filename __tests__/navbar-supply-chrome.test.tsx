@@ -105,12 +105,14 @@ describe("Navbar supply chrome", () => {
       root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
     });
 
-    const expectedOrder = ["健身打卡", "牛马水铺", "共享看板", "牛马日历", "战报中心", "牛马补给站"];
+    const expectedOrder = ["健身打卡", "牛马水铺", "共享看板", "数据看板", "牛马补给站"];
     expect(
       Array.from(container.querySelectorAll(".home-tab-strip .tab-btn")).map((button) =>
         button.textContent?.trim(),
       ),
     ).toEqual(expectedOrder);
+    expect(container.textContent).not.toContain("牛马日历");
+    expect(container.textContent).not.toContain("战报中心");
 
     await act(async () => {
       container.querySelector<HTMLButtonElement>(".mobile-nav-toggle")?.click();
@@ -185,10 +187,10 @@ describe("Navbar supply chrome", () => {
   });
 
   it("surfaces social invitation pending count in supply navigation", async () => {
-    activeTab = "dash";
+    activeTab = "data";
 
     await act(async () => {
-      root.render(<Navbar activeTabOverride="dash" supplyNavContext={supplyNavContextWithSocial} />);
+      root.render(<Navbar activeTabOverride="data" supplyNavContext={supplyNavContextWithSocial} />);
     });
 
     expect(container.querySelector(".app-supply-social-badge")?.textContent).toBe("2");
@@ -234,10 +236,10 @@ describe("Navbar supply chrome", () => {
   });
 
   it("renders a compact mobile wallet while preserving desktop supply asset chips", async () => {
-    activeTab = "dash";
+    activeTab = "data";
 
     await act(async () => {
-      root.render(<Navbar activeTabOverride="dash" supplyNavContext={supplyNavContext} />);
+      root.render(<Navbar activeTabOverride="data" supplyNavContext={supplyNavContext} />);
     });
 
     const wallet = container.querySelector<HTMLButtonElement>(".app-supply-mobile-wallet");
@@ -385,21 +387,21 @@ describe("Navbar supply chrome", () => {
 
     routerPrefetchMock.mockClear();
 
-    const calendarTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
-      button.textContent?.includes("牛马日历"),
+    const dataTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
+      button.textContent?.includes("数据看板"),
     );
     const drawPoolTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".app-supply-secondary-tab")).find(
       (button) => button.textContent?.includes("抽奖池"),
     );
 
     await act(async () => {
-      calendarTab?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      dataTab?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
       drawPoolTab?.focus();
     });
 
     expect(routerPrefetchMock).toHaveBeenCalledWith("/calendar");
     expect(routerPrefetchMock).toHaveBeenCalledWith("/dashboard/cards");
-    expect(preloadBoardTabComponentMock).toHaveBeenCalledWith("calendar");
+    expect(preloadBoardTabComponentMock).toHaveBeenCalledWith("data");
     expect(preloadSupplyPanelComponentMock).toHaveBeenCalledWith("drawPool");
   });
 });
