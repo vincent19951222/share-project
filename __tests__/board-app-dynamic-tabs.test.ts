@@ -29,8 +29,8 @@ describe("BoardApp dynamic tab boundaries", () => {
     expect(loaderSource).toContain("loadSupplyStation");
     expect(loaderSource).toContain("preloadBoardTabComponent");
     expect(loaderSource).toContain('case "data"');
-    expect(loaderSource).not.toContain('case "dash"');
-    expect(loaderSource).not.toContain('case "calendar"');
+    expect(loaderSource).not.toContain('case "' + 'dash"');
+    expect(loaderSource).not.toContain('case "' + 'calendar"');
     expect(loaderSource).toContain("preloadSupplyPanelComponent");
   });
 });
