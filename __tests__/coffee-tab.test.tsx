@@ -123,7 +123,6 @@ describe("coffee tab navigation", () => {
       "/board",
       "/drink",
       "/calendar",
-      "/report",
       "/dashboard/status",
     ]);
   });
@@ -145,8 +144,7 @@ describe("coffee tab navigation", () => {
       "健身打卡",
       "牛马水铺",
       "共享看板",
-      "牛马日历",
-      "战报中心",
+      "数据看板",
       "牛马补给站",
     ]);
     expect(tabIconSources).toEqual([
@@ -154,7 +152,6 @@ describe("coffee tab navigation", () => {
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg",
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_board_pixel.svg",
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_calendar_pixel.svg",
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_report_pixel.svg",
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg",
     ]);
   });
