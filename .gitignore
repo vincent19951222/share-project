@@ -8,6 +8,7 @@
 # Codex local config and logs
 .codex/
 .codex-dev-*.log
+.playwright-cli/
 .worktrees/
 .agents/
 skills-lock.json

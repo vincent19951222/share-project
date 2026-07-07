@@ -21,58 +21,11 @@ describe("supply embedded scene CSS", () => {
     expect(embeddedRule).not.toMatch(/width:\s*100vw/);
   });
 
-  it("keeps the supply secondary navigation hidden until the supply chrome is hovered or focused", () => {
-    const navRuleStart = css.indexOf(".app-supply-secondary-nav {");
-    expect(navRuleStart).toBeGreaterThanOrEqual(0);
-    const navRule = css.slice(navRuleStart, css.indexOf("}", navRuleStart) + 1);
-
-    expect(navRule).toMatch(/position:\s*absolute/);
-    expect(navRule).toMatch(/top:\s*calc\(100% - 0\.2rem\)/);
-    expect(navRule).toMatch(/left:\s*50%/);
-    expect(navRule).toMatch(/right:\s*auto/);
-    expect(navRule).toMatch(/width:\s*max-content/);
-    expect(navRule).toMatch(/max-width:\s*calc\(100vw - 3rem\)/);
-    expect(navRule).toMatch(/opacity:\s*0/);
-    expect(navRule).toMatch(/pointer-events:\s*none/);
-    expect(navRule).toMatch(/transform:\s*translate\(-50%,\s*-0\.45rem\)/);
-    expect(navRule).toMatch(/visibility:\s*hidden/);
-    expect(navRule).not.toMatch(/margin-top/);
-
-    expect(css).toContain(".app-top-nav--with-supply-menu:has(.app-supply-primary-tab:hover) .app-supply-secondary-nav");
-    expect(css).toContain(
-      ".app-top-nav--with-supply-menu:has(.app-supply-primary-tab:focus-visible) .app-supply-secondary-nav",
-    );
-    expect(css).toContain(".app-top-nav--with-supply-menu:has(.app-supply-secondary-nav:hover) .app-supply-secondary-nav");
-    expect(css).toContain(
-      ".app-top-nav--with-supply-menu:has(.app-supply-secondary-nav:focus-within) .app-supply-secondary-nav",
-    );
-    expect(css).toContain(".app-top-nav--with-supply-menu.app-supply-menu-open .app-supply-secondary-nav");
-    expect(css).toMatch(/transform:\s*translate\(-50%,\s*0\)/);
-    expect(css).toMatch(/visibility:\s*visible/);
-  });
-
-  it("renders the hover-revealed secondary navigation on a content-width shelf", () => {
-    const shelfRuleStart = css.indexOf(".app-supply-secondary-nav::before");
-    expect(shelfRuleStart).toBeGreaterThanOrEqual(0);
-    const shelfRule = css.slice(shelfRuleStart, css.indexOf("}", shelfRuleStart) + 1);
-
-    expect(shelfRule).toMatch(/position:\s*absolute/);
-    expect(shelfRule).toMatch(/inset:\s*0 0 0\.15rem/);
-    expect(shelfRule).toMatch(/border:\s*3px solid #111827/);
-    expect(shelfRule).toMatch(/background:\s*rgba\(255,\s*248,\s*232,\s*0\.96\)/);
-    expect(shelfRule).toMatch(/box-shadow:\s*4px 4px 0 rgba\(17,\s*24,\s*39,\s*0\.38\)/);
-  });
-
-  it("renders generated image icons inside the secondary supply tabs", () => {
-    const iconRuleStart = css.indexOf(".app-supply-secondary-tab img {");
-    expect(iconRuleStart).toBeGreaterThanOrEqual(0);
-    const iconRule = css.slice(iconRuleStart, css.indexOf("}", iconRuleStart) + 1);
-
-    expect(iconRule).toMatch(/display:\s*block/);
-    expect(iconRule).toMatch(/width:\s*1\.45rem/);
-    expect(iconRule).toMatch(/height:\s*1\.45rem/);
-    expect(iconRule).toMatch(/image-rendering:\s*pixelated/);
-    expect(iconRule).toMatch(/object-fit:\s*contain/);
+  it("does not keep the removed shared Navbar supply secondary navigation styles", () => {
+    expect(css).not.toContain(".app-supply-secondary-nav");
+    expect(css).not.toContain(".app-supply-secondary-tab");
+    expect(css).not.toContain(".app-supply-secondary-rail");
+    expect(css).not.toContain(".app-top-nav--with-supply-menu");
   });
 
   it("keeps embedded supply content tight below the shared chrome", () => {

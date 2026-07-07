@@ -134,14 +134,6 @@ describe("mobile-only adaptation CSS", () => {
       /width:\s*100%/,
       /min-height:\s*44px/,
     ]);
-    expectMobileRule(".app-supply-secondary-nav", [
-      /max-width:\s*100%/,
-      /overflow-x:\s*auto/,
-    ]);
-    expectMobileRule(".app-supply-secondary-tab", [
-      /min-height:\s*44px/,
-      /flex:\s*0 0 auto/,
-    ]);
   });
 
   it("turns punch and shared board scenes into mobile vertical flows", () => {
