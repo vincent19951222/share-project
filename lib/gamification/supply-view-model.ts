@@ -1,8 +1,9 @@
 import { buildSupplyAiImageSnapshot } from "@/lib/gamification/ai-image/snapshot";
+import { settleTimedOutAiImageTasksForUser } from "@/lib/gamification/ai-image/tasks";
+import { convertLegacyTicketsForUser } from "@/lib/gamification/legacy-ticket-conversion";
 import { buildLegacySupplyArchiveSnapshot } from "@/lib/gamification/legacy-supply-archive";
 import { buildGamificationStateForUser } from "@/lib/gamification/state";
 import { buildSupplyTaskRecordSnapshot } from "@/lib/gamification/task-records";
-import { prisma } from "@/lib/prisma";
 import type { SupplyStationProductionSnapshot } from "@/lib/types";
 
 export const SUPPLY_BACKPACK_CAPACITY = 60;
@@ -17,16 +18,9 @@ export async function buildSupplyStationViewModelForUser(
     return null;
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      username: true,
-      avatarKey: true,
-      coins: true,
-      ticketBalance: true,
-    },
-  });
+  await settleTimedOutAiImageTasksForUser({ userId, now });
+
+  const user = await convertLegacyTicketsForUser(userId);
 
   if (!user) {
     return null;

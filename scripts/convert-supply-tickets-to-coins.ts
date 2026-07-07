@@ -1,48 +1,11 @@
 import "dotenv/config";
+import { convertSupplyTicketsToCoins } from "@/lib/gamification/legacy-ticket-conversion";
 import { prisma } from "@/lib/prisma";
 
-export const LEGACY_TICKET_TO_COIN_RATE = 50;
-
-export interface ConvertSupplyTicketsToCoinsResult {
-  convertedUserCount: number;
-  ticketCount: number;
-  coinGrantTotal: number;
-}
-
-export async function convertSupplyTicketsToCoins({
-  apply,
-}: {
-  apply: boolean;
-}): Promise<ConvertSupplyTicketsToCoinsResult> {
-  const users = await prisma.user.findMany({
-    where: { ticketBalance: { gt: 0 } },
-    select: { id: true, ticketBalance: true, coins: true },
-    orderBy: { createdAt: "asc" },
-  });
-
-  const ticketCount = users.reduce((sum, user) => sum + user.ticketBalance, 0);
-  const coinGrantTotal = ticketCount * LEGACY_TICKET_TO_COIN_RATE;
-
-  if (apply) {
-    for (const user of users) {
-      const coinGrant = user.ticketBalance * LEGACY_TICKET_TO_COIN_RATE;
-
-      await prisma.user.updateMany({
-        where: { id: user.id, ticketBalance: user.ticketBalance },
-        data: {
-          coins: { increment: coinGrant },
-          ticketBalance: 0,
-        },
-      });
-    }
-  }
-
-  return {
-    convertedUserCount: users.length,
-    ticketCount,
-    coinGrantTotal,
-  };
-}
+export {
+  LEGACY_TICKET_TO_COIN_RATE,
+  convertSupplyTicketsToCoins,
+} from "@/lib/gamification/legacy-ticket-conversion";
 
 async function main() {
   const apply = process.argv.includes("--apply");

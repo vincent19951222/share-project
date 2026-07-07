@@ -88,6 +88,15 @@ async function finalizeTask(taskId: string) {
   await settleAiImageTaskByItems({ taskId });
 }
 
+async function isTaskStillRunning(taskId: string) {
+  const task = await prisma.aiImageGenerationTask.findUnique({
+    where: { id: taskId },
+    select: { status: true },
+  });
+
+  return task?.status === "running";
+}
+
 function startRunnerHeartbeat(input: {
   taskId: string;
   itemId: string;
@@ -175,22 +184,41 @@ export async function runAiImageTaskWithDependencies(
     const providerPrompt = readProviderPrompt(task.promptSnapshotJson);
     const referenceImages = await loadReferenceImages(task.inputImages, dependencies.fetchImpl);
 
-    await prisma.aiImageGenerationTask.update({
-      where: { id: taskId },
+    const started = await prisma.aiImageGenerationTask.updateMany({
+      where: {
+        id: taskId,
+        status: { in: ["queued", "running"] },
+      },
       data: {
         status: "running",
         errorMessage: null,
       },
     });
 
+    if (started.count === 0) {
+      return;
+    }
+
     for (const item of runnableItems) {
-      await prisma.aiImageGenerationItem.update({
-        where: { id: item.id },
+      if (!(await isTaskStillRunning(taskId))) {
+        return;
+      }
+
+      const startedItem = await prisma.aiImageGenerationItem.updateMany({
+        where: {
+          id: item.id,
+          status: { in: ["queued", "failed"] },
+        },
         data: {
           status: "running",
           errorMessage: null,
         },
       });
+
+      if (startedItem.count === 0) {
+        continue;
+      }
+
       const stopHeartbeat = startRunnerHeartbeat({
         taskId,
         itemId: item.id,
@@ -210,6 +238,19 @@ export async function runAiImageTaskWithDependencies(
         });
 
         await prisma.$transaction(async (tx) => {
+          const currentTask = await tx.aiImageGenerationTask.findUnique({
+            where: { id: taskId },
+            select: { status: true },
+          });
+          const currentItem = await tx.aiImageGenerationItem.findUnique({
+            where: { id: item.id },
+            select: { status: true },
+          });
+
+          if (currentTask?.status !== "running" || currentItem?.status !== "running") {
+            return;
+          }
+
           await tx.aiImageGenerationItem.update({
             where: { id: item.id },
             data: {
@@ -240,8 +281,11 @@ export async function runAiImageTaskWithDependencies(
           });
         });
       } catch (error) {
-        await prisma.aiImageGenerationItem.update({
-          where: { id: item.id },
+        await prisma.aiImageGenerationItem.updateMany({
+          where: {
+            id: item.id,
+            status: "running",
+          },
           data: {
             status: "failed",
             errorMessage: toSafeErrorMessage(error),

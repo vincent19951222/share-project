@@ -97,7 +97,7 @@ describe("supply production view model", () => {
       teamId,
       dayKey: "2026-05-25",
       resources: {
-        coins: { label: "银子", value: 2450 },
+        coins: { label: "银子", value: 3350 },
       },
       profile: {
         username,
@@ -110,7 +110,7 @@ describe("supply production view model", () => {
       },
     });
     expect(snapshot?.resources).toEqual({
-      coins: { label: "银子", value: 2450 },
+      coins: { label: "银子", value: 3350 },
     });
     expect(snapshot?.dashboard.dailyQuests).toEqual([]);
     expect(snapshot?.dashboard.todayEffects).toEqual([]);
@@ -121,7 +121,7 @@ describe("supply production view model", () => {
     expect(snapshot?.drawPool.lottery.message).toBe("旧抽奖池已下线，主题扭蛋请使用 AI 生图入口。");
     expect(snapshot?.shop.products).toEqual([]);
     expect(snapshot?.supplyAiImage.wallet).toMatchObject({
-      coins: 2450,
+      coins: 3350,
       generationCostPerImage: 60,
       themeDrawCost: 200,
     });
@@ -139,10 +139,14 @@ describe("supply production view model", () => {
       },
     ]);
     expect(snapshot?.legacyArchive).toEqual({
-      ticketBalance: 18,
+      ticketBalance: 0,
       inventoryQuantity: 2,
       redemptionCount: 0,
       latestTaskRecordCount: 4,
+    });
+    await expect(prisma.user.findUniqueOrThrow({ where: { id: userId } })).resolves.toMatchObject({
+      coins: 3350,
+      ticketBalance: 0,
     });
     expect(snapshot?.taskRecord.dates).toHaveLength(7);
     expect(snapshot?.taskRecord.dates[0]).toMatchObject({

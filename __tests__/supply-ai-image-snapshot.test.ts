@@ -131,17 +131,20 @@ describe("supply AI image snapshot", () => {
     await prisma.$disconnect();
   });
 
-  it("returns coins, AI themes, recent tasks, artworks, and no primary ticket resource", async () => {
+  it("returns converted coins, AI themes, recent tasks, artworks, and no primary ticket resource", async () => {
     const snapshot = await buildSupplyStationViewModelForUser(userId, fixedNow);
+    const userAfterSnapshot = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
     expect(snapshot?.resources).toEqual({
-      coins: { label: "银子", value: 800 },
+      coins: { label: "银子", value: 1050 },
     });
     expect(snapshot?.supplyAiImage.wallet).toMatchObject({
-      coins: 800,
+      coins: 1050,
       generationCostPerImage: 60,
       themeDrawCost: 200,
     });
+    expect(userAfterSnapshot.coins).toBe(1050);
+    expect(userAfterSnapshot.ticketBalance).toBe(0);
     expect(snapshot?.supplyAiImage.themes.unlocked).toHaveLength(1);
     expect(snapshot?.supplyAiImage.themes.locked).toHaveLength(12);
     expect(snapshot?.supplyAiImage.recentTasks).toMatchObject([
@@ -193,6 +196,62 @@ describe("supply AI image snapshot", () => {
     expect(serializedSnapshot).not.toContain("data:image");
     expect(serializedSnapshot).not.toContain("base64");
     expect(JSON.stringify(snapshot?.supplyAiImage.themes)).not.toContain("promptTemplate");
+  });
+
+  it("settles timed out running image tasks while building the primary supply snapshot", async () => {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { coins: 940, ticketBalance: 0 },
+    });
+    const task = await prisma.aiImageGenerationTask.create({
+      data: {
+        userId,
+        teamId,
+        themeId: "theme-01",
+        userPrompt: "stuck task",
+        requestedCount: 1,
+        status: "running",
+        coinCost: 60,
+        coinRefunded: false,
+        refundedCoinAmount: 0,
+        providerModel: "gpt-image-2",
+        promptSnapshotJson: JSON.stringify({
+          themeId: "theme-01",
+          providerPrompt: "server only prompt",
+        }),
+        createdAt: new Date("2026-07-06T08:40:00+08:00"),
+        updatedAt: new Date("2026-07-06T08:40:00+08:00"),
+      },
+    });
+    await prisma.aiImageGenerationItem.create({
+      data: {
+        taskId: task.id,
+        userId,
+        teamId,
+        themeId: "theme-01",
+        index: 0,
+        status: "running",
+        updatedAt: new Date("2026-07-06T08:40:00+08:00"),
+      },
+    });
+
+    const snapshot = await buildSupplyStationViewModelForUser(userId, fixedNow);
+    const settledTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+      include: { items: true },
+    });
+    const userAfterSnapshot = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(settledTask.status).toBe("failed");
+    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.items[0]?.status).toBe("failed");
+    expect(userAfterSnapshot.coins).toBe(1000);
+    expect(snapshot?.supplyAiImage.recentTasks[0]).toMatchObject({
+      id: task.id,
+      status: "failed",
+      refundedCoinAmount: 60,
+      retryAvailable: true,
+    });
   });
 
   it("does not require old daily task assignments", async () => {

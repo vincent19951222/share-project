@@ -543,4 +543,63 @@ describe("AI image task service", () => {
     expect(completedTask.status).toBe("completed");
     expect(completedTask.refundedCoinAmount).toBe(0);
   });
+
+  it("does not let a late runner resurrect a timed out and refunded task", async () => {
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-01",
+      userPrompt: "late runner",
+      requestedCount: 1,
+      referenceImages: [],
+      startRunner: false,
+    });
+    const deferred = createDeferred<{ b64Json: string; mimeType: "image/png" }>();
+    const provider = vi.fn(() => deferred.promise);
+    const runPromise = runAiImageTaskWithDependencies(task.id, {
+      heartbeatIntervalMs: 60 * 60 * 1000,
+      provider,
+      upload: uploadAiImageBase64Mock,
+    });
+
+    await vi.waitFor(() => expect(provider).toHaveBeenCalledTimes(1));
+
+    await prisma.aiImageGenerationTask.update({
+      where: { id: task.id },
+      data: {
+        status: "running",
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+    await prisma.aiImageGenerationItem.updateMany({
+      where: { taskId: task.id },
+      data: {
+        status: "running",
+        updatedAt: new Date("2026-07-06T12:00:00+08:00"),
+      },
+    });
+
+    await settleTimedOutAiImageTask({
+      taskId: task.id,
+      now: new Date("2026-07-06T12:30:00+08:00"),
+    });
+
+    deferred.resolve({
+      b64Json: Buffer.from("late-output").toString("base64"),
+      mimeType: "image/png",
+    });
+    await runPromise;
+
+    const settledTask = await prisma.aiImageGenerationTask.findUniqueOrThrow({
+      where: { id: task.id },
+      include: { items: true, artworks: true },
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(settledTask.status).toBe("failed");
+    expect(settledTask.coinRefunded).toBe(true);
+    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.items[0]?.status).toBe("failed");
+    expect(settledTask.artworks).toHaveLength(0);
+    expect(user.coins).toBe(1000);
+  });
 });

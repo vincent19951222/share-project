@@ -208,12 +208,17 @@ export async function settleAiImageTaskByItems(input: {
       select: {
         id: true,
         userId: true,
+        status: true,
         coinCost: true,
         refundedCoinAmount: true,
       },
     });
 
     if (!task) {
+      return;
+    }
+
+    if (task.status !== "queued" && task.status !== "running") {
       return;
     }
 
@@ -608,4 +613,21 @@ export async function settleTimedOutAiImageTask(input: {
     markUnfinishedAsFailedMessage: "任务处理超时",
     taskErrorMessage: "任务处理超时",
   });
+}
+
+export async function settleTimedOutAiImageTasksForUser(input: {
+  userId: string;
+  now?: Date;
+}): Promise<void> {
+  const runningTasks = await prisma.aiImageGenerationTask.findMany({
+    where: {
+      userId: input.userId,
+      status: "running",
+    },
+    select: { id: true },
+  });
+
+  for (const task of runningTasks) {
+    await settleTimedOutAiImageTask({ taskId: task.id, now: input.now });
+  }
 }
