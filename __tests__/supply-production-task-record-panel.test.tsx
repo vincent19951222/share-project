@@ -168,7 +168,7 @@ const snapshot = {
     adminQueue: [],
   },
   supplyAiImage: {
-    wallet: { coins: 2450, generationCostPerImage: 60, themeDrawCost: 200 },
+    wallet: { coins: 2450, generationCostPerImage: 10, themeDrawCost: 200 },
     themes: { unlocked: [], locked: [], allUnlocked: false },
     recentTasks: [],
     recentArtworks: [],

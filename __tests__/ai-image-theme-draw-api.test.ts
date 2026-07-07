@@ -5,7 +5,6 @@ import { NextRequest } from "next/server";
 import { POST } from "@/app/api/gamification/ai-image/themes/draw/route";
 import { createCookieValue } from "@/lib/auth";
 import { seedDatabase } from "@/lib/db-seed";
-import { getAiImageThemes } from "@/lib/gamification/ai-image/themes";
 import * as themeUnlocksService from "@/lib/gamification/ai-image/theme-unlocks";
 import { prisma } from "@/lib/prisma";
 
@@ -46,44 +45,28 @@ describe("AI image theme draw API", () => {
     expect(body).toEqual({ error: "未登录" });
   });
 
-  it("draws a locked theme with coins and returns a client-safe theme snapshot", async () => {
-    const response = await POST(request(userId));
-    const body = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(body.theme).toMatchObject({
-      id: expect.any(String),
-      unlocked: true,
-      defaultUnlocked: false,
-      enabled: true,
-    });
-    expect(Object.keys(body)).toEqual(["theme"]);
-    expect(JSON.stringify(body)).not.toContain("promptTemplate");
-  });
-
-  it("maps insufficient coins to a user-facing business error", async () => {
-    await prisma.user.update({ where: { id: userId }, data: { coins: 0 } });
-
+  it("keeps the legacy draw endpoint as an all-collected business response", async () => {
     const response = await POST(request(userId));
     const body = await response.json();
 
     expect(response.status).toBe(409);
-    expect(body).toEqual({ error: "银子不足" });
+    expect(body).toEqual({ error: "主题已集齐" });
+    expect(JSON.stringify(body)).not.toContain("promptTemplate");
+  });
+
+  it("does not charge users when every theme is already available", async () => {
+    await prisma.user.update({ where: { id: userId }, data: { coins: 0 } });
+
+    const response = await POST(request(userId));
+    const body = await response.json();
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    expect(response.status).toBe(409);
+    expect(body).toEqual({ error: "主题已集齐" });
+    expect(user.coins).toBe(0);
   });
 
   it("maps no remaining themes to a user-facing business error", async () => {
-    const lockedThemes = getAiImageThemes().filter((theme) => !theme.defaultUnlocked);
-    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
-
-    await prisma.aiImageThemeUnlock.createMany({
-      data: lockedThemes.map((theme) => ({
-        userId,
-        teamId: user.teamId,
-        themeId: theme.id,
-        source: "draw",
-      })),
-    });
-
     const response = await POST(request(userId));
     const body = await response.json();
 

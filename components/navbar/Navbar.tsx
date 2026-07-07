@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useCallback, useEffect, useTransition } from "react";
-import { preloadBoardTabComponent, preloadSupplyPanelComponent } from "@/components/board/tab-component-loaders";
+import { preloadBoardTabComponent } from "@/components/board/tab-component-loaders";
 import { useBoard } from "@/lib/store";
 import { TabBtn } from "@/components/ui/TabBtn";
 import { ProfileDropdown } from "./ProfileDropdown";
@@ -13,14 +13,12 @@ import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { TeamDynamicsBell } from "./TeamDynamicsBell";
 import {
   appTabRoutes,
-  supplyNavItems,
   type SupplyNavContext,
   type SupplyPanelKey,
 } from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
 export function Navbar({
-  activeSupplyPanel,
   activeTabOverride,
   supplyNavContext,
 }: {
@@ -33,12 +31,9 @@ export function Navbar({
   const [profileOpen, setProfileOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
-  const [supplyMenuOpen, setSupplyMenuOpen] = useState(false);
   const [pendingTab, setPendingTab] = useState<AppTab | null>(null);
-  const [pendingSupplyPanel, setPendingSupplyPanel] = useState<SupplyPanelKey | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const prefetchedTabsRef = useRef(false);
-  const supplyMenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [, startTransition] = useTransition();
   const currentMember =
     state.members.find((member) => member.id === state.currentUserId) ??
@@ -65,21 +60,8 @@ export function Navbar({
     [router],
   );
 
-  const prefetchSupplyPanel = useCallback(
-    (panel: SupplyPanelKey) => {
-      const item = supplyNavItems.find((candidate) => candidate.id === panel);
-      if (item) {
-        router.prefetch?.(item.route);
-        preloadSupplyPanelComponent(panel);
-      }
-    },
-    [router],
-  );
-
   function handleTabChange(tab: AppTab) {
     setMobileTabsOpen(false);
-    setSupplyMenuOpen(false);
-    setPendingSupplyPanel(null);
 
     if (tab === activeTab) {
       return;
@@ -90,47 +72,6 @@ export function Navbar({
       router.push(appTabRoutes[tab]);
     });
   }
-
-  function handleSupplyPanelChange(panel: SupplyPanelKey) {
-    const item = supplyNavItems.find((candidate) => candidate.id === panel);
-    if (!item) {
-      return;
-    }
-
-    setSupplyMenuOpen(false);
-
-    if (panel === activeSupplyPanel) {
-      return;
-    }
-
-    setPendingTab("supply");
-    setPendingSupplyPanel(panel);
-    startTransition(() => {
-      router.push(item.route);
-    });
-  }
-
-  const clearSupplyMenuCloseTimer = useCallback(() => {
-    if (supplyMenuCloseTimerRef.current) {
-      clearTimeout(supplyMenuCloseTimerRef.current);
-      supplyMenuCloseTimerRef.current = null;
-    }
-  }, []);
-
-  const openSupplyMenu = useCallback(() => {
-    clearSupplyMenuCloseTimer();
-    setSupplyMenuOpen(true);
-  }, [clearSupplyMenuCloseTimer]);
-
-  const scheduleSupplyMenuClose = useCallback(() => {
-    clearSupplyMenuCloseTimer();
-    supplyMenuCloseTimerRef.current = setTimeout(() => {
-      setSupplyMenuOpen(false);
-      supplyMenuCloseTimerRef.current = null;
-    }, 220);
-  }, [clearSupplyMenuCloseTimer]);
-
-  useEffect(() => clearSupplyMenuCloseTimer, [clearSupplyMenuCloseTimer]);
 
   const handleProfileClick = useCallback(() => {
     if (!currentMember) {
@@ -171,19 +112,13 @@ export function Navbar({
     }
   }, [activeTab, pendingTab]);
 
-  useEffect(() => {
-    if (pendingSupplyPanel && pendingSupplyPanel === activeSupplyPanel) {
-      setPendingSupplyPanel(null);
-    }
-  }, [activeSupplyPanel, pendingSupplyPanel]);
-
   return (
     <>
       <nav
         ref={navRef}
-        className={`app-top-nav app-top-nav--with-supply-menu w-full shrink-0 px-2 py-2 z-50${
+        className={`app-top-nav w-full shrink-0 px-2 py-2 z-50${
           showSupplyChrome ? " app-top-nav--supply" : ""
-        }${supplyMenuOpen ? " app-supply-menu-open" : ""}`}
+        }`}
       >
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="app-top-nav-brand-area flex min-w-0 items-center gap-3 sm:gap-6">
@@ -259,17 +194,13 @@ export function Navbar({
                 aria-label={supplyTabAriaLabel}
                 active={activeTab === "supply"}
                 className="supply-tab app-supply-primary-tab"
-                onBlur={scheduleSupplyMenuClose}
                 pending={pendingTab === "supply"}
                 onFocus={() => {
-                  openSupplyMenu();
                   prefetchAppTab("supply");
                 }}
                 onMouseEnter={() => {
-                  openSupplyMenu();
                   prefetchAppTab("supply");
                 }}
-                onMouseLeave={scheduleSupplyMenuClose}
                 onClick={() => handleTabChange("supply")}
               >
                 <AssetIcon name="supply" className="h-4 w-4 object-contain" />
@@ -444,38 +375,6 @@ export function Navbar({
             </TabBtn>
           </div>
         ) : null}
-        <div
-          className="app-supply-secondary-nav"
-          aria-label="牛马补给站分区导航"
-          onBlur={scheduleSupplyMenuClose}
-          onFocus={openSupplyMenu}
-          onMouseEnter={openSupplyMenu}
-          onMouseLeave={scheduleSupplyMenuClose}
-        >
-          <div className="app-supply-secondary-rail" role="tablist">
-            {supplyNavItems.map((item) => {
-              const selected = item.id === (activeSupplyPanel ?? "studio");
-
-              return (
-                <button
-                  aria-label={item.label}
-                  aria-current={selected ? "page" : undefined}
-                  aria-selected={selected}
-                  className={`app-supply-secondary-tab${pendingSupplyPanel === item.id ? " pending" : ""}`}
-                  key={item.id}
-                  onFocus={() => prefetchSupplyPanel(item.id)}
-                  onMouseEnter={() => prefetchSupplyPanel(item.id)}
-                  onClick={() => handleSupplyPanelChange(item.id)}
-                  role="tab"
-                  type="button"
-                >
-                  <img alt="" aria-hidden="true" src={item.iconImage} />
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
       </nav>
       {editModalOpen && currentMember ? (
         <EditProfileModal

@@ -19,6 +19,14 @@ async function flush() {
   });
 }
 
+async function expandComposer(container: HTMLElement) {
+  await act(async () => {
+    container
+      .querySelector<HTMLButtonElement>("[data-testid='supply-composer-collapsed-input']")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+}
+
 function buildSnapshot(
   overrides: Partial<SupplyStationProductionSnapshot> = {},
 ): SupplyStationProductionSnapshot {
@@ -183,7 +191,7 @@ function buildSnapshot(
     },
     redemptions: { mine: [], adminQueue: [] },
     supplyAiImage: {
-      wallet: { coins: 2400, generationCostPerImage: 60, themeDrawCost: 200 },
+      wallet: { coins: 2400, generationCostPerImage: 10, themeDrawCost: 200 },
       themes: {
         unlocked: [
           {
@@ -198,22 +206,21 @@ function buildSnapshot(
             tag: "像素",
             palette: ["#fde047"],
           },
-        ],
-        locked: [
           {
             id: "theme-02",
             name: "深夜健身房",
             description: "霓虹训练棚",
             previewImageUrl: "https://example.com/theme-2.png",
-            defaultUnlocked: false,
-            unlocked: false,
+            defaultUnlocked: true,
+            unlocked: true,
             enabled: true,
             sortOrder: 2,
             tag: "霓虹",
             palette: ["#1d4ed8"],
           },
         ],
-        allUnlocked: false,
+        locked: [],
+        allUnlocked: true,
       },
       recentTasks: [
         {
@@ -222,7 +229,7 @@ function buildSnapshot(
           userPrompt: "训练后的像素海报",
           requestedCount: 2,
           status: "failed",
-          coinCost: 120,
+          coinCost: 20,
           refundedCoinAmount: 0,
           errorMessage: "有一张失败",
           retryAvailable: true,
@@ -325,8 +332,10 @@ describe("SupplyStationShell", () => {
     );
     expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
     expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
-    expect(container.querySelector("[data-panel='studio'][data-state='active']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-theme-masonry']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-creation-control-deck']")).not.toBeNull();
     expect(container.textContent).toContain("牛马像素馆");
+    expect(container.textContent).toContain("深夜健身房");
     expect(container.textContent).toContain("生成");
   });
 
@@ -349,7 +358,7 @@ describe("SupplyStationShell", () => {
                     userPrompt: "",
                     requestedCount: 1,
                     status: "queued",
-                    coinCost: 60,
+                    coinCost: 10,
                     refundedCoinAmount: 0,
                     errorMessage: null,
                     retryAvailable: false,
@@ -369,6 +378,8 @@ describe("SupplyStationShell", () => {
       root.render(<SupplyStationShell />);
     });
     await flush();
+
+    await expandComposer(container);
 
     await act(async () => {
       container
@@ -425,48 +436,10 @@ describe("SupplyStationShell", () => {
     expect(container.textContent).toContain("已重新提交失败图片");
   });
 
-  it("draws an AI image theme and refreshes the production snapshot", async () => {
+  it("falls back from the old theme gacha panel to the studio workspace", async () => {
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() }))
-        .mockResolvedValueOnce(
-          createJsonResponse({
-            theme: {
-              id: "theme-02",
-              name: "深夜健身房",
-            },
-          }),
-        )
-        .mockResolvedValueOnce(
-          createJsonResponse({
-            snapshot: buildSnapshot({
-              supplyAiImage: {
-                ...buildSnapshot().supplyAiImage,
-                themes: {
-                  unlocked: [
-                    ...buildSnapshot().supplyAiImage.themes.unlocked,
-                    {
-                      id: "theme-02",
-                      name: "深夜健身房",
-                      description: "霓虹训练棚",
-                      previewImageUrl: "https://example.com/theme-2.png",
-                      defaultUnlocked: false,
-                      unlocked: true,
-                      enabled: true,
-                      sortOrder: 2,
-                      tag: "霓虹",
-                      palette: ["#1d4ed8"],
-                    },
-                  ],
-                  locked: [],
-                  allUnlocked: false,
-                },
-              },
-            }),
-          }),
-        ),
+      vi.fn().mockResolvedValueOnce(createJsonResponse({ snapshot: buildSnapshot() })),
     );
     const { SupplyStationShell } = await import("@/components/gamification/production/SupplyStationShell");
 
@@ -475,26 +448,9 @@ describe("SupplyStationShell", () => {
     });
     await flush();
 
-    await act(async () => {
-      container
-        .querySelector<HTMLButtonElement>("[data-action='draw-ai-image-theme']")
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    await flush();
-
-    expect(fetch).toHaveBeenNthCalledWith(
-      2,
-      "/api/gamification/ai-image/themes/draw",
-      expect.objectContaining({
-        method: "POST",
-      }),
-    );
-    expect(fetch).toHaveBeenNthCalledWith(
-      3,
-      "/api/gamification/supply/state",
-      expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
-    );
-    expect(container.textContent).toContain("新主题已解锁");
+    expect(container.querySelector("[data-action='draw-ai-image-theme']")).toBeNull();
+    expect(container.querySelector("[data-testid='supply-theme-masonry']")).not.toBeNull();
+    expect(container.textContent).not.toContain("主题扭蛋");
   });
 
   it("updates the shared nav asset cache after a supply mutation refreshes state", async () => {
@@ -521,6 +477,8 @@ describe("SupplyStationShell", () => {
       root.render(<SupplyStationShell />);
     });
     await flush();
+
+    await expandComposer(container);
 
     await act(async () => {
       container

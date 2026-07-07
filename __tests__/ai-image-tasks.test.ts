@@ -107,41 +107,33 @@ describe("AI image task service", () => {
     const items = await prisma.aiImageGenerationItem.findMany({ where: { taskId: task.id } });
 
     expect(task.status).toBe("queued");
-    expect(task.coinCost).toBe(240);
-    expect(user.coins).toBe(760);
+    expect(task.coinCost).toBe(40);
+    expect(user.coins).toBe(960);
     expect(items).toHaveLength(4);
     expect(items.every((item) => item.status === "queued")).toBe(true);
   });
 
-  it("rejects locked themes", async () => {
-    await expect(
-      createAiImageTask({
-        userId,
-        themeId: "theme-02",
-        userPrompt: "",
-        requestedCount: 1,
-        referenceImages: [],
-        startRunner: false,
-      }),
-    ).rejects.toThrow("主题未解锁");
+  it("creates tasks from every enabled preset without theme draw", async () => {
+    const task = await createAiImageTask({
+      userId,
+      themeId: "theme-02",
+      userPrompt: "",
+      requestedCount: 1,
+      referenceImages: [],
+      startRunner: false,
+    });
+
+    expect(task.themeId).toBe("theme-02");
   });
 
-  it("draws an unowned theme and charges coins", async () => {
-    const result = await drawAiImageTheme({ userId, rng: () => 0 });
-    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
-    const unlock = await prisma.aiImageThemeUnlock.findUnique({
-      where: { userId_themeId: { userId, themeId: result.theme.id } },
-    });
+  it("keeps the legacy theme draw service as an all-collected no-op", async () => {
+    await expect(drawAiImageTheme({ userId, rng: () => 0 })).rejects.toThrow("主题已集齐");
 
-    expect(result.theme.unlocked).toBe(true);
-    expect(result.theme.defaultUnlocked).toBe(false);
-    expect(user.coins).toBe(800);
-    expect(unlock).toMatchObject({
-      userId,
-      teamId,
-      themeId: result.theme.id,
-      source: "draw",
-    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const unlocks = await prisma.aiImageThemeUnlock.findMany({ where: { userId } });
+
+    expect(user.coins).toBe(1000);
+    expect(unlocks).toHaveLength(0);
   });
 
   it("stores reference inputs without persisting data URLs and hides provider prompts from snapshots", async () => {
@@ -201,7 +193,7 @@ describe("AI image task service", () => {
     });
     await prisma.aiImageGenerationTask.update({
       where: { id: original.id },
-      data: { status: "failed", coinRefunded: true, refundedCoinAmount: 120 },
+      data: { status: "failed", coinRefunded: true, refundedCoinAmount: 20 },
     });
     await prisma.user.update({ where: { id: userId }, data: { coins: 1000 } });
 
@@ -270,7 +262,7 @@ describe("AI image task service", () => {
 
     expect(settledTask.status).toBe("partial");
     expect(settledTask.coinRefunded).toBe(true);
-    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.refundedCoinAmount).toBe(10);
     expect(settledTask.items).toHaveLength(2);
     expect(settledTask.items[0]).toMatchObject({
       status: "completed",
@@ -280,7 +272,7 @@ describe("AI image task service", () => {
     expect(settledTask.items[1]?.status).toBe("failed");
     expect(settledTask.items[1]?.errorMessage).toBeTruthy();
     expect(settledTask.artworks).toHaveLength(1);
-    expect(user.coins).toBe(940);
+    expect(user.coins).toBe(990);
   });
 
   it("settles timed out running tasks as failed and refunds coins", async () => {
@@ -321,7 +313,7 @@ describe("AI image task service", () => {
 
     expect(settledTask.status).toBe("failed");
     expect(settledTask.coinRefunded).toBe(true);
-    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.refundedCoinAmount).toBe(10);
     expect(settledTask.errorMessage).toBe("任务处理超时");
     expect(settledTask.items[0]?.status).toBe("failed");
     expect(user.coins).toBe(1000);
@@ -392,14 +384,14 @@ describe("AI image task service", () => {
 
     expect(settledTask.status).toBe("partial");
     expect(settledTask.coinRefunded).toBe(true);
-    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.refundedCoinAmount).toBe(10);
     expect(settledTask.items[0]).toMatchObject({
       status: "completed",
       imageUrl: "https://cdn.example.com/already-done.png",
     });
     expect(settledTask.items[1]?.status).toBe("failed");
     expect(settledTask.artworks).toHaveLength(1);
-    expect(user.coins).toBe(940);
+    expect(user.coins).toBe(990);
   });
 
   it("corrects an earlier over-refund when settlement recomputes a partial outcome", async () => {
@@ -424,7 +416,7 @@ describe("AI image task service", () => {
       data: {
         status: "running",
         coinRefunded: true,
-        refundedCoinAmount: 120,
+        refundedCoinAmount: 20,
         updatedAt: new Date("2026-07-06T12:00:00+08:00"),
       },
     });
@@ -453,8 +445,8 @@ describe("AI image task service", () => {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
     expect(settledTask.status).toBe("partial");
-    expect(settledTask.refundedCoinAmount).toBe(60);
-    expect(user.coins).toBe(940);
+    expect(settledTask.refundedCoinAmount).toBe(10);
+    expect(user.coins).toBe(990);
   });
 
   it("fails malformed prompt snapshots without leaving the task stuck in running", async () => {
@@ -482,7 +474,7 @@ describe("AI image task service", () => {
 
     expect(settledTask.status).toBe("failed");
     expect(settledTask.coinRefunded).toBe(true);
-    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.refundedCoinAmount).toBe(10);
     expect(settledTask.items[0]?.status).toBe("failed");
     expect(settledTask.items[0]?.errorMessage).toBe("生成任务缺少可执行提示词");
     expect(user.coins).toBe(1000);
@@ -525,7 +517,7 @@ describe("AI image task service", () => {
       expect(liveTask.coinRefunded).toBe(false);
       expect(liveTask.refundedCoinAmount).toBe(0);
       expect(liveTask.items[0]?.status).toBe("running");
-      expect(user.coins).toBe(940);
+      expect(user.coins).toBe(990);
     } finally {
       deferred.resolve({
         b64Json: Buffer.from("heartbeat-output").toString("base64"),
@@ -597,7 +589,7 @@ describe("AI image task service", () => {
 
     expect(settledTask.status).toBe("failed");
     expect(settledTask.coinRefunded).toBe(true);
-    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.refundedCoinAmount).toBe(10);
     expect(settledTask.items[0]?.status).toBe("failed");
     expect(settledTask.artworks).toHaveLength(0);
     expect(user.coins).toBe(1000);

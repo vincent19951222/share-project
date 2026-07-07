@@ -6,6 +6,25 @@ import type { SupplyStationProductionSnapshot } from "@/lib/types";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
+function buildUnlockedThemes() {
+  return Array.from({ length: 13 }, (_, index) => {
+    const order = index + 1;
+
+    return {
+      id: `theme-${String(order).padStart(2, "0")}`,
+      name: `主题 ${order}`,
+      description: "Phase 1 默认开放主题",
+      previewImageUrl: `https://example.com/theme-${order}.png`,
+      defaultUnlocked: true,
+      unlocked: true,
+      enabled: true,
+      sortOrder: order,
+      tag: "可用",
+      palette: ["#fde047", "#111827"],
+    };
+  });
+}
+
 const snapshot = {
   currentUserId: "u1",
   currentUserRole: "MEMBER",
@@ -115,8 +134,8 @@ const snapshot = {
   },
   redemptions: { mine: [], adminQueue: [] },
   supplyAiImage: {
-    wallet: { coins: 0, generationCostPerImage: 60, themeDrawCost: 200 },
-    themes: { unlocked: [], locked: [], allUnlocked: false },
+    wallet: { coins: 0, generationCostPerImage: 10, themeDrawCost: 200 },
+    themes: { unlocked: buildUnlockedThemes(), locked: [], allUnlocked: true },
     recentTasks: [],
     recentArtworks: [],
   },
@@ -162,11 +181,18 @@ describe("production supply UI Lab visual contract", () => {
     });
 
     expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
-    expect(container.querySelector(".supply-ai-image-shell-header")).not.toBeNull();
-    expect(container.querySelector(".supply-ai-image-shell-nav")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell-header")).toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell-nav")).toBeNull();
+    expect(container.querySelector("[role='status']")).toBeNull();
     expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-theme-masonry']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-creation-control-deck']")).not.toBeNull();
+    expect(container.querySelectorAll("[data-testid='supply-theme-card']")).toHaveLength(13);
     expect(container.querySelector(".supply-dashboard-scene")).toBeNull();
-    expect(container.textContent).toContain("845");
+    expect(container.textContent).not.toContain("SUPPLY STATION");
+    expect(container.textContent).not.toContain("我的银子");
+    expect(container.textContent).not.toContain("回到打卡");
+    expect(container.textContent).not.toContain("主题扭蛋");
     expect(container.textContent).not.toContain("生产模式");
     expect(container.textContent).not.toContain("debug");
     expect(container.textContent).not.toContain("Playground");
@@ -190,6 +216,7 @@ describe("production supply UI Lab visual contract", () => {
     expect(container.querySelector(".supply-artwork-backpack-panel")).not.toBeNull();
     expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
     expect(container.querySelector(".supply-shop-scene")).toBeNull();
-    expect(container.querySelector("[data-panel='artworks'][data-state='active']")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell-nav")).toBeNull();
+    expect(container.textContent).not.toContain("主题扭蛋");
   });
 });

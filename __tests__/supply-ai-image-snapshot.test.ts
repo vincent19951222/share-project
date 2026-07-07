@@ -28,7 +28,7 @@ describe("supply AI image snapshot", () => {
         userPrompt: "训练后的像素海报",
         requestedCount: 2,
         status: "partial",
-        coinCost: 120,
+        coinCost: 20,
         coinRefunded: false,
         refundedCoinAmount: 0,
         providerModel: "gpt-image-2",
@@ -88,7 +88,7 @@ describe("supply AI image snapshot", () => {
         userPrompt: "unsafe image payload",
         requestedCount: 1,
         status: "completed",
-        coinCost: 60,
+        coinCost: 10,
         coinRefunded: false,
         refundedCoinAmount: 0,
         providerModel: "gpt-image-2",
@@ -140,20 +140,21 @@ describe("supply AI image snapshot", () => {
     });
     expect(snapshot?.supplyAiImage.wallet).toMatchObject({
       coins: 1050,
-      generationCostPerImage: 60,
+      generationCostPerImage: 10,
       themeDrawCost: 200,
     });
     expect(userAfterSnapshot.coins).toBe(1050);
     expect(userAfterSnapshot.ticketBalance).toBe(0);
-    expect(snapshot?.supplyAiImage.themes.unlocked).toHaveLength(1);
-    expect(snapshot?.supplyAiImage.themes.locked).toHaveLength(12);
+    expect(snapshot?.supplyAiImage.themes.unlocked).toHaveLength(13);
+    expect(snapshot?.supplyAiImage.themes.locked).toHaveLength(0);
+    expect(snapshot?.supplyAiImage.themes.allUnlocked).toBe(true);
     expect(snapshot?.supplyAiImage.recentTasks).toMatchObject([
       {
         themeId: "theme-01",
         userPrompt: "训练后的像素海报",
         requestedCount: 2,
         status: "partial",
-        coinCost: 120,
+        coinCost: 20,
         refundedCoinAmount: 0,
         errorMessage: "有一张生成失败",
         retryAvailable: true,
@@ -201,7 +202,7 @@ describe("supply AI image snapshot", () => {
   it("settles timed out running image tasks while building the primary supply snapshot", async () => {
     await prisma.user.update({
       where: { id: userId },
-      data: { coins: 940, ticketBalance: 0 },
+      data: { coins: 990, ticketBalance: 0 },
     });
     const task = await prisma.aiImageGenerationTask.create({
       data: {
@@ -211,7 +212,7 @@ describe("supply AI image snapshot", () => {
         userPrompt: "stuck task",
         requestedCount: 1,
         status: "running",
-        coinCost: 60,
+        coinCost: 10,
         coinRefunded: false,
         refundedCoinAmount: 0,
         providerModel: "gpt-image-2",
@@ -243,13 +244,13 @@ describe("supply AI image snapshot", () => {
     const userAfterSnapshot = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
     expect(settledTask.status).toBe("failed");
-    expect(settledTask.refundedCoinAmount).toBe(60);
+    expect(settledTask.refundedCoinAmount).toBe(10);
     expect(settledTask.items[0]?.status).toBe("failed");
     expect(userAfterSnapshot.coins).toBe(1000);
     expect(snapshot?.supplyAiImage.recentTasks[0]).toMatchObject({
       id: task.id,
       status: "failed",
-      refundedCoinAmount: 60,
+      refundedCoinAmount: 10,
       retryAvailable: true,
     });
   });

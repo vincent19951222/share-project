@@ -56,7 +56,7 @@ describe("GET /api/gamification/supply/state", () => {
       },
       supplyAiImage: {
         wallet: {
-          generationCostPerImage: 60,
+          generationCostPerImage: 10,
           themeDrawCost: 200,
         },
       },

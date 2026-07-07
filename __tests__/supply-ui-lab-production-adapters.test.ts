@@ -127,7 +127,7 @@ const snapshot = {
   },
   redemptions: { mine: [], adminQueue: [] },
   supplyAiImage: {
-    wallet: { coins: 0, generationCostPerImage: 60, themeDrawCost: 200 },
+    wallet: { coins: 0, generationCostPerImage: 10, themeDrawCost: 200 },
     themes: { unlocked: [], locked: [], allUnlocked: false },
     recentTasks: [],
     recentArtworks: [],

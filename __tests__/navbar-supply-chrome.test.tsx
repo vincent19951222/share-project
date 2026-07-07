@@ -9,9 +9,8 @@ import type { AppTab } from "@/lib/types";
 
 const routerPushMock = vi.fn();
 const routerPrefetchMock = vi.fn();
-const { preloadBoardTabComponentMock, preloadSupplyPanelComponentMock } = vi.hoisted(() => ({
+const { preloadBoardTabComponentMock } = vi.hoisted(() => ({
   preloadBoardTabComponentMock: vi.fn(),
-  preloadSupplyPanelComponentMock: vi.fn(),
 }));
 
 let activeTab: AppTab = "supply";
@@ -42,7 +41,6 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/components/board/tab-component-loaders", () => ({
   preloadBoardTabComponent: preloadBoardTabComponentMock,
-  preloadSupplyPanelComponent: preloadSupplyPanelComponentMock,
 }));
 
 vi.mock("@/components/navbar/TeamDynamicsBell", () => ({
@@ -85,7 +83,6 @@ describe("Navbar supply chrome", () => {
     routerPushMock.mockClear();
     routerPrefetchMock.mockClear();
     preloadBoardTabComponentMock.mockClear();
-    preloadSupplyPanelComponentMock.mockClear();
     activeTab = "supply";
     vi.useRealTimers();
   });
@@ -115,50 +112,36 @@ describe("Navbar supply chrome", () => {
     ).toEqual(expectedOrder);
   });
 
-  it("renders the supply secondary tabs when the supply primary tab is active", async () => {
+  it("keeps the supply chrome focused on the primary entry without the phase 2 rail", async () => {
     await act(async () => {
       root.render(<Navbar activeSupplyPanel="studio" activeTabOverride="supply" supplyNavContext={supplyNavContext} />);
     });
 
-    expect(container.querySelector(".app-supply-secondary-nav")).not.toBeNull();
-    expect(container.querySelector(".app-top-nav--with-supply-menu")).not.toBeNull();
+    expect(container.querySelector(".app-supply-secondary-nav")).toBeNull();
+    expect(container.querySelector(".app-top-nav--with-supply-menu")).toBeNull();
     expect(container.querySelector(".app-top-nav--supply")).not.toBeNull();
     expect(container.querySelector(".app-supply-primary-tab")).not.toBeNull();
-    expect(
-      Array.from(container.querySelectorAll(".app-supply-secondary-tab")).map((tab) => tab.textContent?.trim()),
-    ).toEqual(["生图工位", "主题扭蛋", "作品库", "旧补给归档"]);
-    expect(
-      Array.from(container.querySelectorAll<HTMLImageElement>(".app-supply-secondary-tab img")).map((image) =>
-        image.getAttribute("src"),
-      ),
-    ).toEqual([
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_status.png",
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_shop.png",
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_task_record.png",
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_backpack.png",
-    ]);
-    Array.from(container.querySelectorAll<HTMLImageElement>(".app-supply-secondary-tab img")).forEach((image) => {
-      const src = image.getAttribute("src");
-      expect(src).toBeTruthy();
-      expect(src).toContain("share_project_public_assets_home_scenes_supply_nav_icons_");
-    });
-    expect(container.querySelector(".app-supply-secondary-tab[aria-current='page']")?.textContent).toContain("生图工位");
+    expect(container.textContent).not.toContain("主题扭蛋");
+    expect(container.textContent).not.toContain("作品库");
+    expect(container.textContent).not.toContain("旧补给归档");
   });
 
-  it("pushes formal dashboard routes from secondary tabs", async () => {
+  it("pushes the formal studio route from the supply primary tab", async () => {
+    activeTab = "punch";
+
     await act(async () => {
-      root.render(<Navbar activeSupplyPanel="studio" activeTabOverride="supply" supplyNavContext={supplyNavContext} />);
+      root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
     });
 
-    const artworkTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".app-supply-secondary-tab")).find(
-      (button) => button.textContent?.includes("作品库"),
+    const supplyTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".home-tab-strip .tab-btn")).find(
+      (button) => button.textContent?.includes("牛马补给站"),
     );
 
     await act(async () => {
-      artworkTab?.click();
+      supplyTab?.click();
     });
 
-    expect(routerPushMock).toHaveBeenCalledWith("/dashboard/backpack");
+    expect(routerPushMock).toHaveBeenCalledWith("/dashboard/status");
   });
 
   it("renders supply resources in the right context slot", async () => {
@@ -189,20 +172,20 @@ describe("Navbar supply chrome", () => {
     );
   });
 
-  it("keeps supply assets and the hoverable supply secondary tabs available on regular primary tabs", async () => {
+  it("keeps supply assets available on regular primary tabs without showing phase 2 sections", async () => {
     activeTab = "punch";
 
     await act(async () => {
       root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
     });
 
-    expect(container.querySelector(".app-top-nav--with-supply-menu")).not.toBeNull();
+    expect(container.querySelector(".app-top-nav--with-supply-menu")).toBeNull();
     expect(container.querySelector(".app-top-nav--supply")).toBeNull();
     expect(container.querySelector(".app-supply-assets")?.textContent).toContain("440");
     expect(container.querySelector(".app-supply-assets")?.textContent).not.toContain("抽奖券");
     expect(container.querySelector(".app-supply-assets")?.textContent).not.toContain("背包");
-    expect(container.querySelector(".app-supply-secondary-nav")).not.toBeNull();
-    expect(container.querySelector(".app-supply-secondary-tab[aria-current='page']")?.textContent).toContain("生图工位");
+    expect(container.querySelector(".app-supply-secondary-nav")).toBeNull();
+    expect(container.textContent).not.toContain("主题扭蛋");
   });
 
   it("keeps a stable asset placeholder before supply resources load", async () => {
@@ -261,7 +244,7 @@ describe("Navbar supply chrome", () => {
     expect(toggle?.textContent).not.toContain("×");
   });
 
-  it("keeps the secondary supply tabs reachable while moving from the primary tab to the flyout", async () => {
+  it("does not open a supply flyout when hovering the primary supply tab", async () => {
     vi.useFakeTimers();
     activeTab = "punch";
 
@@ -271,41 +254,23 @@ describe("Navbar supply chrome", () => {
 
     const topNav = container.querySelector(".app-top-nav");
     const primarySupplyTab = container.querySelector(".app-supply-primary-tab");
-    const secondaryNav = container.querySelector(".app-supply-secondary-nav");
-    const artworkTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".app-supply-secondary-tab")).find(
-      (button) => button.textContent?.includes("作品库"),
-    );
 
     expect(topNav).not.toBeNull();
     expect(primarySupplyTab).not.toBeNull();
-    expect(secondaryNav).not.toBeNull();
-    expect(artworkTab).not.toBeUndefined();
+    expect(container.querySelector(".app-supply-secondary-nav")).toBeNull();
 
     await act(async () => {
       primarySupplyTab?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
     });
 
-    expect(topNav?.classList.contains("app-supply-menu-open")).toBe(true);
+    expect(topNav?.classList.contains("app-supply-menu-open")).toBe(false);
 
     await act(async () => {
       primarySupplyTab?.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
-      vi.advanceTimersByTime(120);
-    });
-
-    expect(topNav?.classList.contains("app-supply-menu-open")).toBe(true);
-
-    await act(async () => {
-      secondaryNav?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
       vi.advanceTimersByTime(300);
     });
 
-    expect(topNav?.classList.contains("app-supply-menu-open")).toBe(true);
-
-    await act(async () => {
-      artworkTab?.click();
-    });
-
-    expect(routerPushMock).toHaveBeenCalledWith("/dashboard/backpack");
+    expect(topNav?.classList.contains("app-supply-menu-open")).toBe(false);
   });
 
   it("marks a primary tab as pending immediately after click and clears when it becomes active", async () => {
@@ -360,7 +325,7 @@ describe("Navbar supply chrome", () => {
     expect(punchTab?.classList.contains("pending")).toBe(false);
   });
 
-  it("prefetches primary and supply secondary routes on hover or focus", async () => {
+  it("prefetches primary routes on hover or focus", async () => {
     activeTab = "punch";
 
     await act(async () => {
@@ -372,18 +337,19 @@ describe("Navbar supply chrome", () => {
     const calendarTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
       button.textContent?.includes("牛马日历"),
     );
-    const themeGachaTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".app-supply-secondary-tab")).find(
-      (button) => button.textContent?.includes("主题扭蛋"),
+    const supplyTab = Array.from(container.querySelectorAll<HTMLButtonElement>(".tab-btn")).find((button) =>
+      button.textContent?.includes("牛马补给站"),
     );
 
     await act(async () => {
       calendarTab?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-      themeGachaTab?.focus();
+      supplyTab?.focus();
     });
 
     expect(routerPrefetchMock).toHaveBeenCalledWith("/calendar");
-    expect(routerPrefetchMock).toHaveBeenCalledWith("/dashboard/cards");
+    expect(routerPrefetchMock).toHaveBeenCalledWith("/dashboard/status");
+    expect(routerPrefetchMock).not.toHaveBeenCalledWith("/dashboard/cards");
     expect(preloadBoardTabComponentMock).toHaveBeenCalledWith("calendar");
-    expect(preloadSupplyPanelComponentMock).toHaveBeenCalledWith("themeGacha");
+    expect(preloadBoardTabComponentMock).toHaveBeenCalledWith("supply");
   });
 });

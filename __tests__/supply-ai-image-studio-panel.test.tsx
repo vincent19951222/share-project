@@ -9,7 +9,7 @@ import type { SupplyAiImageSnapshot } from "@/lib/types";
 const snapshot: SupplyAiImageSnapshot = {
   wallet: {
     coins: 800,
-    generationCostPerImage: 60,
+    generationCostPerImage: 10,
     themeDrawCost: 200,
   },
   themes: {
@@ -26,9 +26,21 @@ const snapshot: SupplyAiImageSnapshot = {
         tag: "像素",
         palette: ["#fde047"],
       },
+      {
+        id: "theme-02",
+        name: "深夜健身房",
+        description: "霓虹风",
+        previewImageUrl: "https://example.com/theme-2.png",
+        defaultUnlocked: true,
+        unlocked: true,
+        enabled: true,
+        sortOrder: 2,
+        tag: "霓虹",
+        palette: ["#1d4ed8"],
+      },
     ],
     locked: [],
-    allUnlocked: false,
+    allUnlocked: true,
   },
   recentTasks: [
     {
@@ -37,7 +49,7 @@ const snapshot: SupplyAiImageSnapshot = {
       userPrompt: "训练后海报",
       requestedCount: 2,
       status: "partial",
-      coinCost: 120,
+      coinCost: 20,
       refundedCoinAmount: 0,
       errorMessage: "有一张失败",
       retryAvailable: true,
@@ -83,6 +95,14 @@ async function flushAsyncState() {
   });
 }
 
+async function expandComposer(container: HTMLElement) {
+  await act(async () => {
+    container
+      .querySelector<HTMLButtonElement>("[data-testid='supply-composer-collapsed-input']")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+}
+
 function cloneSnapshot(overrides: Partial<SupplyAiImageSnapshot> = {}): SupplyAiImageSnapshot {
   return {
     ...snapshot,
@@ -110,7 +130,7 @@ describe("SupplyAiImageStudioPanel", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders wallet, themes, count selector, prompt input, and generate button", () => {
+  it("renders the phase 1 workspace as a theme masonry and chat control deck", () => {
     const onCreateTask = vi.fn();
 
     act(() => {
@@ -123,14 +143,135 @@ describe("SupplyAiImageStudioPanel", () => {
       );
     });
 
-    expect(container.textContent).toContain("800");
     expect(container.textContent).toContain("牛马像素馆");
-    expect(container.querySelector("textarea")).not.toBeNull();
-    expect(Array.from(container.querySelectorAll("button")).some((button) => button.textContent === "1")).toBe(true);
-    expect(Array.from(container.querySelectorAll("button")).some((button) => button.textContent === "2")).toBe(true);
-    expect(Array.from(container.querySelectorAll("button")).some((button) => button.textContent === "4")).toBe(true);
-    expect(container.textContent).toContain("生成");
+    expect(container.textContent).toContain("深夜健身房");
+    expect(container.textContent).toContain("对话流");
+    const masonryViewport = container.querySelector("[data-testid='supply-theme-masonry']");
+    const masonryColumns = container.querySelector("[data-testid='supply-theme-masonry-columns']");
+
+    expect(masonryViewport?.className).toContain("xl:overflow-y-auto");
+    expect(masonryViewport?.className).not.toContain("columns-1");
+    expect(masonryColumns?.className).toContain("columns-1");
+    expect(masonryColumns?.className).toContain("lg:columns-3");
+    expect(container.querySelectorAll("[data-testid='supply-theme-card']")).toHaveLength(2);
+    expect(container.querySelector("[data-testid='supply-creation-control-deck']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-desktop-task-history']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-desktop-task-history']")?.textContent).toContain("任务队列");
+    expect(container.querySelector("[data-testid='supply-creation-composer']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-composer-collapsed-input']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-expanded-creation-panel']")).toBeNull();
+    expect(container.querySelector("textarea")).toBeNull();
+    expect(container.querySelector("input[type='file']")).toBeNull();
+    expect(container.textContent).toContain("上传参考图，描述想要的作品");
     expect(container.textContent).toContain("重新生成失败项");
+  });
+
+  it("expands the bottom composer only after the user clicks it and collapses it from the chat flow", async () => {
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={snapshot}
+          onCreateTask={vi.fn()}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    const composer = container.querySelector<HTMLElement>("[data-testid='supply-creation-composer']");
+    const chatFlow = container.querySelector<HTMLElement>("[data-testid='supply-creation-chat-flow']");
+    const collapsedInput = composer?.querySelector<HTMLButtonElement>("[data-testid='supply-composer-collapsed-input']");
+
+    expect(composer).not.toBeNull();
+    expect(chatFlow).not.toBeNull();
+    expect(collapsedInput?.textContent).toContain("上传参考图，描述想要的作品");
+    expect(composer?.querySelector("[data-testid='supply-expanded-creation-panel']")).toBeNull();
+    expect(composer?.querySelector("input[type='file']")).toBeNull();
+    expect(composer?.querySelector("textarea")).toBeNull();
+    expect(composer?.querySelector("[data-action='create-ai-image-task']")).toBeNull();
+
+    await act(async () => {
+      collapsedInput?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const expandedPanel = composer?.querySelector<HTMLElement>("[data-testid='supply-expanded-creation-panel']");
+    expect(expandedPanel).not.toBeNull();
+    expect(expandedPanel?.textContent).toContain("添加参考图");
+    expect(expandedPanel?.textContent).toContain("补充要求");
+    expect(expandedPanel?.textContent).toContain("可选");
+    expect(expandedPanel?.querySelector("input[type='file']")).not.toBeNull();
+    expect(expandedPanel?.querySelector("textarea")).not.toBeNull();
+    expect(expandedPanel?.querySelector("[data-action='create-ai-image-task']")?.textContent).toContain(
+      "10银子 生成 1 张",
+    );
+    expect(expandedPanel?.querySelector("[data-testid='supply-reference-upload-zone']")?.className).toContain("p-1.5");
+    expect(expandedPanel?.querySelector("[data-testid='supply-reference-upload-empty']")?.className).toContain("min-h-[40px]");
+    expect(expandedPanel?.querySelector("[data-testid='supply-reference-upload-plus']")?.className).toContain("h-9");
+
+    await act(async () => {
+      chatFlow?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(composer?.querySelector("[data-testid='supply-expanded-creation-panel']")).toBeNull();
+    expect(composer?.querySelector("[data-testid='supply-composer-collapsed-input']")).not.toBeNull();
+  });
+
+  it("lets masonry theme images keep their natural height instead of forcing preset ratios", () => {
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={snapshot}
+          onCreateTask={vi.fn()}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    const cards = Array.from(container.querySelectorAll<HTMLElement>("[data-testid='supply-theme-card']"));
+    const mediaFrames = cards.map((card) => card.firstElementChild as HTMLDivElement | null);
+    const images = cards.map((card) => card.querySelector<HTMLImageElement>("img"));
+
+    expect(mediaFrames).toHaveLength(2);
+    expect(mediaFrames.every((frame) => frame?.style.aspectRatio === "")).toBe(true);
+    expect(images.every((image) => image?.className.includes("h-auto"))).toBe(true);
+    expect(images.every((image) => image?.className.includes("absolute"))).toBe(false);
+  });
+
+  it("constrains the desktop workbench so the masonry column scrolls independently and the control deck fits the viewport", () => {
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={snapshot}
+          onCreateTask={vi.fn()}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    const panel = container.querySelector<HTMLElement>(".supply-ai-image-studio-panel");
+    const grid = panel?.firstElementChild as HTMLElement | null;
+    const masonry = container.querySelector<HTMLElement>("[data-testid='supply-theme-masonry']");
+    const masonryColumns = container.querySelector<HTMLElement>("[data-testid='supply-theme-masonry-columns']");
+    const leftRail = masonry?.parentElement;
+    const deck = container.querySelector<HTMLElement>("[data-testid='supply-creation-control-deck']");
+
+    expect(panel?.className).toContain("xl:h-[calc(100dvh-8rem)]");
+    expect(panel?.className).toContain("xl:overflow-hidden");
+    expect(grid?.className).toContain("xl:h-full");
+    expect(grid?.className).toContain("xl:min-h-0");
+    expect(leftRail?.className).toContain("xl:flex");
+    expect(leftRail?.className).toContain("xl:h-full");
+    expect(leftRail?.className).toContain("xl:min-h-0");
+    expect(leftRail?.className).toContain("xl:overflow-hidden");
+    expect(masonry?.className).toContain("xl:flex-1");
+    expect(masonry?.className).toContain("xl:overflow-y-auto");
+    expect(masonry?.className).not.toContain("columns-1");
+    expect(masonryColumns?.className).toContain("columns-1");
+    expect(masonryColumns?.className).toContain("lg:columns-3");
+    expect(deck?.className).toContain("xl:h-full");
+    expect(deck?.className).not.toContain("xl:sticky");
+    expect(deck?.className).not.toContain("xl:top-20");
+    expect(container.querySelector("[data-testid='supply-creation-chat-flow']")?.className).toContain("flex-1");
+    expect(container.querySelector("[data-testid='supply-creation-composer']")?.className).toContain("shrink-0");
   });
 
   it("converts uploaded files to data urls, submits payload, and clears local inputs after success", async () => {
@@ -145,6 +286,8 @@ describe("SupplyAiImageStudioPanel", () => {
         />,
       );
     });
+
+    await expandComposer(container);
 
     const input = container.querySelector<HTMLInputElement>("input[type='file']");
     const textarea = container.querySelector<HTMLTextAreaElement>("textarea");
@@ -174,6 +317,10 @@ describe("SupplyAiImageStudioPanel", () => {
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
+    expect(container.querySelector("[data-action='create-ai-image-task']")?.textContent).toContain(
+      "40银子 生成 4 张",
+    );
+
     await act(async () => {
       container
         .querySelector<HTMLButtonElement>("[data-action='create-ai-image-task']")
@@ -196,9 +343,11 @@ describe("SupplyAiImageStudioPanel", () => {
       ],
     });
 
-    expect(textarea?.value).toBe("");
     expect(container.textContent).not.toContain("pose.png");
     expect(container.textContent).not.toContain("light.png");
+    expect(container.querySelector("[data-testid='supply-expanded-creation-panel']")).toBeNull();
+    expect(container.querySelector("[data-testid='supply-composer-collapsed-input']")).not.toBeNull();
+    expect(container.querySelector("textarea")).toBeNull();
   });
 
   it("keeps prompt and reference images after a failed create attempt", async () => {
@@ -213,6 +362,8 @@ describe("SupplyAiImageStudioPanel", () => {
         />,
       );
     });
+
+    await expandComposer(container);
 
     const input = container.querySelector<HTMLInputElement>("input[type='file']");
     const textarea = container.querySelector<HTMLTextAreaElement>("textarea");
@@ -248,6 +399,7 @@ describe("SupplyAiImageStudioPanel", () => {
     expect(onCreateTask).toHaveBeenCalledTimes(1);
     expect(textarea?.value).toBe("失败后也要保留");
     expect(container.textContent).toContain("keep.png");
+    expect(container.querySelector("[data-testid='supply-expanded-creation-panel']")).not.toBeNull();
   });
 
   it("caps uploads at three and deleting one duplicate filename only removes the clicked item", async () => {
@@ -262,6 +414,8 @@ describe("SupplyAiImageStudioPanel", () => {
         />,
       );
     });
+
+    await expandComposer(container);
 
     const input = container.querySelector<HTMLInputElement>("input[type='file']");
     expect(input).not.toBeNull();
@@ -331,6 +485,8 @@ describe("SupplyAiImageStudioPanel", () => {
         />,
       );
     });
+
+    await expandComposer(container);
 
     const input = container.querySelector<HTMLInputElement>("input[type='file']");
     expect(input).not.toBeNull();

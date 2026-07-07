@@ -45,12 +45,11 @@ const bannedUiLabRouteTerms = [
 
 const requiredProductionVisualTerms = [
   "SupplyAiImageStudioPanel",
-  "SupplyThemeGachaPanel",
   "SupplyArtworkBackpackPanel",
   "SupplyLegacyArchivePanel",
   "createAiImageGenerationTask",
   "retryAiImageGenerationTask",
-  "drawAiImageThemeFromSupply",
+  "normalizeInitialPanel",
   "studio",
   "themeGacha",
   "artworks",
@@ -89,5 +88,8 @@ describe("supply production isolation", () => {
     for (const term of requiredProductionVisualTerms) {
       expect(`${shell}\n${adapters}`, `missing ${term}`).toContain(term);
     }
+
+    expect(shell).not.toContain("SupplyThemeGachaPanel");
+    expect(shell).not.toContain("drawAiImageThemeFromSupply");
   });
 });

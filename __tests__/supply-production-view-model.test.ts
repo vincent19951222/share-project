@@ -37,7 +37,7 @@ describe("supply production view model", () => {
         userPrompt: "训练海报",
         requestedCount: 1,
         status: "completed",
-        coinCost: 60,
+        coinCost: 10,
         coinRefunded: false,
         refundedCoinAmount: 0,
         providerModel: "gpt-image-2",
@@ -122,7 +122,7 @@ describe("supply production view model", () => {
     expect(snapshot?.shop.products).toEqual([]);
     expect(snapshot?.supplyAiImage.wallet).toMatchObject({
       coins: 3350,
-      generationCostPerImage: 60,
+      generationCostPerImage: 10,
       themeDrawCost: 200,
     });
     expect(snapshot?.supplyAiImage.recentTasks).toMatchObject([

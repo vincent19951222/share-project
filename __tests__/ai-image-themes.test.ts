@@ -7,11 +7,11 @@ import { toClientThemeSnapshot } from "@/lib/gamification/ai-image/theme-snapsho
 import { getAiImageThemeById, getAiImageThemes } from "@/lib/gamification/ai-image/themes";
 
 describe("AI image preset themes", () => {
-  it("loads 13 enabled presets with exactly one default unlock", () => {
+  it("loads 13 enabled presets with every theme available by default", () => {
     const themes = getAiImageThemes();
 
     expect(themes).toHaveLength(13);
-    expect(themes.filter((theme) => theme.defaultUnlocked)).toHaveLength(1);
+    expect(themes.filter((theme) => theme.defaultUnlocked)).toHaveLength(13);
     expect(themes.every((theme) => theme.enabled)).toBe(true);
     expect(themes.every((theme) => theme.previewImageUrl.includes("/images/"))).toBe(true);
     expect(themes[0]?.previewImageUrl).toBe(

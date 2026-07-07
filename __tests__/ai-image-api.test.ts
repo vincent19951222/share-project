@@ -105,15 +105,15 @@ describe("AI image task API", () => {
   it("maps task validation errors to status plus Chinese message", async () => {
     const response = await CREATE(
       request("http://localhost/api/gamification/ai-image/tasks", userId, {
-        themeId: "theme-02",
+        themeId: "missing-theme",
         requestedCount: 1,
         referenceImages: [],
       }),
     );
     const body = await response.json();
 
-    expect(response.status).toBe(403);
-    expect(body).toEqual({ error: "主题未解锁" });
+    expect(response.status).toBe(404);
+    expect(body).toEqual({ error: "主题不存在" });
   });
 
   it("returns task detail only to the owner and keeps the snapshot client-safe", async () => {
@@ -193,7 +193,7 @@ describe("AI image task API", () => {
     expect(body.task).toMatchObject({
       id: task.id,
       status: "failed",
-      refundedCoinAmount: 60,
+      refundedCoinAmount: 10,
       errorMessage: "任务处理超时",
     });
     expect(body.task.items[0]).toMatchObject({
@@ -253,7 +253,7 @@ describe("AI image task API", () => {
       status: "running",
       errorMessage: null,
     });
-    expect(reloadedUser.coins).toBe(940);
+    expect(reloadedUser.coins).toBe(990);
   });
 
   it("retries failed tasks and only returns the new id", async () => {
@@ -268,7 +268,7 @@ describe("AI image task API", () => {
 
     await prisma.aiImageGenerationTask.update({
       where: { id: original.id },
-      data: { status: "failed", coinRefunded: true, refundedCoinAmount: 60 },
+      data: { status: "failed", coinRefunded: true, refundedCoinAmount: 10 },
     });
     await prisma.aiImageGenerationItem.updateMany({
       where: { taskId: original.id },

@@ -25,7 +25,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-02-character-sketch-reference.webp",
     promptTemplate:
       "construction-site fat-loss poster, hard hat, reflective vest, barbell, concrete gray, fluorescent yellow, bold brutalist typography feeling.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 2,
     tag: "硬核",
@@ -39,7 +39,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-03-fashion-collage-reference.webp",
     promptTemplate:
       "healthy low-fat food characters training together, chicken breast, broccoli, egg, humorous mascot style, bright editorial composition.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 3,
     tag: "食物",
@@ -53,7 +53,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-04-portrait.webp",
     promptTemplate:
       "1990s Hong Kong movie poster fitness portrait, warm film grain, dramatic gym lighting, retro Chinese poster mood.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 4,
     tag: "港风",
@@ -67,7 +67,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-05-thinking.webp",
     promptTemplate:
       "office worker stealth fitness scene, desk, monitor, resistance band, humorous but polished, modern Chinese workplace energy.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 5,
     tag: "工位",
@@ -81,7 +81,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-magazine-cover.webp",
     promptTemplate:
       "brutalist fitness poster, huge bold typography feeling, strict grid, chunky border, yellow black white red accents, no generic neon.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 6,
     tag: "海报",
@@ -95,7 +95,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-emoji-sticker-pack.webp",
     promptTemplate:
       "cute muscular pet mascot lifting weights, funny gym energy, expressive character design, polished illustration, bold outlines.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 7,
     tag: "萌宠",
@@ -109,7 +109,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-08-pixel-avatar-collage.webp",
     promptTemplate:
       "eastern immortal yoga master, elegant stretching pose, misty mountain training ground, refined Chinese fantasy fitness poster.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 8,
     tag: "瑜伽",
@@ -123,7 +123,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-09-doodle-illustration.webp",
     promptTemplate:
       "cyber fitness poster, disciplined futuristic gym, mechanical light signage, sharp composition, restrained neon, premium sports editorial.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 9,
     tag: "赛博",
@@ -137,7 +137,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-10-cinematic-still.webp",
     promptTemplate:
       "sweaty training arena, team slogan lightbox, post-workout energy, cinematic sports scene, bold local fitness community.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 10,
     tag: "暴汗",
@@ -151,7 +151,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-11-graffiti-revival.webp",
     promptTemplate:
       "comic panel fitness story, four-panel energy, expressive Chinese captions feeling without readable text, funny workout struggle.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 11,
     tag: "漫画",
@@ -165,7 +165,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-12-contact-sheet.webp",
     promptTemplate:
       "fitness sticker pack style, clean cutout, white sticker border, playful gym accessories, transparent-background feeling.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 12,
     tag: "贴纸",
@@ -179,7 +179,7 @@ const THEMES: AiImageThemeDefinition[] = [
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-13-editorial-grid.webp",
     promptTemplate:
       "team fitness report cover, editorial layout, bold title space without readable text, achievement atmosphere, yellow black accent colors.",
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     enabled: true,
     sortOrder: 13,
     tag: "战报",

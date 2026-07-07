@@ -1,4 +1,4 @@
-export const AI_IMAGE_GENERATION_COIN_COST = 60;
+export const AI_IMAGE_GENERATION_COIN_COST = 10;
 export const AI_IMAGE_THEME_DRAW_COIN_COST = 200;
 export const AI_IMAGE_MAX_REFERENCE_IMAGES = 3;
 export const AI_IMAGE_ALLOWED_REQUEST_COUNTS = [1, 2, 4] as const;
