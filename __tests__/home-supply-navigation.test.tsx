@@ -70,8 +70,11 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
       </section>
     ),
     DynamicDrinkCheckin: () => <section data-testid="drink-checkin">牛马水铺</section>,
-    DynamicReportCenter: () => <section data-testid="report-center">战报中心</section>,
-    DynamicCalendarBoard: () => <section data-testid="calendar-board">牛马日历</section>,
+    DynamicDataDashboard: ({ initialView }: { initialView?: "personal" | "team" }) => (
+      <section data-initial-view={initialView} data-testid="data-dashboard">
+        数据看板
+      </section>
+    ),
     DynamicSupplyStation: ({
       initialPanel,
       onBackToPunch,
@@ -184,8 +187,7 @@ describe("Home supply navigation", () => {
     expect(container.querySelector("[data-testid='punch-board']")).toBeNull();
     expect(container.querySelector("[data-testid='shared-board']")).toBeNull();
     expect(container.querySelector("[data-testid='drink-checkin']")).toBeNull();
-    expect(container.querySelector("[data-testid='calendar-board']")).toBeNull();
-    expect(container.querySelector("[data-testid='report-center']")).toBeNull();
+    expect(container.querySelector("[data-testid='data-dashboard']")).toBeNull();
   });
 
   it("keeps the home navbar on regular home tabs", async () => {
@@ -340,6 +342,35 @@ describe("Home supply navigation", () => {
     });
 
     expect(container.querySelector("[data-testid='drink-provider']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='data-dashboard']")?.getAttribute("data-initial-view")).toBe("team");
+  });
+
+  it("keeps calendar and report routes as data dashboard entry points", async () => {
+    const { default: CalendarPage } = await import("@/app/(board)/calendar/page");
+
+    await act(async () => {
+      root.render(<CalendarPage />);
+    });
+
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "data",
+      }),
+    );
+    expect(container.querySelector("[data-testid='data-dashboard']")?.getAttribute("data-initial-view")).toBe("personal");
+
+    const { default: ReportPage } = await import("@/app/(board)/report/page");
+
+    await act(async () => {
+      root.render(<ReportPage />);
+    });
+
+    expect(navbarPropsMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        activeTabOverride: "data",
+      }),
+    );
+    expect(container.querySelector("[data-testid='data-dashboard']")?.getAttribute("data-initial-view")).toBe("team");
   });
 
   it("wires the supply station return action back to the punch tab", async () => {

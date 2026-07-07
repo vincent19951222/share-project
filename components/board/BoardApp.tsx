@@ -3,10 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  DynamicCalendarBoard,
-  DynamicDashboardBoard,
+  DynamicDataDashboard,
   DynamicDrinkCheckin,
-  DynamicReportCenter,
   DynamicSharedBoard,
   DynamicSupplyStation,
 } from "@/components/board/dynamic-tabs";
@@ -27,12 +25,16 @@ import {
 } from "@/lib/supply-nav-cache";
 import type { AppTab } from "@/lib/types";
 
+type DataDashboardView = "personal" | "team";
+
 export function BoardApp({
   activeTab,
   supplyPanel = "dashboard",
+  initialDataView = "personal",
 }: {
   activeTab: AppTab;
   supplyPanel?: SupplyPanelKey;
+  initialDataView?: DataDashboardView;
 }) {
   const { state } = useBoard();
   const router = useRouter();
@@ -106,10 +108,8 @@ export function BoardApp({
             onPanelChange={handleSupplyPanelChange}
           />
         );
-      case "calendar":
-        return <DynamicDashboardBoard />;
-      case "dash":
-        return <DynamicReportCenter />;
+      case "data":
+        return <DynamicDataDashboard initialView={initialDataView} />;
       default:
         return <PunchBoard />;
     }
@@ -130,11 +130,7 @@ export function BoardApp({
     </>
   );
 
-  if (activeTab === "coffee") {
-    return <DrinkProvider>{pageShell}</DrinkProvider>;
-  }
-
-  if (activeTab === "dash") {
+  if (activeTab === "coffee" || activeTab === "data") {
     return <DrinkProvider>{pageShell}</DrinkProvider>;
   }
 

@@ -38,7 +38,7 @@ const initialState: BoardState = {
       timestamp: new Date("2026-04-22T00:00:00+08:00"),
     },
   ],
-  activeTab: "dash",
+  activeTab: "data",
   currentUserId: "user-1",
 };
 
@@ -222,7 +222,7 @@ describe("BoardProvider sync", () => {
     const state = JSON.parse(container.querySelector("[data-testid='state']")!.textContent ?? "{}");
     expect(state.gridData[0][0]).toBe(true);
     expect(state.teamVaultTotal).toBe(15);
-    expect(state.activeTab).toBe("dash");
+    expect(state.activeTab).toBe("data");
     expect(state.logs).toHaveLength(1);
     expect(state.logs[0].text).toBe("保留这条本地日志");
   });
@@ -465,7 +465,7 @@ describe("BoardProvider sync", () => {
     );
     expect(state.members[0].avatarKey).toBe("female3");
     expect(state.currentUser.assetBalance).toBe(25);
-    expect(state.activeTab).toBe("dash");
+    expect(state.activeTab).toBe("data");
     expect(state.logs).toHaveLength(1);
     expect(state.logs[0].text).toBe("保留这条本地日志");
   });

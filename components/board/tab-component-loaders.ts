@@ -6,6 +6,7 @@ export const loadDrinkCheckin = () => import("@/components/drink-checkin/DrinkCh
 export const loadCalendarBoard = () => import("@/components/calendar/CalendarBoard").then((mod) => mod.CalendarBoard);
 export const loadDashboardBoard = () => import("@/components/dashboard/DashboardBoard").then((mod) => mod.DashboardBoard);
 export const loadReportCenter = () => import("@/components/report-center/ReportCenter").then((mod) => mod.ReportCenter);
+export const loadDataDashboard = () => import("@/components/data-dashboard/DataDashboard").then((mod) => mod.DataDashboard);
 export const loadSupplyStation = () => import("@/components/gamification/SupplyStation").then((mod) => mod.SupplyStation);
 
 export function preloadBoardTabComponent(tab: AppTab) {
@@ -16,11 +17,9 @@ export function preloadBoardTabComponent(tab: AppTab) {
     case "coffee":
       void loadDrinkCheckin();
       break;
-    case "calendar":
+    case "data":
+      void loadDataDashboard();
       void loadDashboardBoard();
-      break;
-    case "dash":
-      void loadReportCenter();
       break;
     case "supply":
       void loadSupplyStation();

@@ -19,6 +19,6 @@ describe("supply dashboard formal route", () => {
     expect(navbar).not.toContain("ui-lab");
     expect(routes).toContain('supply: "/dashboard/status"');
     expect(routes).toContain('dashboard: "/dashboard/status"');
-    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";');
+    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";');
   });
 });

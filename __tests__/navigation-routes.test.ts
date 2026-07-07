@@ -8,8 +8,7 @@ describe("formal navigation routes", () => {
       punch: "/",
       board: "/board",
       coffee: "/drink",
-      calendar: "/calendar",
-      dash: "/report",
+      data: "/calendar",
       supply: "/dashboard/status",
     });
   });

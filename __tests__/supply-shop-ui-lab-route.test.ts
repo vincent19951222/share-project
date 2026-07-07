@@ -21,7 +21,7 @@ describe("supply shop formal route", () => {
     expect(navbar).not.toContain("ui-lab");
     expect(supplyStation).not.toContain("SupplyShopScene");
     expect(routes).toContain('shop: "/dashboard/store"');
-    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";');
+    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";');
     expect(topTabs).toContain('label: "补给商店"');
     expect(topTabs).toContain('href: "/dashboard/store"');
   });

@@ -1,5 +1,5 @@
 import { BoardApp } from "@/components/board/BoardApp";
 
 export default function CalendarRoutePage() {
-  return <BoardApp activeTab="calendar" />;
+  return <BoardApp activeTab="data" initialDataView="personal" />;
 }

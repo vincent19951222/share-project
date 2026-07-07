@@ -21,7 +21,7 @@ describe("supply draw pool formal route", () => {
     expect(navbar).not.toContain("ui-lab");
     expect(supplyStation).not.toContain("SupplyDrawPoolScene");
     expect(routes).toContain('drawPool: "/dashboard/cards"');
-    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";');
+    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";');
     expect(dashboardMock).toContain('href: "/dashboard/cards"');
     expect(dashboardMock).toContain('title: "抽奖池"');
     expect(dashboardMock).not.toContain('href="#supply"');

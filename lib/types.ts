@@ -36,7 +36,7 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
-export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";
+export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";
 
 export type GamificationTaskStatus = "pending" | "completed";
 export type GamificationLotteryStatus = "placeholder" | "active";

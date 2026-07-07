@@ -21,7 +21,7 @@ describe("supply task record formal route", () => {
     expect(navbar).not.toContain("ui-lab");
     expect(supplyStation).not.toContain("SupplyTaskRecordScene");
     expect(routes).toContain('taskRecord: "/dashboard/quest"');
-    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";');
+    expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";');
     expect(topTabs).toContain('label: "任务记录"');
     expect(topTabs).toContain('href: "/dashboard/quest"');
   });

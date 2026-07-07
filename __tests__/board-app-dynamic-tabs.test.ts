@@ -12,6 +12,7 @@ describe("BoardApp dynamic tab boundaries", () => {
     expect(boardAppSource).not.toContain('from "@/components/coffee-checkin/CoffeeCheckin"');
     expect(boardAppSource).not.toContain('from "@/components/drink-checkin/DrinkCheckin"');
     expect(boardAppSource).not.toContain('from "@/components/calendar/CalendarBoard"');
+    expect(boardAppSource).not.toContain('from "@/components/data-dashboard/DataDashboard"');
     expect(boardAppSource).not.toContain('from "@/components/report-center/ReportCenter"');
     expect(boardAppSource).not.toContain('from "@/components/gamification/SupplyStation"');
   });
@@ -20,13 +21,16 @@ describe("BoardApp dynamic tab boundaries", () => {
     expect(dynamicTabsSource).toContain('from "next/dynamic"');
     expect(dynamicTabsSource).toContain("DynamicSharedBoard");
     expect(dynamicTabsSource).toContain("DynamicDrinkCheckin");
-    expect(dynamicTabsSource).toContain("DynamicCalendarBoard");
-    expect(dynamicTabsSource).toContain("DynamicReportCenter");
+    expect(dynamicTabsSource).toContain("DynamicDataDashboard");
     expect(dynamicTabsSource).toContain("DynamicSupplyStation");
     expect(loaderSource).toContain("loadDrinkCheckin");
     expect(loaderSource).toContain("loadSharedBoard");
+    expect(loaderSource).toContain("loadDataDashboard");
     expect(loaderSource).toContain("loadSupplyStation");
     expect(loaderSource).toContain("preloadBoardTabComponent");
+    expect(loaderSource).toContain('case "data"');
+    expect(loaderSource).not.toContain('case "dash"');
+    expect(loaderSource).not.toContain('case "calendar"');
     expect(loaderSource).toContain("preloadSupplyPanelComponent");
   });
 });

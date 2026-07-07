@@ -23,7 +23,7 @@ describe("supply backpack formal route", () => {
     expect(supplyStation).not.toContain("SupplyBackpackScene");
     expect(routes).toContain('backpack: "/dashboard/backpack"');
     expect(types).toContain(
-      'export type AppTab = "punch" | "board" | "coffee" | "supply" | "dash" | "calendar";',
+      'export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";',
     );
     expect(backpackShortcut).toMatchObject({
       href: "/dashboard/backpack",
