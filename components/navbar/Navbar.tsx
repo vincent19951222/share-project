@@ -229,7 +229,7 @@ export function Navbar({
                   );
                 })
               ) : (
-                ["coins", "ticket", "backpack"].map((resourceId) => (
+                ["coins"].map((resourceId) => (
                   <span
                     aria-hidden="true"
                     className={`app-supply-asset-chip app-supply-asset-skeleton app-supply-asset-chip--${resourceId}`}

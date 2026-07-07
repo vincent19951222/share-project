@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 const productionFiles = [
   "components/gamification/SupplyStation.tsx",
   "components/gamification/production/SupplyStationShell.tsx",
+  "components/gamification/production/SupplyAiImageStudioPanel.tsx",
+  "components/gamification/production/SupplyThemeGachaPanel.tsx",
+  "components/gamification/production/SupplyArtworkBackpackPanel.tsx",
+  "components/gamification/production/SupplyLegacyArchivePanel.tsx",
   "components/gamification/production/SupplyDashboardPanel.tsx",
   "components/gamification/production/SupplyDrawPoolPanel.tsx",
   "components/gamification/production/SupplyBackpackPanel.tsx",
@@ -40,16 +44,16 @@ const bannedUiLabRouteTerms = [
 ];
 
 const requiredProductionVisualTerms = [
-  "SupplyDashboardScene",
-  "SupplyDrawPoolScene",
-  "SupplyBackpackScene",
-  "SupplyShopScene",
-  "SupplyTaskRecordScene",
-  "toSupplyDashboardPreview",
-  "toSupplyDrawPoolPreview",
-  "toSupplyBackpackPreview",
-  "toSupplyShopPreview",
-  "toSupplyTaskRecordPreview",
+  "SupplyAiImageStudioPanel",
+  "SupplyArtworkBackpackPanel",
+  "SupplyLegacyArchivePanel",
+  "createAiImageGenerationTask",
+  "retryAiImageGenerationTask",
+  "normalizeInitialPanel",
+  "studio",
+  "themeGacha",
+  "artworks",
+  "legacyArchive",
 ];
 
 function readSource(file: string) {
@@ -84,5 +88,8 @@ describe("supply production isolation", () => {
     for (const term of requiredProductionVisualTerms) {
       expect(`${shell}\n${adapters}`, `missing ${term}`).toContain(term);
     }
+
+    expect(shell).not.toContain("SupplyThemeGachaPanel");
+    expect(shell).not.toContain("drawAiImageThemeFromSupply");
   });
 });

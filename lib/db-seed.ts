@@ -69,6 +69,26 @@ export async function seedDatabase(): Promise<void> {
     where: { teamId: team.id },
   });
 
+  await prisma.aiImageArtwork.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.aiImageTaskInputImage.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.aiImageGenerationItem.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.aiImageGenerationTask.deleteMany({
+    where: { teamId: team.id },
+  });
+
+  await prisma.aiImageThemeUnlock.deleteMany({
+    where: { teamId: team.id },
+  });
+
   await prisma.itemUseRecord.deleteMany({
     where: { teamId: team.id },
   });

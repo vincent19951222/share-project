@@ -92,8 +92,6 @@ const shopCategoryMeta = {
   real_world: { label: "真实福利", icon: "★", iconImage: supplyUiLabCategoryIcons.real_world },
 } satisfies Record<SupplyShopCategoryId, { label: string; icon: string; iconImage: string }>;
 
-const dashboardResourceIds = ["coins", "ticket", "backpack"] as const;
-
 function formatNumber(value: number) {
   return new Intl.NumberFormat("zh-CN").format(value);
 }
@@ -107,36 +105,28 @@ function avatarPath(avatarKey: string) {
 }
 
 function getResources(snapshot: SupplyStationProductionSnapshot): SupplyUiLabResource[] {
-  const resources = [snapshot.resources.coins, snapshot.resources.ticket, snapshot.resources.backpack];
-
-  return resources.map((resource, index) => {
-    const id = dashboardResourceIds[index];
-
-    return {
-      id,
-      label: resource.label,
-      value: formatResourceValue(resource.value, resource.maxValue),
-      icon: id === "coins" ? "◎" : id === "ticket" ? "券" : "包",
-      iconImage: supplyUiLabResourceIconPaths[id],
-    };
-  });
+  return [
+    {
+      id: "coins",
+      label: snapshot.resources.coins.label,
+      value: formatResourceValue(snapshot.resources.coins.value, snapshot.resources.coins.maxValue),
+      icon: "◎",
+      iconImage: supplyUiLabResourceIconPaths.coins,
+    },
+  ];
 }
 
 function getDashboardResources(snapshot: SupplyStationProductionSnapshot): SupplyDashboardResource[] {
-  const resources = [snapshot.resources.coins, snapshot.resources.ticket, snapshot.resources.backpack];
-
-  return resources.map((resource, index) => {
-    const id = dashboardResourceIds[index];
-
-    return {
-      id,
-      label: resource.label,
-      value: resource.value,
-      maxValue: resource.maxValue,
-      icon: id === "coins" ? "◎" : id === "ticket" ? "券" : "包",
-      iconImage: supplyUiLabResourceIconPaths[id],
-    };
-  });
+  return [
+    {
+      id: "coins",
+      label: snapshot.resources.coins.label,
+      value: snapshot.resources.coins.value,
+      maxValue: snapshot.resources.coins.maxValue,
+      icon: "◎",
+      iconImage: supplyUiLabResourceIconPaths.coins,
+    },
+  ];
 }
 
 function mapTodayEffect(effect: GamificationTodayEffectSnapshot): SupplyUiLabActiveEffect {
@@ -514,7 +504,6 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
   const completedQuestCount = snapshot.dashboard.dailyQuests.filter(
     (dimension) => dimension.assignment?.status === "completed",
   ).length;
-  const socialPendingCount = snapshot.social.pendingReceivedCount + snapshot.social.teamWidePendingCount;
 
   return {
     profile: {
@@ -527,7 +516,7 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       nextLevelExp: snapshot.profile.nextLevelExp,
       streakDays: completedQuestCount,
     },
-    motto: completedQuestCount === snapshot.dashboard.dailyQuests.length ? "今日主线已清空，牛马可以喘口气。" : "不是在健身，就是在去健身的路上！",
+    motto: completedQuestCount === snapshot.dashboard.dailyQuests.length ? "今日任务已清空，牛马可以喘口气。" : "不是在健身，就是在去健身的路上！",
     resources: getDashboardResources(snapshot),
     activeEffects: snapshot.dashboard.todayEffects.map(mapTodayEffect),
     dailyQuests: snapshot.dashboard.dailyQuests.map((dimension) => ({
@@ -548,8 +537,8 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       },
     })),
     dailyReward: {
-      claimable: snapshot.drawPool.wallet.lifeTicketClaimable,
-      claimed: snapshot.drawPool.wallet.lifeTicketEarned,
+      claimable: false,
+      claimed: true,
     },
     shortcutLinks: [
       {
@@ -563,26 +552,10 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       {
         id: "backpack",
         href: "/dashboard/backpack",
-        title: "背包",
-        subtitle: "查看全部道具",
-        badge: formatResourceValue(snapshot.backpack.capacity.usedSlots, snapshot.backpack.capacity.totalSlots),
+        title: "作品库",
+        subtitle: "查看 AI 生图作品",
+        badge: String(snapshot.supplyAiImage.recentArtworks.length),
         image: supplyDashboardAssetPaths.dockBackpack,
-      },
-      {
-        id: "draw-pool",
-        href: "/dashboard/cards",
-        title: "抽奖池",
-        subtitle: "随机获取道具、银子或真实福利！",
-        badge: formatNumber(snapshot.drawPool.wallet.ticketBalance),
-        image: supplyDashboardAssetPaths.dockSupplyMachine,
-      },
-      {
-        id: "task-record",
-        href: "/dashboard/quest",
-        title: "任务记录",
-        subtitle: "查看历史任务与奖励",
-        badge: socialPendingCount > 0 ? `${socialPendingCount} 待回应` : String(snapshot.taskRecord.timeline.length),
-        image: supplyDashboardAssetPaths.dockTaskRecord,
       },
     ],
     inventoryPreview: {
@@ -599,7 +572,6 @@ export function toSupplyDashboardPreview(snapshot: SupplyStationProductionSnapsh
       remainingDraws: snapshot.drawPool.wallet.ticketBalance,
       maxDraws: 10,
       featuredRewards: [
-        { id: "ticket", name: "抽奖券", icon: "券", quantity: snapshot.resources.ticket.value },
         { id: "coins", name: "银子", icon: "◎", quantity: snapshot.resources.coins.value },
       ],
     },

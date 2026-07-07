@@ -15,8 +15,6 @@ const snapshot = {
   dayKey: "2026-05-26",
   resources: {
     coins: { label: "银子", value: 845 },
-    ticket: { label: "抽奖券", value: 5 },
-    backpack: { label: "背包", value: 17, maxValue: 60 },
   },
   profile: {
     username: "li",
@@ -128,6 +126,13 @@ const snapshot = {
     message: "队友雷达可用。",
   },
   redemptions: { mine: [], adminQueue: [] },
+  supplyAiImage: {
+    wallet: { coins: 0, generationCostPerImage: 10, themeDrawCost: 200 },
+    themes: { unlocked: [], locked: [], allUnlocked: false },
+    recentTasks: [],
+    recentArtworks: [],
+  },
+  legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
 } satisfies SupplyStationProductionSnapshot;
 
 describe("supply production to UI Lab adapters", () => {
@@ -141,8 +146,8 @@ describe("supply production to UI Lab adapters", () => {
       currentLevelExp: 50,
       nextLevelExp: 1000,
     });
-    expect(dashboard.resources.map((resource) => resource.label)).toEqual(["银子", "抽奖券", "背包"]);
-    expect(dashboard.resources[2]).toMatchObject({ value: 17, maxValue: 60 });
+    expect(dashboard.resources.map((resource) => resource.label)).toEqual(["银子"]);
+    expect(dashboard.resources[0]).toMatchObject({ value: 845 });
     expect(dashboard.dailyQuests[0]).toMatchObject({
       id: "movement",
       title: "屁股离线",
@@ -153,12 +158,34 @@ describe("supply production to UI Lab adapters", () => {
     expect(dashboard.shortcutLinks.map((link) => link.id)).toEqual([
       "home",
       "backpack",
-      "draw-pool",
-      "task-record",
     ]);
   });
 
-  it("maps pending received social invitations to dashboard notice and task record badge", () => {
+  it("does not promote legacy draw, task record, ticket, or redemption entrypoints from the dashboard preview", () => {
+    const dashboard = toSupplyDashboardPreview({
+      ...snapshot,
+      drawPool: {
+        ...snapshot.drawPool,
+        wallet: {
+          ...snapshot.drawPool.wallet,
+          lifeTicketClaimable: true,
+          lifeTicketEarned: false,
+        },
+      },
+    });
+    const serializedShortcuts = JSON.stringify(dashboard.shortcutLinks);
+
+    expect(serializedShortcuts).not.toContain("draw-pool");
+    expect(serializedShortcuts).not.toContain("task-record");
+    expect(serializedShortcuts).not.toContain("/dashboard/cards");
+    expect(serializedShortcuts).not.toContain("/dashboard/quest");
+    expect(serializedShortcuts).not.toContain("抽奖池");
+    expect(serializedShortcuts).not.toContain("任务记录");
+    expect(dashboard.motto).not.toContain("今日主线");
+    expect(dashboard.dailyReward).toEqual({ claimable: false, claimed: true });
+  });
+
+  it("maps pending received social invitations to dashboard notice without restoring task-record shortcuts", () => {
     const snapshotWithInvite: SupplyStationProductionSnapshot = {
       ...snapshot,
       social: {
@@ -194,7 +221,7 @@ describe("supply production to UI Lab adapters", () => {
       actionLabel: "去回应",
       target: "task-record",
     });
-    expect(dashboard.shortcutLinks.find((link) => link.id === "task-record")?.badge).toBe("1 待回应");
+    expect(dashboard.shortcutLinks.find((link) => link.id === "task-record")).toBeUndefined();
   });
 
   it("maps secondary panels without mock values", () => {

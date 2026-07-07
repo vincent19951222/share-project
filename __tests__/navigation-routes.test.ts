@@ -15,11 +15,10 @@ describe("formal navigation routes", () => {
 
   it("maps supply station panels to their public dashboard routes", () => {
     expect(supplyPanelRoutes).toEqual({
-      dashboard: "/dashboard/status",
-      shop: "/dashboard/store",
-      taskRecord: "/dashboard/quest",
-      backpack: "/dashboard/backpack",
-      drawPool: "/dashboard/cards",
+      studio: "/dashboard/status",
+      themeGacha: "/dashboard/cards",
+      artworks: "/dashboard/backpack",
+      legacyArchive: "/dashboard/store",
     });
   });
 

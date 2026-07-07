@@ -1,12 +1,12 @@
 import type { AppTab } from "@/lib/types";
 
-export type SupplyPanelKey = "dashboard" | "drawPool" | "backpack" | "shop" | "taskRecord";
+export type SupplyPanelKey = "studio" | "themeGacha" | "artworks" | "legacyArchive";
 
-export type SupplyNavResourceId = "coins" | "ticket" | "backpack";
+export type SupplyNavResourceId = "coins";
 
 export interface SupplyNavResource {
   id: SupplyNavResourceId;
-  label: "银子" | "抽奖券" | "背包";
+  label: "银子";
   value: number;
   maxValue?: number;
   iconImage: string;
@@ -42,42 +42,35 @@ export const appTabRoutes: Record<AppTab, string> = {
 };
 
 export const supplyPanelRoutes: Record<SupplyPanelKey, string> = {
-  dashboard: "/dashboard/status",
-  drawPool: "/dashboard/cards",
-  backpack: "/dashboard/backpack",
-  shop: "/dashboard/store",
-  taskRecord: "/dashboard/quest",
+  studio: "/dashboard/status",
+  themeGacha: "/dashboard/cards",
+  artworks: "/dashboard/backpack",
+  legacyArchive: "/dashboard/store",
 };
 
 export const supplyNavItems: SupplyNavItem[] = [
   {
-    id: "dashboard",
-    label: "我的状态",
+    id: "studio",
+    label: "生图工位",
     iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_status.png",
-    route: supplyPanelRoutes.dashboard,
+    route: supplyPanelRoutes.studio,
   },
   {
-    id: "shop",
-    label: "补给商店",
+    id: "themeGacha",
+    label: "主题扭蛋",
     iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_shop.png",
-    route: supplyPanelRoutes.shop,
+    route: supplyPanelRoutes.themeGacha,
   },
   {
-    id: "taskRecord",
-    label: "任务记录",
+    id: "artworks",
+    label: "作品库",
     iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_task_record.png",
-    route: supplyPanelRoutes.taskRecord,
+    route: supplyPanelRoutes.artworks,
   },
   {
-    id: "backpack",
-    label: "背包",
+    id: "legacyArchive",
+    label: "旧补给归档",
     iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_backpack.png",
-    route: supplyPanelRoutes.backpack,
-  },
-  {
-    id: "drawPool",
-    label: "抽奖池",
-    iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_nav_icons_supply_nav_draw_pool.png",
-    route: supplyPanelRoutes.drawPool,
+    route: supplyPanelRoutes.legacyArchive,
   },
 ];

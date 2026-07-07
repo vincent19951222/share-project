@@ -36,6 +36,66 @@ export interface CurrentUserSnapshot {
   isAdmin: boolean;
 }
 
+export interface AiImageThemeSnapshot {
+  id: string;
+  name: string;
+  description: string;
+  previewImageUrl: string;
+  defaultUnlocked: boolean;
+  unlocked: boolean;
+  enabled: boolean;
+  sortOrder: number;
+  tag: string;
+  palette: string[];
+}
+
+export interface AiImageGenerationItemSnapshot {
+  id: string;
+  index: number;
+  status: "queued" | "running" | "completed" | "failed";
+  imageUrl: string | null;
+  errorMessage: string | null;
+}
+
+export interface AiImageGenerationTaskSnapshot {
+  id: string;
+  themeId: string;
+  userPrompt: string;
+  requestedCount: number;
+  status: "queued" | "running" | "completed" | "partial" | "failed";
+  coinCost: number;
+  refundedCoinAmount: number;
+  errorMessage: string | null;
+  retryAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+  items: AiImageGenerationItemSnapshot[];
+}
+
+export interface AiImageArtworkSnapshot {
+  id: string;
+  taskId: string;
+  itemId: string;
+  themeId: string;
+  imageUrl: string;
+  createdAt: string;
+}
+
+export interface SupplyAiImageSnapshot {
+  wallet: {
+    coins: number;
+    generationCostPerImage: number;
+    themeDrawCost: number;
+  };
+  themes: {
+    unlocked: AiImageThemeSnapshot[];
+    locked: AiImageThemeSnapshot[];
+    allUnlocked: boolean;
+  };
+  recentTasks: AiImageGenerationTaskSnapshot[];
+  recentArtworks: AiImageArtworkSnapshot[];
+}
+
 export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";
 
 export type GamificationTaskStatus = "pending" | "completed";
@@ -267,6 +327,25 @@ export interface SupplyResourceSnapshot {
   maxValue?: number;
 }
 
+export interface SupplyCoinsResourceSnapshot extends SupplyResourceSnapshot {
+  label: "银子";
+}
+
+export interface SupplyTicketResourceSnapshot extends SupplyResourceSnapshot {
+  label: "抽奖券";
+}
+
+export interface SupplyBackpackResourceSnapshot extends SupplyResourceSnapshot {
+  label: "背包";
+}
+
+export interface SupplyLegacyArchiveSnapshot {
+  ticketBalance: number;
+  inventoryQuantity: number;
+  redemptionCount: number;
+  latestTaskRecordCount: number;
+}
+
 export interface SupplyShopProductSnapshot {
   itemId: string;
   name: string;
@@ -305,9 +384,7 @@ export interface SupplyStationProductionSnapshot {
   teamId: string;
   dayKey: string;
   resources: {
-    coins: SupplyResourceSnapshot;
-    ticket: SupplyResourceSnapshot;
-    backpack: SupplyResourceSnapshot;
+    coins: SupplyCoinsResourceSnapshot;
   };
   profile: GamificationProfileSnapshot & {
     username: string;
@@ -330,6 +407,8 @@ export interface SupplyStationProductionSnapshot {
   taskRecord: SupplyTaskRecordSnapshot;
   social: GamificationSocialSummary;
   redemptions: GamificationRedemptionSectionSnapshot;
+  supplyAiImage: SupplyAiImageSnapshot;
+  legacyArchive: SupplyLegacyArchiveSnapshot;
 }
 
 export type GamificationOpsRiskSeverity = "ok" | "watch" | "risk";

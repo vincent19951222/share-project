@@ -13,8 +13,6 @@ const snapshot = {
   dayKey: "2026-05-26",
   resources: {
     coins: { label: "银子", value: 2450 },
-    ticket: { label: "抽奖券", value: 18 },
-    backpack: { label: "背包", value: 2, maxValue: 60 },
   },
   profile: {
     username: "li",
@@ -169,6 +167,13 @@ const snapshot = {
     ],
     adminQueue: [],
   },
+  supplyAiImage: {
+    wallet: { coins: 2450, generationCostPerImage: 10, themeDrawCost: 200 },
+    themes: { unlocked: [], locked: [], allUnlocked: false },
+    recentTasks: [],
+    recentArtworks: [],
+  },
+  legacyArchive: { ticketBalance: 18, inventoryQuantity: 2, redemptionCount: 1, latestTaskRecordCount: 3 },
 } satisfies SupplyStationProductionSnapshot;
 
 describe("SupplyTaskRecordPanel", () => {

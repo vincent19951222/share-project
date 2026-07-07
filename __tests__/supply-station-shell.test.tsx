@@ -20,6 +20,23 @@ async function flush() {
 }
 
 function buildSnapshot(): SupplyStationProductionSnapshot {
+  const themes = Array.from({ length: 13 }, (_, index) => {
+    const order = index + 1;
+
+    return {
+      id: `theme-${String(order).padStart(2, "0")}`,
+      name: `主题 ${order}`,
+      description: "Phase 1 默认开放主题",
+      previewImageUrl: `https://example.com/theme-${order}.png`,
+      defaultUnlocked: true,
+      unlocked: true,
+      enabled: true,
+      sortOrder: order,
+      tag: "可用",
+      palette: ["#fde047", "#111827"],
+    };
+  });
+
   return {
     currentUserId: "u1",
     currentUserRole: "MEMBER",
@@ -27,8 +44,6 @@ function buildSnapshot(): SupplyStationProductionSnapshot {
     dayKey: "2026-05-26",
     resources: {
       coins: { label: "银子", value: 2400 },
-      ticket: { label: "抽奖券", value: 12 },
-      backpack: { label: "背包", value: 1, maxValue: 60 },
     },
     profile: {
       username: "li",
@@ -114,7 +129,14 @@ function buildSnapshot(): SupplyStationProductionSnapshot {
       availableRecipients: [],
       message: "ready",
     },
-    redemptions: { mine: [], adminQueue: [] },
+  redemptions: { mine: [], adminQueue: [] },
+    supplyAiImage: {
+      wallet: { coins: 0, generationCostPerImage: 10, themeDrawCost: 200 },
+      themes: { unlocked: themes, locked: [], allUnlocked: true },
+      recentTasks: [],
+      recentArtworks: [],
+    },
+    legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
   };
 }
 
@@ -135,7 +157,7 @@ describe("SupplyStation legacy entry", () => {
     vi.resetModules();
   });
 
-  it("renders the UI Lab production scene through the stable SupplyStation export", async () => {
+  it("renders the AI image production shell through the stable SupplyStation export", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(createJsonResponse({ snapshot: buildSnapshot() })));
     const { SupplyStation } = await import("@/components/gamification/SupplyStation");
 
@@ -149,12 +171,27 @@ describe("SupplyStation legacy entry", () => {
       "/api/gamification/supply/state",
       expect.objectContaining({ cache: "no-store", credentials: "same-origin" }),
     );
-    expect(container.querySelector(".supply-dashboard-scene")).not.toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene--embedded")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-shell")).not.toBeNull();
+    expect(container.querySelector(".supply-ai-image-studio-panel")).not.toBeNull();
     expect(container.querySelector(".supply-production-shell")).toBeNull();
-    expect(container.querySelector(".supply-dashboard-scene")?.getAttribute("aria-label")).toBe("牛马补给站");
+    expect(container.querySelector(".supply-ai-image-shell")?.getAttribute("aria-label")).toBe("牛马补给站");
+    expect(container.querySelector(".supply-ai-image-shell-header")).toBeNull();
+    expect(container.querySelector("[role='status']")).toBeNull();
     expect(container.querySelector(".supply-ui-lab-topbar")).toBeNull();
-    expect(container.textContent).toContain("工位重启");
+    expect(container.querySelector("[data-testid='supply-theme-masonry']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='supply-creation-control-deck']")).not.toBeNull();
+    expect(container.querySelectorAll("[data-testid='supply-theme-card']")).toHaveLength(13);
+    expect(container.textContent).toContain("选择主题");
+    expect(container.textContent).toContain("对话流");
+    expect(container.textContent).not.toContain("SUPPLY STATION");
+    expect(container.textContent).not.toContain("我的银子");
+    expect(container.textContent).not.toContain("回到打卡");
+    expect(container.textContent).not.toContain("主题扭蛋");
+    expect(container.textContent).not.toContain("作品库");
+    expect(container.textContent).not.toContain("旧补给归档");
+    expect(container.textContent).not.toContain("抽奖券");
+    expect(container.textContent).not.toContain("领取抽奖券");
+    expect(container.textContent).not.toContain("逛商店");
 
     expect(container.textContent).not.toContain("玩法规则");
     expect(container.textContent).not.toContain("抽奖概率");

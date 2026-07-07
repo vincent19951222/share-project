@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseCookieValue } from "@/lib/auth";
 import { buildSupplyStationViewModelForUser } from "@/lib/gamification/supply-view-model";
-import {
-  ensureTodayTaskAssignments,
-  GamificationTaskError,
-} from "@/lib/gamification/tasks";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +10,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
     }
 
-    await ensureTodayTaskAssignments({ userId });
     const snapshot = await buildSupplyStationViewModelForUser(userId);
 
     if (!snapshot) {
@@ -23,10 +18,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ snapshot });
   } catch (error) {
-    if (error instanceof GamificationTaskError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });
   }
 }

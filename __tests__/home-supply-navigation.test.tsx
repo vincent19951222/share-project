@@ -49,14 +49,6 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
     return {
       resources: [
         { id: "coins", label: "银子", value: 440, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png" },
-        { id: "ticket", label: "抽奖券", value: 7, iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_ticket.png" },
-        {
-          id: "backpack",
-          label: "背包",
-          value: 12,
-          maxValue: 60,
-          iconImage: "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_backpack.png",
-        },
       ],
       profile: { username: "li", avatarKey: "male1" },
       social: { pendingCount: 0, latestLabel: null },
@@ -84,7 +76,7 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
       initialPanel?: string;
       onBackToPunch?: () => void;
       onNavContextChange?: (context: unknown) => void;
-      onPanelChange?: (panel: "shop" | "taskRecord") => void;
+      onPanelChange?: (panel: "themeGacha" | "legacyArchive") => void;
     }) => {
       React.useEffect(() => {
         supplyContextReports.current += 1;
@@ -102,11 +94,11 @@ vi.mock("@/components/board/dynamic-tabs", async () => {
           <button onClick={onBackToPunch} type="button">
             回到打卡
           </button>
-          <button onClick={() => onPanelChange?.("shop")} type="button">
-            去商店
+          <button onClick={() => onPanelChange?.("themeGacha")} type="button">
+            去主题扭蛋
           </button>
-          <button onClick={() => onPanelChange?.("taskRecord")} type="button">
-            去任务记录
+          <button onClick={() => onPanelChange?.("legacyArchive")} type="button">
+            去旧补给归档
           </button>
         </section>
       );
@@ -132,8 +124,6 @@ describe("Home supply navigation", () => {
   const supplySnapshot = {
     resources: {
       coins: { label: "银子", value: 440 },
-      ticket: { label: "抽奖券", value: 7 },
-      backpack: { label: "背包", value: 12, maxValue: 60 },
     },
     profile: { username: "li", avatarKey: "male1" },
     social: {
@@ -174,11 +164,11 @@ describe("Home supply navigation", () => {
 
     expect(container.querySelector("[data-testid='home-navbar']")).not.toBeNull();
     expect(container.querySelector("[data-testid='supply-station']")).not.toBeNull();
-    expect(container.querySelector("[data-testid='supply-panel']")?.textContent).toBe("dashboard");
+    expect(container.querySelector("[data-testid='supply-panel']")?.textContent).toBe("studio");
     expect(navbarPropsMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         activeTabOverride: "supply",
-        activeSupplyPanel: "dashboard",
+        activeSupplyPanel: "studio",
         supplyNavContext: expect.objectContaining({
           profile: { username: "li", avatarKey: "male1" },
         }),
@@ -232,8 +222,6 @@ describe("Home supply navigation", () => {
         supplyNavContext: expect.objectContaining({
           resources: expect.arrayContaining([
             expect.objectContaining({ id: "coins", value: 440 }),
-            expect.objectContaining({ id: "ticket", value: 7 }),
-            expect.objectContaining({ id: "backpack", value: 12, maxValue: 60 }),
           ]),
         }),
       }),
@@ -265,8 +253,6 @@ describe("Home supply navigation", () => {
     fetchSupplyStationStateMock.mockResolvedValueOnce({
       resources: {
         coins: { label: "银子", value: 125 },
-        ticket: { label: "抽奖券", value: 2 },
-        backpack: { label: "背包", value: 4, maxValue: 60 },
       },
       profile: { username: "wang", avatarKey: "female1" },
       social: {
@@ -294,8 +280,6 @@ describe("Home supply navigation", () => {
         supplyNavContext: expect.objectContaining({
           resources: expect.arrayContaining([
             expect.objectContaining({ id: "coins", value: 125 }),
-            expect.objectContaining({ id: "ticket", value: 2 }),
-            expect.objectContaining({ id: "backpack", value: 4, maxValue: 60 }),
           ]),
           profile: { username: "wang", avatarKey: "female1" },
         }),
@@ -396,18 +380,18 @@ describe("Home supply navigation", () => {
 
     await act(async () => {
       Array.from(container.querySelectorAll<HTMLButtonElement>("[data-testid='supply-station'] button"))
-        .find((button) => button.textContent === "去商店")
+        .find((button) => button.textContent === "去主题扭蛋")
+        ?.click();
+    });
+
+    expect(routerPushMock).toHaveBeenCalledWith("/dashboard/cards");
+
+    await act(async () => {
+      Array.from(container.querySelectorAll<HTMLButtonElement>("[data-testid='supply-station'] button"))
+        .find((button) => button.textContent === "去旧补给归档")
         ?.click();
     });
 
     expect(routerPushMock).toHaveBeenCalledWith("/dashboard/store");
-
-    await act(async () => {
-      Array.from(container.querySelectorAll<HTMLButtonElement>("[data-testid='supply-station'] button"))
-        .find((button) => button.textContent === "去任务记录")
-        ?.click();
-    });
-
-    expect(routerPushMock).toHaveBeenCalledWith("/dashboard/quest");
   });
 });

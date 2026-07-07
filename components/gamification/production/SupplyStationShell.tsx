@@ -1,64 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ApiError,
-  claimGamificationLifeTicket,
-  completeGamificationTask,
-  dismissSocialInvitation,
-  drawGamificationLottery,
+  createAiImageGenerationTask,
   fetchSupplyStationState,
-  purchaseGamificationShopItem,
-  rerollGamificationTask,
-  requestRealWorldRedemption,
-  respondToSocialInvitation,
-  useGamificationItem,
-  type UseGamificationItemRequest,
+  retryAiImageGenerationTask,
 } from "@/lib/api";
-import { SupplyBackpackScene } from "@/components/gamification/ui-lab/supply-backpack/SupplyBackpackScene";
-import { SupplyDashboardScene } from "@/components/gamification/ui-lab/supply-dashboard/SupplyDashboardScene";
-import type { SupplyUiLabTopBarTabId } from "@/components/gamification/ui-lab/supply-dashboard/SupplyUiLabTopBar";
-import { SupplyDrawPoolScene } from "@/components/gamification/ui-lab/supply-draw-pool/SupplyDrawPoolScene";
-import { SupplyShopScene } from "@/components/gamification/ui-lab/supply-shop/SupplyShopScene";
-import { SupplyTaskRecordScene } from "@/components/gamification/ui-lab/supply-task-record/SupplyTaskRecordScene";
 import type { SupplyNavContext } from "@/lib/navigation-routes";
 import { cacheSupplyNavSnapshot } from "@/lib/supply-nav-cache";
 import { buildSupplyNavContext } from "@/lib/supply-nav-context";
-import type {
-  GamificationDimensionSnapshot,
-  GamificationLotteryDrawSnapshot,
-  SupplyStationProductionSnapshot,
-} from "@/lib/types";
+import type { SupplyStationProductionSnapshot } from "@/lib/types";
 import {
-  toSupplyBackpackPreview,
-  toSupplyDashboardPreview,
-  toSupplyDrawPoolPreview,
-  toSupplyShopPreview,
-  toSupplyTaskRecordPreview,
-} from "./supply-ui-lab-adapters";
+  CreateAiImageGenerationTaskPayload,
+  SupplyAiImageStudioPanel,
+} from "./SupplyAiImageStudioPanel";
+import { SupplyArtworkBackpackPanel } from "./SupplyArtworkBackpackPanel";
+import { SupplyLegacyArchivePanel } from "./SupplyLegacyArchivePanel";
 
-export type SupplyProductionPanel = "dashboard" | "drawPool" | "backpack" | "shop" | "taskRecord";
-type SupplyDashboardAction = "complete-task" | "reroll-task" | "claim-ticket";
-type SupplyAction =
-  | SupplyDashboardAction
-  | "draw-single"
-  | "draw-ten"
-  | "use-item"
-  | "request-redemption"
-  | "purchase-shop-item"
-  | "dismiss-social-invitation"
-  | "respond-social-invitation";
+export type SupplyProductionPanel = "studio" | "themeGacha" | "artworks" | "legacyArchive";
+type SupplyAction = "create-ai-image-task" | "retry-ai-image-task";
 
 interface SupplyErrorState {
   message: string;
   status: number | null;
-}
-
-export interface SupplyBackpackUseTarget {
-  dimensionKey?: string;
-  recipientUserId?: string;
-  message?: string;
 }
 
 function getSupplyErrorState(caught: unknown): SupplyErrorState {
@@ -75,31 +40,12 @@ function getSupplyErrorState(caught: unknown): SupplyErrorState {
   };
 }
 
-function normalizeBackpackUseTarget(
-  target?: SupplyBackpackUseTarget,
-): UseGamificationItemRequest["target"] {
-  if (!target) {
-    return undefined;
-  }
-
-  const dimensionKey =
-    target.dimensionKey === "movement" ||
-    target.dimensionKey === "hydration" ||
-    target.dimensionKey === "social" ||
-    target.dimensionKey === "learning"
-      ? target.dimensionKey
-      : undefined;
-
-  return {
-    dimensionKey,
-    recipientUserId: target.recipientUserId,
-    message: target.message,
-  };
+function normalizeInitialPanel(panel: SupplyProductionPanel): SupplyProductionPanel {
+  return panel === "themeGacha" ? "studio" : panel;
 }
 
 export function SupplyStationShell({
-  initialPanel = "dashboard",
-  onBackToPunch,
+  initialPanel = "studio",
   onNavContextChange,
   onPanelChange,
 }: {
@@ -109,13 +55,25 @@ export function SupplyStationShell({
   onPanelChange?: (panel: SupplyProductionPanel) => void;
 }) {
   const [snapshot, setSnapshot] = useState<SupplyStationProductionSnapshot | null>(null);
-  const [activePanel, setActivePanel] = useState<SupplyProductionPanel>(initialPanel);
-  const [, setActiveAction] = useState<SupplyAction | null>(null);
-  const [latestDraw, setLatestDraw] = useState<GamificationLotteryDrawSnapshot | null>(null);
-  const [selectedBackpackItemId, setSelectedBackpackItemId] = useState<string | null>(null);
-  const [selectedShopItemId, setSelectedShopItemId] = useState<string | null>(null);
+  const [activePanel, setActivePanel] = useState<SupplyProductionPanel>(normalizeInitialPanel(initialPanel));
   const [error, setError] = useState<SupplyErrorState | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [snapshotStaleAfterMutation, setSnapshotStaleAfterMutation] = useState(false);
+  const [snapshotRefreshWarning, setSnapshotRefreshWarning] = useState<string | null>(null);
+  const activeActionRef = useRef<SupplyAction | null>(null);
+  const snapshotStaleAfterMutationRef = useRef(false);
+
+  const markSnapshotFresh = useCallback(() => {
+    snapshotStaleAfterMutationRef.current = false;
+    setSnapshotStaleAfterMutation(false);
+    setSnapshotRefreshWarning(null);
+  }, []);
+
+  const markSnapshotStaleAfterMutation = useCallback(() => {
+    snapshotStaleAfterMutationRef.current = true;
+    setSnapshotStaleAfterMutation(true);
+    setSnapshotRefreshWarning("操作已提交成功，但补给站还没刷新出来，请先刷新后再继续。");
+  }, []);
 
   const applySnapshot = useCallback((nextSnapshot: SupplyStationProductionSnapshot) => {
     cacheSupplyNavSnapshot(nextSnapshot);
@@ -127,19 +85,21 @@ export function SupplyStationShell({
       setError(null);
       const nextSnapshot = await fetchSupplyStationState();
       applySnapshot(nextSnapshot);
+      markSnapshotFresh();
     } catch (caught) {
       setError(getSupplyErrorState(caught));
     }
-  }, [applySnapshot]);
+  }, [applySnapshot, markSnapshotFresh]);
 
   const refreshSnapshotSilently = useCallback(async () => {
     try {
       const nextSnapshot = await fetchSupplyStationState();
       applySnapshot(nextSnapshot);
+      markSnapshotFresh();
     } catch {
       // Keep the current snapshot if a background refresh fails.
     }
-  }, [applySnapshot]);
+  }, [applySnapshot, markSnapshotFresh]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -166,239 +126,141 @@ export function SupplyStationShell({
   }, [refreshSnapshotSilently]);
 
   useEffect(() => {
-    setActivePanel(initialPanel);
+    setActivePanel(normalizeInitialPanel(initialPanel));
   }, [initialPanel]);
 
   useEffect(() => {
     onNavContextChange?.(snapshot ? buildSupplyNavContext(snapshot) : null);
   }, [onNavContextChange, snapshot]);
 
-  const selectPanel = useCallback(
+  const handlePanelChange = useCallback(
     (panel: SupplyProductionPanel) => {
-      setActivePanel(panel);
-      onPanelChange?.(panel);
+      const normalizedPanel = normalizeInitialPanel(panel);
+
+      setActivePanel(normalizedPanel);
+      onPanelChange?.(normalizedPanel);
     },
     [onPanelChange],
   );
 
   const runAction = useCallback(
     async (action: SupplyAction, work: () => Promise<string | void>) => {
-      setActiveAction(action);
+      if (activeActionRef.current || snapshotStaleAfterMutationRef.current) {
+        return false;
+      }
+
+      activeActionRef.current = action;
       setError(null);
       setSuccessMessage(null);
 
       try {
         const message = await work();
-        const nextSnapshot = await fetchSupplyStationState();
-        applySnapshot(nextSnapshot);
         setSuccessMessage(message ?? "操作成功");
+
+        try {
+          const nextSnapshot = await fetchSupplyStationState();
+          applySnapshot(nextSnapshot);
+          markSnapshotFresh();
+        } catch {
+          markSnapshotStaleAfterMutation();
+        }
+
+        return true;
       } catch (caught) {
         setError(getSupplyErrorState(caught));
+        return false;
       } finally {
-        setActiveAction(null);
+        activeActionRef.current = null;
       }
     },
-    [applySnapshot],
+    [applySnapshot, markSnapshotFresh, markSnapshotStaleAfterMutation],
   );
 
-  const handleCompleteTask = useCallback(
-    (dimensionKey: GamificationDimensionSnapshot["key"]) => {
-      void runAction("complete-task", async () => {
-        await completeGamificationTask({ dimensionKey });
-        return "任务已完成";
+  const handleCreateTask = useCallback(
+    async (payload: CreateAiImageGenerationTaskPayload) => {
+      const didSucceed = await runAction("create-ai-image-task", async () => {
+        await createAiImageGenerationTask(payload);
+        return "生图任务已创建";
+      });
+
+      if (!didSucceed) {
+        throw new Error("create-ai-image-task-failed");
+      }
+
+      return true;
+    },
+    [runAction],
+  );
+
+  const handleRetryTask = useCallback(
+    async (taskId: string) => {
+      await runAction("retry-ai-image-task", async () => {
+        await retryAiImageGenerationTask(taskId);
+        return "已重新提交失败图片";
       });
     },
     [runAction],
   );
 
-  const handleRerollTask = useCallback(
-    (dimensionKey: GamificationDimensionSnapshot["key"]) => {
-      void runAction("reroll-task", async () => {
-        await rerollGamificationTask({ dimensionKey });
-        return "任务已更换";
-      });
-    },
-    [runAction],
-  );
-
-  const handleClaimTicket = useCallback(() => {
-    void runAction("claim-ticket", async () => {
-      await claimGamificationLifeTicket();
-      return "抽奖券已领取";
-    });
-  }, [runAction]);
-
-  const handleDraw = useCallback(
-    (drawType: "SINGLE" | "TEN", useCoinTopUp: boolean) => {
-      void runAction(drawType === "TEN" ? "draw-ten" : "draw-single", async () => {
-        const result = await drawGamificationLottery({ drawType, useCoinTopUp });
-        setLatestDraw(result.draw);
-        selectPanel("drawPool");
-        return drawType === "TEN" ? "十连完成" : "单抽完成";
-      });
-    },
-    [runAction, selectPanel],
-  );
-
-  const handleUseItem = useCallback(
-    (itemId: string, target?: SupplyBackpackUseTarget) => {
-      void runAction("use-item", async () => {
-        const result = await useGamificationItem({
-          itemId,
-          target: normalizeBackpackUseTarget(target),
-        });
-        return result.itemUse.message;
-      });
-    },
-    [runAction],
-  );
-
-  const handleRequestRedemption = useCallback(
-    (itemId: string) => {
-      void runAction("request-redemption", async () => {
-        await requestRealWorldRedemption(itemId);
-        return "兑换申请已提交";
-      });
-    },
-    [runAction],
-  );
-
-  const handlePurchase = useCallback(
-    (itemId: string) => {
-      void runAction("purchase-shop-item", async () => {
-        await purchaseGamificationShopItem(itemId);
-        setSelectedShopItemId(itemId);
-        return "购买成功";
-      });
-    },
-    [runAction],
-  );
-
-  const handleRespondSocialInvitation = useCallback(
-    (invitationId: string) => {
-      void runAction("respond-social-invitation", async () => {
-        await respondToSocialInvitation({ invitationId });
-        return "已回应队友雷达";
-      });
-    },
-    [runAction],
-  );
-
-  const handleDismissSocialInvitation = useCallback(
-    (invitationId: string) => {
-      void runAction("dismiss-social-invitation", async () => {
-        await dismissSocialInvitation({ invitationId });
-        return "已忽略队友邀请";
-      });
-    },
-    [runAction],
-  );
-
-  const handlePanelNavigation = useCallback((target: "home" | "draw-pool" | "backpack" | "shop" | "task-record") => {
-    if (target === "home") {
-      onBackToPunch?.();
-      return;
-    }
-
-    const nextPanelByTarget: Record<Exclude<typeof target, "home">, SupplyProductionPanel> = {
-      "draw-pool": "drawPool",
-      backpack: "backpack",
-      shop: "shop",
-      "task-record": "taskRecord",
-    };
-
-    selectPanel(nextPanelByTarget[target]);
-  }, [onBackToPunch, selectPanel]);
-
-  const handleTopBarTabNavigation = useCallback((tabId: SupplyUiLabTopBarTabId) => {
-    const nextPanelByTab: Record<SupplyUiLabTopBarTabId, SupplyProductionPanel> = {
-      status: "dashboard",
-      shop: "shop",
-      "task-record": "taskRecord",
-    };
-
-    selectPanel(nextPanelByTab[tabId]);
-  }, [selectPanel]);
+  const shouldShowStatus = !snapshot || Boolean(error || snapshotRefreshWarning || successMessage);
 
   return (
-    <section className="supply-ui-lab-production-frame" aria-label="牛马补给站">
-      <div className="supply-ui-lab-production-status" role="status">
-        {!snapshot && !error ? <p>补给站加载中...</p> : null}
-        {error ? (
-          <div>
-            <p>{error.message}</p>
-            {error.status === 401 ? <a href="/login">去登录</a> : null}
-            {error.status !== 401 ? (
-              <button onClick={() => void loadSnapshot()} type="button">
-                重试
+    <section className="supply-ai-image-shell flex flex-col gap-4" aria-label="牛马补给站">
+      {shouldShowStatus ? (
+        <div className="soft-card p-4" role="status">
+          {!snapshot && !error ? <p className="text-sm font-bold text-sub">补给站加载中...</p> : null}
+          {error ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm font-bold text-main">{error.message}</p>
+              {error.status === 401 ? <a href="/login">去登录</a> : null}
+              {error.status !== 401 ? (
+                <button
+                  className="rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-black text-main shadow-[0_2px_0_0_#1f2937]"
+                  onClick={() => void loadSnapshot()}
+                  type="button"
+                >
+                  重试
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+          {snapshotRefreshWarning ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm font-bold text-main">{snapshotRefreshWarning}</p>
+              <button
+                className="rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-black text-main shadow-[0_2px_0_0_#1f2937]"
+                onClick={() => void loadSnapshot()}
+                type="button"
+              >
+                刷新补给站
               </button>
-            ) : null}
-          </div>
-        ) : null}
-        {successMessage ? <p>{successMessage}</p> : null}
-      </div>
+            </div>
+          ) : null}
+          {successMessage ? <p className="text-sm font-bold text-main">{successMessage}</p> : null}
+        </div>
+      ) : null}
 
       {snapshot ? (
         <>
-          {activePanel === "dashboard" ? (
-            <SupplyDashboardScene
-              chrome="embedded"
-              data={toSupplyDashboardPreview(snapshot)}
-              feedbackMessage={successMessage}
-              onBackToPunch={onBackToPunch}
-              onClaimRewards={handleClaimTicket}
-              onCompleteQuest={(questId) => handleCompleteTask(questId as GamificationDimensionSnapshot["key"])}
-              onNavigate={(target) => handlePanelNavigation(target)}
-              onRerollQuest={(questId) => handleRerollTask(questId as GamificationDimensionSnapshot["key"])}
-              onSelectSupplyTab={handleTopBarTabNavigation}
+          {activePanel === "studio" ? (
+            <SupplyAiImageStudioPanel
+              mutationsDisabled={snapshotStaleAfterMutation}
+              onCreateTask={handleCreateTask}
+              onOpenAssets={() => handlePanelChange("artworks")}
+              onRetryTask={handleRetryTask}
+              snapshot={snapshot.supplyAiImage}
             />
           ) : null}
 
-          {activePanel === "drawPool" ? (
-            <SupplyDrawPoolScene
-              chrome="embedded"
-              data={toSupplyDrawPoolPreview(snapshot, latestDraw)}
-              onDraw={(actionId) =>
-                handleDraw(
-                  actionId === "ten" ? "TEN" : "SINGLE",
-                  actionId === "ten" && snapshot.drawPool.lottery.tenDrawTopUpRequired > 0,
-                )
-              }
+          {activePanel === "artworks" ? (
+            <SupplyArtworkBackpackPanel
+              onBackToStudio={() => handlePanelChange("studio")}
+              snapshot={snapshot.supplyAiImage}
             />
           ) : null}
 
-          {activePanel === "backpack" ? (
-            <SupplyBackpackScene
-              chrome="embedded"
-              data={toSupplyBackpackPreview(snapshot, selectedBackpackItemId)}
-              onRequestRedemption={handleRequestRedemption}
-              onSelectItem={setSelectedBackpackItemId}
-              onUseItem={handleUseItem}
-              selectedItemId={selectedBackpackItemId}
-            />
-          ) : null}
-
-          {activePanel === "shop" ? (
-            <SupplyShopScene
-              chrome="embedded"
-              data={toSupplyShopPreview(snapshot, selectedShopItemId)}
-              onBackToPunch={onBackToPunch}
-              onPurchase={handlePurchase}
-              onSelectProduct={setSelectedShopItemId}
-              onSelectSupplyTab={handleTopBarTabNavigation}
-              selectedProductId={selectedShopItemId}
-            />
-          ) : null}
-
-          {activePanel === "taskRecord" ? (
-            <SupplyTaskRecordScene
-              chrome="embedded"
-              data={toSupplyTaskRecordPreview(snapshot)}
-              onBackToPunch={onBackToPunch}
-              onDismissSocialInvitation={handleDismissSocialInvitation}
-              onRespondSocialInvitation={handleRespondSocialInvitation}
-              onSelectSupplyTab={handleTopBarTabNavigation}
-            />
+          {activePanel === "legacyArchive" ? (
+            <SupplyLegacyArchivePanel snapshot={snapshot.legacyArchive} />
           ) : null}
         </>
       ) : null}

@@ -29,7 +29,7 @@ type DataDashboardView = "personal" | "team";
 
 export function BoardApp({
   activeTab,
-  supplyPanel = "dashboard",
+  supplyPanel = "studio",
   initialDataView = "personal",
 }: {
   activeTab: AppTab;

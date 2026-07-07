@@ -58,12 +58,10 @@ export function SupplyDashboardPanel({
   return (
     <section className="supply-production-dashboard" aria-label="我的状态">
       <header className="supply-production-dashboard__topbar">
-        {Object.entries(snapshot.resources).map(([key, resource]) => (
-          <article className="supply-production-dashboard__resource" key={key}>
-            <span>{resource.label}</span>
-            <strong>{formatResource(resource.value, resource.maxValue)}</strong>
-          </article>
-        ))}
+        <article className="supply-production-dashboard__resource" key="coins">
+          <span>{snapshot.resources.coins.label}</span>
+          <strong>{formatResource(snapshot.resources.coins.value, snapshot.resources.coins.maxValue)}</strong>
+        </article>
       </header>
 
       <div className="supply-production-dashboard__grid">

@@ -33,6 +33,11 @@ model Team {
   experienceLedgers ExperienceLedger[]
   shopPurchases ShopPurchase[]
   adminMakeupPunchLedgers AdminMakeupPunchLedger[]
+  aiImageThemeUnlocks AiImageThemeUnlock[]
+  aiImageGenerationTasks AiImageGenerationTask[]
+  aiImageGenerationItems AiImageGenerationItem[]
+  aiImageArtworks AiImageArtwork[]
+  aiImageTaskInputImages AiImageTaskInputImage[]
 }
 
 model User {
@@ -71,6 +76,11 @@ model User {
   cancelledRedemptions  RealWorldRedemption[]  @relation("RedemptionCanceller")
   administeredMakeupPunches AdminMakeupPunchLedger[] @relation("AdminMakeupPunchAdmin")
   targetedMakeupPunches AdminMakeupPunchLedger[] @relation("AdminMakeupPunchTarget")
+  aiImageThemeUnlocks   AiImageThemeUnlock[]
+  aiImageGenerationTasks AiImageGenerationTask[]
+  aiImageGenerationItems AiImageGenerationItem[]
+  aiImageArtworks       AiImageArtwork[]
+  aiImageTaskInputImages AiImageTaskInputImage[]
   createdAt             DateTime               @default(now())
 }
 
@@ -219,6 +229,115 @@ model ExperienceLedger {
   @@index([userId, createdAt])
   @@index([teamId, dayKey, createdAt])
   @@unique([sourceType, sourceId])
+}
+
+model AiImageThemeUnlock {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id])
+  themeId   String
+  source    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, themeId])
+  @@index([teamId, themeId])
+}
+
+model AiImageGenerationTask {
+  id                 String                  @id @default(cuid())
+  userId             String
+  user               User                    @relation(fields: [userId], references: [id])
+  teamId             String
+  team               Team                    @relation(fields: [teamId], references: [id])
+  themeId            String
+  userPrompt         String?
+  requestedCount     Int
+  status             String
+  coinCost           Int
+  coinRefunded       Boolean                 @default(false)
+  refundedCoinAmount Int                     @default(0)
+  providerModel      String
+  errorMessage       String?
+  promptSnapshotJson String
+  retryOfTaskId      String?
+  retryOfTask        AiImageGenerationTask?  @relation("AiImageTaskRetrySource", fields: [retryOfTaskId], references: [id])
+  retryTasks         AiImageGenerationTask[] @relation("AiImageTaskRetrySource")
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  items              AiImageGenerationItem[]
+  artworks           AiImageArtwork[]
+  inputImages        AiImageTaskInputImage[]
+
+  @@index([userId, createdAt])
+  @@index([teamId, createdAt])
+  @@index([status, updatedAt])
+  @@index([retryOfTaskId])
+}
+
+model AiImageGenerationItem {
+  id           String                @id @default(cuid())
+  taskId       String
+  task         AiImageGenerationTask @relation(fields: [taskId], references: [id])
+  userId       String
+  user         User                  @relation(fields: [userId], references: [id])
+  teamId       String
+  team         Team                  @relation(fields: [teamId], references: [id])
+  themeId      String
+  index        Int
+  status       String
+  imageUrl     String?
+  cosKey       String?
+  errorMessage String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  artwork      AiImageArtwork?
+
+  @@unique([taskId, index])
+  @@index([userId, createdAt])
+  @@index([teamId, createdAt])
+  @@index([status, updatedAt])
+}
+
+model AiImageArtwork {
+  id                 String                @id @default(cuid())
+  taskId             String
+  task               AiImageGenerationTask @relation(fields: [taskId], references: [id])
+  itemId             String                @unique
+  item               AiImageGenerationItem @relation(fields: [itemId], references: [id])
+  userId             String
+  user               User                  @relation(fields: [userId], references: [id])
+  teamId             String
+  team               Team                  @relation(fields: [teamId], references: [id])
+  themeId            String
+  imageUrl           String
+  cosKey             String
+  promptSnapshotJson String
+  createdAt          DateTime              @default(now())
+
+  @@index([userId, createdAt])
+  @@index([teamId, createdAt])
+  @@index([themeId, createdAt])
+}
+
+model AiImageTaskInputImage {
+  id        String                @id @default(cuid())
+  taskId    String
+  task      AiImageGenerationTask @relation(fields: [taskId], references: [id])
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id])
+  teamId    String
+  team      Team                  @relation(fields: [teamId], references: [id])
+  imageUrl  String
+  cosKey    String
+  mimeType  String
+  sizeBytes Int
+  sortOrder Int
+  createdAt DateTime              @default(now())
+
+  @@index([taskId, sortOrder])
+  @@index([userId, createdAt])
 }
 
 model ShopPurchase {

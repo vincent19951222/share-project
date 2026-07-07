@@ -13,8 +13,6 @@ const snapshot = {
   dayKey: "2026-05-26",
   resources: {
     coins: { label: "银子", value: 2450 },
-    ticket: { label: "抽奖券", value: 18 },
-    backpack: { label: "背包", value: 2, maxValue: 60 },
   },
   profile: {
     username: "li",
@@ -98,6 +96,13 @@ const snapshot = {
     message: "ready",
   },
   redemptions: { mine: [], adminQueue: [] },
+  supplyAiImage: {
+    wallet: { coins: 0, generationCostPerImage: 10, themeDrawCost: 200 },
+    themes: { unlocked: [], locked: [], allUnlocked: false },
+    recentTasks: [],
+    recentArtworks: [],
+  },
+  legacyArchive: { ticketBalance: 0, inventoryQuantity: 0, redemptionCount: 0, latestTaskRecordCount: 0 },
 } satisfies SupplyStationProductionSnapshot;
 
 describe("SupplyDashboardPanel", () => {
@@ -115,7 +120,7 @@ describe("SupplyDashboardPanel", () => {
     container.remove();
   });
 
-  it("renders production resources, profile exp, and empty today effects", async () => {
+  it("renders legacy resources, profile exp, and empty today effects", async () => {
     await act(async () => {
       root.render(
         <SupplyDashboardPanel
@@ -131,10 +136,8 @@ describe("SupplyDashboardPanel", () => {
 
     expect(container.textContent).toContain("银子");
     expect(container.textContent).toContain("2,450");
-    expect(container.textContent).toContain("抽奖券");
-    expect(container.textContent).toContain("18");
-    expect(container.textContent).toContain("背包");
-    expect(container.textContent).toContain("2/60");
+    expect(container.textContent).toContain("领取抽奖券");
+    expect(container.textContent).toContain("看背包");
     expect(container.textContent).toContain("Lv.3");
     expect(container.textContent).toContain("720/1000");
     expect(container.textContent).toContain("距离升级还差 280 EXP");

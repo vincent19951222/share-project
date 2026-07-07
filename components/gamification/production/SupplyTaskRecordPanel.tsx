@@ -155,7 +155,6 @@ export function SupplyTaskRecordPanel({
         <div aria-label="记录资源摘要">
           <span>Lv.{snapshot.profile.level}</span>
           <span>{snapshot.resources.coins.label} {snapshot.resources.coins.value}</span>
-          <span>{snapshot.resources.ticket.label} {snapshot.resources.ticket.value}</span>
         </div>
       </header>
 

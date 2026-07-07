@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "fs";
 import { describe, expect, it } from "vitest";
 
-describe("supply task record formal route", () => {
-  it("uses /dashboard/quest as the formal task-record route and keeps the legacy page as a redirect", () => {
+describe("supply quest compatibility route", () => {
+  it("keeps /dashboard/quest as a compatibility alias into legacy archive and preserves the legacy redirect", () => {
     expect(existsSync("app/(board)/dashboard/quest/page.tsx")).toBe(true);
     expect(existsSync("app/ui-lab/supply-dashboard/task-record/page.tsx")).toBe(true);
 
@@ -13,16 +13,13 @@ describe("supply task record formal route", () => {
     const routes = readFileSync("lib/navigation-routes.ts", "utf8");
     const types = readFileSync("lib/types.ts", "utf8");
     const supplyStation = readFileSync("components/gamification/SupplyStation.tsx", "utf8");
-    const topTabs = readFileSync("components/gamification/ui-lab/supply-dashboard/SupplyDashboardTopTabs.tsx", "utf8");
-
     expect(boardPage).not.toContain("SupplyTaskRecordScene");
-    expect(formalPage).toContain('<BoardApp activeTab="supply" supplyPanel="taskRecord" />');
+    expect(formalPage).toContain('<BoardApp activeTab="supply" supplyPanel="legacyArchive" />');
     expect(legacyPage).toContain('redirect("/dashboard/quest")');
     expect(navbar).not.toContain("ui-lab");
     expect(supplyStation).not.toContain("SupplyTaskRecordScene");
-    expect(routes).toContain('taskRecord: "/dashboard/quest"');
+    expect(routes).not.toContain('taskRecord: "/dashboard/quest"');
+    expect(routes).toContain('legacyArchive: "/dashboard/store"');
     expect(types).toContain('export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";');
-    expect(topTabs).toContain('label: "任务记录"');
-    expect(topTabs).toContain('href: "/dashboard/quest"');
   });
 });

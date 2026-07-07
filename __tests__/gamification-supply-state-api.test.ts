@@ -36,7 +36,7 @@ describe("GET /api/gamification/supply/state", () => {
     expect(body).toEqual({ error: "未登录" });
   });
 
-  it("ensures today's tasks and returns production supply snapshot", async () => {
+  it("returns production supply snapshot without creating old daily tasks", async () => {
     const dayKey = getShanghaiDayKey();
 
     await expect(
@@ -53,14 +53,19 @@ describe("GET /api/gamification/supply/state", () => {
       dayKey,
       resources: {
         coins: { label: "银子" },
-        ticket: { label: "抽奖券" },
-        backpack: { label: "背包", maxValue: 60 },
+      },
+      supplyAiImage: {
+        wallet: {
+          generationCostPerImage: 10,
+          themeDrawCost: 200,
+        },
       },
     });
-    expect(body.snapshot.dashboard.dailyQuests).toHaveLength(4);
+    expect(body.snapshot.resources.ticket).toBeUndefined();
+    expect(body.snapshot.dashboard.dailyQuests).toEqual([]);
     await expect(
       prisma.dailyTaskAssignment.count({ where: { userId, dayKey } }),
-    ).resolves.toBe(4);
+    ).resolves.toBe(0);
   });
 
   it("returns 401 when the cookie points to a missing user", async () => {

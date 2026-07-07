@@ -31,24 +31,10 @@ export function buildSupplyNavContext(snapshot: SupplyStationProductionSnapshot)
     resources: [
       {
         id: "coins",
-        label: snapshot.resources.coins.label,
+        label: "银子",
         value: snapshot.resources.coins.value,
         maxValue: snapshot.resources.coins.maxValue,
         iconImage: supplyUiLabResourceIconPaths.coins,
-      },
-      {
-        id: "ticket",
-        label: snapshot.resources.ticket.label,
-        value: snapshot.resources.ticket.value,
-        maxValue: snapshot.resources.ticket.maxValue,
-        iconImage: supplyUiLabResourceIconPaths.ticket,
-      },
-      {
-        id: "backpack",
-        label: snapshot.resources.backpack.label,
-        value: snapshot.resources.backpack.value,
-        maxValue: snapshot.resources.backpack.maxValue,
-        iconImage: supplyUiLabResourceIconPaths.backpack,
       },
     ],
     profile: {
