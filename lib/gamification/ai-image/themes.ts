@@ -208,7 +208,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "小红书体验封面",
     description: "基于参考图和文字内容生成第一人称体验感的小红书竖版封面。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-magazine-cover.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-xiaohongshu-experience-cover.webp",
     defaultUnlocked: true,
     enabled: true,
     sortOrder: 6,

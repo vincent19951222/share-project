@@ -149,7 +149,7 @@ describe("AI image preset themes", () => {
       bestFor: ["个人 IP 参考图", "工具、AI、效率、产品、方法或生活观察内容"],
       avoidFor: ["需要写实照片输出的任务", "多人合照或商业导师风形象"],
       previewImageUrl:
-        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-magazine-cover.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-xiaohongshu-experience-cover.webp",
       palette: ["#fde047", "#111827", "#ffffff"],
     });
     expect(theme?.promptTemplate).toContain("小红书竖版封面");
