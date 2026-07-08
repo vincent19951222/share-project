@@ -136,6 +136,30 @@ describe("AI image preset themes", () => {
     expect(theme?.promptTemplate).toContain("不要做成专业写实插画");
   });
 
+  it("configures theme-06 as a structured Xiaohongshu experience cover preset", () => {
+    const theme = getAiImageThemeById("theme-06");
+
+    expect(theme).toMatchObject({
+      id: "theme-06",
+      name: "小红书体验封面",
+      description: "基于参考图和文字内容生成第一人称体验感的小红书竖版封面。",
+      tag: "封面",
+      templateKind: "creative_poster",
+      referencePolicy: "optional",
+      bestFor: ["个人 IP 参考图", "工具、AI、效率、产品、方法或生活观察内容"],
+      avoidFor: ["需要写实照片输出的任务", "多人合照或商业导师风形象"],
+      previewImageUrl:
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-06-magazine-cover.webp",
+      palette: ["#fde047", "#111827", "#ffffff"],
+    });
+    expect(theme?.promptTemplate).toContain("小红书竖版封面");
+    expect(theme?.promptTemplate).toContain("从“我试了型”“我做了型”“我懂了型”中自动选择 1 种");
+    expect(theme?.promptTemplate).toContain("黑色短发、圆框眼镜、温和聪明且松弛的男生气质");
+    expect(theme?.promptTemplate).toContain("用户额外需求主要用于提供主题、体验、工具、产品、方法、生活观察或想表达的内容");
+    expect(theme?.promptTemplate).toContain("所有中文必须清晰可读");
+    expect(theme?.promptTemplate).not.toContain("brutalist fitness poster");
+  });
+
   it("does not expose promptTemplate in client snapshots", () => {
     const theme = getAiImageThemeById("theme-01");
     expect(theme?.promptTemplate).toContain("手绘涂鸦");
