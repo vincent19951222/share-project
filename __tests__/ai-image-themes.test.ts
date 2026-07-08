@@ -173,7 +173,7 @@ describe("AI image preset themes", () => {
       bestFor: ["单个角色或人物参考图", "主体清晰的半身或全身照片"],
       avoidFor: ["多人合照", "主体过小或遮挡严重的照片", "需要保留原始照片背景的任务"],
       previewImageUrl:
-        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-emoji-sticker-pack.webp",
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-pvc-figure-display.webp",
       palette: ["#f8fafc", "#111827", "#e5e7eb"],
     });
     expect(theme?.promptTemplate).toContain("圆形塑料底座上的 PVC 角色手办");

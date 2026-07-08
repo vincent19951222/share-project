@@ -244,7 +244,7 @@ const THEMES: AiImageThemeDefinition[] = [
     name: "PVC 手办展示",
     description: "把参考图角色转换成室内桌面 PVC 手办，并展示包装盒、底座和 Blender 建模屏幕。",
     previewImageUrl:
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-emoji-sticker-pack.webp",
+      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-pvc-figure-display.webp",
     defaultUnlocked: true,
     enabled: true,
     sortOrder: 7,
