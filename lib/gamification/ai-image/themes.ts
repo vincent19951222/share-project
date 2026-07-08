@@ -241,21 +241,39 @@ const THEMES: AiImageThemeDefinition[] = [
   }),
   createTheme({
     id: "theme-07",
-    name: "肌肉萌宠",
-    description: "宠物拟人举铁，轻松搞笑但不幼稚。",
+    name: "PVC 手办展示",
+    description: "把参考图角色转换成室内桌面 PVC 手办，并展示包装盒、底座和 Blender 建模屏幕。",
     previewImageUrl:
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-emoji-sticker-pack.webp",
-    promptTemplate:
-      "cute muscular pet mascot lifting weights, funny gym energy, expressive character design, polished illustration, bold outlines.",
     defaultUnlocked: true,
     enabled: true,
     sortOrder: 7,
-    tag: "萌宠",
-    palette: ["#f9a8d4", "#fef08a", "#374151"],
-    templateKind: "scene_generation",
-    referencePolicy: "optional",
-    bestFor: ["文字描述明确的健身主题场景"],
-    avoidFor: ["需要严格保留人物身份的参考图"],
+    tag: "手办",
+    palette: ["#f8fafc", "#111827", "#e5e7eb"],
+    templateKind: "reference_transform",
+    referencePolicy: "required",
+    bestFor: ["单个角色或人物参考图", "主体清晰的半身或全身照片"],
+    avoidFor: ["多人合照", "主体过小或遮挡严重的照片", "需要保留原始照片背景的任务"],
+    promptSections: {
+      taskGoal:
+        "基于用户上传的参考图片，将参考图中的主体转换成一个角色手办展示场景：前景是一尊站在圆形塑料底座上的 PVC 角色手办，后方有印着该角色形象的包装盒，旁边或后方有一台电脑，屏幕上显示 Blender 建模过程。场景尽量设置在室内桌面或工作室环境。",
+      inputFit:
+        "本模板适合单个主体清晰的人物、IP 角色、宠物或物品参考图。若参考图包含多人或多个主体，请优先选择最清晰、最主要的一个主体做成手办。若参考图背景复杂，则只提取主体特征，不保留原始背景。",
+      referenceRules:
+        "参考图已作为图像输入提供。请分析并保留参考主体的身份辨识度、主要面部或轮廓特征、发型发色、服装方向、代表性配色、姿态气质和用户指定需要保留的物体或细节。参考图用于设计手办本体、包装盒印刷图和 Blender 建模屏幕中的角色，不要复制参考图原始构图，不要把主体变成陌生角色。",
+      styleRules:
+        "整体采用高完成度 3D 产品展示和收藏级角色手办摄影风格。手办是清透、有光泽、边缘干净的 PVC/塑料材质，可以有轻微半透明质感和真实高光。画面应像室内桌面上的精致商品样张，干净、真实、有建模工作流细节，但不要变成廉价玩具照片。",
+      compositionRules:
+        "构图以角色手办为主视觉，手办位于前景或画面中心，完整站在圆形塑料底座上。包装盒放在手办后方，盒面印有同一角色形象。电脑屏幕显示 Blender 建模过程，可以看到简洁的 3D 视窗、线框、模型轮廓或建模界面。三者关系清晰：手办在前、包装盒在后、电脑作为制作过程背景。不要裁掉手办头部、底座、包装盒主要画面或电脑屏幕。",
+      userPromptRules:
+        "用户额外需求主要用于指定角色姿势、手办比例、材质透明度、包装盒颜色、桌面环境、灯光氛围、是否更偏可爱或更偏收藏级模型，以及需要保留的角色细节。",
+      conflictRules:
+        "如果用户额外需求与参考图主体身份冲突，优先保留参考主体身份。如果用户要求写实真人照片，仍然输出 PVC 手办产品展示场景。如果用户要求移除包装盒、圆形底座或 Blender 屏幕，除非表达非常明确，否则保留这些固定元素作为主题核心。",
+      qualityRules:
+        "高细节、清晰主体、真实塑料材质、高质量产品摄影光影、干净室内背景、包装盒印刷图清楚、Blender 屏幕具有可识别的建模过程感、手办结构稳定、五官和手部自然、整体风格统一。",
+      negativeRules:
+        "不要改变主体身份。不要生成多余人物。不要漏掉圆形底座、包装盒或电脑建模屏幕。不要直接输出原照片。不要出现水印、Logo、二维码、乱码文字、无意义英文或品牌商标。不要让包装盒或屏幕文字喧宾夺主。不要裁脸、裁手办、裁底座或让背景过乱。",
+    },
   }),
   createTheme({
     id: "theme-08",

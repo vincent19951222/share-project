@@ -160,6 +160,30 @@ describe("AI image preset themes", () => {
     expect(theme?.promptTemplate).not.toContain("brutalist fitness poster");
   });
 
+  it("configures theme-07 as a structured PVC figure display preset", () => {
+    const theme = getAiImageThemeById("theme-07");
+
+    expect(theme).toMatchObject({
+      id: "theme-07",
+      name: "PVC 手办展示",
+      description: "把参考图角色转换成室内桌面 PVC 手办，并展示包装盒、底座和 Blender 建模屏幕。",
+      tag: "手办",
+      templateKind: "reference_transform",
+      referencePolicy: "required",
+      bestFor: ["单个角色或人物参考图", "主体清晰的半身或全身照片"],
+      avoidFor: ["多人合照", "主体过小或遮挡严重的照片", "需要保留原始照片背景的任务"],
+      previewImageUrl:
+        "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/images/theme-07-emoji-sticker-pack.webp",
+      palette: ["#f8fafc", "#111827", "#e5e7eb"],
+    });
+    expect(theme?.promptTemplate).toContain("圆形塑料底座上的 PVC 角色手办");
+    expect(theme?.promptTemplate).toContain("包装盒");
+    expect(theme?.promptTemplate).toContain("Blender 建模过程");
+    expect(theme?.promptTemplate).toContain("参考图用于设计手办本体、包装盒印刷图和 Blender 建模屏幕中的角色");
+    expect(theme?.promptTemplate).toContain("不要漏掉圆形底座、包装盒或电脑建模屏幕");
+    expect(theme?.promptTemplate).not.toContain("cute muscular pet mascot");
+  });
+
   it("does not expose promptTemplate in client snapshots", () => {
     const theme = getAiImageThemeById("theme-01");
     expect(theme?.promptTemplate).toContain("手绘涂鸦");

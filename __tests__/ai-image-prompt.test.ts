@@ -54,7 +54,7 @@ describe("AI image prompt snapshot", () => {
   });
 
   it("keeps backward compatibility for old prompt templates without the user slot", () => {
-    const theme = getAiImageThemeById("theme-07")!;
+    const theme = getAiImageThemeById("theme-08")!;
     const snapshot = buildPromptSnapshot({
       theme,
       userPrompt: "加入黄色训练灯牌",
@@ -66,7 +66,7 @@ describe("AI image prompt snapshot", () => {
   });
 
   it("trims blank user prompt for old prompt templates without appending add-on text", () => {
-    const theme = getAiImageThemeById("theme-07")!;
+    const theme = getAiImageThemeById("theme-08")!;
     const snapshot = buildPromptSnapshot({ theme, userPrompt: "   " });
 
     expect(snapshot.clientPromptSummary).toBe("");
