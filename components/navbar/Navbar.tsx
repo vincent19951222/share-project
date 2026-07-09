@@ -18,6 +18,8 @@ import {
 } from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
+const primaryNavTabs = ["punch", "coffee", "board", "data"] as const satisfies AppTab[];
+
 export function Navbar({
   activeTabOverride,
   supplyNavContext,
@@ -46,8 +48,8 @@ export function Navbar({
     }
 
     prefetchedTabsRef.current = true;
-    Object.values(appTabRoutes).forEach((route) => {
-      router.prefetch?.(route);
+    primaryNavTabs.forEach((tab) => {
+      router.prefetch?.(appTabRoutes[tab]);
     });
   }, [router]);
 
@@ -100,7 +102,6 @@ export function Navbar({
           supplyNavContext?.social.latestLabel ? `，${supplyNavContext.social.latestLabel}` : ""
         }`
       : "";
-  const supplyTabAriaLabel = socialPendingLabel ? `牛马补给站，${socialPendingLabel}` : "牛马补给站";
   const supplyAssetAriaLabel = socialPendingLabel
     ? `补给站资产：${supplyAssetSummary}，${socialPendingLabel}`
     : `补给站资产：${supplyAssetSummary}`;
@@ -176,19 +177,6 @@ export function Navbar({
               >
                 <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
                 数据看板
-              </TabBtn>
-              <TabBtn
-                aria-label={supplyTabAriaLabel}
-                active={activeTab === "supply"}
-                className="supply-tab app-supply-primary-tab"
-                pending={pendingTab === "supply"}
-                onFocus={() => prefetchAppTab("supply")}
-                onMouseEnter={() => prefetchAppTab("supply")}
-                onClick={() => handleTabChange("supply")}
-              >
-                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
-                牛马补给站
-                {socialPendingCount > 0 ? <span className="app-supply-social-badge">{socialPendingCount}</span> : null}
               </TabBtn>
             </div>
           </div>
@@ -327,21 +315,6 @@ export function Navbar({
                 <AssetIcon name="calendar" className="h-4 w-4 object-contain" />
                 数据看板
               </span>
-            </TabBtn>
-            <TabBtn
-              aria-label={supplyTabAriaLabel}
-              active={activeTab === "supply"}
-              className="mobile-tab-btn supply-tab justify-between"
-              pending={pendingTab === "supply"}
-              onFocus={() => prefetchAppTab("supply")}
-              onMouseEnter={() => prefetchAppTab("supply")}
-              onClick={() => handleTabChange("supply")}
-            >
-              <span className="flex items-center gap-2">
-                <AssetIcon name="supply" className="h-4 w-4 object-contain" />
-                牛马补给站
-              </span>
-              {socialPendingCount > 0 ? <span className="app-supply-social-badge">{socialPendingCount}</span> : null}
             </TabBtn>
           </div>
         ) : null}

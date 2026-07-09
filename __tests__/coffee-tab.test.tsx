@@ -87,28 +87,17 @@ describe("coffee tab navigation", () => {
     expect(routerPush).toHaveBeenCalledWith("/drink");
   });
 
-  it("navigates to supply station without dispatching a duplicate tab state update", async () => {
+  it("does not show the experimental supply station in primary navigation", async () => {
     const { Navbar } = await import("@/components/navbar/Navbar");
 
     await act(async () => {
       root.render(<Navbar />);
     });
 
-    const supplyButton = Array.from(container.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("牛马补给站"),
-    );
-
-    expect(supplyButton).toBeDefined();
-    expect(
-      supplyButton!.querySelector('img[src*="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg"]'),
-    ).not.toBeNull();
-
-    await act(async () => {
-      supplyButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-
+    expect(container.querySelector(".calendar-tab-strip")?.textContent).not.toContain("牛马补给站");
+    expect(container.querySelector(".app-supply-primary-tab")).toBeNull();
     expect(dispatch).not.toHaveBeenCalled();
-    expect(routerPush).toHaveBeenCalledWith("/dashboard/status");
+    expect(routerPush).not.toHaveBeenCalledWith("/dashboard/status");
   });
 
   it("prefetches the primary tab routes after the navbar mounts", async () => {
@@ -120,10 +109,9 @@ describe("coffee tab navigation", () => {
 
     expect(routerPrefetch.mock.calls.map(([route]) => route)).toEqual([
       "/",
-      "/board",
       "/drink",
+      "/board",
       "/calendar",
-      "/dashboard/status",
     ]);
   });
 
@@ -145,14 +133,12 @@ describe("coffee tab navigation", () => {
       "牛马水铺",
       "共享看板",
       "数据看板",
-      "牛马补给站",
     ]);
     expect(tabIconSources).toEqual([
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_workout_pixel.svg",
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_coffee_pixel.svg",
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_board_pixel.svg",
       "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_calendar_pixel.svg",
-      "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_icons_supply_pixel.svg",
     ]);
   });
 

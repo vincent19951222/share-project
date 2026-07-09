@@ -94,7 +94,7 @@ describe("Navbar supply chrome", () => {
       root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
     });
 
-    const expectedOrder = ["健身打卡", "牛马水铺", "共享看板", "数据看板", "牛马补给站"];
+    const expectedOrder = ["健身打卡", "牛马水铺", "共享看板", "数据看板"];
     expect(
       Array.from(container.querySelectorAll(".home-tab-strip .tab-btn")).map((button) =>
         button.textContent?.trim(),
@@ -102,6 +102,7 @@ describe("Navbar supply chrome", () => {
     ).toEqual(expectedOrder);
     expect(container.textContent).not.toContain("牛马日历");
     expect(container.textContent).not.toContain("战报中心");
+    expect(container.querySelector(".app-supply-primary-tab")).toBeNull();
 
     await act(async () => {
       container.querySelector<HTMLButtonElement>(".mobile-nav-toggle")?.click();
@@ -120,7 +121,7 @@ describe("Navbar supply chrome", () => {
     });
 
     expect(container.querySelector(".app-top-nav--supply")).not.toBeNull();
-    expect(container.querySelector(".app-supply-primary-tab")).not.toBeNull();
+    expect(container.querySelector(".app-supply-primary-tab")).toBeNull();
     expect(container.querySelector(".app-top-nav--with-supply-menu")).toBeNull();
     expect(container.querySelector(".app-supply-secondary-nav")).toBeNull();
     expect(container.querySelectorAll(".app-supply-secondary-tab")).toHaveLength(0);
@@ -129,20 +130,16 @@ describe("Navbar supply chrome", () => {
     expect(container.textContent).not.toContain("旧补给归档");
   });
 
-  it("pushes the formal dashboard status route from the primary supply tab", async () => {
+  it("keeps the experimental supply entry out of primary navigation", async () => {
     activeTab = "punch";
 
     await act(async () => {
       root.render(<Navbar activeTabOverride="punch" supplyNavContext={supplyNavContext} />);
     });
 
-    const supplyTab = container.querySelector<HTMLButtonElement>(".app-supply-primary-tab");
-
-    await act(async () => {
-      supplyTab?.click();
-    });
-
-    expect(routerPushMock).toHaveBeenCalledWith("/dashboard/status");
+    expect(container.querySelector(".app-supply-primary-tab")).toBeNull();
+    expect(container.querySelector(".home-tab-strip")?.textContent).not.toContain("牛马补给站");
+    expect(routerPushMock).not.toHaveBeenCalledWith("/dashboard/status");
   });
 
   it("renders supply resources in the right context slot", async () => {
@@ -157,17 +154,14 @@ describe("Navbar supply chrome", () => {
     expect(container.querySelector('img[src="https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_avatars_male1.png"]')).not.toBeNull();
   });
 
-  it("surfaces social invitation pending count in supply navigation", async () => {
+  it("keeps social invitation context on the compact supply wallet", async () => {
     activeTab = "data";
 
     await act(async () => {
       root.render(<Navbar activeTabOverride="data" supplyNavContext={supplyNavContextWithSocial} />);
     });
 
-    expect(container.querySelector(".app-supply-social-badge")?.textContent).toBe("2");
-    expect(container.querySelector(".app-supply-primary-tab")?.getAttribute("aria-label")).toContain(
-      "2 个队友邀请待响应",
-    );
+    expect(container.querySelector(".app-supply-primary-tab")).toBeNull();
     expect(container.querySelector(".app-supply-mobile-wallet")?.getAttribute("aria-label")).toContain(
       "luo 邀请你喝水",
     );
@@ -245,7 +239,7 @@ describe("Navbar supply chrome", () => {
     expect(toggle?.textContent).not.toContain("×");
   });
 
-  it("does not open a redundant desktop flyout from the primary supply tab", async () => {
+  it("does not expose a redundant desktop supply flyout", async () => {
     vi.useFakeTimers();
     activeTab = "punch";
 
@@ -257,7 +251,7 @@ describe("Navbar supply chrome", () => {
     const primarySupplyTab = container.querySelector(".app-supply-primary-tab");
 
     expect(topNav).not.toBeNull();
-    expect(primarySupplyTab).not.toBeNull();
+    expect(primarySupplyTab).toBeNull();
     expect(container.querySelector(".app-supply-secondary-nav")).toBeNull();
 
     await act(async () => {

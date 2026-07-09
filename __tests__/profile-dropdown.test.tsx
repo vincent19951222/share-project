@@ -69,7 +69,7 @@ describe("ProfileDropdown", () => {
     expect(container.textContent).toContain("赛季设置");
   });
 
-  it("shows a docs center link beside the existing account actions", () => {
+  it("shows secondary page links beside the existing account actions", () => {
     act(() => {
       root.render(
         <BoardProvider initialState={initialState}>
@@ -79,8 +79,11 @@ describe("ProfileDropdown", () => {
     });
 
     const docsLink = container.querySelector('a[href="/docs"]');
+    const aiImageLink = container.querySelector('a[href="/dashboard/status"]');
 
     expect(docsLink).not.toBeNull();
     expect(docsLink?.textContent).toContain("文档中心");
+    expect(aiImageLink).not.toBeNull();
+    expect(aiImageLink?.textContent).toContain("AI 生图实验室");
   });
 });
