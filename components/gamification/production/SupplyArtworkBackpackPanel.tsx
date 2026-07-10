@@ -16,7 +16,7 @@ export function SupplyArtworkBackpackPanel({ onBackToStudio, snapshot }: SupplyA
 
   return (
     <section
-      className="supply-artwork-backpack-panel grid gap-4 xl:grid-cols-[minmax(280px,0.76fr)_minmax(0,1.24fr)]"
+      className="supply-artwork-backpack-panel grid gap-4 xl:grid-cols-[minmax(240px,3fr)_minmax(0,7fr)]"
       data-panel="artworks"
     >
       <header className="soft-card flex flex-wrap items-start justify-between gap-4 p-4 xl:col-span-2">
@@ -45,7 +45,7 @@ export function SupplyArtworkBackpackPanel({ onBackToStudio, snapshot }: SupplyA
         </div>
       </header>
 
-      <aside className="soft-card p-4" aria-label="主题资产">
+      <aside className="soft-card min-w-0 p-4" aria-label="主题资产">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.18em] text-sub">THEMES</p>
@@ -56,28 +56,27 @@ export function SupplyArtworkBackpackPanel({ onBackToStudio, snapshot }: SupplyA
           </span>
         </div>
 
-        <div className="mt-4 grid gap-3">
+        <div className="mt-4 grid gap-2.5">
           {snapshot.themes.unlocked.map((theme) => (
             <article
-              className="overflow-hidden rounded-xl border-[3px] border-slate-900 bg-white shadow-[0_4px_0_0_#1f2937]"
+              className="grid h-[96px] grid-cols-[88px_minmax(0,1fr)] overflow-hidden rounded-lg border-2 border-slate-900 bg-white shadow-[0_3px_0_0_#1f2937]"
               data-testid="supply-theme-asset"
               key={theme.id}
             >
               <img
                 alt={`主题卡：${theme.name}`}
-                className="aspect-[4/3] w-full object-cover"
+                className="h-full min-h-0 w-full object-cover"
+                loading="lazy"
                 src={theme.previewImageUrl}
               />
-              <div className="p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-black text-main">{theme.name}</p>
-                    <p className="mt-1 line-clamp-2 text-xs font-bold leading-5 text-sub">{theme.description}</p>
-                  </div>
-                  <span className="shrink-0 rounded-full border-2 border-slate-900 bg-yellow-100 px-2 py-1 text-[10px] font-black text-main shadow-[0_2px_0_0_#1f2937]">
+              <div className="min-w-0 p-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="min-w-0 truncate text-sm font-black text-main">{theme.name}</p>
+                  <span className="max-w-[72px] shrink-0 truncate rounded-full border-2 border-slate-900 bg-yellow-100 px-2 py-0.5 text-[10px] font-black text-main shadow-[0_1px_0_0_#1f2937]">
                     {theme.tag}
                   </span>
                 </div>
+                <p className="mt-1 line-clamp-2 text-[11px] font-bold leading-4 text-sub">{theme.description}</p>
               </div>
             </article>
           ))}

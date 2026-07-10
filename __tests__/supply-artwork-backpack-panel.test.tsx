@@ -108,6 +108,23 @@ describe("SupplyArtworkBackpackPanel", () => {
     expect(onBackToStudio).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps the backpack split at roughly 3/7 with compact theme covers", async () => {
+    await act(async () => {
+      root.render(<SupplyArtworkBackpackPanel snapshot={buildSnapshot()} />);
+    });
+
+    const panel = container.querySelector<HTMLElement>(".supply-artwork-backpack-panel");
+    const themeCards = Array.from(container.querySelectorAll<HTMLElement>("[data-testid='supply-theme-asset']"));
+    const firstThemeCover = themeCards[0]?.querySelector<HTMLImageElement>("img[alt='主题卡：牛马像素馆']");
+
+    expect(panel?.className).toContain("xl:grid-cols-[minmax(240px,3fr)_minmax(0,7fr)]");
+    expect(themeCards[0]?.className).toContain("h-[96px]");
+    expect(themeCards[0]?.className).toContain("grid-cols-[88px_minmax(0,1fr)]");
+    expect(firstThemeCover?.className).toContain("h-full");
+    expect(firstThemeCover?.className).toContain("min-h-0");
+    expect(firstThemeCover?.className).toContain("object-cover");
+  });
+
   it("keeps an explicit artwork empty state without hiding unlocked themes", async () => {
     await act(async () => {
       root.render(

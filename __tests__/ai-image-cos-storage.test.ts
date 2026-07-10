@@ -129,18 +129,26 @@ describe("AI image COS storage helpers", () => {
     ).rejects.toThrow("缺少 COS 密钥配置");
   });
 
-  it("throws when COS public config is missing", async () => {
+  it("uses the default Tencent COS public URL when COS_PUBLIC_BASE_URL is empty", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-06T12:00:00+08:00"));
     vi.stubEnv("COS_SECRET_ID", "sid");
     vi.stubEnv("COS_SECRET_KEY", "skey");
+    vi.stubEnv("COS_BUCKET", "bucket-1250000000");
+    vi.stubEnv("COS_REGION", "ap-guangzhou");
+    vi.stubEnv("COS_PUBLIC_BASE_URL", "");
+    putObjectMock.mockResolvedValue(undefined);
 
-    await expect(
-      uploadAiImageBase64({
-        b64Json: Buffer.from("provider").toString("base64"),
-        mimeType: "image/png",
-        userId: "u1",
-        id: "item2",
-      }),
-    ).rejects.toThrow("缺少 COS 存储配置");
+    const result = await uploadAiImageBase64({
+      b64Json: Buffer.from("provider").toString("base64"),
+      mimeType: "image/png",
+      userId: "u1",
+      id: "item2",
+    });
+
+    expect(result.imageUrl).toBe(
+      "https://bucket-1250000000.cos.ap-guangzhou.myqcloud.com/share-project/ai-images/u1/2026/07/06/item2/original.png",
+    );
   });
 
   it("uploads provider base64 output as an output image", async () => {

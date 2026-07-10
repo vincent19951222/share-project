@@ -94,11 +94,13 @@ function getCosClient() {
 function getCosConfig() {
   const Bucket = process.env.COS_BUCKET;
   const Region = process.env.COS_REGION;
-  const publicBaseUrl = process.env.COS_PUBLIC_BASE_URL;
 
-  if (!Bucket || !Region || !publicBaseUrl) {
+  if (!Bucket || !Region) {
     throw new Error("缺少 COS 存储配置");
   }
+
+  const publicBaseUrl =
+    process.env.COS_PUBLIC_BASE_URL?.trim() || `https://${Bucket}.cos.${Region}.myqcloud.com`;
 
   return {
     Bucket,

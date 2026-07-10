@@ -16,6 +16,11 @@ interface LocalReferenceImage {
   filename: string;
 }
 
+interface PreviewImage {
+  alt: string;
+  imageUrl: string;
+}
+
 interface SupplyAiImageStudioPanelProps {
   snapshot: SupplyAiImageSnapshot;
   mutationsDisabled?: boolean;
@@ -162,6 +167,7 @@ export function SupplyAiImageStudioPanel({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryingTaskId, setRetryingTaskId] = useState<string | null>(null);
   const [isComposerExpanded, setIsComposerExpanded] = useState(false);
+  const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
 
   useEffect(() => {
     if (!themeOptions.some((theme) => theme.id === selectedThemeId)) {
@@ -302,7 +308,7 @@ export function SupplyAiImageStudioPanel({
 
         <aside
           data-testid="supply-creation-control-deck"
-          className="soft-card flex max-h-[820px] min-h-0 flex-col overflow-hidden p-4 xl:h-full xl:max-h-none"
+          className="soft-card flex h-[calc(100dvh-8rem)] max-h-[820px] min-h-0 flex-col overflow-hidden p-4 xl:h-full xl:max-h-none"
         >
           <div className="mb-4 flex shrink-0 items-start justify-between gap-4 border-b-[3px] border-slate-200 pb-4">
             <div>
@@ -409,11 +415,24 @@ export function SupplyAiImageStudioPanel({
                               className="rounded-xl border-2 border-slate-200 bg-slate-50 p-2 text-sm font-bold text-main"
                             >
                               {item.imageUrl ? (
-                                <img
-                                  alt={`任务 ${task.id} 结果 ${item.index + 1}`}
-                                  className="aspect-square w-full rounded-lg border-2 border-slate-900 object-cover"
-                                  src={item.imageUrl}
-                                />
+                                <button
+                                  aria-label={`预览任务 ${task.id} 结果 ${item.index + 1}`}
+                                  className="block w-full rounded-lg text-left transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-100 active:translate-y-[1px]"
+                                  data-action="preview-ai-image-result"
+                                  onClick={() =>
+                                    setPreviewImage({
+                                      alt: `任务 ${task.id} 结果 ${item.index + 1}`,
+                                      imageUrl: item.imageUrl!,
+                                    })
+                                  }
+                                  type="button"
+                                >
+                                  <img
+                                    alt={`任务 ${task.id} 结果 ${item.index + 1}`}
+                                    className="aspect-square w-full rounded-lg border-2 border-slate-900 object-cover"
+                                    src={item.imageUrl}
+                                  />
+                                </button>
                               ) : (
                                 <div className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-white text-xs text-sub">
                                   {formatItemStatus(item.status)}
@@ -566,6 +585,37 @@ export function SupplyAiImageStudioPanel({
           </div>
         </aside>
       </div>
+
+      {previewImage ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/70 p-4"
+          data-testid="supply-ai-image-preview-backdrop"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            aria-label="生图预览"
+            aria-modal="true"
+            className="relative max-h-[88dvh] w-full max-w-4xl rounded-xl border-[3px] border-slate-900 bg-white p-3 shadow-[0_18px_0_0_rgba(15,23,42,0.55)]"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+          >
+            <button
+              aria-label="关闭预览"
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-900 bg-white text-xl font-black leading-none text-main shadow-[0_3px_0_0_#1f2937] transition active:translate-y-[1px] active:shadow-none"
+              data-action="close-ai-image-preview"
+              onClick={() => setPreviewImage(null)}
+              type="button"
+            >
+              ×
+            </button>
+            <img
+              alt={previewImage.alt}
+              className="max-h-[80dvh] w-full rounded-lg bg-slate-100 object-contain"
+              src={previewImage.imageUrl}
+            />
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

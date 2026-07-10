@@ -274,6 +274,58 @@ describe("SupplyAiImageStudioPanel", () => {
     expect(container.querySelector("[data-testid='supply-creation-composer']")?.className).toContain("shrink-0");
   });
 
+  it("keeps the collapsed composer pinned when a new queued task enters the chat history", () => {
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={cloneSnapshot({
+            recentTasks: [
+              {
+                id: "task-queued",
+                themeId: "theme-02",
+                userPrompt: "",
+                requestedCount: 1,
+                status: "queued",
+                coinCost: 10,
+                refundedCoinAmount: 0,
+                errorMessage: null,
+                retryAvailable: false,
+                createdAt: "2026-07-07T13:54:00.000Z",
+                updatedAt: "2026-07-07T13:54:00.000Z",
+                items: [
+                  {
+                    id: "item-queued",
+                    index: 0,
+                    status: "queued",
+                    imageUrl: null,
+                    errorMessage: null,
+                  },
+                ],
+              },
+              ...snapshot.recentTasks,
+            ],
+          })}
+          onCreateTask={vi.fn()}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    const deck = container.querySelector<HTMLElement>("[data-testid='supply-creation-control-deck']");
+    const chatFlow = container.querySelector<HTMLElement>("[data-testid='supply-creation-chat-flow']");
+    const composer = container.querySelector<HTMLElement>("[data-testid='supply-creation-composer']");
+
+    expect(container.textContent).toContain("排队中");
+    expect(deck?.className).toContain("h-[calc(100dvh-8rem)]");
+    expect(deck?.className).toContain("max-h-[820px]");
+    expect(deck?.className).toContain("overflow-hidden");
+    expect(chatFlow?.className).toContain("min-h-0");
+    expect(chatFlow?.className).toContain("flex-1");
+    expect(chatFlow?.className).toContain("overflow-y-auto");
+    expect(composer?.className).toContain("shrink-0");
+    expect(composer?.querySelector("[data-testid='supply-composer-collapsed-input']")).not.toBeNull();
+  });
+
   it("converts uploaded files to data urls, submits payload, and clears local inputs after success", async () => {
     const onCreateTask = vi.fn().mockResolvedValue(undefined);
 
@@ -553,5 +605,55 @@ describe("SupplyAiImageStudioPanel", () => {
     expect(container.textContent).not.toContain("provider timeout");
     expect(container.textContent).toContain("任务有未完成的图片，可直接重试。");
     expect(container.textContent).toContain("这张图片暂时没出图，重试后会重新排队。");
+  });
+
+  it("opens completed task images in a preview dialog that closes from the button or backdrop", async () => {
+    act(() => {
+      root.render(
+        <SupplyAiImageStudioPanel
+          snapshot={snapshot}
+          onCreateTask={vi.fn()}
+          onRetryTask={vi.fn()}
+        />,
+      );
+    });
+
+    expect(container.querySelector("[role='dialog']")).toBeNull();
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-action='preview-ai-image-result']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    const dialog = container.querySelector<HTMLElement>("[role='dialog']");
+    expect(dialog).not.toBeNull();
+    expect(dialog?.getAttribute("aria-modal")).toBe("true");
+    expect(dialog?.querySelector("img")?.getAttribute("src")).toBe("https://example.com/artwork-1.png");
+    expect(dialog?.querySelector("img")?.getAttribute("alt")).toBe("任务 task-1 结果 1");
+
+    await act(async () => {
+      dialog
+        ?.querySelector<HTMLButtonElement>("[data-action='close-ai-image-preview']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[role='dialog']")).toBeNull();
+
+    await act(async () => {
+      container
+        .querySelector<HTMLButtonElement>("[data-action='preview-ai-image-result']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[role='dialog']")).not.toBeNull();
+
+    await act(async () => {
+      container
+        .querySelector<HTMLElement>("[data-testid='supply-ai-image-preview-backdrop']")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(container.querySelector("[role='dialog']")).toBeNull();
   });
 });

@@ -76,10 +76,31 @@ describe("AI image provider", () => {
 
   it("throws a Chinese error when API key is missing", async () => {
     vi.stubEnv("BOLUOPETS_API_KEY", "");
+    vi.stubEnv("VITE_BOLUOPETS_API_KEY", "");
 
     await expect(generateAiImage({ prompt: "x", referenceImages: [] })).rejects.toThrow(
       "缺少生图 API Key",
     );
+  });
+
+  it("accepts the current VITE_BOLUOPETS_API_KEY env name as a server fallback", async () => {
+    vi.stubEnv("BOLUOPETS_API_KEY", "");
+    vi.stubEnv("VITE_BOLUOPETS_API_KEY", "vite-test-key");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [{ b64_json: Buffer.from("ok").toString("base64") }] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await generateAiImage({ prompt: "pixel poster", referenceImages: [] });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options).toMatchObject({
+      headers: {
+        Authorization: "Bearer vite-test-key",
+      },
+    });
   });
 
   it("propagates provider error messages for non-ok responses", async () => {
