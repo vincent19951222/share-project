@@ -16,6 +16,7 @@ import type {
 import { scopeToQuery } from "@/lib/dashboard-scope";
 import type { DrinkType } from "@/lib/drinks";
 import type { WorkoutTicketPayload } from "@/lib/workouts";
+import type { CreateTrainingPlanInput } from "@/lib/training-plan/domain";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -71,6 +72,21 @@ export async function fetchBoardState(): Promise<BoardSnapshot> {
   const response = await fetch("/api/board/state", {
     cache: "no-store",
     credentials: "same-origin",
+  });
+
+  return readSnapshot(response);
+}
+
+export async function createTrainingPlan(
+  input: CreateTrainingPlanInput,
+): Promise<BoardSnapshot> {
+  const response = await fetch("/api/training-plan", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
   });
 
   return readSnapshot(response);

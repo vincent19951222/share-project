@@ -5,6 +5,7 @@ import {
   getShanghaiDayKey,
 } from "@/lib/economy";
 import { mapWorkoutRecordToTicketPayload } from "@/lib/workouts";
+import { getCurrentTrainingPlanSnapshot } from "@/lib/training-plan/service";
 
 export const BOARD_TOTAL_DAYS = 30;
 export const BOARD_TARGET_COINS = 2000;
@@ -87,26 +88,29 @@ export async function buildBoardSnapshotForUser(
     return null;
   }
 
-  const todayWorkout = await prisma.workoutRecord.findFirst({
-    where: {
-      userId: user.id,
-      dayKey: todayDayKey,
-      punchRecord: {
-        punched: true,
-      },
-    },
-    select: {
-      trainingType: true,
-      durationMinutes: true,
-      entries: {
-        select: {
-          category: true,
-          code: true,
-          label: true,
+  const [todayWorkout, currentTrainingPlan] = await Promise.all([
+    prisma.workoutRecord.findFirst({
+      where: {
+        userId: user.id,
+        dayKey: todayDayKey,
+        punchRecord: {
+          punched: true,
         },
       },
-    },
-  });
+      select: {
+        trainingType: true,
+        durationMinutes: true,
+        entries: {
+          select: {
+            category: true,
+            code: true,
+            label: true,
+          },
+        },
+      },
+    }),
+    getCurrentTrainingPlanSnapshot({ userId: user.id, now }),
+  ]);
 
   const activeSeason = user.team.seasons[0] ?? null;
   const statsByUserId = new Map(
@@ -192,6 +196,7 @@ export async function buildBoardSnapshotForUser(
     activeSeason: activeSeasonSnapshot,
     monthKey: currentMonthKey,
     currentUserTodayWorkout: mapWorkoutRecordToTicketPayload(todayWorkout),
+    currentTrainingPlan,
     today,
     totalDays,
     currentUserId: user.id,

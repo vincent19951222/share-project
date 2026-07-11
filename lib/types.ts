@@ -1,5 +1,13 @@
 import type { DrinkType } from "@/lib/drinks";
 import type { CardioItem, StrengthPart, TrainingType, WorkoutTicketPayload } from "@/lib/workouts";
+import type { TrainingPlanSnapshot } from "@/lib/training-plan/service";
+
+export type {
+  TrainingPlanDaySnapshot,
+  TrainingPlanExerciseSnapshot,
+  TrainingPlanSnapshot,
+  TrainingPlanWorkoutPayload,
+} from "@/lib/training-plan/service";
 
 export interface Member {
   id: string;
@@ -792,6 +800,7 @@ export interface BoardSnapshot {
   activeSeason?: ActiveSeasonSnapshot | null;
   monthKey?: string;
   currentUserTodayWorkout?: WorkoutTicketPayload | null;
+  currentTrainingPlan?: TrainingPlanSnapshot | null;
   /** @deprecated Kept only while the UI migrates to teamVaultTotal. */
   teamCoins?: number;
   /** @deprecated Kept only while the UI migrates to activeSeason target slots. */
