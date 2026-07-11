@@ -27,6 +27,44 @@ export async function seedDatabase(): Promise<void> {
     create: { code: SEED_TEAM.code, name: SEED_TEAM.name },
   });
 
+  const existingTeamUsers = await prisma.user.findMany({
+    where: { teamId: team.id },
+    select: { id: true },
+  });
+  const existingTeamUserIds = existingTeamUsers.map((user) => user.id);
+
+  if (existingTeamUserIds.length > 0) {
+    const existingTrainingPlans = await prisma.trainingPlan.findMany({
+      where: { userId: { in: existingTeamUserIds } },
+      select: { id: true },
+    });
+    const existingTrainingPlanIds = existingTrainingPlans.map((plan) => plan.id);
+
+    if (existingTrainingPlanIds.length > 0) {
+      const existingTrainingDays = await prisma.trainingPlanDay.findMany({
+        where: { planId: { in: existingTrainingPlanIds } },
+        select: { id: true },
+      });
+      const existingTrainingDayIds = existingTrainingDays.map((day) => day.id);
+
+      if (existingTrainingDayIds.length > 0) {
+        await prisma.trainingPlanExercise.deleteMany({
+          where: { planDayId: { in: existingTrainingDayIds } },
+        });
+      }
+      await prisma.trainingPlanDay.deleteMany({
+        where: { planId: { in: existingTrainingPlanIds } },
+      });
+      await prisma.trainingPlan.deleteMany({
+        where: { id: { in: existingTrainingPlanIds } },
+      });
+    }
+
+    await prisma.trainingProfile.deleteMany({
+      where: { userId: { in: existingTeamUserIds } },
+    });
+  }
+
   const existingSeasons = await prisma.season.findMany({
     where: { teamId: team.id },
     select: { id: true },
