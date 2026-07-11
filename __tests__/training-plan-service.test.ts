@@ -127,6 +127,27 @@ describe("training plan service", () => {
     expect(snapshot?.days[2]).toMatchObject({ dayKey: "2026-07-18", status: "upcoming" });
   });
 
+  it("keeps cardio selections unique when a template includes the bike", async () => {
+    const plan = await createTrainingPlanForUser({
+      userId,
+      now: new Date("2026-07-13T08:00:00+08:00"),
+      input: {
+        weeklyFrequency: 3,
+        sessionDurationMinutes: 45,
+        weekdays: [1, 3, 6],
+        equipment: ["gym"],
+        avoidTags: [],
+      },
+    });
+
+    expect(plan.days.some((day) => day.workoutPayload.cardioItems.includes("bike"))).toBe(true);
+    for (const day of plan.days) {
+      expect(new Set(day.workoutPayload.cardioItems).size).toBe(
+        day.workoutPayload.cardioItems.length,
+      );
+    }
+  });
+
   it("rejects creation when an avoid tag leaves no safe fixed template", async () => {
     await expect(
       createTrainingPlanForUser({

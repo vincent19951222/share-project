@@ -22,7 +22,7 @@ import {
 } from "@/lib/training-plan/domain";
 import { getShanghaiDayKey } from "@/lib/economy";
 
-type PlanCardioItem = CardioItem | "bike";
+type PlanCardioItem = CardioItem;
 
 export interface TrainingPlanWorkoutPayload {
   trainingType: TrainingType;
@@ -143,12 +143,7 @@ function buildWorkoutPayload(
     if (strengthPart) strengthSelection.add(strengthPart);
   }
 
-  const cardioCatalog: PlanCardioItem[] = [
-    "treadmill",
-    "elliptical",
-    "bike",
-    ...CARDIO_ITEMS.filter((item) => item !== "treadmill" && item !== "elliptical"),
-  ];
+  const cardioCatalog: PlanCardioItem[] = [...CARDIO_ITEMS];
   const cardioItems = cardioCatalog.filter((item) => cardioSelection.has(item));
   const strengthParts = STRENGTH_PARTS.filter((item) => strengthSelection.has(item));
   const trainingType: TrainingType =
