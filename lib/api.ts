@@ -17,6 +17,11 @@ import { scopeToQuery } from "@/lib/dashboard-scope";
 import type { DrinkType } from "@/lib/drinks";
 import type { WorkoutTicketPayload } from "@/lib/workouts";
 import type { CreateTrainingPlanInput } from "@/lib/training-plan/domain";
+import type { TrainingPlanCompletionInput } from "@/lib/training-plan/completion";
+
+export type PunchSubmissionPayload = WorkoutTicketPayload & {
+  trainingPlanCompletion?: TrainingPlanCompletionInput;
+};
 
 export class ApiError extends Error {
   readonly status: number;
@@ -92,7 +97,7 @@ export async function createTrainingPlan(
   return readSnapshot(response);
 }
 
-export async function submitTodayPunch(payload: WorkoutTicketPayload): Promise<BoardSnapshot> {
+export async function submitTodayPunch(payload: PunchSubmissionPayload): Promise<BoardSnapshot> {
   const response = await fetch("/api/board/punch", {
     method: "POST",
     credentials: "same-origin",
@@ -105,7 +110,7 @@ export async function submitTodayPunch(payload: WorkoutTicketPayload): Promise<B
   return readSnapshot(response);
 }
 
-export async function updateTodayWorkout(payload: WorkoutTicketPayload): Promise<BoardSnapshot> {
+export async function updateTodayWorkout(payload: PunchSubmissionPayload): Promise<BoardSnapshot> {
   const response = await fetch("/api/board/punch", {
     method: "PATCH",
     credentials: "same-origin",

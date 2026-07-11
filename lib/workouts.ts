@@ -1,7 +1,7 @@
 import type { Prisma } from "@/lib/generated/prisma/client";
 
 export const TRAINING_TYPES = ["cardio", "strength", "both"] as const;
-export const CARDIO_ITEMS = ["treadmill", "elliptical", "walk", "swim", "dance"] as const;
+export const CARDIO_ITEMS = ["treadmill", "elliptical", "bike", "walk", "swim", "dance"] as const;
 export const STRENGTH_PARTS = ["chest", "back", "shoulder", "arms", "legs", "abs"] as const;
 
 export type TrainingType = (typeof TRAINING_TYPES)[number];
@@ -34,6 +34,7 @@ export type WorkoutParseResult =
 const cardioLabels: Record<CardioItem, string> = {
   treadmill: "跑步机",
   elliptical: "椭圆机",
+  bike: "动感单车",
   walk: "散步",
   swim: "游泳",
   dance: "跳舞",
@@ -108,7 +109,7 @@ function isValidDuration(value: unknown): value is number {
     Number.isInteger(value) &&
     value >= 10 &&
     value <= 180 &&
-    value % 10 === 0
+    (value % 10 === 0 || value === 45)
   );
 }
 

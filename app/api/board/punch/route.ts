@@ -39,6 +39,13 @@ import {
   replaceWorkoutForPunch,
   type WorkoutTicketPayload,
 } from "@/lib/workouts";
+import {
+  TrainingPlanDayNotCompletableError,
+  completeTrainingPlanDay,
+  isTrainingPlanCompletionAlreadyApplied,
+  parseTrainingPlanCompletion,
+  resetTrainingPlanDayForWorkout,
+} from "@/lib/training-plan/completion";
 
 const STREAK_MILESTONES = new Set([7, 14, 30]);
 
@@ -86,6 +93,11 @@ export async function POST(request: NextRequest) {
 
     if (!parsedWorkout.ok) {
       return NextResponse.json({ error: parsedWorkout.error }, { status: 400 });
+    }
+
+    const parsedCompletion = parseTrainingPlanCompletion(body);
+    if (!parsedCompletion.ok) {
+      return NextResponse.json({ error: parsedCompletion.error }, { status: 400 });
     }
 
     const workoutPayload: WorkoutTicketPayload = parsedWorkout.payload;
@@ -244,7 +256,7 @@ export async function POST(request: NextRequest) {
             countedForSeasonSlot: Boolean(seasonForLedger && countsForSeasonSlot),
           },
         });
-        await createWorkoutForPunch({
+        const workout = await createWorkoutForPunch({
           tx,
           userId: user.id,
           teamId: user.teamId,
@@ -252,6 +264,16 @@ export async function POST(request: NextRequest) {
           dayKey: todayDayKey,
           payload: workoutPayload,
         });
+        if (parsedCompletion.value) {
+          await completeTrainingPlanDay({
+            tx,
+            userId: user.id,
+            dayKey: todayDayKey,
+            workoutRecordId: workout.id,
+            input: parsedCompletion.value,
+            now,
+          });
+        }
         const grantsFitnessTicket = shouldGrantFitnessPunchTicket(punch);
 
         await grantFitnessPunchExperience({
@@ -383,7 +405,23 @@ export async function POST(request: NextRequest) {
         }
       });
     } catch (error) {
+      if (error instanceof TrainingPlanDayNotCompletableError) {
+        return NextResponse.json(
+          { error: "training-plan-day-not-completable" },
+          { status: 409 },
+        );
+      }
       if (isPunchConflictError(error)) {
+        if (
+          parsedCompletion.value &&
+          (await isTrainingPlanCompletionAlreadyApplied({
+            userId: user.id,
+            dayKey: todayDayKey,
+            input: parsedCompletion.value,
+          }))
+        ) {
+          return buildSnapshotResponse(user.id, now);
+        }
         return NextResponse.json({ error: "duplicate-punch" }, { status: 409 });
       }
 
@@ -532,6 +570,11 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: parsedWorkout.error }, { status: 400 });
     }
 
+    const parsedCompletion = parseTrainingPlanCompletion(body);
+    if (!parsedCompletion.ok) {
+      return NextResponse.json({ error: parsedCompletion.error }, { status: 400 });
+    }
+
     const workoutPayload: WorkoutTicketPayload = parsedWorkout.payload;
     const now = new Date();
     const todayDayKey = getShanghaiDayKey(now);
@@ -566,7 +609,7 @@ export async function PATCH(request: NextRequest) {
         return false;
       }
 
-      await replaceWorkoutForPunch({
+      const workout = await replaceWorkoutForPunch({
         tx,
         userId: user.id,
         teamId: user.teamId,
@@ -574,6 +617,16 @@ export async function PATCH(request: NextRequest) {
         dayKey: todayDayKey,
         payload: workoutPayload,
       });
+      if (parsedCompletion.value) {
+        await completeTrainingPlanDay({
+          tx,
+          userId: user.id,
+          dayKey: todayDayKey,
+          workoutRecordId: workout.id,
+          input: parsedCompletion.value,
+          now,
+        });
+      }
 
       return true;
     });
@@ -583,7 +636,13 @@ export async function PATCH(request: NextRequest) {
     }
 
     return buildSnapshotResponse(user.id, now);
-  } catch {
+  } catch (error) {
+    if (error instanceof TrainingPlanDayNotCompletableError) {
+      return NextResponse.json(
+        { error: "training-plan-day-not-completable" },
+        { status: 409 },
+      );
+    }
     return NextResponse.json({ error: "server-error" }, { status: 500 });
   }
 }
@@ -645,6 +704,10 @@ export async function DELETE(request: NextRequest) {
         });
 
         if (todayWorkout) {
+          await resetTrainingPlanDayForWorkout({
+            tx,
+            workoutRecordId: todayWorkout.id,
+          });
           await tx.workoutEntry.deleteMany({
             where: { workoutRecordId: todayWorkout.id },
           });

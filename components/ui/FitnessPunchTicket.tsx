@@ -25,6 +25,7 @@ type FitnessPunchTicketProps = {
 const cardioItems: Array<{ id: CardioItem; label: string }> = [
   { id: "treadmill", label: "跑步机" },
   { id: "elliptical", label: "椭圆机" },
+  { id: "bike", label: "动感单车" },
   { id: "walk", label: "散步" },
   { id: "swim", label: "游泳" },
   { id: "dance", label: "跳舞" },

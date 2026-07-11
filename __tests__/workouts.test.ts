@@ -125,7 +125,7 @@ describe("workout helpers", () => {
     })).toEqual({ ok: false, error: "invalid-workout-payload" });
   });
 
-  it("accepts walking as a cardio workout and rejects the old bike parameter", () => {
+  it("accepts walking and bike as cardio workouts", () => {
     const parsed = parseWorkoutTicketPayload({
       trainingType: "cardio",
       cardioItem: "walk",
@@ -140,12 +140,29 @@ describe("workout helpers", () => {
       { category: "cardio", code: "walk", label: "散步" },
     ]);
     expect(buildWorkoutSummary(parsed.payload)).toBe("散步 · 60 分钟");
-    expect(parseWorkoutTicketPayload({
+    const bike = parseWorkoutTicketPayload({
       trainingType: "cardio",
       cardioItem: "bike",
       strengthParts: [],
       durationMinutes: 60,
-    })).toEqual({ ok: false, error: "invalid-workout-payload" });
+    });
+    expect(bike.ok).toBe(true);
+    if (!bike.ok) throw new Error(bike.error);
+    expect(buildWorkoutEntries(bike.payload)).toEqual([
+      { category: "cardio", code: "bike", label: "动感单车" },
+    ]);
+  });
+
+  it("accepts the 45 minute duration used by beginner plan templates", () => {
+    const parsed = parseWorkoutTicketPayload({
+      trainingType: "strength",
+      cardioItem: null,
+      cardioItems: [],
+      strengthParts: ["chest", "back"],
+      durationMinutes: 45,
+    });
+
+    expect(parsed.ok).toBe(true);
   });
 
   it("accepts arms as a strength workout part", () => {
