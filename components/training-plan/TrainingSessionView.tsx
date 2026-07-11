@@ -151,7 +151,7 @@ export function TrainingSessionView({ day, onBusyChange }: TrainingSessionViewPr
         <span>已勾选动作</span>
       </div>
 
-      <div className="training-session-exercises">
+      <div className="training-session-exercises training-plan-session-list">
         {day.exercises.map((exercise, index) => {
           const draft = drafts[exercise.id];
           return (

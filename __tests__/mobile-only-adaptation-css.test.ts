@@ -166,6 +166,14 @@ describe("mobile-only adaptation CSS", () => {
       /column-count:\s*1/,
       /gap:\s*0\.85rem/,
     ]);
+    const trainingMobileBlocks = extractBlocks("@media (max-width: 767px)");
+    expect(
+      trainingMobileBlocks.some(
+        (block) =>
+          block.includes(".training-plan-card") &&
+          block.includes("grid-template-columns: minmax(0, 1fr) auto"),
+      ),
+    ).toBe(true);
   });
 
   it("contains water shop wide content inside mobile containers", () => {
