@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useBoard } from "@/lib/store";
 import { TrainingPlanCard } from "@/components/training-plan/TrainingPlanCard";
+import { TrainingPlanDetailDialog } from "@/components/training-plan/TrainingPlanDetailDialog";
 import { TrainingPlanSetupDialog } from "@/components/training-plan/TrainingPlanSetupDialog";
 import { TeamHeader } from "./TeamHeader";
 import { HeatmapGrid } from "./HeatmapGrid";
@@ -11,6 +12,7 @@ import { ActivityStream } from "./ActivityStream";
 export function PunchBoard() {
   const { state, dispatch } = useBoard();
   const [setupOpen, setSetupOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   return (
     <section
@@ -61,7 +63,7 @@ export function PunchBoard() {
         <TrainingPlanCard
           plan={state.currentTrainingPlan ?? null}
           onCreate={() => setSetupOpen(true)}
-          onOpen={() => undefined}
+          onOpen={() => setDetailOpen(true)}
         />
         <HeatmapGrid />
         <ActivityStream />
@@ -73,6 +75,13 @@ export function PunchBoard() {
           dispatch({ type: "APPLY_REMOTE_SNAPSHOT", snapshot });
         }}
       />
+      {state.currentTrainingPlan ? (
+        <TrainingPlanDetailDialog
+          plan={state.currentTrainingPlan}
+          open={detailOpen}
+          onClose={() => setDetailOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }

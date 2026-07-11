@@ -98,7 +98,7 @@ describe("PunchPopup", () => {
     expect(pageText()).toContain("有氧项目");
     expect(pageText()).toContain("散步");
     expect(pageText()).toContain("跳舞");
-    expect(pageText()).not.toContain("单车");
+    expect(pageText()).toContain("动感单车");
     expect(pageText()).toContain("今日重点部位");
     expect(pageText()).toContain("胸部");
     expect(pageText()).toContain("手臂");
