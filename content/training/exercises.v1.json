@@ -1,0 +1,2452 @@
+[
+  {
+    "id": "0001",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0001",
+    "nameEn": "3/4 sit-up",
+    "nameZh": "徒手核心训练 0001",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors",
+      "lower back"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，慢慢将上半身抬离地面，向前卷曲，直到躯干呈 45 度角。 在顶部停顿片刻，然后慢慢将上半身放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0002",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0002",
+    "nameEn": "45° side bend",
+    "nameZh": "徒手核心训练 0002",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，双臂在身体两侧笔直向下伸展。 保持背部挺直，核心肌群参与，慢慢将躯干向一侧弯曲，将手向膝盖方向放低。 在底部停顿片刻，然后慢慢回到起始位置。 在另一侧重复。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0003",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0003",
+    "nameEn": "air bike",
+    "nameZh": "徒手核心训练 0003",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双手放在脑后。 将双腿抬离地面，并以 90 度角弯曲膝盖。 将右肘靠近左膝盖，同时伸直右腿。 返回起始位置，在另一侧重复该动作，将左肘拉向右膝盖，同时伸直左腿。 继续交替进行蹬踏动作，达到所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0006",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0006",
+    "nameEn": "alternate heel touchers",
+    "nameZh": "徒手核心训练 0006",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双臂伸直至两侧，与地面平行。 收紧腹肌，将肩膀抬离地面，并将右手伸向右脚跟。 返回起始位置并在左侧重复，将左手伸向左脚跟。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0020",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0020",
+    "nameEn": "balance board",
+    "nameZh": "徒手臀腿训练 0020",
+    "bodyPart": "upper legs",
+    "target": "quads",
+    "secondaryMuscles": [
+      "calves",
+      "hamstrings",
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "将平衡板放在平坦的表面上。 用一只脚踩在平衡板上，确保其居中。 慢慢地将体重转移到平衡板上的脚上，保持核心肌群参与。 在保持该姿势所需的时间内保持平衡和稳定。 用另一只脚重复该练习。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0025",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0025",
+    "nameEn": "barbell bench press",
+    "nameZh": "杠铃卧推",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "barbell",
+    "instructionsZh": "平躺在长凳上，双脚平放在地上，背部紧贴长凳。 正手握住杠铃，握距略宽于肩宽。 将杠铃从架子上提起，并将其直接放在胸部上方，双臂完全伸展。 将杠铃慢慢降低到胸部，保持肘部内收。 当杠铃触及胸部时暂停片刻。 伸展双臂，将杠铃推回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "0662"
+  },
+  {
+    "id": "0085",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0085",
+    "nameEn": "barbell romanian deadlift",
+    "nameZh": "杠铃罗马尼亚硬拉",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "hamstrings",
+      "lower back"
+    ],
+    "equipment": "barbell",
+    "instructionsZh": "站立，双脚分开与肩同宽，脚趾指向前方。 正手握住杠铃，双手分开略宽于肩宽。 弯曲臀部，保持背部挺直，膝盖稍微弯曲。 将杠铃向地面降低，使其靠近身体。 当你降低杠铃时，感受腿筋的拉伸。 一旦感觉到腿筋拉伸，就将臀部向前推并站直。 在动作的最高点挤压臀部。 将杠铃放回起始位置，然后重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [
+      "lower-back"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3013"
+  },
+  {
+    "id": "0130",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0130",
+    "nameEn": "bench hip extension",
+    "nameZh": "徒手臀腿训练 0130",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "坐在长凳上，背部靠在长凳上，双脚平放在地上。 将双手放在长凳上以获得支撑。 收紧臀肌和腿筋，然后将臀部抬离长凳，直到身体从膝盖到肩膀形成一条直线。 在顶部暂停片刻，然后慢慢将臀部放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0137",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0137",
+    "nameEn": "body-up",
+    "nameZh": "徒手手臂训练 0137",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先将双手放在凸起的表面上，例如长凳或双杠上，手掌朝下，手指向前。 将双腿向前方伸展，脚跟保持在地面上，身体伸直。 弯曲肘部降低身体，使其靠近身体两侧，直到上臂与地面平行。 暂停片刻，然后用手掌伸直手臂，将身体抬回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper arms",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0138",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0138",
+    "nameEn": "bottoms-up",
+    "nameZh": "徒手核心训练 0138",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques",
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双腿伸展，双臂放在身体两侧。 弯曲膝盖并将其靠近胸部，保持双脚离开地面。 收紧腹肌，将臀部抬离地面，将膝盖靠近头部。 在顶部暂停片刻，然后慢慢将臀部放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0241",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0241",
+    "nameEn": "cable triceps pushdown (v-bar)",
+    "nameZh": "绳索三头下压",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "equipment": "cable",
+    "instructionsZh": "在最高设置下将 V 形杆附件连接到电缆机上。 面对电缆机站立，双脚与肩同宽。 正手握住 V 形杆，手掌朝下，双手与肩同宽。 在整个练习过程中，保持肘部靠近身体两侧，上臂保持静止。 收紧三头肌并呼气，同时向下推 V 形杆，直到手臂完全伸展。 在动作的底部暂停片刻，挤压你的三头肌。 吸气，同时缓慢地将 V 形杆返回到起始位置，保持控制。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper arms",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "1771"
+  },
+  {
+    "id": "0257",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0257",
+    "nameEn": "circles knee stretch",
+    "nameZh": "徒手小腿训练 0257",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "hamstrings",
+      "quadriceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，双手放在臀部。 稍微弯曲膝盖，将脚跟抬离地面，用脚掌保持平衡。 保持膝盖弯曲，先顺时针旋转膝盖，然后逆时针旋转膝盖。 执行所需的重复运动次数。",
+    "difficulty": "beginner",
+    "movementPattern": "lower legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0259",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0259",
+    "nameEn": "close-grip push-up",
+    "nameZh": "徒手手臂训练 0259",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高位平板支撑开始，双手并拢，位于肩膀正下方。 收紧核心，将身体降低到地面，保持肘部靠近身体两侧。 推动手掌以伸展手臂并返回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0260",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0260",
+    "nameEn": "cocoons",
+    "nameZh": "徒手核心训练 0260",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors",
+      "lower back"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，慢慢将上半身抬离地面，向前卷曲，直到躯干呈 45 度角。 在顶部停顿片刻，然后慢慢将上半身放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0262",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0262",
+    "nameEn": "cross body crunch",
+    "nameZh": "徒手核心训练 0262",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，将上半身抬离地面，然后扭转，使右肘靠近左膝盖。 在顶部停顿片刻，然后慢慢将上半身放回起始位置。 在另一侧重复，将左肘靠近右膝盖。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0267",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0267",
+    "nameEn": "crunch (hands overhead)",
+    "nameZh": "徒手核心训练 0267",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双臂伸直至头顶上方。 收紧腹肌，将上半身抬离地面，向前向膝盖弯曲。 在顶部停顿片刻，然后慢慢将上半身放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0274",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0274",
+    "nameEn": "crunch floor",
+    "nameZh": "卷腹",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，将肩膀抬离地面，向前向膝盖弯曲。 在顶部停顿片刻，然后慢慢将肩膀放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0276",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0276",
+    "nameEn": "dead bug",
+    "nameZh": "死虫式",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors",
+      "lower back"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双臂伸向天花板。 弯曲膝盖，将双腿抬离地面，使臀部和膝盖形成 90 度角。 接合你的核心和下背部，将你的下背部压入地面。 慢慢地将右臂和左腿放低至地面，保持它们伸直并悬停在地板上方。 暂停片刻，然后回到起始位置。 用左臂和右腿重复该动作。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0283",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0283",
+    "nameEn": "diamond push-up",
+    "nameZh": "徒手手臂训练 0283",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高位平板支撑开始，双手并拢，拇指和食指形成菱形。 让你的身体从头到脚保持一条直线，锻炼你的核心和臀部。 将胸部降低至双手形成的菱形，保持肘部靠近身体。 在底部暂停片刻，然后将自己推回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0284",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0284",
+    "nameEn": "donkey calf raise",
+    "nameZh": "徒手小腿训练 0284",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "将脚趾站立在升高的表面上，例如台阶或木块。 将双手放在稳定的支撑物上，例如墙壁或栏杆，以保持平衡。 尽可能高地抬高脚后跟，将身体重量转移到脚掌上。 在顶部停顿片刻，然后慢慢降低脚后跟回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "calf",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0286",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0286",
+    "nameEn": "dumbbell alternate side press",
+    "nameZh": "哑铃肩部训练 0286",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "triceps",
+      "core"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃，与肩同高。 将一个哑铃推过头顶，同时将另一个哑铃保持在与肩同高的位置。 将按下的哑铃放回肩部高度，同时将另一个哑铃压过头顶。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0287",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0287",
+    "nameEn": "dumbbell arnold press v. 2",
+    "nameZh": "哑铃肩部训练 0287",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "triceps",
+      "upper chest"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "坐在有背部支撑的长凳上，双手各握一个哑铃，与肩同高，手掌朝向身体，肘部弯曲。 向上推哑铃，直到手臂完全伸展，手掌朝前。 抬起时旋转手腕，使手掌在动作的最高点朝前。 在最高点暂停片刻，然后慢慢将哑铃放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0289",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0289",
+    "nameEn": "dumbbell bench press",
+    "nameZh": "哑铃卧推",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "平躺在长凳上，双脚平放在地上，背部紧贴长凳。 双手各握一个哑铃，手掌朝前，双臂伸至胸部上方。 慢慢地将哑铃降低到胸部两侧，保持肘部呈 90 度角。 暂停片刻，然后将哑铃推回起始位置，完全伸展双臂。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "0662"
+  },
+  {
+    "id": "0290",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0290",
+    "nameEn": "dumbbell bench seated press",
+    "nameZh": "哑铃肩部训练 0290",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "triceps",
+      "chest"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "坐在长凳上，每只手各拿一个哑铃，放在大腿上。 向后倾斜，将哑铃放在胸部两侧，手掌朝前。 向上推哑铃，直到手臂完全伸展。 在最高点暂停片刻，然后慢慢将哑铃放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0294",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0294",
+    "nameEn": "dumbbell biceps curl",
+    "nameZh": "哑铃弯举",
+    "bodyPart": "upper arms",
+    "target": "biceps",
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "站直，双手各握一个哑铃，手掌朝前，双臂完全伸展。 保持上臂静止，呼气并弯举哑铃，同时收缩二头肌。 继续举重，直到二头肌完全收缩并且哑铃与肩部齐平。 挤压二头肌时，保持收缩位置短暂停顿。 吸气并慢慢开始将哑铃放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "curl",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "1769"
+  },
+  {
+    "id": "0299",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0299",
+    "nameEn": "dumbbell cuban press",
+    "nameZh": "哑铃肩部训练 0299",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "triceps",
+      "upper back"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃，与肩同高，手掌朝下。 保持核心收紧，肘部稍微弯曲，将哑铃向上举过头顶，直到手臂完全伸展。 旋转手腕，使手掌朝前。 慢慢地将哑铃放回起始位置，同时将手腕旋转回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0309",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0309",
+    "nameEn": "dumbbell front raise v. 2",
+    "nameZh": "哑铃肩部训练 0309",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "trapezius",
+      "biceps"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃，手掌朝向大腿。 保持背部挺直并启动核心肌群。 慢慢举起你面前的哑铃，手臂伸直，直到与肩齐平。 在顶部停顿片刻，然后慢慢将哑铃放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0310",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0310",
+    "nameEn": "dumbbell front raise",
+    "nameZh": "哑铃肩部训练 0310",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "biceps",
+      "trapezius"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃，手掌朝向大腿。 保持双臂伸直，呼气并将哑铃举至身前，直至与肩齐平。 在顶部停顿片刻，然后吸气，慢慢将哑铃放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0311",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0311",
+    "nameEn": "dumbbell full can lateral raise",
+    "nameZh": "哑铃肩部训练 0311",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "traps",
+      "rotator cuff"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃，手掌朝向身体。 保持背部挺直并启动核心肌群。 将手臂向两侧举起，肘部保持轻微弯曲，直到与地面平行。 在顶部暂停片刻，然后慢慢将手臂放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0325",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0325",
+    "nameEn": "dumbbell incline raise",
+    "nameZh": "哑铃肩部训练 0325",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "trapezius",
+      "triceps"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "坐在上斜凳上，每只手各拿一个哑铃，放在大腿上。 向后靠在长凳上，将哑铃举至肩高，手掌朝前。 背部靠在长凳上，呼气并将哑铃举过头顶，充分伸展双臂。 在顶部停顿片刻，然后吸气，慢慢将哑铃放回肩部高度。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0326",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0326",
+    "nameEn": "dumbbell incline rear lateral raise",
+    "nameZh": "哑铃肩部训练 0326",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "traps",
+      "rhomboids"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "设置一个 45 度角的上斜凳。 坐在长凳上，胸部靠在靠背上，双手各握一个哑铃。 双臂伸直向下，手掌相对。 保持肘部轻微弯曲，将手臂向两侧抬起，直到与地面平行。 在顶部暂停片刻，然后慢慢将手臂放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0332",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0332",
+    "nameEn": "dumbbell iron cross",
+    "nameZh": "哑铃肩部训练 0332",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "triceps",
+      "chest"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃放在身体两侧。 将双臂向两侧举起，直至与地面平行，与身体形成T字形。 暂停片刻，然后慢慢将手臂放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0334",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0334",
+    "nameEn": "dumbbell lateral raise",
+    "nameZh": "哑铃侧平举",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "traps"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手各握一个哑铃，手掌朝向身体。 保持背部挺直并启动核心肌群。 将手臂向两侧抬起，直到与地板平行，保持肘部稍微弯曲。 在顶部暂停片刻，然后慢慢将手臂放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "0699"
+  },
+  {
+    "id": "0405",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0405",
+    "nameEn": "dumbbell seated shoulder press",
+    "nameZh": "坐姿哑铃推肩",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "triceps",
+      "upper back"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "坐在长凳上，每只手各拿一个哑铃，放在大腿上。 将哑铃举至肩高，手掌朝前。 向上推哑铃，直到手臂完全伸过头顶。 在顶部停顿片刻，然后慢慢将哑铃放回肩部高度。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "0699"
+  },
+  {
+    "id": "0443",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0443",
+    "nameEn": "elbow-to-knee",
+    "nameZh": "徒手核心训练 0443",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，将上半身抬离地面，将右肘靠近左膝盖。 同时，将左膝移向右肘，形成扭转动作。 在顶部停顿片刻，然后慢慢降低上半身并将双腿伸展回到起始位置。 重复该动作，这次将左肘移向右膝，将右膝移向左肘。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0456",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0456",
+    "nameEn": "flexion leg sit up (bent knee)",
+    "nameZh": "徒手核心训练 0456",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，慢慢将上半身抬离地面，向前卷曲，直到躯干呈 45 度角。 同时，将双腿抬离地面，弯曲膝盖并将其拉向胸部。 在顶部停顿片刻，然后慢慢降低上半身和双腿回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0457",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0457",
+    "nameEn": "flexion leg sit up (straight arm)",
+    "nameZh": "徒手核心训练 0457",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors",
+      "quadriceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双腿伸直，双臂伸直至头顶上方。 收紧腹肌，将上半身抬离地面，同时将双腿抬向胸部。 抬起上半身和腿部时，将双手伸向脚趾。 在顶部停顿片刻，然后慢慢降低上半身和双腿回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0459",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0459",
+    "nameEn": "flutter kicks",
+    "nameZh": "徒手臀腿训练 0459",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "hip flexors",
+      "lower abs"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双腿伸展，双手放在身体两侧。 收紧核心肌群并将双腿抬离地面约 6 英寸。 保持双腿伸直，交替将一条腿抬得比另一条腿稍高。 继续这个颤动动作达到所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0464",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0464",
+    "nameEn": "front plank with twist",
+    "nameZh": "徒手核心训练 0464",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高平板支撑位置开始，双手直接放在肩膀下方，身体从头到脚成一条直线。 调动你的核心和臀部以保持稳定的位置。 将躯干向右旋转，抬起右臂并向天花板延伸。 扭转时保持臀部和腿部稳定。 保持片刻，然后回到起始位置。 在左侧重复扭转。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0466",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0466",
+    "nameEn": "gironda sternum chin",
+    "nameZh": "徒手背部训练 0466",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "biceps",
+      "rhomboids",
+      "rear deltoids"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "面向高杠站立，双脚分开与肩同宽。 向上伸手，正手握住杠铃，握距略宽于肩宽。 悬挂在杠上，双臂完全伸展，身体伸直。 用你的背阔肌和二头肌将你的胸部拉向杠铃杆，以胸骨为主导。 在最高点暂停片刻，然后慢慢降低回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0467",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0467",
+    "nameEn": "gorilla chin",
+    "nameZh": "徒手核心训练 0467",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "forearms",
+      "biceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，膝盖稍微弯曲。 正手握住引体向上杆，握距略宽于肩宽。 悬挂在杠上，双臂完全伸展，手掌背向自己。 收紧核心肌群，将身体拉向杠铃杆，将下巴置于杠铃上方。 在顶部停顿片刻，然后慢慢将身体放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0469",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0469",
+    "nameEn": "groin crunch",
+    "nameZh": "徒手核心训练 0469",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors",
+      "inner thighs"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在脑后，肘部朝外。 收紧腹肌，将双腿抬离地面，将膝盖靠近胸部。 在顶部暂停片刻，然后慢慢将双腿放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0484",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0484",
+    "nameEn": "hip raise (bent knee)",
+    "nameZh": "徒手核心训练 0484",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将双手放在身体两侧，掌心朝下。 收紧核心肌群和臀肌，然后将臀部抬离地面，直到身体从膝盖到肩膀形成一条直线。 在顶部暂停片刻，然后慢慢将臀部放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0488",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0488",
+    "nameEn": "hyperextension (on bench)",
+    "nameZh": "徒手背部训练 0488",
+    "bodyPart": "back",
+    "target": "spine",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "调整过度伸展凳，使臀部舒适地放在垫子上，并且双脚固定。 双臂交叉放在胸前或将双手放在脑后。 慢慢地将上半身降低到地面，同时保持背部挺直。 在底部停顿片刻，然后抬起上半身，直到与双腿成一直线。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0489",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0489",
+    "nameEn": "hyperextension",
+    "nameZh": "徒手背部训练 0489",
+    "bodyPart": "back",
+    "target": "spine",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "调整过度伸展凳，使大腿上部放在垫子上并且双脚固定。 双臂交叉放在胸前或将双手放在脑后。 将上半身压向地面，同时保持背部挺直。 在底部停顿片刻，然后抬起上半身，直到与双腿成一直线。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0490",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0490",
+    "nameEn": "incline close-grip push-up",
+    "nameZh": "徒手手臂训练 0490",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "将双手放在较高的表面上，例如长凳或台阶上，双手之间的距离略宽于肩宽。 将双腿伸到身后，放在脚掌上，身体从头到脚跟形成一条直线。 弯曲肘部，使肘部靠近身体两侧，将胸部降低到升高的表面。 在底部暂停片刻，然后伸直手臂将自己推回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0491",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0491",
+    "nameEn": "incline leg hip raise (leg straight)",
+    "nameZh": "徒手核心训练 0491",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "躺在倾斜的长凳上，背部平放在长凳上，双腿伸直在身前。 将双手放在长凳两侧以获得支撑。 收紧腹肌，将双腿抬离长凳，尽可能抬高双腿，同时保持伸直。 在顶部暂停片刻，然后慢慢将双腿放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0493",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0493",
+    "nameEn": "incline push-up",
+    "nameZh": "徒手胸部训练 0493",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "将双手放在较高的表面上，例如长凳或台阶上，双手之间的距离略宽于肩宽。 将双腿伸到身后，放在脚掌上，从头到脚跟形成一条直线。 弯曲肘部，将胸部向升高的表面降低，保持身体呈一条直线。 在底部暂停片刻，然后伸直手臂将自己推回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0494",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0494",
+    "nameEn": "incline reverse grip push-up",
+    "nameZh": "徒手胸部训练 0494",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "将双手放在长凳或高架表面的边缘，距离略宽于肩宽。 将双腿伸到身后，放在脚掌上，从头到脚跟形成一条直线。 弯曲肘部，将胸部向长凳方向降低，使其靠近身体两侧。 在底部暂停片刻，然后伸展双臂将自己推回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0495",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0495",
+    "nameEn": "incline twisting sit-up",
+    "nameZh": "徒手核心训练 0495",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "设置一个 45 度角的上斜凳。 躺在长凳上，双脚固定在脚垫下。 将双手放在脑后或放在胸前。 收紧腹肌，将上半身抬离长凳，向前卷曲。 当你蜷缩起来时，将你的躯干扭转到一侧，将你的肘部拉向另一侧的膝盖。 在顶部停顿片刻，然后慢慢将上半身放回起始位置。 重复这个动作，这次将你的躯干扭转到另一侧。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "waist",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0496",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0496",
+    "nameEn": "inverse leg curl (bench support)",
+    "nameZh": "徒手臀腿训练 0496",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "glutes",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "脸朝下躺在长凳上，臀部位于边缘，双腿伸直在身后。 抓住长凳以获得支撑。 保持上半身不动，弯曲膝盖并将双腿向臀部弯曲。 在顶部停顿片刻，然后慢慢将双腿伸展回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0497",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0497",
+    "nameEn": "inverted row v. 2",
+    "nameZh": "徒手背部训练 0497",
+    "bodyPart": "back",
+    "target": "upper back",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "在史密斯机上在腰部高度设置一根杠铃或使用悬挂训练器。 面向杠铃或悬吊训练器站立，用正手握法抓住它，双手与肩同宽。 双脚向前走，向后倾斜，直到身体呈轻微角度。 保持身体挺直，将胸部向上拉向杠铃或手柄，将肩胛骨挤压在一起。 在最高点暂停片刻，然后慢慢降低回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0498",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0498",
+    "nameEn": "inverted row with straps",
+    "nameZh": "徒手背部训练 0498",
+    "bodyPart": "back",
+    "target": "upper back",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "在胸部高度设置悬挂训练器或带子。 面向锚点站立，并用正手握住手柄。 双脚向前走，向后倾斜，直到身体呈一定角度。 保持身体挺直并启动核心。 将胸部拉向手柄，将肩胛骨挤压在一起。 在顶部停顿片刻，然后慢慢降低回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0499",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0499",
+    "nameEn": "inverted row",
+    "nameZh": "徒手背部训练 0499",
+    "bodyPart": "back",
+    "target": "upper back",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "在腰部高度设置一个杠铃或使用悬挂训练器。 面向杠铃或悬吊训练器站立，双脚分开与肩同宽。 正手握住杠铃或手柄，握距略宽于肩宽。 向后倾斜，保持身体挺直，脚后跟着地。 将胸部拉向杠铃或手柄，将肩胛骨挤压在一起。 在顶部停顿片刻，然后慢慢降低回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0500",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0500",
+    "nameEn": "isometric wipers",
+    "nameZh": "徒手胸部训练 0500",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "shoulders",
+      "triceps",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先平躺在垫子或长凳上。 将手臂伸直至两侧，与身体垂直。 启动你的核心并将双腿抬离地面，保持它们并拢并伸直。 慢慢地将双腿向一侧降低，目标是用脚接触地面，同时保持控制。 暂停片刻，然后用核心力量将双腿抬回到起始位置。 重复该动作，这次将双腿降低到另一侧。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0555",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0555",
+    "nameEn": "kick out sit",
+    "nameZh": "徒手臀腿训练 0555",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "坐在长凳或椅子的边缘，双脚平放在地上，膝盖弯曲成 90 度角。 稍微向后倾斜，将双手放在长凳或椅子的边缘以获得支撑。 启动腿筋，将脚抬离地面，并将双腿伸直到身前。 在顶部停顿片刻，然后慢慢弯曲膝盖，将脚放回身体。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0585",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0585",
+    "nameEn": "lever leg extension",
+    "nameZh": "器械腿屈伸",
+    "bodyPart": "upper legs",
+    "target": "quads",
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "equipment": "leverage machine",
+    "instructionsZh": "调整机器的座椅高度和靠背以适合您的身体。 坐在机器上，背部靠在靠背上，双脚放在脚垫上。 抓住手柄或侧杆以保持稳定性。 伸直膝盖，举起重物，向前伸展双腿。 在顶部暂停片刻，然后慢慢将重量放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [
+      "knee"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3132"
+  },
+  {
+    "id": "0599",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0599",
+    "nameEn": "lever seated leg curl",
+    "nameZh": "器械坐姿腿弯举",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "equipment": "leverage machine",
+    "instructionsZh": "调整机器以适合您的身体，然后坐在机器上，背部靠在靠背上。 将小腿放在带衬垫的杠杆下方，就在脚踝上方。 抓住机器两侧的手柄以提供支撑。 保持大腿不动，呼气并尽可能向上弯曲双腿。 挤压腿筋时，保持收缩位置短暂停顿。 吸气并缓慢地将控制杆降低回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3013"
+  },
+  {
+    "id": "0613",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0613",
+    "nameEn": "lying (side) quads stretch",
+    "nameZh": "徒手臀腿训练 0613",
+    "bodyPart": "upper legs",
+    "target": "quads",
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "侧躺，双腿伸直。 弯曲上面的那条腿，用手抓住脚踝或脚。 轻轻地将脚踝或脚拉向臀部，直到感觉到股四头肌有拉伸感。 保持拉伸 20-30 秒。 松开拉伸并在另一侧重复。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0624",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0624",
+    "nameEn": "march sit (wall)",
+    "nameZh": "徒手臀腿训练 0624",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "背靠墙站立，双脚分开与臀部同宽。 慢慢地将背部滑下墙壁，直到膝盖弯曲成 90 度角。 将右脚抬离地面，并将膝盖靠近胸部。 将右脚放低，将左脚抬离地面，将膝盖靠近胸部。 继续交替抬起右脚和左脚，达到所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0628",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0628",
+    "nameEn": "monster walk",
+    "nameZh": "徒手臀腿训练 0628",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "hamstrings",
+      "quadriceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "在脚踝周围放置一根阻力带。 双脚分开与肩同宽站立，稍微弯曲膝盖。 右脚向一侧迈出一步，保持阻力带的张力。 左脚跟随，向一侧迈步以返回起始位置。 重复所需的重复次数，然后换边。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0630",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0630",
+    "nameEn": "mountain climber",
+    "nameZh": "徒手心肺训练 0630",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "core",
+      "shoulders",
+      "triceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高平板支撑位置开始，双手直接放在肩膀下方，身体呈一条直线。 启动你的核心并将你的右膝盖靠近你的胸部，然后快速切换并将你的左膝盖靠近你的胸部。 继续以跑步动作交替双腿，保持臀部较低，核心肌群参与。 在整个练习过程中保持稳定的节奏和均匀的呼吸。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0642",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0642",
+    "nameEn": "outside leg kick push-up",
+    "nameZh": "徒手臀腿训练 0642",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从俯卧撑位置开始，双手分开略宽于肩宽，双脚并拢。 弯曲肘部，将身体降低到地面，保持背部挺直，核心参与。 当你向后推时，将一条腿踢向一侧，完全伸展并启动臀部。 将腿恢复到起始位置并重复俯卧撑，每次重复时交替腿。 继续交替踢腿和俯卧撑，达到所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0643",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0643",
+    "nameEn": "overhead triceps stretch",
+    "nameZh": "徒手手臂训练 0643",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "站立或坐直，双脚分开与肩同宽。 将一只手臂伸过头顶，弯曲肘部，使手伸向对面的肩胛骨。 用另一只手轻轻地将伸出的手臂的肘部拉向头部的另一侧，感受三头肌的拉伸。 保持拉伸 15-30 秒，然后放松。 在另一侧重复。",
+    "difficulty": "beginner",
+    "movementPattern": "upper arms",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0651",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0651",
+    "nameEn": "pull up (neutral grip)",
+    "nameZh": "徒手背部训练 0651",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "用中立握法（手掌相对）悬挂在引体向上杆上，双臂完全伸展。 启动你的核心并将肩胛骨挤压在一起。 弯曲肘部并将肘部向下推向臀部，将身体向上拉向杠铃。 继续拉，直到下巴位于杠铃上方。 在顶部停顿片刻，然后有控制地慢慢将身体放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0658",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0658",
+    "nameEn": "push-up (wall) v. 2",
+    "nameZh": "徒手胸部训练 0658",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "面向墙壁站立，距离大约一臂距离。 将双手放在墙上，与肩同高，距离略宽于肩宽。 双脚向后退一步，保持与臀部同宽。 收紧核心肌群，保持身体从头到脚跟呈一条直线。 弯曲肘部，将胸部向墙壁降低，保持身体挺直。 暂停片刻，然后将自己推回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0659",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0659",
+    "nameEn": "push-up (wall)",
+    "nameZh": "徒手胸部训练 0659",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "deltoids"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "面向墙壁站立，距离大约一臂距离。 将双手放在墙上，与肩同高，距离略宽于肩宽。 后退几英尺，保持身体挺直，双脚分开与臀部同宽。 弯曲肘部，将胸部向墙壁降低，保持身体呈一条直线。 推回起始位置，伸直手臂。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0661",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0661",
+    "nameEn": "push-up inside leg kick",
+    "nameZh": "徒手臀腿训练 0661",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从俯卧撑位置开始，双手分开略宽于肩宽，双脚并拢。 弯曲肘部，将身体降低到地面，保持背部挺直，核心肌群参与。 当你向后推时，将一条腿抬离地面并将其踢向一侧，保持伸直。 将腿放下并重复俯卧撑，然后换另一条腿。 每次重复俯卧撑时继续交替踢腿。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0662",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0662",
+    "nameEn": "push-up",
+    "nameZh": "俯卧撑",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "deltoids",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高位平板支撑开始，双手分开略宽于肩宽，双脚并拢。 弯曲肘部，调动核心力量，将身体压向地面，保持身体呈一条直线。 当你的胸部刚好高于地面时，暂停片刻，然后伸直手臂，将自己推回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0669",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0669",
+    "nameEn": "rear deltoid stretch",
+    "nameZh": "徒手肩部训练 0669",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "trapezius",
+      "rhomboids"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "站直，双脚分开与肩同宽。 将右臂伸过胸部，将左手放在右肘上。 轻轻地将右臂拉向左肩，感受右肩的拉伸。 保持拉伸 15-30 秒，然后放松。 在另一侧重复。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0677",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0677",
+    "nameEn": "ring dips",
+    "nameZh": "徒手手臂训练 0677",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先，将手臂完全伸展，身体伸直，挂在吊环上。 弯曲肘部，降低身体，直到肩膀低于肘部。 伸直手臂，将自己推回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper arms",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0684",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0684",
+    "nameEn": "run (equipment)",
+    "nameZh": "徒手心肺训练 0684",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先站直，双脚分开与臀部同宽。 启动你的核心并保持上半身放松。 开始原地慢跑，将膝盖抬向胸部，然后轻轻落在脚掌上。 保持稳定的步伐并继续慢跑所需的时间或距离。 记住在整个练习过程中深呼吸并保持良好的姿势。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0685",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0685",
+    "nameEn": "run",
+    "nameZh": "徒手心肺训练 0685",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先站直，双脚分开与臀部同宽。 启动你的核心并保持上半身放松。 开始原地慢跑，将膝盖抬向胸部，然后轻轻落在脚掌上。 保持稳定的步伐并继续慢跑所需的时间或距离。 记住在整个练习过程中深呼吸并保持良好的姿势。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0690",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0690",
+    "nameEn": "seated lower back stretch",
+    "nameZh": "徒手背部训练 0690",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "坐在椅子边缘，双脚平放在地面上。 将双手放在大腿上或椅子两侧以获得支撑。 从臀部开始慢慢向前倾斜，保持背部挺直。 感受下背部的拉伸并保持 20-30 秒。 慢慢回到起始位置并重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0696",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0696",
+    "nameEn": "self assisted inverse leg curl (on floor)",
+    "nameZh": "徒手臀腿训练 0696",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "glutes",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双腿伸展，双臂放在身体两侧。 弯曲膝盖，将双脚平放在地面上，距离与臀部同宽。 将臀部抬离地面，锻炼臀肌和腿筋。 慢慢地将双腿向臀部弯曲，保持臀部抬起。 在顶部停顿片刻，然后慢慢将双腿伸展回起始位置。 将臀部放回地面。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0697",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0697",
+    "nameEn": "self assisted inverse leg curl",
+    "nameZh": "徒手臀腿训练 0697",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "glutes",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺在垫子或长凳上，双腿伸展。 将双手放在身体两侧或臀部下方以获得支撑。 弯曲膝盖，将脚抬离地面，将大腿靠近胸部。 在顶部暂停片刻，然后慢慢将双腿放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0699",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0699",
+    "nameEn": "shoulder tap push-up",
+    "nameZh": "肩部触碰俯卧撑",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高位平板支撑开始，双手分开略宽于肩宽，身体从头到脚跟呈一条直线。 弯曲肘部，使肘部靠近身体两侧，将身体降低到地面。 当你向后推时，将右手抬离地面并轻拍左肩。 将右手放回地面并重复俯卧撑，这次抬起左手并拍打右肩。 每次重复俯卧撑时，继续交替拍肩。 在整个练习过程中保持核心稳定并避免臀部过度旋转。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0710",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0710",
+    "nameEn": "side hip abduction",
+    "nameZh": "徒手臀腿训练 0710",
+    "bodyPart": "upper legs",
+    "target": "abductors",
+    "secondaryMuscles": [
+      "glutes",
+      "quadriceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，双手放在臀部。 将重心转移到一条腿上，并将另一条腿向一侧抬起，保持伸直。 在顶部暂停片刻，然后慢慢将腿放回起始位置。 在另一侧重复。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0717",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0717",
+    "nameEn": "side push-up",
+    "nameZh": "徒手手臂训练 0717",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "shoulders",
+      "chest",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先侧躺，双腿伸展并叠放在一起。 将下面的手放在肩膀正下方的地面上，手指指向前方。 用下面的手将身体抬离地面，保持双腿伸直，核心肌群参与。 将上臂伸向天花板，形成从头部到脚后跟的直线。 有控制地降低身体回到起始位置。 重复所需的重复次数，然后换边。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0720",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0720",
+    "nameEn": "side-to-side chin",
+    "nameZh": "徒手背部训练 0720",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，膝盖稍微弯曲。 正手握住引体向上杆，双手之间的距离略大于肩宽。 悬挂在杠上，双臂完全伸展，身体放松。 弯曲肘部并将下巴朝向杠铃杆，将自己拉起，同时保持身体挺直。 一旦你的下巴高于杠铃，就将自己放低回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0730",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0730",
+    "nameEn": "single leg platform slide",
+    "nameZh": "徒手臀腿训练 0730",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "glutes",
+      "quadriceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先将一只脚站在平台或滑板上。 稍微弯曲膝盖，将脚向后滑动到平台上，伸展腿。 在整个运动过程中保持核心参与并保持笔直姿势。 将脚滑回初始位置，慢慢返回起始位置。 重复该动作达到所需的重复次数，然后换腿。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0739",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0739",
+    "nameEn": "sled 45в° leg press",
+    "nameZh": "45 度腿举",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "sled machine",
+    "instructionsZh": "将雪橇机的座椅和脚踏板调整到舒适的位置。 坐在雪橇机上，背部靠在靠背上，双脚与肩同宽放在踏板上。 握住座椅两侧的把手以保持稳定性。 伸展双腿，将脚踏板推离身体，脚后跟保持在脚踏板上。 继续推动，直到双腿几乎完全伸展，但不要锁住膝盖。 在动作的最高点暂停片刻，然后弯曲膝盖，慢慢地将踏板放回到身体的方向。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "knee"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3132"
+  },
+  {
+    "id": "0778",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0778",
+    "nameEn": "spider crawl push up",
+    "nameZh": "徒手臀腿训练 0778",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "core",
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从俯卧撑位置开始，双手分开略宽于肩宽，双脚并拢。 将右膝靠近右肘，使其离开地面。 当您将右膝向后拉时，同时弯曲肘部将身体降低到地面。 推回起始位置，然后将左膝朝向左肘重复此动作。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0794",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0794",
+    "nameEn": "standing lateral stretch",
+    "nameZh": "徒手背部训练 0794",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "shoulders",
+      "obliques"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，膝盖稍微弯曲。 将双臂伸直至两侧，与地面平行。 慢慢将上半身向一侧倾斜，感觉侧面和背阔肌有拉伸感。 保持拉伸 15-30 秒。 返回起始位置并在另一侧重复。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0795",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0795",
+    "nameEn": "standing single leg curl",
+    "nameZh": "徒手臀腿训练 0795",
+    "bodyPart": "upper legs",
+    "target": "hamstrings",
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "站立，双脚分开与臀部同宽，双手放在臀部。 将体重转移到左腿上，将右脚抬离地面，弯曲膝盖。 慢慢地将右脚跟卷向臀部，挤压腿筋。 在顶部暂停片刻，然后慢慢将右脚放回起始位置。 重复所需的重复次数，然后换腿。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0815",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0815",
+    "nameEn": "triceps dips floor",
+    "nameZh": "徒手手臂训练 0815",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "坐在椅子或长凳的边缘，双手放在臀部旁边，手指指向前方。 将你的屁股从椅子前面滑下来，双腿伸到你面前。 伸直手臂，保持肘部稍微弯曲，以保持三头肌和肘关节的张力。 慢慢弯曲你的肘部，将你的身体向地板降低，直到你的肘部成大约 90 度角。 一旦到达动作的底部，向下压入椅子以伸直肘部，返回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper arms",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "0818",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0818",
+    "nameEn": "twin handle parallel grip lat pulldown",
+    "nameZh": "平行握高位下拉",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "biceps",
+      "rhomboids",
+      "rear deltoids"
+    ],
+    "equipment": "cable",
+    "instructionsZh": "调整座椅高度并将自己面向电缆机。 正手握住手柄，双手与肩同宽。 坐下来，将大腿放在大腿垫下方，保持双脚平放在地板上。 稍微向后倾斜，挺胸，保持脊柱中立。 将手柄向下拉至上胸部，将肩胛骨挤压在一起。 在动作的底部暂停片刻，感受背阔肌的收缩。 慢慢松开手柄并返回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3167"
+  },
+  {
+    "id": "0861",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0861",
+    "nameEn": "cable seated row",
+    "nameZh": "坐姿绳索划船",
+    "bodyPart": "back",
+    "target": "upper back",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "cable",
+    "instructionsZh": "坐在电缆划船机上，双脚平放在脚踏板上，膝盖稍微弯曲。 正手握住手柄，保持背部挺直，肩膀放松。 将手柄拉向身体，将肩胛骨挤压在一起。 在动作的最高点暂停片刻，然后慢慢松开手柄回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3167"
+  },
+  {
+    "id": "0872",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "0872",
+    "nameEn": "reverse crunch",
+    "nameZh": "反向卷腹",
+    "bodyPart": "waist",
+    "target": "abs",
+    "secondaryMuscles": [
+      "hip flexors"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双臂沿着身体两侧伸展。 弯曲膝盖，将脚抬离地面，使大腿垂直于地板。 收缩腹肌，将臀部卷离地板，使膝盖靠近胸部。 在顶部暂停片刻，然后慢慢将臀部放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "core",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1167",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1167",
+    "nameEn": "dynamic chest stretch (male)",
+    "nameZh": "徒手胸部训练 1167",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "站直，双脚分开与肩同宽。 将双臂伸直至两侧，与地面平行。 慢慢地将双臂向前伸，交叉在身体前面。 感受胸部肌肉的伸展。 保持拉伸 10-30 秒。 返回起始位置并重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1271",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1271",
+    "nameEn": "chest and front of shoulder stretch",
+    "nameZh": "胸肩前侧拉伸",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "deltoids"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "站直，双脚分开与肩同宽。 将双臂伸直至前方，与肩同高。 双臂交叉在身体前方，右臂放在左臂上方。 手指交叉并将手掌压在一起。 轻轻地将肩胛骨挤压在一起，然后将双手向前推，感觉胸部和肩膀前部有拉伸感。 保持拉伸 20-30 秒，然后放松。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1273",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1273",
+    "nameEn": "clap push up",
+    "nameZh": "徒手胸部训练 1273",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高平板支撑位置开始，双手分开略宽于肩宽。 弯曲肘部，将身体降低到地面，保持核心参与。 爆发性地推动手掌，将身体推离地面。 在半空中时，拍手，然后回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1275",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1275",
+    "nameEn": "drop push up",
+    "nameZh": "徒手胸部训练 1275",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高平板支撑位置开始，双手分开略宽于肩宽。 将胸部压向地面，保持肘部靠近身体。 当你的胸部刚好高于地面时，迅速将膝盖放在地上。 伸展双臂，将自己推回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1297",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1297",
+    "nameEn": "isometric chest squeeze",
+    "nameZh": "徒手胸部训练 1297",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，膝盖稍微弯曲。 将双臂伸直在身前，与地面平行，手掌相对。 尽可能用力挤压胸部肌肉，同时保持手臂伸直。 保持这个姿势几秒钟，专注于收缩胸部肌肉。 释放挤压并放松胸部肌肉。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1311",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1311",
+    "nameEn": "wide hand push up",
+    "nameZh": "徒手胸部训练 1311",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从高平板支撑位置开始，双手分开比肩宽。 保持身体从头到脚呈一条直线。 弯曲肘部，将胸部压向地面，使其靠近身体两侧。 推动手掌以伸展手臂并返回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1346",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1346",
+    "nameEn": "kneeling lat stretch",
+    "nameZh": "徒手背部训练 1346",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "跪在地上，膝盖分开与臀部同宽，脚趾向后。 将双臂伸过头顶，手指交叉。 保持背部挺直，慢慢向右侧倾斜，感受左侧背阔肌的拉伸。 保持伸展动作 20-30 秒，然后回到起始位置。 在左侧重复该拉伸动作，向左侧倾斜，感受右侧背阔肌的拉伸。 继续交替进行所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1350",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1350",
+    "nameEn": "lever seated row",
+    "nameZh": "器械坐姿划船",
+    "bodyPart": "back",
+    "target": "upper back",
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "equipment": "leverage machine",
+    "instructionsZh": "将座椅高度和脚踏板调整到舒适的位置。 坐在机器上，胸部靠在垫子上，双脚放在脚踏板上。 正手握住手柄，距离与肩同宽。 保持背部挺直，核心肌群参与。 将手柄拉向身体，将肩胛骨挤压在一起。 在动作的最高点停顿片刻。 慢慢松开手柄并返回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3167"
+  },
+  {
+    "id": "1352",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1352",
+    "nameEn": "lower back curl",
+    "nameZh": "徒手背部训练 1352",
+    "bodyPart": "back",
+    "target": "spine",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，双腿伸直，双臂放在身体两侧。 收紧臀肌和腿筋，慢慢将上半身抬离地面，向上弯曲背部。 在顶部停顿片刻，然后慢慢将上半身放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "curl",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1358",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1358",
+    "nameEn": "side lying floor stretch",
+    "nameZh": "徒手背部训练 1358",
+    "bodyPart": "back",
+    "target": "lats",
+    "secondaryMuscles": [
+      "obliques",
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "侧躺，双腿伸直，下臂伸直过头顶。 弯曲上面的膝盖，将脚放在下面的腿前面的地面上。 将上臂伸过头顶，抓住稳定的东西，例如墙壁或一件家具。 慢慢地将下面的腿抬离地面，保持伸直，直到感觉到身体一侧有拉伸感。 保持拉伸 20-30 秒，然后慢慢将腿放下。 在另一侧重复。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1362",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1362",
+    "nameEn": "sphinx",
+    "nameZh": "徒手背部训练 1362",
+    "bodyPart": "back",
+    "target": "spine",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "面朝下躺在地上，前臂平放在地板上，肘部直接位于肩膀下方。 收紧核心肌群，将胸部抬离地面，将前臂和脚趾保持在地板上。 保持这个姿势几秒钟，确保颈部保持在中立位置。 慢慢地将胸部放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "back",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1368",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1368",
+    "nameEn": "ankle circles",
+    "nameZh": "徒手小腿训练 1368",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "ankle stabilizers"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "坐在地上，双腿在身前伸展。 将一条腿抬离地面，并以圆周运动旋转脚踝。 在一个方向上转所需的圈数，然后切换到另一个方向。 换另一条腿重复上述步骤。",
+    "difficulty": "beginner",
+    "movementPattern": "lower legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1373",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1373",
+    "nameEn": "bodyweight standing calf raise",
+    "nameZh": "徒手站姿提踵",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "ankles",
+      "feet"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，脚趾指向前方。 将手放在墙壁或稳定的表面上以保持平衡。 慢慢地将脚后跟抬离地面，将身体重量转移到脚掌上。 在顶部停顿片刻，然后慢慢降低脚后跟回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "calf",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1377",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1377",
+    "nameEn": "calf stretch with hands against wall",
+    "nameZh": "靠墙小腿拉伸",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "面向墙壁站立，双脚分开与臀部同宽。 将双手靠在墙上，与肩同高。 右脚向后退一步，保持脚后跟着地，腿伸直。 弯曲左膝并向前倾斜，保持后腿伸直，脚后跟着地。 保持拉伸 20-30 秒。 换腿并重复拉伸。",
+    "difficulty": "beginner",
+    "movementPattern": "calf",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1385",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1385",
+    "nameEn": "lever seated squat calf raise on leg press machine",
+    "nameZh": "腿举机提踵",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "glutes"
+    ],
+    "equipment": "leverage machine",
+    "instructionsZh": "调整压腿机的座椅，使双脚放在踏板上时膝盖稍微弯曲。 坐在机器上，背部靠在靠背上，双脚平放在踏板上，与肩同宽。 将脚趾和脚掌放在踏板上，使脚后跟远离边缘。 松开安全手柄，并通过伸展膝盖将踏板推离您。 一旦膝盖完全伸展，弯曲小腿，慢慢降低脚后跟。 在底部停顿片刻，然后通过伸展小腿将踏板向后推。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "push",
+    "avoidTags": [
+      "knee"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "1373"
+  },
+  {
+    "id": "1386",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1386",
+    "nameEn": "one leg donkey calf raise",
+    "nameZh": "徒手小腿训练 1386",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，脚趾指向前方。 将双手放在稳定的表面上以获得支撑，例如墙壁或酒吧。 将一条腿抬离地面，保持膝盖稍微弯曲。 使用小腿肌肉，尽可能高地抬高脚跟。 在顶部停顿片刻，然后慢慢降低脚跟。 重复所需的重复次数，然后换腿。",
+    "difficulty": "beginner",
+    "movementPattern": "calf",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1387",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1387",
+    "nameEn": "one leg floor calf raise",
+    "nameZh": "徒手小腿训练 1387",
+    "bodyPart": "lower legs",
+    "target": "calves",
+    "secondaryMuscles": [
+      "ankles",
+      "feet"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与臀部同宽站立，双手放在墙壁或坚固的物体上以保持平衡。 将一只脚抬离地面并用另一只脚保持平衡。 慢慢地将脚跟抬离地面，将身体抬起到脚掌上。 在顶部暂停片刻，然后慢慢将脚跟放回起始位置。 重复所需的重复次数，然后换腿并重复。",
+    "difficulty": "beginner",
+    "movementPattern": "calf",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1418",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1418",
+    "nameEn": "hug keens to chest",
+    "nameZh": "徒手臀腿训练 1418",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "hamstrings",
+      "quadriceps"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "首先站立，双脚分开与肩同宽。 弯曲膝盖并将身体降低至蹲姿。 当你蹲下时，将膝盖抬向胸部，并用手臂抱住它们。 保持这个姿势一会儿，然后慢慢回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "upper legs",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1689",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1689",
+    "nameEn": "push and pull bodyweight",
+    "nameZh": "徒手胸部训练 1689",
+    "bodyPart": "chest",
+    "target": "pectorals",
+    "secondaryMuscles": [
+      "triceps",
+      "deltoids"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "从俯卧撑位置开始，双手分开略宽于肩宽，身体呈一条直线。 弯曲肘部，将胸部压向地面，保持身体伸直。 推动手掌以伸展手臂并返回到起始位置。 从俯卧撑位置开始，弯曲肘部，将胸部拉向地面，保持身体伸直。 推动手掌以伸展手臂并返回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "chest",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1760",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1760",
+    "nameEn": "dumbbell goblet squat",
+    "nameZh": "哑铃高脚杯深蹲",
+    "bodyPart": "upper legs",
+    "target": "quads",
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "dumbbell",
+    "instructionsZh": "双脚分开与肩同宽站立，双手握住哑铃垂直放在胸前。 保持胸部挺直，核心收紧，通过向后推臀部并弯曲膝盖，将身体降低至蹲姿。 继续降低，直到大腿与地面平行，或者尽可能低。 在底部停顿片刻，然后推动脚后跟回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [
+      "knee"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": "3132"
+  },
+  {
+    "id": "1769",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1769",
+    "nameEn": "bodyweight side lying biceps curl",
+    "nameZh": "侧卧徒手弯举",
+    "bodyPart": "upper arms",
+    "target": "biceps",
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "侧躺，双腿伸直，用手臂支撑头部。 将上臂靠在身体两侧，弯曲肘部，将前臂卷向肩膀。 在顶部暂停片刻，然后慢慢将前臂放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "curl",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "1771",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "1771",
+    "nameEn": "bodyweight kneeling triceps extension",
+    "nameZh": "跪姿徒手三头伸展",
+    "bodyPart": "upper arms",
+    "target": "triceps",
+    "secondaryMuscles": [
+      "shoulders",
+      "chest"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "跪在地上，膝盖分开与臀部同宽。 将双手放在身前的地面上，与肩同宽，手指指向前方。 将双腿伸直在身后，用脚趾和双手保持平衡，从头到脚跟形成一条直线。 弯曲肘部，将上半身向地面降低，保持肘部靠近身体两侧。 在底部停顿片刻，然后双手用力伸直手臂，回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "2138",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "2138",
+    "nameEn": "stationary bike run v. 3",
+    "nameZh": "动感单车",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "stationary bike",
+    "instructionsZh": "调整座椅高度和位置以确保正确对齐。 将脚放在踏板上，并用带子（如果有）将其固定。 以舒适的速度开始踩踏板。 保持稳定的节奏并根据需要增加阻力。 调动核心肌肉以保持稳定性和正确的姿势。 继续踩踏板达到所需的锻炼时间。 逐渐减小阻力并减速，然后完全停止。 锻炼后伸展双腿并放松。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "2141",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "2141",
+    "nameEn": "walk elliptical cross trainer",
+    "nameZh": "椭圆机行走",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "glutes",
+      "calves"
+    ],
+    "equipment": "elliptical machine",
+    "instructionsZh": "将椭圆机的阻力水平和倾斜度调整到您想要的设置。 踩上机器的踏板并轻轻握住手柄。 首先用脚向下压，然后将手柄拉向身体。 继续这个动作，交替推和拉，以模拟行走或跑步动作。 在整个练习过程中保持稳定的步伐并保持核心参与。 继续进行有氧运动所需的持续时间。 下车前逐渐降低机器的强度和速度。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "2271",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "2271",
+    "nameEn": "left hook. boxing",
+    "nameZh": "徒手肩部训练 2271",
+    "bodyPart": "shoulders",
+    "target": "delts",
+    "secondaryMuscles": [
+      "biceps",
+      "triceps",
+      "forearms"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，膝盖稍微弯曲。 左手举起以保护脸部，右手握住下巴。 旋转臀部并以左脚为轴心，同时以出拳动作向前伸展左臂。 扭转你的躯干并调动你的核心肌肉以产生出拳的力量。 将手臂拉回到起始位置，然后重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "shoulders",
+    "avoidTags": [
+      "shoulder"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "3013",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "3013",
+    "nameEn": "low glute bridge on floor",
+    "nameZh": "臀桥",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "hamstrings",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "平躺，膝盖弯曲，双脚平放在地上。 将手臂放在身体两侧，手掌朝下。 启动臀肌和核心肌群，然后将臀部抬离地面，直到身体从膝盖到肩膀形成一条直线。 在顶部暂停片刻，挤压臀部。 慢慢地将臀部放回起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "hinge",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "3132",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "3132",
+    "nameEn": "potty squat with support",
+    "nameZh": "扶助深蹲",
+    "bodyPart": "upper legs",
+    "target": "glutes",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，脚趾稍微向外。 抓住稳定的支撑物，例如椅子或墙壁，以保持平衡。 弯曲膝盖并将臀部向后推，将身体降低至蹲姿。 在整个动作过程中保持挺胸、背部挺直。 在底部停顿片刻，然后推动脚后跟回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "squat",
+    "avoidTags": [
+      "knee"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "3167",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "3167",
+    "nameEn": "bodyweight squatting row (with towel)",
+    "nameZh": "毛巾辅助徒手划船",
+    "bodyPart": "back",
+    "target": "upper back",
+    "secondaryMuscles": [
+      "biceps",
+      "shoulders"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立，手掌朝下，将毛巾放在身前。 弯曲膝盖，将身体降低至蹲姿，保持背部挺直，挺胸。 当你下蹲时，同时将毛巾拉向胸部，将肩胛骨挤压在一起。 在深蹲底部停顿片刻，然后慢慢回到起始位置，同时伸展双臂。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "pull",
+    "avoidTags": [
+      "knee"
+    ],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "3221",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "3221",
+    "nameEn": "half knee bends (male)",
+    "nameZh": "徒手心肺训练 3221",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "glutes"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "双脚分开与肩同宽站立。 弯曲膝盖并降低身体，就像坐回椅子上一样。 保持挺胸，将体重放在脚后跟上。 在底部停顿片刻，然后推动脚后跟回到起始位置。 重复所需的重复次数。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "3318",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "3318",
+    "nameEn": "swing 360",
+    "nameZh": "徒手心肺训练 3318",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "shoulders",
+      "core"
+    ],
+    "equipment": "body weight",
+    "instructionsZh": "站立，双脚分开与肩同宽，膝盖稍微弯曲。 将双臂伸直在身前，与地面平行。 启动你的核心并以圆周运动摆动你的手臂，同时旋转你的躯干。 继续圆周运动，摆动手臂并旋转躯干，达到所需的重复次数。 记住在整个练习过程中保持呼吸。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  },
+  {
+    "id": "3666",
+    "source": "hasaneyldrm/exercises-dataset",
+    "sourceId": "3666",
+    "nameEn": "walking on incline treadmill",
+    "nameZh": "上坡跑步机行走",
+    "bodyPart": "cardio",
+    "target": "cardiovascular system",
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "equipment": "leverage machine",
+    "instructionsZh": "将跑步机的倾斜度调整到您想要的强度。 站在跑步机上，双脚分开与肩同宽。 开始以舒适的步伐行走，确保保持正确的姿势。 在整个练习过程中，调动核心肌肉并保持背部挺直。 继续在倾斜跑步机上行走，完成有氧运动所需的时间。 逐渐降低跑步机的坡度和速度，使其冷却后再停止。",
+    "difficulty": "beginner",
+    "movementPattern": "cardio",
+    "avoidTags": [],
+    "beginnerTip": "先使用轻重量熟悉动作，最后两次略感吃力但仍能保持稳定。",
+    "homeAlternativeId": null
+  }
+]

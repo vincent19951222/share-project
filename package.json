@@ -14,6 +14,8 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "compress:reward-icons": "node scripts/compress-reward-icons.mjs",
+    "training:import-exercises": "tsx scripts/import-beginner-exercises.ts",
+    "training:build-templates": "tsx scripts/build-beginner-training-templates.ts",
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest"

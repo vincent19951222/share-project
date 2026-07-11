@@ -1,0 +1,5755 @@
+[
+  {
+    "id": "beginner-fat-loss-2d-30m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 2,
+    "durationMinutes": 30,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-2d-45m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 2,
+    "durationMinutes": 45,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-2d-60m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 2,
+    "durationMinutes": 60,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-3d-30m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 3,
+    "durationMinutes": 30,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-3d-45m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 3,
+    "durationMinutes": 45,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-3d-60m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 3,
+    "durationMinutes": 60,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "全身基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "全身基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "全身基础 C",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1350",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-4d-30m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 4,
+    "durationMinutes": 30,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 30,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 45
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-4d-45m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 4,
+    "durationMinutes": 45,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 45,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner-fat-loss-4d-60m",
+    "version": 1,
+    "goal": "beginner-fat-loss",
+    "weeklyFrequency": 4,
+    "durationMinutes": 60,
+    "weeks": [
+      {
+        "weekIndex": 1,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 2,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 2,
+                "reps": "12",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 3,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "weekIndex": 4,
+        "sessions": [
+          {
+            "slot": 0,
+            "title": "上肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0025",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0861",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0334",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0241",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 1,
+            "title": "下肢基础 A",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2138",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0739",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0599",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0585",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0274",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 2,
+            "title": "上肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "2141",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0289",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0818",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0405",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0294",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0872",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1271",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          },
+          {
+            "slot": 3,
+            "title": "下肢基础 B",
+            "estimatedMinutes": 60,
+            "exercises": [
+              {
+                "exerciseId": "3666",
+                "phase": "warmup",
+                "sets": null,
+                "reps": null,
+                "seconds": 300,
+                "restSeconds": null
+              },
+              {
+                "exerciseId": "0085",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1760",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1385",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "0276",
+                "phase": "main",
+                "sets": 3,
+                "reps": "10",
+                "seconds": null,
+                "restSeconds": 60
+              },
+              {
+                "exerciseId": "1377",
+                "phase": "cooldown",
+                "sets": null,
+                "reps": null,
+                "seconds": 180,
+                "restSeconds": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
