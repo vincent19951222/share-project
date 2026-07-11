@@ -55,6 +55,8 @@ model User {
   team                  Team                   @relation(fields: [teamId], references: [id])
   punchRecords          PunchRecord[]
   workoutRecords        WorkoutRecord[]
+  trainingProfile       TrainingProfile?
+  trainingPlans         TrainingPlan[]
   boardNotes            BoardNote[]
   seasonStats           SeasonMemberStat[]
   activityEvents        ActivityEvent[]
@@ -559,6 +561,7 @@ model WorkoutRecord {
   trainingType    String
   durationMinutes Int?
   entries         WorkoutEntry[]
+  trainingPlanDay TrainingPlanDay?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
@@ -577,6 +580,86 @@ model WorkoutEntry {
 
   @@unique([workoutRecordId, category, code])
   @@index([category, code])
+}
+
+model TrainingProfile {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weeklyFrequency        Int
+  sessionDurationMinutes Int
+  weekdaysJson           String
+  equipmentJson          String
+  avoidTagsJson          String
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model TrainingPlan {
+  id                  String            @id @default(cuid())
+  userId              String
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  templateId          String
+  templateVersion     Int
+  status              String
+  startDayKey         String
+  endDayKey           String
+  profileSnapshotJson String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  completedAt         DateTime?
+  days                TrainingPlanDay[]
+
+  @@index([userId, status, createdAt])
+  @@index([userId, startDayKey, endDayKey])
+}
+
+model TrainingPlanDay {
+  id                 String                 @id @default(cuid())
+  planId             String
+  plan               TrainingPlan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  dayKey             String
+  weekIndex          Int
+  weekday            Int
+  title              String
+  estimatedMinutes   Int
+  workoutPayloadJson String
+  completedAt        DateTime?
+  workoutRecordId    String?                 @unique
+  workoutRecord      WorkoutRecord?          @relation(fields: [workoutRecordId], references: [id], onDelete: SetNull)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  exercises          TrainingPlanExercise[]
+
+  @@unique([planId, dayKey])
+  @@index([dayKey, completedAt])
+}
+
+model TrainingPlanExercise {
+  id                        String          @id @default(cuid())
+  planDayId                 String
+  planDay                   TrainingPlanDay @relation(fields: [planDayId], references: [id], onDelete: Cascade)
+  exerciseId                String
+  name                      String
+  bodyPart                  String
+  equipment                 String
+  phase                     String
+  sortOrder                 Int
+  plannedSets               Int?
+  plannedReps               String?
+  plannedSeconds            Int?
+  restSeconds               Int?
+  beginnerTip               String
+  homeAlternativeExerciseId String?
+  homeAlternativeName       String?
+  completedAt               DateTime?
+  actualWeightKg            Float?
+  actualReps                String?
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
+
+  @@unique([planDayId, sortOrder])
+  @@index([exerciseId])
 }
 
 model AdminMakeupPunchLedger {
