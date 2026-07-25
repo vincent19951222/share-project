@@ -82,7 +82,7 @@ describe("home punch scene", () => {
     expect(content?.querySelector(".team-header-vault-note")).not.toBeNull();
     expect(content?.querySelector(".team-header-ledger")).not.toBeNull();
     expect(content?.querySelectorAll(".team-header-pin")).toHaveLength(4);
-    expect(content?.querySelector(".training-plan-card")).not.toBeNull();
+    expect(content?.querySelector(".training-plan-card")).toBeNull();
     expect(content?.querySelector(".heatmap-shell")).not.toBeNull();
     expect(content?.querySelector(".activity-stream")).not.toBeNull();
     expect(content?.querySelector(".activity-stream-console")).not.toBeNull();

@@ -1,19 +1,8 @@
-"use client";
-
-import { useState } from "react";
-import { useBoard } from "@/lib/store";
-import { TrainingPlanCard } from "@/components/training-plan/TrainingPlanCard";
-import { TrainingPlanDetailDialog } from "@/components/training-plan/TrainingPlanDetailDialog";
-import { TrainingPlanSetupDialog } from "@/components/training-plan/TrainingPlanSetupDialog";
 import { TeamHeader } from "./TeamHeader";
 import { HeatmapGrid } from "./HeatmapGrid";
 import { ActivityStream } from "./ActivityStream";
 
 export function PunchBoard() {
-  const { state, dispatch } = useBoard();
-  const [setupOpen, setSetupOpen] = useState(false);
-  const [detailOpen, setDetailOpen] = useState(false);
-
   return (
     <section
       className="punch-board-shell punch-scene absolute inset-0 flex flex-col gap-4 transition-opacity duration-300"
@@ -60,28 +49,9 @@ export function PunchBoard() {
       </div>
       <div className="punch-scene-content relative z-10 flex min-h-0 flex-1 flex-col gap-4">
         <TeamHeader />
-        <TrainingPlanCard
-          plan={state.currentTrainingPlan ?? null}
-          onCreate={() => setSetupOpen(true)}
-          onOpen={() => setDetailOpen(true)}
-        />
         <HeatmapGrid />
         <ActivityStream />
       </div>
-      <TrainingPlanSetupDialog
-        open={setupOpen}
-        onClose={() => setSetupOpen(false)}
-        onCreated={(snapshot) => {
-          dispatch({ type: "APPLY_REMOTE_SNAPSHOT", snapshot });
-        }}
-      />
-      {state.currentTrainingPlan ? (
-        <TrainingPlanDetailDialog
-          plan={state.currentTrainingPlan}
-          open={detailOpen}
-          onClose={() => setDetailOpen(false)}
-        />
-      ) : null}
     </section>
   );
 }
