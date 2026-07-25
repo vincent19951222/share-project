@@ -145,6 +145,7 @@ export async function POST(request: NextRequest) {
     const teamMemberCount = teamMemberIds.length;
     let recordCountedForSeasonSlot = false;
     let nextFilledSlots = activeSeason?.filledSlots ?? 0;
+    let seasonReachedTarget = false;
 
     try {
       await prisma.$transaction(async (tx) => {
@@ -194,14 +195,12 @@ export async function POST(request: NextRequest) {
         let countsForSeasonSlot = false;
 
         if (seasonForLedger) {
+          const previousFilledSlots = seasonForLedger.filledSlots;
           const seasonUpdate = await tx.season.updateMany({
             where: {
               id: seasonForLedger.id,
               status: "ACTIVE",
               monthKey: currentMonthKey,
-              filledSlots: {
-                lt: seasonForLedger.targetSlots,
-              },
             },
             data: {
               filledSlots: {
@@ -212,7 +211,7 @@ export async function POST(request: NextRequest) {
 
           countsForSeasonSlot = seasonUpdate.count === 1;
 
-          if (!countsForSeasonSlot && seasonForLedger.filledSlots < seasonForLedger.targetSlots) {
+          if (!countsForSeasonSlot) {
             const currentSeason = await tx.season.findUnique({
               where: { id: seasonForLedger.id },
               select: {
@@ -232,9 +231,15 @@ export async function POST(request: NextRequest) {
           recordCountedForSeasonSlot = Boolean(seasonForLedger && countsForSeasonSlot);
           nextFilledSlots = seasonForLedger
             ? countsForSeasonSlot
-              ? Math.min(seasonForLedger.filledSlots + 1, seasonForLedger.targetSlots)
+              ? previousFilledSlots + 1
               : seasonForLedger.filledSlots
             : nextFilledSlots;
+          seasonReachedTarget = Boolean(
+            seasonForLedger &&
+              countsForSeasonSlot &&
+              previousFilledSlots < seasonForLedger.targetSlots &&
+              nextFilledSlots >= seasonForLedger.targetSlots,
+          );
         }
 
         const baseSeasonContribution = seasonForLedger ? baseReward : 0;
@@ -478,8 +483,7 @@ export async function POST(request: NextRequest) {
 
     if (
       activeSeason &&
-      recordCountedForSeasonSlot &&
-      nextFilledSlots === activeSeason.targetSlots
+      seasonReachedTarget
     ) {
       dynamicsToCreate.push(
         createOrReuseTeamDynamic({
@@ -527,8 +531,7 @@ export async function POST(request: NextRequest) {
 
     if (
       activeSeason &&
-      recordCountedForSeasonSlot &&
-      nextFilledSlots === activeSeason.targetSlots
+      seasonReachedTarget
     ) {
       pushTasks.push(
         pushSeasonTargetReachedIfNeeded({

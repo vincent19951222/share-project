@@ -185,7 +185,6 @@ export async function POST(request: NextRequest) {
           where: {
             id: seasonForLedger.id,
             status: "ACTIVE",
-            filledSlots: { lt: seasonForLedger.targetSlots },
           },
           data: {
             filledSlots: { increment: 1 },
@@ -193,7 +192,7 @@ export async function POST(request: NextRequest) {
         });
         let countsForSeasonSlot = seasonUpdate.count === 1;
 
-        if (!countsForSeasonSlot && seasonForLedger.filledSlots < seasonForLedger.targetSlots) {
+        if (!countsForSeasonSlot) {
           const currentSeason = await tx.season.findUnique({
             where: { id: seasonForLedger.id },
             select: {

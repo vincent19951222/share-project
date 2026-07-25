@@ -87,4 +87,30 @@ describe("SeasonSprintPanel", () => {
     expect(container.querySelector('[data-report-season-slot][title*="张三"]')).not.toBeNull();
     expect(container.querySelector('[data-report-season-slot][title*="李四"]')).not.toBeNull();
   });
+
+  it("shows over-target totals while keeping the visual grid capped to the target", () => {
+    const season: ActiveSeasonSnapshot = {
+      id: "s-over",
+      monthKey: "2026-06",
+      goalName: "六月冲刺",
+      targetSlots: 2,
+      filledSlots: 4,
+      contributions: [
+        { userId: "u1", name: "张三", avatarKey: "a", colorIndex: 0, slotContribution: 3, seasonIncome: 30 },
+        { userId: "u2", name: "李四", avatarKey: "b", colorIndex: 1, slotContribution: 1, seasonIncome: 10 },
+      ],
+    };
+
+    act(() => {
+      root.render(<SeasonSprintPanel season={season} />);
+    });
+
+    const text = container.textContent ?? "";
+    const slots = container.querySelectorAll("[data-report-season-slot]");
+
+    expect(text).toContain("100% · 已 4 / 目标 2");
+    expect(slots.length).toBe(2);
+    expect(container.querySelectorAll('[data-report-season-slot][data-slot-state="filled"]').length).toBe(2);
+    expect(container.querySelectorAll("path[data-season-slice]").length).toBe(2);
+  });
 });
