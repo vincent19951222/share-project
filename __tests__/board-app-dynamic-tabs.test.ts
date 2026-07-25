@@ -22,15 +22,15 @@ describe("BoardApp dynamic tab boundaries", () => {
     expect(dynamicTabsSource).toContain("DynamicSharedBoard");
     expect(dynamicTabsSource).toContain("DynamicDrinkCheckin");
     expect(dynamicTabsSource).toContain("DynamicDataDashboard");
-    expect(dynamicTabsSource).toContain("DynamicSupplyStation");
+    expect(dynamicTabsSource).not.toContain("DynamicSupplyStation");
     expect(loaderSource).toContain("loadDrinkCheckin");
     expect(loaderSource).toContain("loadSharedBoard");
     expect(loaderSource).toContain("loadDataDashboard");
-    expect(loaderSource).toContain("loadSupplyStation");
+    expect(loaderSource).not.toContain("loadSupplyStation");
     expect(loaderSource).toContain("preloadBoardTabComponent");
     expect(loaderSource).toContain('case "data"');
     expect(loaderSource).not.toContain('case "' + 'dash"');
     expect(loaderSource).not.toContain('case "' + 'calendar"');
-    expect(loaderSource).toContain("preloadSupplyPanelComponent");
+    expect(loaderSource).not.toContain("preloadSupplyPanelComponent");
   });
 });

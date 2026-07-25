@@ -1,4 +1,5 @@
 import type {
+  AiImageSnapshot,
   AiImageGenerationTaskSnapshot,
   AiImageThemeSnapshot,
   BoardSnapshot,
@@ -306,6 +307,19 @@ export async function fetchSupplyStationState(): Promise<SupplyStationProduction
   const payload = await readApiResult<{
     snapshot: SupplyStationProductionSnapshot;
   }>(response, "获取牛马补给站失败");
+
+  return payload.snapshot;
+}
+
+export async function fetchAiImageState(): Promise<AiImageSnapshot> {
+  const response = await fetch("/api/gamification/ai-image/state", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  const payload = await readApiResult<{ snapshot: AiImageSnapshot }>(
+    response,
+    "获取 AI 生图数据失败",
+  );
 
   return payload.snapshot;
 }
@@ -625,7 +639,7 @@ export async function retryAiImageGenerationTask(taskId: string): Promise<{ task
   return readApiResult(response, "重试生图任务失败");
 }
 
-export async function drawAiImageThemeFromSupply(): Promise<{ theme: AiImageThemeSnapshot }> {
+export async function drawAiImageTheme(): Promise<{ theme: AiImageThemeSnapshot }> {
   const response = await fetch("/api/gamification/ai-image/themes/draw", {
     method: "POST",
     credentials: "same-origin",

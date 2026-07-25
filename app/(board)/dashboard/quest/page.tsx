@@ -1,5 +1,5 @@
-import { BoardApp } from "@/components/board/BoardApp";
+import { redirect } from "next/navigation";
 
 export default function SupplyDashboardQuestRoutePage() {
-  return <BoardApp activeTab="supply" supplyPanel="legacyArchive" />;
+  return redirect("/");
 }

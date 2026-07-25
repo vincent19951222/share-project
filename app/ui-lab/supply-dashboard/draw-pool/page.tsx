@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function SupplyDashboardDrawPoolLegacyPage() {
-  redirect("/dashboard/cards");
+  return redirect("/ai-image?view=themes");
 }

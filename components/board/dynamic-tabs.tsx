@@ -7,7 +7,6 @@ import {
   loadDashboardBoard,
   loadDrinkCheckin,
   loadSharedBoard,
-  loadSupplyStation,
 } from "./tab-component-loaders";
 
 export const DynamicSharedBoard = dynamic(loadSharedBoard, {
@@ -24,8 +23,4 @@ export const DynamicDashboardBoard = dynamic(loadDashboardBoard, {
 
 export const DynamicDataDashboard = dynamic(loadDataDashboard, {
   loading: () => <BoardTabLoadingShell label="数据看板加载中" />,
-});
-
-export const DynamicSupplyStation = dynamic(loadSupplyStation, {
-  loading: () => <BoardTabLoadingShell label="牛马补给站加载中" />,
 });

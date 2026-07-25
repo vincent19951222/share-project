@@ -89,7 +89,7 @@ export interface AiImageArtworkSnapshot {
   createdAt: string;
 }
 
-export interface SupplyAiImageSnapshot {
+export interface AiImageSnapshot {
   wallet: {
     coins: number;
     generationCostPerImage: number;
@@ -104,7 +104,10 @@ export interface SupplyAiImageSnapshot {
   recentArtworks: AiImageArtworkSnapshot[];
 }
 
-export type AppTab = "punch" | "board" | "coffee" | "data" | "supply";
+/** @deprecated Legacy supply components remain until historical data is physically retired. */
+export type SupplyAiImageSnapshot = AiImageSnapshot;
+
+export type AppTab = "punch" | "board" | "coffee" | "data";
 
 export type GamificationTaskStatus = "pending" | "completed";
 export type GamificationLotteryStatus = "placeholder" | "active";

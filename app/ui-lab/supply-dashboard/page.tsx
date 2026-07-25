@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function SupplyDashboardLegacyPage() {
-  redirect("/dashboard/status");
+  return redirect("/ai-image");
 }

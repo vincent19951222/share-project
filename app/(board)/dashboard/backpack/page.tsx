@@ -1,5 +1,5 @@
-import { BoardApp } from "@/components/board/BoardApp";
+import { redirect } from "next/navigation";
 
 export default function SupplyDashboardBackpackRoutePage() {
-  return <BoardApp activeTab="supply" supplyPanel="artworks" />;
+  return redirect("/ai-image?view=artworks");
 }

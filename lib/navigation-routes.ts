@@ -1,5 +1,14 @@
 import type { AppTab } from "@/lib/types";
 
+export type AiImagePanelKey = "studio" | "themes" | "artworks";
+
+export const aiImagePanelRoutes: Record<AiImagePanelKey, string> = {
+  studio: "/ai-image",
+  themes: "/ai-image?view=themes",
+  artworks: "/ai-image?view=artworks",
+};
+
+/** @deprecated Kept only for dormant legacy supply components. */
 export type SupplyPanelKey = "studio" | "themeGacha" | "artworks" | "legacyArchive";
 
 export type SupplyNavResourceId = "coins";
@@ -38,7 +47,6 @@ export const appTabRoutes: Record<AppTab, string> = {
   board: "/board",
   coffee: "/drink",
   data: "/calendar",
-  supply: "/dashboard/status",
 };
 
 export const supplyPanelRoutes: Record<SupplyPanelKey, string> = {

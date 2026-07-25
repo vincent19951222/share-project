@@ -11,22 +11,17 @@ import { AssetIcon } from "@/components/ui/AssetIcon";
 import { getAvatarUrl } from "@/lib/avatars";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { TeamDynamicsBell } from "./TeamDynamicsBell";
-import {
-  appTabRoutes,
-  type SupplyNavContext,
-  type SupplyPanelKey,
-} from "@/lib/navigation-routes";
+import { appTabRoutes } from "@/lib/navigation-routes";
 import type { AppTab } from "@/lib/types";
 
 const primaryNavTabs = ["punch", "coffee", "board", "data"] as const satisfies AppTab[];
+const coinIconUrl =
+  "https://vincent-1355816760.cos.ap-guangzhou.myqcloud.com/obsidian_images/share_project_public_assets_home_scenes_supply_shared_supply_resource_coins.png";
 
 export function Navbar({
   activeTabOverride,
-  supplyNavContext,
 }: {
-  activeSupplyPanel?: SupplyPanelKey;
-  activeTabOverride?: AppTab;
-  supplyNavContext?: SupplyNavContext | null;
+  activeTabOverride?: AppTab | null;
 } = {}) {
   const { state } = useBoard();
   const router = useRouter();
@@ -40,7 +35,7 @@ export function Navbar({
     state.members.find((member) => member.id === state.currentUserId) ??
     state.members[0] ??
     null;
-  const activeTab = activeTabOverride ?? state.activeTab;
+  const activeTab = activeTabOverride === undefined ? state.activeTab : activeTabOverride;
 
   useEffect(() => {
     if (prefetchedTabsRef.current) {
@@ -86,25 +81,8 @@ export function Navbar({
   }, []);
 
   const mobileNavLabel = mobileTabsOpen ? "收起导航" : "展开导航";
-  const showSupplyChrome = activeTab === "supply";
-  const supplyAssetSummary = supplyNavContext
-    ? supplyNavContext.resources
-        .map((resource) => {
-          const valueLabel = resource.maxValue ? `${resource.value}/${resource.maxValue}` : `${resource.value}`;
-          return `${resource.label} ${valueLabel}`;
-        })
-        .join("，")
-    : "加载中";
-  const socialPendingCount = supplyNavContext?.social.pendingCount ?? 0;
-  const socialPendingLabel =
-    socialPendingCount > 0
-      ? `${socialPendingCount} 个队友邀请待响应${
-          supplyNavContext?.social.latestLabel ? `，${supplyNavContext.social.latestLabel}` : ""
-        }`
-      : "";
-  const supplyAssetAriaLabel = socialPendingLabel
-    ? `补给站资产：${supplyAssetSummary}，${socialPendingLabel}`
-    : `补给站资产：${supplyAssetSummary}`;
+  const assetBalance = state.currentUser?.assetBalance ?? 0;
+  const assetBalanceLabel = assetBalance.toLocaleString("zh-CN");
 
   useEffect(() => {
     if (pendingTab === activeTab) {
@@ -115,9 +93,7 @@ export function Navbar({
   return (
     <>
       <nav
-        className={`app-top-nav w-full shrink-0 px-2 py-2 z-50${
-          showSupplyChrome ? " app-top-nav--supply" : ""
-        }`}
+        className="app-top-nav w-full shrink-0 px-2 py-2 z-50"
       >
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="app-top-nav-brand-area flex min-w-0 items-center gap-3 sm:gap-6">
@@ -194,40 +170,16 @@ export function Navbar({
               </span>
             </button>
             <TeamDynamicsBell />
-            <div
-              aria-busy={!supplyNavContext}
-              aria-label={supplyNavContext ? "补给站资产" : "补给站资产加载中"}
-              className={`app-supply-assets${supplyNavContext ? "" : " app-supply-assets--loading"}`}
-            >
-              {supplyNavContext ? (
-                supplyNavContext.resources.map((resource) => {
-                  const valueLabel = resource.maxValue ? `${resource.value}/${resource.maxValue}` : `${resource.value}`;
-
-                  return (
-                    <button
-                      aria-label={`${resource.label} ${valueLabel}`}
-                      className={`app-supply-asset-chip app-supply-asset-chip--${resource.id}`}
-                      key={resource.id}
-                      type="button"
-                    >
-                      <img src={resource.iconImage} alt="" aria-hidden="true" />
-                      <span>{resource.label}</span>
-                      <strong>{valueLabel}</strong>
-                    </button>
-                  );
-                })
-              ) : (
-                ["coins"].map((resourceId) => (
-                  <span
-                    aria-hidden="true"
-                    className={`app-supply-asset-chip app-supply-asset-skeleton app-supply-asset-chip--${resourceId}`}
-                    key={resourceId}
-                  >
-                    <i />
-                    <strong />
-                  </span>
-                ))
-              )}
+            <div aria-label="个人资产" className="app-supply-assets">
+              <button
+                aria-label={`银子 ${assetBalanceLabel}`}
+                className="app-supply-asset-chip app-supply-asset-chip--coins"
+                type="button"
+              >
+                <img src={coinIconUrl} alt="" aria-hidden="true" />
+                <span>银子</span>
+                <strong>{assetBalanceLabel}</strong>
+              </button>
             </div>
             <button
               onClick={handleProfileClick}
@@ -255,11 +207,11 @@ export function Navbar({
           </div>
           <button
             type="button"
-            aria-label={supplyAssetAriaLabel}
+            aria-label={`个人资产：银子 ${assetBalanceLabel}`}
             className="app-supply-mobile-wallet"
           >
             <AssetIcon name="supply" className="h-5 w-5 object-contain" />
-            <span>{supplyAssetSummary}</span>
+            <span>银子 {assetBalanceLabel}</span>
           </button>
         </div>
         {mobileTabsOpen ? (

@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useBoard } from "@/lib/store";
 import { SvgIcons } from "@/components/ui/SvgIcons";
-import { supplyPanelRoutes } from "@/lib/navigation-routes";
+import { aiImagePanelRoutes } from "@/lib/navigation-routes";
 
 interface ProfileDropdownProps {
   onDismiss: () => void;
@@ -84,7 +84,7 @@ export function ProfileDropdown({ onDismiss, onEditProfile }: ProfileDropdownPro
             文档中心
           </Link>
           <Link
-            href={supplyPanelRoutes.studio}
+            href={aiImagePanelRoutes.studio}
             className="mt-2 w-full py-2 text-center text-sm font-bold text-slate-800 bg-yellow-50 border-2 border-yellow-200 rounded-xl hover:bg-yellow-100 transition-colors"
           >
             AI 生图实验室

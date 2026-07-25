@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function SupplyDashboardBackpackLegacyPage() {
-  redirect("/dashboard/backpack");
+  return redirect("/ai-image?view=artworks");
 }

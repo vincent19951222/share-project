@@ -79,7 +79,7 @@ describe("ProfileDropdown", () => {
     });
 
     const docsLink = container.querySelector('a[href="/docs"]');
-    const aiImageLink = container.querySelector('a[href="/dashboard/status"]');
+    const aiImageLink = container.querySelector('a[href="/ai-image"]');
 
     expect(docsLink).not.toBeNull();
     expect(docsLink?.textContent).toContain("文档中心");

@@ -1,5 +1,5 @@
-import { BoardApp } from "@/components/board/BoardApp";
+import { redirect } from "next/navigation";
 
 export default function SupplyDashboardStatusRoutePage() {
-  return <BoardApp activeTab="supply" supplyPanel="studio" />;
+  return redirect("/ai-image");
 }
